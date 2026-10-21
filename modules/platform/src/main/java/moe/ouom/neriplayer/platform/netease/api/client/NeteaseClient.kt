@@ -392,6 +392,9 @@ class NeteaseClient(
     /** 是否已登录 */
     fun hasLogin(): Boolean = sessionStore.currentSession().hasLogin()
 
+    /** Opaque in-memory identity for rejecting import results after login/logout changes. */
+    internal fun importSessionIdentity(): Any = sessionStore.currentSession()
+
     fun commentCacheSessionKey(): String? =
         sessionStore.currentSession().persistedCookiesSnapshot()["MUSIC_U"]
             ?.takeIf { it.isNotBlank() }?.encodeUtf8()?.sha256()?.hex()
@@ -940,6 +943,12 @@ class NeteaseClient(
         return request(url, params, CryptoMode.WEAPI, "POST", usePersistedCookies = true)
     }
 
+    suspend fun getUserPlaylistsCancellable(userId: Long, offset: Int = 0, limit: Int = 50): String =
+        requestCancellable("https://music.163.com/weapi/user/playlist", mapOf(
+            "uid" to userId.toString(), "offset" to offset.toString(),
+            "limit" to limit.toString(), "includeVideo" to "true"
+        ), CryptoMode.WEAPI, "POST", usePersistedCookies = true)
+
     @Throws(IOException::class)
     fun getAlbumDetail(albumId: Long, n: Int = 100000, s: Int = 8): String {
         require(albumId > 0L) { "albumId must be positive" }
@@ -1300,6 +1309,11 @@ class NeteaseClient(
     fun getCurrentUserAccount(): String {
         return callWeApi("/w/nuser/account/get", emptyMap(), usePersistedCookies = true)
     }
+
+    suspend fun getCurrentUserAccountCancellable(): String = requestCancellable(
+        "https://music.163.com/weapi/w/nuser/account/get", emptyMap(),
+        CryptoMode.WEAPI, "POST", usePersistedCookies = true
+    )
 
     /**
      * 获取当前登录用户的 userId

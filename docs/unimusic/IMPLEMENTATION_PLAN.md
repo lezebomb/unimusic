@@ -1,6 +1,6 @@
 # UniMusic 分阶段实施与验收
 
-状态日期：2026-10-21。工具链已补齐；[Phase 1A](PHASE_1A.md) 的 UUID、6 张增量表、分页回填及后台任务已实现，14 个相关 JVM 测试、4 个 Android 迁移测试通过，Debug APK 构建/模拟器安装启动成功。Phase 1B 开发中，统一 UI 和完整导入流程尚未交付。
+状态日期：2026-10-21。工具链已补齐；[Phase 1A](PHASE_1A.md) 的 UUID、6 张增量表、分页回填及后台任务已实现，14 个相关 JVM 测试、4 个 Android 迁移测试通过，Debug APK 构建/模拟器安装启动成功。[Phase 1B.1](PHASE_1B_PROVIDER.md) 的网易云只读 Provider / Fake 已实现并通过 3 个离线测试。下一步是 1B.2 持久导入事务和 1C UI，完整账号批量导入尚未交付。
 
 ## 执行约定
 
@@ -37,6 +37,8 @@
 - 产物：模型源码、Room schema/迁移测试、设计更新；未测量时性能仍标 N/A。
 
 ### 1B：入站 Provider 与导入任务
+
+1B.1 已完成只读 contract、Netease adapter、可取消请求、账号切换保护与共享 Fake，详见 [PHASE_1B_PROVIDER.md](PHASE_1B_PROVIDER.md)。1B.2 的 ImportJob/Failure、持久快照/水位、原库兼容事务、失败重试和 WorkManager 导入任务仍待实现，不能与已完成的旧库回填 Worker 混淆。
 
 - model 定义 PlaylistImportProvider contract；platform 新增 Netease adapter，复用安全 session、分页歌单与可取消详情调用。
 - local 新增导入 coordinator/WorkManager Worker，页级事务 checkpoint、账号检查、失败项重试、取消/恢复、一次性与持续关联。
@@ -87,7 +89,7 @@
 
 1. 工具链与 1A 迁移验证已完成；无需重复下载或重做 Phase 0。
 2. 继续 1B/1C 的只读 Provider、持久导入事务与 UI；不能以适配器可调用代替完整导入验收。
-3. 进入功能阶段时将必要 CI push 分支覆盖 `main`，并区分变更范围 smoke 与发布前关键集；保留原有 CI 能力。
+3. `unimusic_smoke.yml` 已覆盖 main 的定向 JVM/Android 迁移检查，保留原有完整 CI；远端 Actions 执行结果需单独确认，本地检查结果不冒充远端结果。
 4. 实际账号/平台授权仅用于线上验收，不阻塞 Fake provider 开发；任何平台暂不可接入时明确标记其 capability 与降级方式。
 
 Phase 1 的工具链与 Room 数据保留前置条件已满足。

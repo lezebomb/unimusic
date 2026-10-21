@@ -62,14 +62,13 @@ v21 实现前 6 项的最小字段。Source 尚未增加独立原始元数据/�
 ```kotlin
 interface PlaylistImportProvider {
     val providerId: String
-    suspend fun accountContext(): ImportAccountContext
-    suspend fun listPlaylists(cursor: String?): PlaylistPage
-    suspend fun readSnapshot(remotePlaylistId: String): PlaylistSnapshot
-    suspend fun readTracks(snapshot: PlaylistSnapshot, cursor: String?): TrackPage
+    suspend fun listPlaylists(accountKey: String, cursor: String?, limit: Int): ImportPlaylistPage
+    suspend fun readSnapshot(accountKey: String, remotePlaylistId: String): ImportPlaylistSnapshot
+    suspend fun readSongs(accountKey: String, resourceIds: List<String>): ImportSongBatch
 }
 ```
 
-这些类型位于 model，生产 Netease adapter 位于 platform，任务与本地事务位于 local。Provider 接口只传账号标识和元数据，不传 credential；通过已注入的安全会话仓库请求。FakeMusicProvider 支持分页、稳定 snapshot、部分失败、授权失效和可取消延迟，测试不需要真实账号。
+这些类型和 Netease adapter / FakeMusicProvider 已在 Phase 1B.1 实现；持久任务与本地事务将在 local 继续接入。Provider 接口只传公开账号标识和元数据，不传 credential；通过已注入的安全会话请求。FakeMusicProvider 支持分页、snapshot 变化、部分失败、授权失效和可取消延迟，测试不需要真实账号。
 
 - `listPlaylists` 复用 `getUserPlaylists(offset, limit)` 逐页读取创建/收藏歌单；识别用户喜欢的歌曲源。必须验证响应 code、页码/游标前进和重复页，避免风控返回内容导致死循环。
 - 当前上游歌单详情接口提供 trackIds 快照，不能假设它已有 tracks 分页。先获取有权读取的源快照/顺序，再分批请求详情；缺失 ID 保留为失败条目或占位，**不能用 mapNotNull 静默减少成功总数**。
