@@ -144,7 +144,7 @@ PACKAGE_OWNERS = {
     "moe.ouom.neriplayer.data.model": MODEL_MODULE,
     **{f"moe.ouom.neriplayer.data.{family}": ":local"
        for family in ("settings", "history", "identity", "backup", "config", "traffic", "search",
-                      "auth", "network", "playlist", "stats", "storage", "listentogether",
+                      "auth", "network", "playlist", "stats", "storage", "listentogether", "unified",
                       "local.media", "local.audioimport", "local.playlist", "local.storage")},
     "moe.ouom.neriplayer.platform.netease.auth": ":platform",
     "moe.ouom.neriplayer.platform.bilibili.auth": ":platform",

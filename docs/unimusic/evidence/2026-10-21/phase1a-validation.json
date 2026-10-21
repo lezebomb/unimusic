@@ -1,0 +1,87 @@
+{
+  "date": "2026-10-21",
+  "jvmSuites": [
+    {
+      "name": "moe.ouom.neriplayer.data.local.database.migration.RegisteredMigrationChainTest",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0
+    },
+    {
+      "name": "moe.ouom.neriplayer.data.local.database.NeriUserDataDatabaseVersionTest",
+      "tests": 8,
+      "failures": 0,
+      "errors": 0
+    },
+    {
+      "name": "moe.ouom.neriplayer.data.unified.UnifiedLibraryRoomStoreTest",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0
+    }
+  ],
+  "androidSuites": [
+    {
+      "name": "moe.ouom.neriplayer.data.local.database.UnifiedLibraryMigrationTest",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0
+    },
+    {
+      "name": "moe.ouom.neriplayer.data.local.database.DatabaseUpgradeInstrumentedTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0
+    }
+  ],
+  "androidDevice": {
+    "api": 35,
+    "abi": "x86_64",
+    "isolatedFreshData": true,
+    "avd": "UniMusicMigrationAPI35",
+    "hardwareAcceleration": "WHPX"
+  },
+  "apk": {
+    "package": "moe.ouom.neriplayer.debug",
+    "backfillWorker": "SUCCESS",
+    "installed": true,
+    "path": "app/build/outputs/apk/debug/app-debug.apk",
+    "sha256": "54e5e765c125ed1cb8b1fcf7209379ae8b5d85f3a5eb0d0b48ec5b03b0c2a6c6",
+    "bytes": 62174686,
+    "launchStatus": "ok"
+  },
+  "schema21Sha256": "8449a2d4884aa1a4fe218d6d148d43db346e577755f8cd4c6d31c4389fba1916",
+  "logs": [
+    {
+      "path": "build\\unimusic-toolchain\\phase1-focused-final.log",
+      "sha256": "b23164a8e24764550d6de55673dee5e7d132b1df2768a4311826ce2dd7c96422"
+    },
+    {
+      "path": "build\\unimusic-toolchain\\phase1-app-final.log",
+      "sha256": "42cdafaa2b3c573ed470768a6f9346842707be266a81e312a15a4231a6d4020b"
+    },
+    {
+      "path": "build\\unimusic-toolchain\\phase1a-android-migration.log",
+      "sha256": "7a35cdbc5024a5e1b619cabe914dfaaa114748c6c9c62fbfbd6979245bb97c54"
+    },
+    {
+      "path": "build\\unimusic-toolchain\\phase1a-android-history.log",
+      "sha256": "f124a5698af67f72ace19792e1fa5177abd96d1f14aa8d4cca70db23de44fd17"
+    },
+    {
+      "path": "build\\unimusic-toolchain\\app-worker-smoke.log",
+      "sha256": "eb59f774d5ed4e76de352b4c4211575916c15cdd7932f5dfa60c46f31b604cf1"
+    },
+    {
+      "path": "build\\unimusic-toolchain\\app-launch-crash.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "notRun": [
+    "Real platform account import",
+    "Real device playback/background/Bluetooth",
+    "Power or application performance measurements",
+    "Release signing",
+    "Unified dataset cross-device synchronization"
+  ]
+}

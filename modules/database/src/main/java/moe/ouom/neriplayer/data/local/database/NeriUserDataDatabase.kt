@@ -85,8 +85,16 @@ import moe.ouom.neriplayer.data.local.database.migration.download.DownloadRomani
 import moe.ouom.neriplayer.data.local.database.migration.download.DownloadFinalizationMigration
 import moe.ouom.neriplayer.data.local.database.migration.download.DownloadBatchMigration
 import moe.ouom.neriplayer.data.local.database.migration.download.DownloadRecoveryCursorMigration
+import moe.ouom.neriplayer.data.local.database.migration.library.UnifiedLibraryMigration
+import moe.ouom.neriplayer.data.local.database.dao.unified.UnifiedLibraryDao
+import moe.ouom.neriplayer.data.local.database.entity.unified.UnifiedSongEntity
+import moe.ouom.neriplayer.data.local.database.entity.unified.SongSourceEntity
+import moe.ouom.neriplayer.data.local.database.entity.unified.LegacySongLinkEntity
+import moe.ouom.neriplayer.data.local.database.entity.unified.UnifiedPlaylistEntity
+import moe.ouom.neriplayer.data.local.database.entity.unified.UnifiedPlaylistMemberEntity
+import moe.ouom.neriplayer.data.local.database.entity.unified.PlaylistOriginEntity
 
-private const val NERI_USER_DATA_FINAL_VERSION = 20
+private const val NERI_USER_DATA_FINAL_VERSION = 21
 
 @Database(
     entities = [
@@ -131,7 +139,13 @@ private const val NERI_USER_DATA_FINAL_VERSION = 20
         ManagedLibraryItemEntity::class,
         PlatformPlaylistCacheEntity::class,
         PlatformPlaylistCacheTrackEntity::class,
-        PlatformPlaylistCacheTrackArtistEntity::class
+        PlatformPlaylistCacheTrackArtistEntity::class,
+        UnifiedSongEntity::class,
+        SongSourceEntity::class,
+        LegacySongLinkEntity::class,
+        UnifiedPlaylistEntity::class,
+        UnifiedPlaylistMemberEntity::class,
+        PlaylistOriginEntity::class
     ],
     version = NERI_USER_DATA_FINAL_VERSION,
     exportSchema = true
@@ -169,6 +183,8 @@ abstract class NeriUserDataDatabase : RoomDatabase() {
     abstract fun managedDownloadArtifactDao(): ManagedDownloadArtifactDao
 
     abstract fun platformPlaylistCacheDao(): PlatformPlaylistCacheDao
+
+    abstract fun unifiedLibraryDao(): UnifiedLibraryDao
 
     companion object {
         const val DATABASE_NAME = "neri_user_data.db"
@@ -226,7 +242,8 @@ abstract class NeriUserDataDatabase : RoomDatabase() {
             MIGRATION_16_17,
             MIGRATION_17_18,
             MIGRATION_18_19,
-            MIGRATION_19_20
+            MIGRATION_19_20,
+            MIGRATION_20_21
         )
 
         private fun checkMainProcess(context: Context) {
@@ -257,6 +274,7 @@ abstract class NeriUserDataDatabase : RoomDatabase() {
         val MIGRATION_17_18: Migration = DownloadRecoveryCursorMigration
         val MIGRATION_18_19: Migration = LyricSyncPersistenceMigration
         val MIGRATION_19_20: Migration = PlaybackStatsPagedMigration
+        val MIGRATION_20_21: Migration = UnifiedLibraryMigration
 
         const val FINAL_DB_VERSION = NERI_USER_DATA_FINAL_VERSION
     }

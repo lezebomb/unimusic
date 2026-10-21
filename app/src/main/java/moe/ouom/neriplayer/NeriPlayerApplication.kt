@@ -49,6 +49,7 @@ import moe.ouom.neriplayer.core.startup.app.WebViewDataDirectorySuffix
 import moe.ouom.neriplayer.core.startup.app.YouTubeMusicUiGatewayInitializer
 import moe.ouom.neriplayer.core.player.shizuku.AndroidRuntimeCompatibility
 import moe.ouom.neriplayer.data.auth.youtube.YouTubeAuthRotationWorker
+import moe.ouom.neriplayer.data.unified.UnifiedLibraryBackfillWorker
 import moe.ouom.neriplayer.data.local.media.metadata.LocalMediaMetadataRecoveryStore
 import moe.ouom.neriplayer.data.playlist.favorite.FavoritePlaylistRepository
 import moe.ouom.neriplayer.data.settings.playback.readPlaybackPreferenceSnapshotSync
@@ -170,6 +171,7 @@ class NeriPlayerApplication : Application(), WorkConfiguration.Provider {
             AppContainer.launchBackgroundIo {
                 AppStartupWorkGate.awaitInteractiveContentOrTimeout()
                 FavoritePlaylistRepository.getInstance(this@NeriPlayerApplication)
+                UnifiedLibraryBackfillWorker.schedule(this@NeriPlayerApplication)
             }
             AppContainer.launchBackgroundIo {
                 AppStartupWorkGate.awaitInteractiveContentOrTimeout()

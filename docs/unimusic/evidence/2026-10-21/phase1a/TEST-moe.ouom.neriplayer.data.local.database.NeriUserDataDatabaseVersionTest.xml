@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="moe.ouom.neriplayer.data.local.database.NeriUserDataDatabaseVersionTest" tests="8" skipped="0" failures="0" errors="0" timestamp="2026-10-21T07:23:25.959Z" hostname="XUSHAOYANG" time="5.14">
+  <properties/>
+  <testcase name="version from a newer app is reported and the file keeps its contents" classname="moe.ouom.neriplayer.data.local.database.NeriUserDataDatabaseVersionTest" time="4.133"/>
+  <testcase name="current and older versions can be opened by this app" classname="moe.ouom.neriplayer.data.local.database.NeriUserDataDatabaseVersionTest" time="0.029"/>
+  <testcase name="version bump still waiting in the write ahead log is seen" classname="moe.ouom.neriplayer.data.local.database.NeriUserDataDatabaseVersionTest" time="0.043"/>
+  <testcase name="direct open refuses unreadable user data before Room and preserves the file" classname="moe.ouom.neriplayer.data.local.database.NeriUserDataDatabaseVersionTest" time="0.022"/>
+  <testcase name="corrected version reopens database" classname="moe.ouom.neriplayer.data.local.database.NeriUserDataDatabaseVersionTest" time="0.231"/>
+  <testcase name="singleton open refuses a newer database before Room and preserves its rows" classname="moe.ouom.neriplayer.data.local.database.NeriUserDataDatabaseVersionTest" time="0.017"/>
+  <testcase name="corrupt file is reported unreadable and never deleted" classname="moe.ouom.neriplayer.data.local.database.NeriUserDataDatabaseVersionTest" time="0.012"/>
+  <testcase name="app check reads the user database in the app database directory" classname="moe.ouom.neriplayer.data.local.database.NeriUserDataDatabaseVersionTest" time="0.012"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

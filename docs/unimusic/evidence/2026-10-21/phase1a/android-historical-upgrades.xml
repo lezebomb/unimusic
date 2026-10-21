@@ -1,0 +1,11 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<testsuites tests="3" failures="0" errors="0" skipped="0" time="0.000" timestamp="2026-10-21T07:31:08" hostname="localhost">
+  <testsuite name="moe.ouom.neriplayer.data.local.database.DatabaseUpgradeInstrumentedTest" tests="3" failures="0" errors="0" skipped="0" time="1.872" timestamp="2026-10-21T07:31:08" hostname="localhost">
+    <properties>
+      <property name="device" value="emulator-5554" />
+    </properties>
+    <testcase name="releaseVersion15KeepsCancelledIdentityAndMetadataBeforeDroppingLegacyTables" classname="moe.ouom.neriplayer.data.local.database.DatabaseUpgradeInstrumentedTest" time="0.560" />
+    <testcase name="recoveryIndexUpgradeKeepsExistingOperationsAndTheirByteWatermark" classname="moe.ouom.neriplayer.data.local.database.DatabaseUpgradeInstrumentedTest" time="0.138" />
+    <testcase name="everyHistoricalUpgradeReachesTheCurrentRoomSchema" classname="moe.ouom.neriplayer.data.local.database.DatabaseUpgradeInstrumentedTest" time="1.174" />
+  </testsuite>
+</testsuites>

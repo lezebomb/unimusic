@@ -1,6 +1,6 @@
 # UniMusic 分阶段实施与验收
 
-状态日期：2026-10-21。当前完成源码导入、Phase 0 核心审计、基准执行尝试和本地结构验证；Android 构建/测试受工具链阻塞。Phase 1 **尚未开始生产数据写入或数据库版本升级**。没有把设计稿记作已完成功能。
+状态日期：2026-10-21。工具链已补齐；[Phase 1A](PHASE_1A.md) 的 UUID、6 张增量表、分页回填及后台任务已实现，14 个相关 JVM 测试、4 个 Android 迁移测试通过，Debug APK 构建/模拟器安装启动成功。Phase 1B 开发中，统一 UI 和完整导入流程尚未交付。
 
 ## 执行约定
 
@@ -9,7 +9,7 @@
 - 所有阶段记录变更、设计、实际命令/结果、可获得性能数据、限制与下一步；没跑账号/真机测试就明确标注。
 - 自动播放先保证版本正确和有权播放。无法确认时保留候选供用户选择，不用提高自动播放数量换取错误匹配。
 
-## Phase 0：审计与基线（本次）
+## Phase 0：审计与基线（已完成）
 
 产物：
 
@@ -27,6 +27,8 @@
 按数据依赖拆分三个子阶段，避免一次替换旧 SongItem。
 
 ### 1A：统一模型与安全迁移
+
+状态：已完成，详见 [PHASE_1A.md](PHASE_1A.md)。当前以兼容投影方式运行，UI 未切换统一库，跨设备 UUID 同步仍属 Phase 3。
 
 - `modules/model/src/main/java/moe/ouom/neriplayer/data/model/unified/`：UnifiedSong、Source、Playlist、Membership、Origin、导入状态/权限类型。
 - `modules/database/.../entity/unified/`、`dao/unified/`、`migration/library/UnifiedLibraryMigration.kt`：新增关系、唯一索引、20→21、schema；修改 `NeriUserDataDatabase.kt` 注册。
@@ -83,9 +85,9 @@
 
 ## 下一步顺序与未决条件
 
-1. 恢复原项目指定工具链，复跑小范围基线；需要可用已授权 Android 设备/模拟器执行 Room 数据保留迁移验证。
-2. 完成 1A 后再实现 1B/1C；不能在迁移失败时让导入器写入半兼容数据。
+1. 工具链与 1A 迁移验证已完成；无需重复下载或重做 Phase 0。
+2. 继续 1B/1C 的只读 Provider、持久导入事务与 UI；不能以适配器可调用代替完整导入验收。
 3. 进入功能阶段时将必要 CI push 分支覆盖 `main`，并区分变更范围 smoke 与发布前关键集；保留原有 CI 能力。
 4. 实际账号/平台授权仅用于线上验收，不阻塞 Fake provider 开发；任何平台暂不可接入时明确标记其 capability 与降级方式。
 
-Phase 1 的数据写入需要先满足工具链和 Room 迁移验证条件。
+Phase 1 的工具链与 Room 数据保留前置条件已满足。

@@ -1,6 +1,6 @@
 # 统一音乐库：模型与迁移设计
 
-状态：Phase 0 设计稿，**尚未注册/执行新迁移，当前数据库仍为 v20**。Phase 1 按此方案实现并通过数据保留测试后启用。既有 SongItem、SongIdentity、系统收藏歌单和同步协议继续工作。
+状态：Phase 1A 已实现并验证 Room v21 的前 6 张统一关系表、精确来源 UUID 桥接与分批后台回填。既有 SongItem、SongIdentity、系统收藏歌单和同步协议继续工作；本文其余导入、匹配和同步部分仍是后续设计，实际验收见 [PHASE_1A.md](PHASE_1A.md)。
 
 ## 1. 录音身份与来源身份分离
 
@@ -29,16 +29,16 @@
 | PlayEvent / `play_event` | UUID eventId、song UUID、PLAY/SKIP/COMPLETE/REPEAT/DISLIKE、有效收听量/时间和设备；事件去重、保留策略和聚合水位 |
 | RecommendationSnapshot / `recommendation_snapshot` | snapshot UUID、日期/算法版本/栏目、song UUID 有序条目、解释原因、PLATFORM/UNIMUSIC 来源标记；必要反馈单独存储 |
 
-前 8 项为 Phase 1；匹配实体的最小键/版本字段可同时预留，行为与评估在 Phase 2；PlayEvent/RecommendationSnapshot 在 Phase 3 引入，避免为尚未实现的推荐提前堆叠不可验证 schema。每次新增表均独立增量迁移，不能在发布后重写 20→21。
+v21 实现前 6 项的最小字段。Source 尚未增加独立原始元数据/匹配证据/质量信息，成员因果 tokens 仍由旧表保存；ImportJob/ImportFailure 将在 Phase 1B 用新的独立迁移实现。匹配实体、PlayEvent/RecommendationSnapshot 分属 Phase 2/3，不提前堆叠不可验证 schema。每次新增表均独立增量迁移，不能重写已提交的 20→21。
 
 ## 3. Room v20 → v21 与回填
 
-1. 只新增统一库/来源/导入表、索引、外键；不重建、清空或改变旧 `track/local_playlist/playlist_member`、收藏、历史、队列、统计、同步 outbox 的含义。
+1. v21 只新增前 6 张统一库/来源关系表、索引、外键；不重建、清空或改变旧 `track/local_playlist/playlist_member`、收藏、历史、队列、统计、同步 outbox 的含义。
 2. Room 的 `@Database` 和 `allMigrations()` 同时更新，导出并提交 v21 schema。迁移 SQL 使用固定完整语句，不引用将来会改变的 model 常量。禁止 destructive migration。
-3. 增量关系回填由可恢复 Kotlin 任务执行，而非在开库迁移中一次加载整个歌曲库。按旧 identity_key 排序分页，每批事务保存 UUID 映射及 checkpoint；唯一约束保证重复执行不生成新 UUID。
+3. 增量关系回填由可恢复 Kotlin/WorkManager 任务执行，不在开库迁移中一次加载整个歌曲库。查询缺少映射的歌曲和成员作为 checkpoint，每批事务保存 UUID 关系；不依赖会漏过前插记录的 OFFSET/最后 key，唯一约束保证重复执行不生成新 UUID。
 4. 保留旧 durable payload、自定义封面/名称/歌词、membership addedAt/顺序、因果 tokens 及所有删除记录。未知 provider 允许导入元数据，但默认 `eligibility=UNKNOWN`，不自动解析播放。
 5. 新读路径在回填/一致性检查完成后开启。中断时旧 repository 仍可读写；新增旧数据通过 bridge 的增量投影补齐。UI 不把“迁移未完成”等同空音乐库。
-6. 导入新歌单时通过 local repository 新增的统一事务入口，同时写旧兼容表、新统一表、导入水位与既有同步 mutation/outbox；提交后再发布 StateFlow。禁止先创建空旧歌单、异步写新库后再更新水位导致半提交。
+6. 后续导入新歌单时将通过 local repository 新增的统一事务入口，同时写旧兼容表、新统一表、导入水位与既有同步 mutation/outbox；提交后再发布 StateFlow。目前这个入站导入事务尚未接入，禁止用先建空歌单再异步填充的方式代替。
 
 首次切换前生成用户可恢复的数据备份，排除凭据、签名 URL 和音频。WAL 数据库备份使用一致性快照/既有逻辑导出，不能在数据库写入时只复制主 `.db` 文件。
 

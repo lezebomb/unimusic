@@ -1,0 +1,9 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<testsuites tests="1" failures="0" errors="0" skipped="0" time="0.000" timestamp="2026-10-21T07:29:20" hostname="localhost">
+  <testsuite name="moe.ouom.neriplayer.data.local.database.UnifiedLibraryMigrationTest" tests="1" failures="0" errors="0" skipped="0" time="0.518" timestamp="2026-10-21T07:29:20" hostname="localhost">
+    <properties>
+      <property name="device" value="emulator-5554" />
+    </properties>
+    <testcase name="upgradePreservesEveryLegacyFieldInLibraryFavoritesHistoryAndOutbox" classname="moe.ouom.neriplayer.data.local.database.UnifiedLibraryMigrationTest" time="0.518" />
+  </testsuite>
+</testsuites>

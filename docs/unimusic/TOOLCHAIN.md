@@ -44,3 +44,9 @@ baseline 自动发现项目内的 JDK 17，通过 [Gradle toolchain 路径配置
 - 后续统一库测试、迁移验证和 Debug APK 的结果另记在 Phase 1A 报告，不用环境安装成功替代功能验收。
 
 [Phase 0 基线](BASELINE.md) 保留当时真实的失败记录，作为环境修复前的历史证据。
+
+## 独立迁移模拟器
+
+本轮另装 Android Emulator 37.2.12 与 Google APIs API 35 x86_64 r9 镜像，WHPX 可用。SDK Manager 的镜像下载无进展后，仅停止本轮安装进程，改用 Google 官方 HTTPS 下载同一个包并按官方仓库元数据校验 SHA-1 `0103e6dab21290c4b9d16550a3ce99476f884eef`，未重装已有构建工具链。AVD 位于忽略的 `.gradle-home/avd/UniMusicMigrationAPI35.avd`，不使用现有设备的数据。
+
+复用时只需将当前进程的 `ANDROID_AVD_HOME` 指向 `D:/unimusic/.gradle-home/avd`，启动 `emulator -avd UniMusicMigrationAPI35 -no-window -no-audio -no-snapshot -gpu swiftshader`；用完正常关闭。模拟器安装/启动结果不能替代真机播放或性能验收。

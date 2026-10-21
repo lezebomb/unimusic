@@ -122,7 +122,9 @@ class NeriUserDataDatabaseVersionTest {
         assertArrayEquals(ByteArray(4096) { 0x5A }, file.readBytes())
     }
 
-    @Test fun `missing and current databases still open after a rejected version is corrected`() {
+    // Robolectric includes the method name in its temp path. Keep it short enough for Windows
+    // native SQLite to create the additional -wal and -shm files within MAX_PATH.
+    @Test fun `corrected version reopens database`() {
         val context = ApplicationProvider.getApplicationContext<Context>()
         val file = context.getDatabasePath(NeriUserDataDatabase.DATABASE_NAME)
         assertTrue(!file.exists())
