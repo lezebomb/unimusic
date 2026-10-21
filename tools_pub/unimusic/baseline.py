@@ -41,6 +41,13 @@ def installed_directories(sdk: Path | None, directory: str) -> list[str]:
     return sorted(child.name for child in path.iterdir() if child.is_dir())
 
 
+def local_java17() -> Path | None:
+    for candidate in sorted((ROOT / ".gradle-home/jdks").glob("jdk-17*"), reverse=True):
+        if (candidate / "bin" / ("javac.exe" if os.name == "nt" else "javac")).is_file():
+            return candidate
+    return None
+
+
 def inventory(java17_home: Path | None) -> dict:
     source = (ROOT / "build-logic/convention/src/main/kotlin/Version.kt").read_text(
         encoding="utf-8"
@@ -120,12 +127,16 @@ def run_check(name: str, command: list[str], output: Path, timeout: int) -> dict
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--android", action="store_true", help="Attempt debug APK + two database test classes")
+    parser.add_argument("--skip-structure", action="store_true", help="Skip an already completed module-boundary check")
     parser.add_argument("--java17-home", type=Path, help="JDK 17 home for Gradle toolchain discovery")
     parser.add_argument("--output", type=Path, default=ROOT / "build/unimusic-baseline/repro")
     parser.add_argument("--timeout", type=int, default=1800, help="Maximum seconds per check")
     args = parser.parse_args()
     if args.timeout <= 0:
         parser.error("--timeout must be positive")
+    if not args.android and args.skip_structure:
+        parser.error("--skip-structure requires --android; do not run a no-check baseline")
+    args.java17_home = args.java17_home or local_java17()
     output = args.output.resolve()
     output.mkdir(parents=True, exist_ok=True)
     report = {
@@ -135,9 +146,12 @@ def main() -> int:
         "checks": [],
         "notRun": ["Android instrumented migrations", "real platform accounts", "device performance/power"],
     }
-    report["checks"].append(run_check(
-        "module-boundaries", [sys.executable, "-X", "utf8", "-B", "tools_pub/quality/module_boundaries.py"], output, args.timeout
-    ))
+    if args.skip_structure:
+        report["notRun"].append("Module boundaries (--skip-structure)")
+    else:
+        report["checks"].append(run_check(
+            "module-boundaries", [sys.executable, "-X", "utf8", "-B", "tools_pub/quality/module_boundaries.py"], output, args.timeout
+        ))
     if args.android:
         command = [
             shutil.which("java") or "java", "-classpath",
