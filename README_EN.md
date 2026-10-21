@@ -1,5 +1,7 @@
 [English](./README_EN.md) | [中文](./README.md)
 
+> **UniMusic development repository**: a GPL-3.0 continuation of NeriPlayer. The current milestone is the source audit and build baseline; no UniMusic APK has been released. See the [UniMusic development records](docs/unimusic/README.md) for actual results and the implementation plan. The upstream documentation below retains NeriPlayer's download and community links.
+
 <h1 align="center">NeriPlayer</h1>
 
 <div align="center">

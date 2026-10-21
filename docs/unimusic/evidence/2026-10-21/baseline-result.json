@@ -1,0 +1,7 @@
+{
+  "startedAt": "2026-10-21T02:26:06.6525316Z",
+  "finishedAt": "2026-10-21T02:28:25.1316294Z",
+  "elapsedSeconds": 138.48,
+  "exitCode": 1,
+  "tasks": ":app:assembleDebug :database:testDebugUnitTest (RegisteredMigrationChainTest,NeriUserDataDatabaseVersionTest)"
+}

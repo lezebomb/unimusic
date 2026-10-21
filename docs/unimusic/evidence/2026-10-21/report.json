@@ -1,0 +1,51 @@
+{
+  "recordedAtUtc": "2026-10-21T02:32:47.396274+00:00",
+  "revision": "b9b6caf39bc65ca252f1c6a632ec24320cec68bb",
+  "environment": {
+    "required": {
+      "compileSdk": "37",
+      "minSdk": "28",
+      "targetSdk": "36",
+      "ndk": "27.0.12077973",
+      "cmake": "3.28.0+",
+      "javaToolchain": "17 (buildSrc and Android convention)"
+    },
+    "javaExecutable": "D:\\Collect\\.tooling\\jdk\\current\\bin\\java.EXE",
+    "javaVersion": "openjdk version \"21.0.12.1\" 2026-08-18 LTS\nOpenJDK Runtime Environment Temurin-21.0.12.1+1 (build 21.0.12.1+1-LTS)\nOpenJDK 64-Bit Server VM Temurin-21.0.12.1+1 (build 21.0.12.1+1-LTS, mixed mode, sharing)",
+    "explicitJava17Version": null,
+    "androidSdk": "D:\\Collect\\.tooling\\android-sdk",
+    "installedPlatforms": [
+      "android-35",
+      "android-36"
+    ],
+    "installedBuildTools": [
+      "36.0.0"
+    ],
+    "installedNdk": [
+      "28.2.13676358"
+    ],
+    "installedCmake": [
+      "3.22.1"
+    ],
+    "adbDeviceStates": [
+      "device"
+    ]
+  },
+  "checks": [
+    {
+      "name": "module-boundaries",
+      "status": "passed",
+      "exitCode": 0,
+      "elapsedSeconds": 55.234,
+      "timedOut": false,
+      "error": null,
+      "log": "build\\unimusic-baseline\\repro\\module-boundaries.log"
+    }
+  ],
+  "notRun": [
+    "Android instrumented migrations",
+    "real platform accounts",
+    "device performance/power",
+    "Android build/JVM tests (use --android)"
+  ]
+}
