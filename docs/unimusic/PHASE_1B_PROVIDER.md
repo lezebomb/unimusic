@@ -17,6 +17,8 @@
 
 原始 [JUnit XML](evidence/2026-10-21/phase1b/TEST-moe.ouom.neriplayer.platform.netease.importing.NeteasePlaylistImportProviderTest.xml) 已归档；工作流 YAML 解析通过，Android 两个迁移测试类分别筛选，保留独立报告。
 
+2026-10-22 核对发现首次远端 [Actions 运行](https://github.com/lezebomb/unimusic/actions/runs/39563381265) 在安装 SDK 包时失败：runner 的 PATH 没有 sdkmanager，退出码 127，尚未执行测试。工作流已改为从 ANDROID_HOME / ANDROID_SDK_ROOT 定位 SDK 内的可执行文件，与现有 NDK 安装 action 保持一致；修复提交触发新的远端验证，不能把本地测试通过记作该次远端成功。
+
 ## 下一步：Phase 1B.2 / 1C
 
 1. 使用新的独立增量迁移增加 ImportJob/ImportFailure 与快照条目，不改写已提交的 20→21 迁移；账号/来源唯一任务，页级事务同时提交兼容歌单、UUID 关系、进度与同步 mutation。

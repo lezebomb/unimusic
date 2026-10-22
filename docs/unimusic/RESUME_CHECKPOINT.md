@@ -1,6 +1,6 @@
 # UniMusic 续跑检查点
 
-更新：2026-10-21 下午（Asia/Shanghai）。今天 15:00 的单次 heartbeat 已执行，不要重复创建定时任务。
+更新：2026-10-22 下午（Asia/Shanghai）。10 月 21 日 15:00 的单次 heartbeat 已执行；10 月 22 日收到重复触发后，已删除自动任务 `3-unimusic`，不要重新创建。
 
 ## 已完成和推送
 
@@ -8,6 +8,7 @@
 - 工具链：`f2c53ea1`，JDK 17 + API 37.0 / Build Tools 37 / NDK 27.0.12077973 / CMake 3.31.6 均可用。
 - Phase 1A：`230d6b10`，持久歌曲 UUID、精确来源键、6 张增量表和 v20→v21、可恢复后台旧库投影，已提交推送。
 - Phase 1B.1：本检查点所在提交包含只读 PlaylistImportProvider / Netease adapter、共享 FakeMusicProvider、3 个离线测试，以及 main 的精简 CI。用 git log 确认提交和推送状态，不凭文档假设远端已更新。
+- 10 月 22 日 CI 修复：首次远端运行在安装 SDK 包时因 PATH 中没有 sdkmanager 失败（尚未执行测试）；已改用 SDK 根目录内的明确路径，修复提交触发新的 Actions 验证。后续先查看其实际结果。
 
 ## 实际验证
 

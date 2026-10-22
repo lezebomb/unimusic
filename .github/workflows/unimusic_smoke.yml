@@ -38,7 +38,10 @@ jobs:
           cache: gradle
       - uses: ./.github/actions/android-ndk
       - name: Install pinned Android build packages
-        run: sdkmanager 'platforms;android-37.0' 'build-tools;37.0.0' 'cmake;3.31.6'
+        shell: bash
+        run: |
+          sdk="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-}}"
+          "$sdk/cmdline-tools/latest/bin/sdkmanager" 'platforms;android-37.0' 'build-tools;37.0.0' 'cmake;3.31.6'
       - name: Check boundaries and changed behavior
         run: |
           chmod +x gradlew
