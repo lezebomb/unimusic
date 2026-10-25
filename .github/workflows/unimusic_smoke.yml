@@ -9,6 +9,7 @@ on:
       - 'modules/local/**'
       - 'modules/platform/**'
       - 'app/src/main/java/moe/ouom/neriplayer/NeriPlayerApplication.kt'
+      - 'app/src/main/java/moe/ouom/neriplayer/core/di/AppContainer.kt'
       - '.github/workflows/unimusic_smoke.yml'
   workflow_dispatch:
 
@@ -47,8 +48,8 @@ jobs:
           chmod +x gradlew
           python3 -X utf8 tools_pub/quality/module_boundaries.py
           ./gradlew -Dorg.gradle.java.installations.paths="$JAVA_HOME_17_X64" \
-            :database:testDebugUnitTest --tests '*RegisteredMigrationChainTest' --tests '*NeriUserDataDatabaseVersionTest' \
-            :local:testDebugUnitTest --tests '*UnifiedLibraryRoomStoreTest' \
+            :database:testDebugUnitTest --tests '*RegisteredMigrationChainTest' --tests '*NeriUserDataDatabaseVersionTest' --tests '*PlaylistImportMigrationTest' \
+            :local:testDebugUnitTest --tests '*UnifiedLibraryRoomStoreTest' --tests '*PlaylistImportCoordinatorTest' --tests '*LocalPlaylistSyncMutationDecoderTest' \
             :platform:testDebugUnitTest --tests '*NeteasePlaylistImportProviderTest' \
             :database:assembleDebugAndroidTest --max-workers=2 --console=plain
       - name: Enable KVM

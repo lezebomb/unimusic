@@ -93,8 +93,13 @@ import moe.ouom.neriplayer.data.local.database.entity.unified.LegacySongLinkEnti
 import moe.ouom.neriplayer.data.local.database.entity.unified.UnifiedPlaylistEntity
 import moe.ouom.neriplayer.data.local.database.entity.unified.UnifiedPlaylistMemberEntity
 import moe.ouom.neriplayer.data.local.database.entity.unified.PlaylistOriginEntity
+import moe.ouom.neriplayer.data.local.database.entity.unified.PlaylistImportJobEntity
+import moe.ouom.neriplayer.data.local.database.entity.unified.PlaylistImportItemEntity
+import moe.ouom.neriplayer.data.local.database.entity.unified.PlaylistImportReceiptEntity
+import moe.ouom.neriplayer.data.local.database.dao.unified.PlaylistImportDao
+import moe.ouom.neriplayer.data.local.database.migration.library.PlaylistImportMigration
 
-private const val NERI_USER_DATA_FINAL_VERSION = 21
+private const val NERI_USER_DATA_FINAL_VERSION = 22
 
 @Database(
     entities = [
@@ -145,7 +150,10 @@ private const val NERI_USER_DATA_FINAL_VERSION = 21
         LegacySongLinkEntity::class,
         UnifiedPlaylistEntity::class,
         UnifiedPlaylistMemberEntity::class,
-        PlaylistOriginEntity::class
+        PlaylistOriginEntity::class,
+        PlaylistImportJobEntity::class,
+        PlaylistImportItemEntity::class,
+        PlaylistImportReceiptEntity::class
     ],
     version = NERI_USER_DATA_FINAL_VERSION,
     exportSchema = true
@@ -185,6 +193,7 @@ abstract class NeriUserDataDatabase : RoomDatabase() {
     abstract fun platformPlaylistCacheDao(): PlatformPlaylistCacheDao
 
     abstract fun unifiedLibraryDao(): UnifiedLibraryDao
+    abstract fun playlistImportDao(): PlaylistImportDao
 
     companion object {
         const val DATABASE_NAME = "neri_user_data.db"
@@ -243,7 +252,8 @@ abstract class NeriUserDataDatabase : RoomDatabase() {
             MIGRATION_17_18,
             MIGRATION_18_19,
             MIGRATION_19_20,
-            MIGRATION_20_21
+            MIGRATION_20_21,
+            MIGRATION_21_22
         )
 
         private fun checkMainProcess(context: Context) {
@@ -275,6 +285,7 @@ abstract class NeriUserDataDatabase : RoomDatabase() {
         val MIGRATION_18_19: Migration = LyricSyncPersistenceMigration
         val MIGRATION_19_20: Migration = PlaybackStatsPagedMigration
         val MIGRATION_20_21: Migration = UnifiedLibraryMigration
+        val MIGRATION_21_22: Migration = PlaylistImportMigration
 
         const val FINAL_DB_VERSION = NERI_USER_DATA_FINAL_VERSION
     }

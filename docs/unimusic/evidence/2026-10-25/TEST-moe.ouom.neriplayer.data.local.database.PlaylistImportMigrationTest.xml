@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="moe.ouom.neriplayer.data.local.database.PlaylistImportMigrationTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2026-10-25T06:20:51.338Z" hostname="XUSHAOYANG" time="4.6">
+  <properties/>
+  <testcase name="upgrade21KeepsLibrary" classname="moe.ouom.neriplayer.data.local.database.PlaylistImportMigrationTest" time="3.981"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

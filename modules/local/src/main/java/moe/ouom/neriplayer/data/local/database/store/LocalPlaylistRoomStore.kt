@@ -52,6 +52,21 @@ internal class LocalPlaylistRoomStore(
             ?.value == ROOM_PRIMARY_STATE
     }
 
+    /** Import rows, compatible playlists and the existing replay outbox commit as one unit. */
+    suspend fun <T> commitImport(
+        previous: List<LocalPlaylist>,
+        prepare: suspend () -> Pair<List<LocalPlaylist>, T>
+    ): Pair<List<LocalPlaylist>, T> = database.withTransaction {
+        check(isRoomPrimary()) { "Playlist imports require Room primary storage" }
+        val prepared = prepare()
+        val digest = domainDigest(prepared.first)
+        writeIncremental(previous, prepared.first, digest)
+        writePendingSyncMutationOutbox(LocalPlaylistSyncMutationOutbox(listOf(
+            LocalPlaylistSyncMutation(expectedPrimaryDigest = digest, playlistDataChanged = prepared.first != previous)
+        )))
+        prepared
+    }
+
     suspend fun readIfRoomPrimary(): List<LocalPlaylist>? {
         if (!isRoomPrimary()) {
             return null

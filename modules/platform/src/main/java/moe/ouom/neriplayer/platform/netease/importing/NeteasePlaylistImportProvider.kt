@@ -39,6 +39,7 @@ class NeteasePlaylistImportProvider internal constructor(
     })
 
     override val providerId = "netease"
+    override fun sessionIdentity(): Any = transport.sessionIdentity()
 
     override suspend fun listPlaylists(accountKey: String, cursor: String?, limit: Int): ImportPlaylistPage {
         require(limit in 1..100)

@@ -901,7 +901,8 @@ class NeriUserDataDatabaseMigrationTest {
             NeriUserDataDatabase.MIGRATION_17_18,
             NeriUserDataDatabase.MIGRATION_18_19,
             NeriUserDataDatabase.MIGRATION_19_20,
-            NeriUserDataDatabase.MIGRATION_20_21
+            NeriUserDataDatabase.MIGRATION_20_21,
+            NeriUserDataDatabase.MIGRATION_21_22
         )
 
         migrated.use {
@@ -968,7 +969,8 @@ class NeriUserDataDatabaseMigrationTest {
             NeriUserDataDatabase.MIGRATION_17_18,
             NeriUserDataDatabase.MIGRATION_18_19,
             NeriUserDataDatabase.MIGRATION_19_20,
-            NeriUserDataDatabase.MIGRATION_20_21
+            NeriUserDataDatabase.MIGRATION_20_21,
+            NeriUserDataDatabase.MIGRATION_21_22
         )
 
         migrated.use {

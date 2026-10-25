@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="moe.ouom.neriplayer.data.unified.PlaylistImportCoordinatorTest" tests="7" skipped="0" failures="0" errors="0" timestamp="2026-10-25T06:28:27.018Z" hostname="XUSHAOYANG" time="6.676">
+  <properties/>
+  <testcase name="durableResumeAndDedup" classname="moe.ouom.neriplayer.data.unified.PlaylistImportCoordinatorTest" time="5.059"/>
+  <testcase name="refreshAndUnlinkKeepEdits" classname="moe.ouom.neriplayer.data.unified.PlaylistImportCoordinatorTest" time="0.192"/>
+  <testcase name="retryKeepsSourcePosition" classname="moe.ouom.neriplayer.data.unified.PlaylistImportCoordinatorTest" time="0.144"/>
+  <testcase name="authAndIncompleteBatchesPause" classname="moe.ouom.neriplayer.data.unified.PlaylistImportCoordinatorTest" time="0.104"/>
+  <testcase name="pageFailureRollsBackEverything" classname="moe.ouom.neriplayer.data.unified.PlaylistImportCoordinatorTest" time="0.222"/>
+  <testcase name="cancelledRunCannotCommit" classname="moe.ouom.neriplayer.data.unified.PlaylistImportCoordinatorTest" time="0.171"/>
+  <testcase name="syncReplaySurvivesRestart" classname="moe.ouom.neriplayer.data.unified.PlaylistImportCoordinatorTest" time="0.149"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

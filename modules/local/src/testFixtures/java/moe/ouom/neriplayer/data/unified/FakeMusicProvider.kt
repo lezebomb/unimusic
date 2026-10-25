@@ -12,12 +12,16 @@ import moe.ouom.neriplayer.data.model.unified.PlaylistImportProvider
 /** Shared deterministic provider for coordinator/Room/UI tests; no real platform account needed. */
 class FakeMusicProvider(
     override val providerId: String = "fake",
-    var activeAccountKey: String? = "test-account",
+    activeAccountKey: String? = "test-account",
     val snapshots: MutableMap<String, ImportPlaylistSnapshot> = mutableMapOf(),
     val songs: MutableMap<String, ImportSong> = mutableMapOf(),
     /** Inject delays, cancellation, transient failures or account changes at request boundaries. */
     var beforeRequest: suspend (String) -> Unit = {}
 ) : PlaylistImportProvider {
+    private var session = Any()
+    var activeAccountKey: String? = activeAccountKey
+        set(value) { field = value; session = Any() }
+    override fun sessionIdentity(): Any = session
     val requestedBatches = mutableListOf<List<String>>()
     val songFailures = mutableMapOf<String, ImportFailureKind>()
 

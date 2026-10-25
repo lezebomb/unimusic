@@ -83,6 +83,21 @@ interface UnifiedLibraryDao {
 
     @Insert suspend fun insertOrigin(origin: PlaylistOriginEntity)
 
+    @Query("SELECT * FROM unified_playlist WHERE playlist_id = :id")
+    suspend fun playlist(id: String): UnifiedPlaylistEntity?
+
+    @Query("SELECT * FROM unified_playlist_member WHERE playlist_id = :playlistId AND song_id = :songId")
+    suspend fun member(playlistId: String, songId: String): UnifiedPlaylistMemberEntity?
+
+    @Query("UPDATE playlist_origin SET refreshed_at = :now, snapshot_id = :snapshot WHERE origin_id = :id")
+    suspend fun refreshOrigin(id: String, now: Long, snapshot: String)
+
+    @Query("UPDATE playlist_origin SET import_mode = :mode, linked = :linked WHERE origin_id = :id")
+    suspend fun setOriginMode(id: String, mode: String, linked: Boolean)
+
+    @Query("UPDATE unified_playlist_member SET position = :position WHERE playlist_id = :playlist AND song_id = :song AND deleted = 0")
+    suspend fun setMemberPosition(playlist: String, song: String, position: Int)
+
     @Query("SELECT * FROM playlist_origin WHERE provider = :provider AND account_key = :accountKey " +
         "AND remote_playlist_id = :remoteId")
     suspend fun origin(provider: String, accountKey: String, remoteId: String): PlaylistOriginEntity?

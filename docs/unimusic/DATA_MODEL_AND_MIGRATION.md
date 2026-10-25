@@ -1,6 +1,6 @@
 # 统一音乐库：模型与迁移设计
 
-状态：Phase 1A 已实现并验证 Room v21 的前 6 张统一关系表、精确来源 UUID 桥接与分批后台回填。既有 SongItem、SongIdentity、系统收藏歌单和同步协议继续工作；本文其余导入、匹配和同步部分仍是后续设计，实际验收见 [PHASE_1A.md](PHASE_1A.md)。
+状态：Phase 1A 的 v21 统一关系与 Phase 1B.2 的 v22 导入后台均已实现；既有 SongItem、SongIdentity、系统收藏歌单和同步协议继续工作。实际范围与验证见 [Phase 1A](PHASE_1A.md) 和 [导入后台](PHASE_1B_BACKEND.md)，UI、匹配和统一数据同步部分仍是后续设计。
 
 ## 1. 录音身份与来源身份分离
 
@@ -23,13 +23,14 @@
 | PlaylistMembership / `unified_playlist_member` | playlist/song UUID 复合键；顺序、addedAt、revision、删除状态/因果信息；来源成员引用另存以保留导入顺序和可追溯性 |
 | PlaylistOrigin / `playlist_origin` | UUID；provider+非凭据 accountKey+remotePlaylistId 唯一；本地 playlist UUID、原始名称/封面、导入模式、关联状态、已提交 snapshot/水位和刷新时间 |
 | ImportJob / `playlist_import_job` | accountKey、origin、运行/取消/暂停/失败状态、snapshot 标识、下一批位置、已提交数量、重试次数；不存 cookies、token 或整段 HTTP 响应 |
-| ImportFailure / `playlist_import_failure` | job/source 唯一；失败原因类型、次数、可重试性、下一次允许重试时间；保留原远端位置 |
+| Snapshot item / ImportFailure / `playlist_import_item` | job/position 复合键、job/resource 唯一；有序 ID、逐项状态、失败类型、次数、下一次允许重试时间 |
+| ImportReceipt / `playlist_import_receipt` | job/resource 唯一；首次导入 snapshot/位置、song UUID、旧 identity 与用户移除状态；不随刷新快照清空 |
 | SongMatch / `song_match` | source pair、版本/算法版本、证据摘要、校准分数、验证状态和时间；检索相关分不作为校准概率 |
 | UserMatchOverride / `user_match_override` | source pair、ACCEPT/REJECT、设备/修订/时间；用户 REJECT 优先于旧自动映射，ACCEPT 仍不能绕过播放权限或自动取消版本冲突 |
 | PlayEvent / `play_event` | UUID eventId、song UUID、PLAY/SKIP/COMPLETE/REPEAT/DISLIKE、有效收听量/时间和设备；事件去重、保留策略和聚合水位 |
 | RecommendationSnapshot / `recommendation_snapshot` | snapshot UUID、日期/算法版本/栏目、song UUID 有序条目、解释原因、PLATFORM/UNIMUSIC 来源标记；必要反馈单独存储 |
 
-v21 实现前 6 项的最小字段。Source 尚未增加独立原始元数据/匹配证据/质量信息，成员因果 tokens 仍由旧表保存；ImportJob/ImportFailure 将在 Phase 1B 用新的独立迁移实现。匹配实体、PlayEvent/RecommendationSnapshot 分属 Phase 2/3，不提前堆叠不可验证 schema。每次新增表均独立增量迁移，不能重写已提交的 20→21。
+v21 实现前 6 项的最小字段；v22 通过独立 21→22 迁移实现任务、有序快照/失败和凭证 3 张表。Source 尚未增加独立匹配证据/质量信息，成员因果 tokens 仍由旧表保存。匹配实体、PlayEvent/RecommendationSnapshot 分属 Phase 2/3，不提前堆叠不可验证 schema。每次新增表均独立增量迁移，不能重写已提交的迁移。
 
 ## 3. Room v20 → v21 与回填
 
@@ -38,7 +39,7 @@ v21 实现前 6 项的最小字段。Source 尚未增加独立原始元数据/�
 3. 增量关系回填由可恢复 Kotlin/WorkManager 任务执行，不在开库迁移中一次加载整个歌曲库。查询缺少映射的歌曲和成员作为 checkpoint，每批事务保存 UUID 关系；不依赖会漏过前插记录的 OFFSET/最后 key，唯一约束保证重复执行不生成新 UUID。
 4. 保留旧 durable payload、自定义封面/名称/歌词、membership addedAt/顺序、因果 tokens 及所有删除记录。未知 provider 允许导入元数据，但默认 `eligibility=UNKNOWN`，不自动解析播放。
 5. 新读路径在回填/一致性检查完成后开启。中断时旧 repository 仍可读写；新增旧数据通过 bridge 的增量投影补齐。UI 不把“迁移未完成”等同空音乐库。
-6. 后续导入新歌单时将通过 local repository 新增的统一事务入口，同时写旧兼容表、新统一表、导入水位与既有同步 mutation/outbox；提交后再发布 StateFlow。目前这个入站导入事务尚未接入，禁止用先建空歌单再异步填充的方式代替。
+6. v22 导入已通过 LocalPlaylistRepository 的独立导入提交入口，同时写旧兼容表、新统一表、条目结果与既有同步 outbox；事务成功后再发布 StateFlow，不允许 JSON 回退。首批全部失败时不建立空占位歌单；真实空快照可建立空歌单。
 
 首次切换前生成用户可恢复的数据备份，排除凭据、签名 URL 和音频。WAL 数据库备份使用一致性快照/既有逻辑导出，不能在数据库写入时只复制主 `.db` 文件。
 
@@ -50,7 +51,7 @@ v21 实现前 6 项的最小字段。Source 尚未增加独立原始元数据/�
 
 ### 回滚的实际边界
 
-- 关闭 UniMusic feature gate，使用旧 repository/旧 UI 读取保留表；提供**保留 schema v21 的修复构建**作为应用回滚版本。
+- 关闭新增功能，使用旧 repository/旧 UI 读取保留表；应用回滚修复构建必须保留用户已升级到的 schema（当前 v22）。
 - 直接安装 v20 二进制会被现有版本检查拒绝打开 v21 数据库，不能承诺二进制降级兼容；不自动创建向下删除迁移。
 - 需要回到原 NeriPlayer 时，使用兼容导出导入或迁移前一致性备份；还原覆盖数据必须由用户明确选择，保留现有数据库副本。
 - 新 UUID 和人工映射在回滚旧功能时保留；后续恢复新读路径能够继续使用，不能重分配身份。

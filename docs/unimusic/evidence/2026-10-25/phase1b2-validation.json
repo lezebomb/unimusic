@@ -1,0 +1,51 @@
+{
+  "date": "2026-10-25",
+  "scope": "Phase 1B.2 Android data/import backend",
+  "newJvmTestSuites": [
+    {
+      "name": "moe.ouom.neriplayer.data.local.database.PlaylistImportMigrationTest",
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "timestamp": "2026-10-25T06:20:51.338Z"
+    },
+    {
+      "name": "moe.ouom.neriplayer.data.unified.PlaylistImportCoordinatorTest",
+      "tests": "7",
+      "failures": "0",
+      "errors": "0",
+      "timestamp": "2026-10-25T06:28:27.018Z"
+    }
+  ],
+  "logs": [
+    {
+      "path": "build/unimusic-toolchain/phase1b2-final.log",
+      "sha256": "e30ddfe3b79189fc3161e7ac15a6de40791f7b96142bcb3b0b3f184533b59907",
+      "result": "success"
+    },
+    {
+      "path": "build/unimusic-toolchain/phase1b2-backend-final.log",
+      "sha256": "01988f52913b33085a0e884e1a010f1c2ad19ce3c0f466d572c0ec05145ac77f",
+      "result": "success"
+    }
+  ],
+  "schemaVersion": 22,
+  "schemaSha256": "a81ce7d434e9f20457f58eeac3268ede26311ab10bea84b6562d1c7070e8f891",
+  "apk": {
+    "path": "app/build/outputs/apk/debug/app-debug.apk",
+    "bytes": 62254466,
+    "sha256": "d1ab3922385d8b019ee090047c626bb4c50feea3d4d8740f8de3e949d81c84b0",
+    "installedThisRound": false
+  },
+  "databaseAndroidTestApkBuilt": true,
+  "deviceTestsRunThisRound": false,
+  "realAccountTestsRun": false,
+  "audioSourceMatchingImplemented": false,
+  "notRun": [
+    "Physical device or emulator execution",
+    "Real Netease account import",
+    "Online playback or source switching",
+    "Performance/power measurement",
+    "Release signing"
+  ]
+}

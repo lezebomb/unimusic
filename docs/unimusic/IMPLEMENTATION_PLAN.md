@@ -1,6 +1,6 @@
 # UniMusic 分阶段实施与验收
 
-状态日期：2026-10-21。工具链已补齐；[Phase 1A](PHASE_1A.md) 的 UUID、6 张增量表、分页回填及后台任务已实现，14 个相关 JVM 测试、4 个 Android 迁移测试通过，Debug APK 构建/模拟器安装启动成功。[Phase 1B.1](PHASE_1B_PROVIDER.md) 的网易云只读 Provider / Fake 已实现并通过 3 个离线测试。下一步是 1B.2 持久导入事务和 1C UI，完整账号批量导入尚未交付。
+状态日期：2026-10-25。[Phase 1A](PHASE_1A.md) 和 [1B.1 Provider](PHASE_1B_PROVIDER.md) 已完成，上一轮远端 CI 已通过。[Phase 1B.2 后台](PHASE_1B_BACKEND.md) 已完成持久导入任务、原库兼容事务、取消/重试/恢复和显式关联刷新，Room 当前 v22，新增 8 个关键 JVM 测试通过。本轮 Debug 构建成功，未连接手机或执行设备测试。下一步是 1C UI；音源匹配/解析/切源仍为 Phase 2 未完成项，真实账号导入和完整播放闭环尚未验收。
 
 ## 执行约定
 
@@ -38,7 +38,7 @@
 
 ### 1B：入站 Provider 与导入任务
 
-1B.1 已完成只读 contract、Netease adapter、可取消请求、账号切换保护与共享 Fake，详见 [PHASE_1B_PROVIDER.md](PHASE_1B_PROVIDER.md)。1B.2 的 ImportJob/Failure、持久快照/水位、原库兼容事务、失败重试和 WorkManager 导入任务仍待实现，不能与已完成的旧库回填 Worker 混淆。
+1B.1 与 1B.2 的后台实现已完成，见 [Provider](PHASE_1B_PROVIDER.md) 和 [后台报告](PHASE_1B_BACKEND.md)。失败明细保存在快照条目中；导入凭证跨快照保留用户移除记录。WorkManager 导入器与旧库回填 Worker 分开，尚未接入导入 UI、定期自动刷新或真实账号验收。
 
 - model 定义 PlaylistImportProvider contract；platform 新增 Netease adapter，复用安全 session、分页歌单与可取消详情调用。
 - local 新增导入 coordinator/WorkManager Worker，页级事务 checkpoint、账号检查、失败项重试、取消/恢复、一次性与持续关联。

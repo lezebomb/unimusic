@@ -24,6 +24,7 @@ internal data class PlaylistSongDeletionRemoval(
 @Keep
 internal data class LocalPlaylistSyncMutation(
     val expectedPrimaryDigest: String = "",
+    val playlistDataChanged: Boolean = false,
     val addedSongDeletions: List<SyncPlaylistSongDeletion> = emptyList(),
     val removedSongDeletions: List<PlaylistSongDeletionRemoval> = emptyList(),
     val deletedPlaylistIds: List<Long> = emptyList(),
@@ -31,7 +32,7 @@ internal data class LocalPlaylistSyncMutation(
     val restoredPlaylistIds: List<Long> = emptyList()
 ) {
     val isEmpty: Boolean
-        get() = addedSongDeletions.isEmpty() &&
+        get() = !playlistDataChanged && addedSongDeletions.isEmpty() &&
             removedSongDeletions.isEmpty() &&
             deletedPlaylistIds.isEmpty() &&
             clearedPlaylistDeletionIds.isEmpty() &&
@@ -45,6 +46,7 @@ internal data class LocalPlaylistSyncMutation(
         if (isEmpty) return other
         if (other.isEmpty) return this
         return LocalPlaylistSyncMutation(
+            playlistDataChanged = playlistDataChanged || other.playlistDataChanged,
             addedSongDeletions = addedSongDeletions + other.addedSongDeletions,
             removedSongDeletions = removedSongDeletions + other.removedSongDeletions,
             deletedPlaylistIds = (deletedPlaylistIds + other.deletedPlaylistIds).distinct(),
@@ -98,6 +100,10 @@ private fun readPlaylistMutation(value: JsonElement): LocalPlaylistSyncMutation 
     require(PLAYLIST_MUTATION_DIGEST_PATTERN.matches(digest)) { "Invalid playlist mutation commit digest" }
     return LocalPlaylistSyncMutation(
         expectedPrimaryDigest = digest,
+        playlistDataChanged = fields.get("playlistDataChanged")?.let {
+            require(it.isJsonPrimitive && it.asJsonPrimitive.isBoolean) { "Invalid playlist data change flag" }
+            it.asBoolean
+        } ?: false,
         addedSongDeletions = fields.mutationArray("addedSongDeletions").map(::readPlaylistSongDeletion),
         removedSongDeletions = fields.mutationArray("removedSongDeletions").map(::readPlaylistSongDeletionRemoval),
         deletedPlaylistIds = fields.mutationArray("deletedPlaylistIds").map(::readPlaylistMutationLong),
