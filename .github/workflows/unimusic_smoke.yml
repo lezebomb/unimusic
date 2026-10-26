@@ -60,7 +60,7 @@ jobs:
             :database:testDebugUnitTest --tests '*RegisteredMigrationChainTest' --tests '*NeriUserDataDatabaseVersionTest' --tests '*PlaylistImportMigrationTest' \
             :local:testDebugUnitTest --tests '*UnifiedLibraryRoomStoreTest' --tests '*PlaylistImportCoordinatorTest' --tests '*LocalPlaylistSyncMutationDecoderTest' \
             :common:testDebugUnitTest --tests '*FederatedSearchEngineTest' \
-            :app:testDebugUnitTest --tests '*ExploreSearchResultRankingTest' --tests '*ExploreScreenYouTubeGateTest' --tests '*ExploreViewModelYouTubeGateTest' --tests '*ExploreSearchPaginationTest' \
+            :app:testDebugUnitTest --tests '*ExploreCatalogSearchTest' --tests '*ExploreSearchResultRankingTest' --tests '*ExploreScreenYouTubeGateTest' --tests '*ExploreViewModelYouTubeGateTest' --tests '*ExploreSearchPaginationTest' \
             :platform:testDebugUnitTest --tests '*NeteasePlaylistImportProviderTest' --tests '*BiliClientPlayUrlTest' --tests '*NeteaseRequestSessionTest' --tests '*NeteaseClientTest' --tests '*KuwoCatalogProviderTest' \
             :playback:logic:testDebugUnitTest --tests '*RecordingMatchPolicyTest' --tests '*PlaybackSourceResolverTest' --tests '*RecordingDiscoveryRankerTest' --tests '*SongUrlResolutionRetryTest' \
             :playback:runtime:testDebugUnitTest --tests '*BiliRecordingMatchTest' --tests '*PlayerManagerNeteaseAutoSourceSwitchTest' --tests '*PlayerManagerNeteaseLocalFallbackTest' \

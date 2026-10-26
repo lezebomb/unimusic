@@ -62,6 +62,7 @@ import moe.ouom.neriplayer.core.player.PlayerManager.neteaseClient
 import moe.ouom.neriplayer.data.model.auth.SavedCookieAuthState
 import moe.ouom.neriplayer.data.model.NeteaseArtistSummary
 import moe.ouom.neriplayer.data.model.SongItem
+import moe.ouom.neriplayer.data.model.unified.CatalogTrack
 import moe.ouom.neriplayer.platform.netease.mapping.parseNeteaseSongDetail
 import moe.ouom.neriplayer.platform.youtube.config.YouTubeFeatureGate
 import moe.ouom.neriplayer.platform.youtube.api.transport.buildYouTubeMusicMediaUri
@@ -152,6 +153,11 @@ sealed class ExploreSearchResult {
         ).joinToString("|")
     }
 
+    /** Catalog entries cannot enter the SongItem queue/download path. */
+    data class Catalog(val track: CatalogTrack) : ExploreSearchResult() {
+        override val stableKey: String = catalogSearchResultKey(track)
+    }
+
     data class Playlist(val playlist: PlaylistSummary) : ExploreSearchResult() {
         override val stableKey: String = "netease|playlist|${playlist.id}"
     }
@@ -196,7 +202,7 @@ data class ExploreUiState(
     val searchPage: Int = 0,
     val searchKeyword: String = "",
     val searchDisplayQuery: String = "",
-    val aggregateSnapshot: FederatedSearchSnapshot<SongItem>? = null,
+    val aggregateSnapshot: FederatedSearchSnapshot<ExploreSearchResult>? = null,
     val selectedSearchSource: SearchSource = SearchSource.ALL,
     val selectedNeteaseSearchType: NeteaseExploreSearchType = NeteaseExploreSearchType.SONG,
     val selectedYouTubeMusicSearchType: YouTubeExploreSearchType = YouTubeExploreSearchType.SONG,
@@ -313,7 +319,8 @@ class ExploreViewModel(application: Application) : AndroidViewModel(application)
     private var ytMusicPlaylistsPending = false
     private var searchRequestVersion = 0L
     private var youtubeEnabled = YouTubeFeatureGate.isEnabled()
-    private var aggregateEngine: FederatedSearchEngine<SongItem>? = null
+    private var aggregateEngine: FederatedSearchEngine<ExploreSearchResult>? = null
+    private var aggregateRanker: ExploreSearchRankingSession? = null
     private var searchAccountContext = neteaseClient.searchSessionIdentity()
 
     private val _uiState = MutableStateFlow(ExploreUiState())
@@ -555,20 +562,22 @@ class ExploreViewModel(application: Application) : AndroidViewModel(application)
         }
     }
 
-    /** 搜索 Bilibili 视频 */
+    /** Discover metadata independently; catalog entries never impersonate a playable provider. */
     private fun searchAggregate(keyword: String, requestVersion: Long) {
         val localSongs = LocalPlaylistRepository.getInstance(app).playlists.value
             .flatMap { it.songs }.filter { LocalSongSupport.isLocalSong(it) }.distinctBy { it.stableKey() }
         var localIndex: SearchTextMatcher.Index<SongItem>? = null
         val accountContext = neteaseClient.searchSessionIdentity()
-        aggregateEngine = FederatedSearchEngine<SongItem>(listOf(
+        aggregateRanker = ExploreSearchRankingSession(_uiState.value.searchDisplayQuery)
+        aggregateEngine = FederatedSearchEngine<ExploreSearchResult>(listOf(
             FederatedSearchProvider("local") { query, cursor ->
                 val offset = cursor?.toIntOrNull() ?: 0
                 val ranked = withContext(Dispatchers.Default) {
                     val index = localIndex ?: SearchTextMatcher.index(localSongs) { it.searchValues() }.also { localIndex = it }
                     index.filterAndRank(query)
                 }
-                SearchPage(ranked.drop(offset).take(30), (offset + 30).takeIf { it < ranked.size }?.toString())
+                SearchPage(ranked.drop(offset).take(30).map(ExploreSearchResult::Song),
+                    (offset + 30).takeIf { it < ranked.size }?.toString())
             },
             FederatedSearchProvider("netease") { query, cursor ->
                 if (!isNeteaseSearchAllowed() || accountContext !== neteaseClient.searchSessionIdentity()) {
@@ -576,11 +585,11 @@ class ExploreViewModel(application: Application) : AndroidViewModel(application)
                 }
                 val page = fetchNeteaseSearchPage(query, query, cursor?.toIntOrNull() ?: 1, NeteaseExploreSearchType.SONG)
                 if (accountContext !== neteaseClient.searchSessionIdentity()) throw SearchSourceException(SearchSourceFailure.AUTH_REQUIRED)
-                SearchPage(page.songs, (page.page + 1).takeIf { page.hasMore }?.toString())
+                SearchPage(page.items, (page.page + 1).takeIf { page.hasMore }?.toString())
             },
             FederatedSearchProvider("bilibili") { query, cursor ->
                 val page = fetchBilibiliSearchPage(query, query, cursor?.toIntOrNull() ?: 1)
-                SearchPage(page.songs, (page.page + 1).takeIf { page.hasMore }?.toString())
+                SearchPage(page.items, (page.page + 1).takeIf { page.hasMore }?.toString())
             },
             FederatedSearchProvider("youtube") { query, _ ->
                 if (!youtubeEnabled) throw SearchSourceException(SearchSourceFailure.DISABLED)
@@ -589,25 +598,31 @@ class ExploreViewModel(application: Application) : AndroidViewModel(application)
                         .map { it.toSongItem(app) }
                 }
                 if (!youtubeEnabled) throw SearchSourceException(SearchSourceFailure.DISABLED)
-                SearchPage(songs)
+                SearchPage(songs.map(ExploreSearchResult::Song))
+            },
+            FederatedSearchProvider("kuwo") { query, cursor ->
+                val page = AppContainer.kuwoCatalogProvider.search(query, cursor, limit = 20)
+                SearchPage(page.tracks.map(ExploreSearchResult::Catalog), page.nextCursor)
             }
-        ), identity = { it.stableKey() })
+        ), identity = { it.stableKey })
         searchJob = launchAggregateSearch(keyword, requestVersion, null)
     }
 
-    private fun launchAggregateSearch(keyword: String, requestVersion: Long, previous: FederatedSearchSnapshot<SongItem>?): Job =
-        viewModelScope.launch {
-            val engine = aggregateEngine ?: return@launch
+    private fun launchAggregateSearch(keyword: String, requestVersion: Long,
+        previous: FederatedSearchSnapshot<ExploreSearchResult>?): Job {
+        val engine = checkNotNull(aggregateEngine)
+        val ranker = checkNotNull(aggregateRanker)
+        return viewModelScope.launch {
             engine.search(keyword, previous).collect { snapshot ->
+                val items = withContext(Dispatchers.Default) { ranker.rank(snapshot.interleavedItems()) }
                 updateSearchStateIfCurrent(requestVersion, SearchSource.ALL) { state ->
-                    val songs = rankExploreSongSearchResults(state.searchDisplayQuery, snapshot.interleavedItems())
                     val retryableFailure = snapshot.sources.values.any { it.failure != null && it.nextCursor != null }
                     state.copy(
                         searching = previous == null && snapshot.loading,
                         searchLoadingMore = previous != null && snapshot.loading,
                         searchError = null,
-                        searchResults = songs,
-                        searchItems = songs.map(ExploreSearchResult::Song),
+                        searchResults = searchSongItems(items),
+                        searchItems = items,
                         searchHasMore = snapshot.hasMore,
                         searchLoadMoreError = if (!snapshot.loading && retryableFailure) app.getString(CoreCommonR.string.explore_aggregate_retry) else null,
                         aggregateSnapshot = snapshot,
@@ -616,6 +631,7 @@ class ExploreViewModel(application: Application) : AndroidViewModel(application)
                 }
             }
         }
+    }
 
     private fun restartAggregateSearch() {
         val state = _uiState.value

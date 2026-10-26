@@ -5,8 +5,12 @@
     <string name="explore_source_login">Sign in required</string>
     <string name="explore_source_disabled">Disabled</string>
     <string name="explore_source_unavailable">Unavailable</string>
-    <string name="explore_aggregate_hint">Search local files, NetEase, Bilibili and enabled YouTube together. Results remain separate; availability is checked at playback.</string>
+    <string name="explore_aggregate_hint">Search local files, NetEase, Bilibili, enabled YouTube and the Kuwo song catalog together. Kuwo provides song information only; open its page to view more.</string>
     <string name="explore_aggregate_retry">Some sources are unavailable. Tap to retry</string>
+    <string name="explore_catalog_kuwo">Kuwo</string>
+    <string name="explore_catalog_metadata_only">Song information only</string>
+    <string name="explore_catalog_view_on_kuwo">View on Kuwo</string>
+    <string name="explore_catalog_open_failed">Unable to open the Kuwo page</string>
     <string name="search_keyword">Search Keyword</string>
     <string name="search_keywords">Search Keywords</string>
     <string name="search_video">Search Videos</string>

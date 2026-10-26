@@ -7,7 +7,7 @@ class RecordingMatchPolicyTest {
     private val studio = RecordingMetadata("晴天", "周杰伦", 269_000)
 
     @Test fun versionConflictsOverridePerfectTextAndDuration() {
-        listOf("Live", "翻唱", "伴奏", "Remix", "Radio Edit", "Sped Up", "Remastered", "重录").forEach { tag ->
+        listOf("Live", "Ｌｉｖｅ", "Ｃｏｖｅｒ", "Ｒｅｍｉｘ", "翻唱", "伴奏", "Remix", "Radio Edit", "Sped Up", "Remastered", "重录").forEach { tag ->
             val candidate = studio.copy(title = "晴天 ($tag)")
             assertEquals(tag, RecordingMismatch.VERSION, RecordingMatchPolicy.assess(studio, candidate).reason)
         }

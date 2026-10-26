@@ -961,6 +961,7 @@ fun ExploreScreen(
                                     key = { _, item -> item.stableKey }
                                 ) { index, item ->
                                     when (item) {
+                                        is ExploreSearchResult.Catalog -> CatalogSearchResultRow(item.track)
                                         is ExploreSearchResult.Song -> {
                                             val song = item.song
                                             val songListIndex = ui.searchResults.indexOfFirst {

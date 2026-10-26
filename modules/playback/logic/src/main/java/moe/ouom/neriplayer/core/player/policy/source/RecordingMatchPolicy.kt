@@ -33,7 +33,7 @@ object RecordingMatchPolicy {
 
     fun versions(metadata: RecordingMetadata): Set<RecordingVersion> = buildSet {
         if (metadata.version != RecordingVersion.UNKNOWN && metadata.version != RecordingVersion.STUDIO) add(metadata.version)
-        val text = "${metadata.title} ${metadata.versionContext}"
+        val text = Normalizer.normalize("${metadata.title} ${metadata.versionContext}", Normalizer.Form.NFKC)
         markers.forEach { (version, regex) -> if (regex.containsMatchIn(text)) add(version) }
     }
 

@@ -13,20 +13,21 @@ import androidx.compose.ui.unit.dp
 import moe.ouom.neriplayer.common.R as CoreCommonR
 import moe.ouom.neriplayer.common.search.FederatedSearchSnapshot
 import moe.ouom.neriplayer.common.search.SearchSourceFailure
-import moe.ouom.neriplayer.data.model.SongItem
+import moe.ouom.neriplayer.ui.viewmodel.tab.ExploreSearchResult
 
 @Composable
-internal fun AggregateSearchStatus(snapshot: FederatedSearchSnapshot<SongItem>?, onRetry: () -> Unit) {
+internal fun AggregateSearchStatus(snapshot: FederatedSearchSnapshot<ExploreSearchResult>?, onRetry: () -> Unit) {
     if (snapshot == null) return
     val names = mapOf("local" to stringResource(CoreCommonR.string.local_files),
         "netease" to stringResource(CoreCommonR.string.platform_netease_short),
-        "bilibili" to stringResource(CoreCommonR.string.platform_bilibili), "youtube" to "YouTube")
+        "bilibili" to stringResource(CoreCommonR.string.platform_bilibili), "youtube" to "YouTube",
+        "kuwo" to stringResource(CoreCommonR.string.explore_catalog_kuwo))
     val authRequired = stringResource(CoreCommonR.string.explore_source_login)
     val disabled = stringResource(CoreCommonR.string.explore_source_disabled)
     val unavailable = stringResource(CoreCommonR.string.explore_source_unavailable)
     Column(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 6.dp)) {
         Text(snapshot.sources.entries.joinToString(" · ") { (id, state) ->
-            val name = names.getValue(id)
+            val name = names[id] ?: id
             val suffix = when {
                 state.loading -> "…"
                 state.failure == SearchSourceFailure.AUTH_REQUIRED -> authRequired

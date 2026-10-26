@@ -56,6 +56,13 @@ class ExploreSearchResultRankingTest {
         assertEquals(songs, rankExploreSongSearchResults("Ｄｒｅａｍ", songs))
     }
 
+    @Test
+    fun `version preference does not promote an artist match over the requested song title`() {
+        val requested = song(1, "晴天 (Live)", "周杰伦")
+        val unrelated = song(2, "完全不同的歌", "晴天")
+        assertEquals(requested, rankExploreSongSearchResults("晴天", listOf(unrelated, requested)).first())
+    }
+
     private fun song(id: Long, name: String, artist: String = "周杰伦"): SongItem {
         return SongItem(
             id = id,

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="moe.ouom.neriplayer.core.player.policy.source.RecordingMatchPolicyTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-10-26T06:08:19.426Z" hostname="XUSHAOYANG" time="0.007">
+  <properties/>
+  <testcase name="titleArtistAndDurationAreIndependentRequirements" classname="moe.ouom.neriplayer.core.player.policy.source.RecordingMatchPolicyTest" time="0.001"/>
+  <testcase name="sameVersionAndCosmeticDifferencesCanMatch" classname="moe.ouom.neriplayer.core.player.policy.source.RecordingMatchPolicyTest" time="0.001"/>
+  <testcase name="versionConflictsOverridePerfectTextAndDuration" classname="moe.ouom.neriplayer.core.player.policy.source.RecordingMatchPolicyTest" time="0.004"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

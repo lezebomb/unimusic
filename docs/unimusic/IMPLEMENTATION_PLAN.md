@@ -1,6 +1,6 @@
 # UniMusic 分阶段实施与验收
 
-状态日期：2026-10-26。Phase 1A、1B 导入后台和 [2A 临播音源筛选](PHASE_2A_SOURCES.md) 已完成，Room 当前 v22，2A 远端 CI 已通过。按用户优先级继续音源与搜索，完成 [2B 聚合搜索](PHASE_2B_SEARCH.md)：复用本地/网易云/B 站/已开启的 YouTube 并行发现、独立分页/错误与版本排序，42 个定向测试和 Debug APK 构建通过。尚无真实账号或设备播放验证；更多新平台、统一 UUID 解析、持久匹配和完整播放闭环仍待完成，不能宣称全部曲目免费可听。
+状态日期：2026-10-26。Phase 1A、1B 导入后台和 2A–2C 已完成，Room 当前 v22，2C 远端 CI 已通过。本轮完成 [2D 目录搜索与排名修正](PHASE_2D_CATALOG_SEARCH.md)：酷我仅元数据结果进入聚合界面并保留官方跳转，与播放队列隔离；修复全角版本漏判、后台执行聚合排名并缓存同次查询分数。22 个定向测试及 Debug 构建通过。尚无真实账号或设备播放验证；统一 UUID 解析、持久匹配和完整播放闭环仍待完成。
 
 ## 执行约定
 
@@ -62,6 +62,8 @@
 2B 已增加现有四来源聚合搜索与版本排序，复用原搜索的 300ms 输入去抖及 generation 取消，独立游标/预算/失败可见；点击播放才解析 URL。现阶段保留跨平台候选，不做无证据的录音合并。音源机制参考与实际范围见 [调研](MUSIC_SOURCE_RESEARCH.md) 和 [2B 报告](PHASE_2B_SEARCH.md)。后续仍需来源权利能力、持久匹配/拒绝和统一 UUID 临播入口。
 
 2C 完成 [酷我仅目录 Provider 与 B 站候选优化](PHASE_2C_CATALOG_AND_MATCHING.md)，并用最新 REA 6.8 CLI 完成 [提供样本的安全静态审计](APK_SOURCE_AUDIT.md)。酷我普通 HTTPS 搜索已在本机取得 5 条元数据，尚无音频可用性结论；新目录 Provider 仅后台装配，未混入可播放 SongItem。新增 6 个测试方法通过。
+
+2D 将该目录以独立 Catalog 类型接入聚合界面，严格限制官方外链，并保留 Song 专用播放队列。修复全角版本识别，查询排名移出主线程、缓存同查询分数并限制版本偏好权重，详见 [2D](PHASE_2D_CATALOG_SEARCH.md)。这不是酷我完整音频接入或可信跨平台录音合并。
 
 1. 先做匹配安全基座：Normalization、VersionClassification、SongMatch/Override repository、硬冲突拒绝、来源资格类型。分析上游加分与分 P 双重累计，旧 70 分阈值不能迁成概率。
 2. `UnifiedSearchEngine` 使用 Flow/Coroutines、supervisorScope/每源预算、平台限流、去抖和请求取消。先返回本地/首个远端批次，合并有证明的同录音；页游标、错误和加载状态按 provider 保存。
