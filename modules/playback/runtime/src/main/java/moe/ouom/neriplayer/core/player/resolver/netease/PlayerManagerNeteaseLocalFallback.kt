@@ -17,9 +17,10 @@ import moe.ouom.neriplayer.data.local.media.displayArtist
 import moe.ouom.neriplayer.data.local.media.displayName
 import moe.ouom.neriplayer.data.model.stableKey
 import kotlin.math.absoluteValue
+import moe.ouom.neriplayer.core.player.policy.source.RecordingMatchPolicy
+import moe.ouom.neriplayer.core.player.policy.source.RecordingMetadata
 
 internal const val NETEASE_LOCAL_FALLBACK_DURATION_TOLERANCE_MS = 8_000L
-private val localFallbackNonTextRegex = Regex("[^\\p{L}\\p{N}]+")
 
 internal suspend fun PlayerManager.tryResolveNeteaseMatchedLocalSource(song: SongItem): SongUrlResult? {
     if (!neteaseLocalSourceFallbackEnabled) return null
@@ -40,7 +41,6 @@ internal suspend fun PlayerManager.tryResolveNeteaseMatchedLocalSource(song: Son
             "NERI-PlayerManager",
             "Netease source unavailable, fallback to matched local audio: " +
                 "song=${song.name}, matchedSongId=${candidate.matchedSongId}, " +
-                "local=${candidate.localFileName ?: localMediaUri}, " +
                 "songDurationMs=${song.durationMs}, localDurationMs=${candidate.durationMs}"
         )
         val playableAudioInfo = runCatching { playableUrl.toUri() }.getOrNull()
@@ -73,7 +73,7 @@ internal fun selectNeteaseLocalFallbackCandidates(
     val exact = localCandidates.filter { candidate ->
         candidate.matchedLyricSource == MusicPlatform.CLOUD_MUSIC &&
             candidate.matchedSongId == targetId &&
-            isNeteaseLocalFallbackDurationCompatible(song, candidate)
+            matchesNeteaseLocalFallbackMetadata(song, candidate)
     }
     val exactKeys = exact.mapTo(mutableSetOf()) { it.stableKey() }
     val rest = localCandidates.filterNot { it.stableKey() in exactKeys }
@@ -84,27 +84,11 @@ internal fun selectNeteaseLocalFallbackCandidates(
         .distinctBy { it.stableKey() }
 }
 
-private fun isNeteaseLocalFallbackDurationCompatible(
-    song: SongItem,
-    candidate: SongItem
-): Boolean {
-    if (song.durationMs <= 0L || candidate.durationMs <= 0L) return true
-    return (candidate.durationMs - song.durationMs).absoluteValue <=
-        NETEASE_LOCAL_FALLBACK_DURATION_TOLERANCE_MS
-}
-
 internal fun matchesNeteaseLocalFallbackMetadata(song: SongItem, candidate: SongItem): Boolean {
-    if (song.durationMs <= 0L || candidate.durationMs <= 0L) return false
-    val durationDiff = (candidate.durationMs - song.durationMs).absoluteValue
-    if (durationDiff > NETEASE_LOCAL_FALLBACK_DURATION_TOLERANCE_MS) return false
-
-    val targetTitle = compactLocalFallbackText(song.originalName ?: song.name)
-    if (targetTitle.isEmpty()) return false
-    if (compactLocalFallbackText(candidate.displayName()) != targetTitle) return false
-
-    val targetArtist = compactLocalFallbackText(song.originalArtist ?: song.artist)
-    if (targetArtist.isEmpty()) return true
-    return compactLocalFallbackText(candidate.displayArtist()) == targetArtist
+    return RecordingMatchPolicy.assess(song.recordingMetadata(), RecordingMetadata(
+        candidate.displayName(), candidate.displayArtist(), candidate.durationMs,
+        versionContext = "${candidate.name} ${candidate.album}"
+    ), NETEASE_LOCAL_FALLBACK_DURATION_TOLERANCE_MS).accepted
 }
 
 private fun sortByDurationCloseness(song: SongItem, candidates: List<SongItem>): List<SongItem> {
@@ -116,8 +100,4 @@ private fun sortByDurationCloseness(song: SongItem, candidates: List<SongItem>):
             Long.MAX_VALUE
         }
     }
-}
-
-private fun compactLocalFallbackText(value: String): String {
-    return localFallbackNonTextRegex.replace(value.lowercase(), "")
 }

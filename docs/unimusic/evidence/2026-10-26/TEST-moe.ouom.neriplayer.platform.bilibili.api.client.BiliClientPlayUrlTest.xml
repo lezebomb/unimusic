@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="moe.ouom.neriplayer.platform.bilibili.api.client.BiliClientPlayUrlTest" tests="7" skipped="0" failures="0" errors="0" timestamp="2026-10-26T04:37:50.108Z" hostname="XUSHAOYANG" time="0.708">
+  <properties/>
+  <testcase name="play info without any media is not retried" classname="moe.ouom.neriplayer.platform.bilibili.api.client.BiliClientPlayUrlTest" time="0.579"/>
+  <testcase name="play url by avid omits unset options and tolerates absent stream sections" classname="moe.ouom.neriplayer.platform.bilibili.api.client.BiliClientPlayUrlTest" time="0.017"/>
+  <testcase name="play url api error is reported with code and message" classname="moe.ouom.neriplayer.platform.bilibili.api.client.BiliClientPlayUrlTest" time="0.025"/>
+  <testcase name="play url request sends every explicit option and parses all stream sections" classname="moe.ouom.neriplayer.platform.bilibili.api.client.BiliClientPlayUrlTest" time="0.023"/>
+  <testcase name="unusable html5 fallback reuses the last progressive stream from the dash response" classname="moe.ouom.neriplayer.platform.bilibili.api.client.BiliClientPlayUrlTest" time="0.021"/>
+  <testcase name="available dash audio is returned without retrying" classname="moe.ouom.neriplayer.platform.bilibili.api.client.BiliClientPlayUrlTest" time="0.013"/>
+  <testcase name="empty dash audio is retried with backoff before using the html5 progressive stream" classname="moe.ouom.neriplayer.platform.bilibili.api.client.BiliClientPlayUrlTest" time="0.022"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

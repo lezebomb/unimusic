@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="moe.ouom.neriplayer.core.player.policy.source.PlaybackSourceResolverTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-10-26T04:42:52.376Z" hostname="XUSHAOYANG" time="0.334">
+  <properties/>
+  <testcase name="totalBudgetIncludesDiscoveryAndEachSlowCandidate" classname="moe.ouom.neriplayer.core.player.policy.source.PlaybackSourceResolverTest" time="0.309"/>
+  <testcase name="firstSuccessStopsDiscoveryAndSkipsIneligibleAudio" classname="moe.ouom.neriplayer.core.player.policy.source.PlaybackSourceResolverTest" time="0.005"/>
+  <testcase name="parentCancellationPropagatesAndDoesNotBlacklistTheSource" classname="moe.ouom.neriplayer.core.player.policy.source.PlaybackSourceResolverTest" time="0.005"/>
+  <testcase name="transientFailureCoolsDownWithoutPoisoningOtherSongs" classname="moe.ouom.neriplayer.core.player.policy.source.PlaybackSourceResolverTest" time="0.008"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

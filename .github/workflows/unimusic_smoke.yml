@@ -8,6 +8,8 @@ on:
       - 'modules/database/**'
       - 'modules/local/**'
       - 'modules/platform/**'
+      - 'modules/playback/**'
+      - 'tools_pub/quality/module_boundaries.py'
       - 'app/src/main/java/moe/ouom/neriplayer/NeriPlayerApplication.kt'
       - 'app/src/main/java/moe/ouom/neriplayer/core/di/AppContainer.kt'
       - '.github/workflows/unimusic_smoke.yml'
@@ -50,7 +52,9 @@ jobs:
           ./gradlew -Dorg.gradle.java.installations.paths="$JAVA_HOME_17_X64" \
             :database:testDebugUnitTest --tests '*RegisteredMigrationChainTest' --tests '*NeriUserDataDatabaseVersionTest' --tests '*PlaylistImportMigrationTest' \
             :local:testDebugUnitTest --tests '*UnifiedLibraryRoomStoreTest' --tests '*PlaylistImportCoordinatorTest' --tests '*LocalPlaylistSyncMutationDecoderTest' \
-            :platform:testDebugUnitTest --tests '*NeteasePlaylistImportProviderTest' \
+            :platform:testDebugUnitTest --tests '*NeteasePlaylistImportProviderTest' --tests '*BiliClientPlayUrlTest' \
+            :playback:logic:testDebugUnitTest --tests '*RecordingMatchPolicyTest' --tests '*PlaybackSourceResolverTest' --tests '*SongUrlResolutionRetryTest' \
+            :playback:runtime:testDebugUnitTest --tests '*BiliRecordingMatchTest' --tests '*PlayerManagerNeteaseAutoSourceSwitchTest' --tests '*PlayerManagerNeteaseLocalFallbackTest' \
             :database:assembleDebugAndroidTest --max-workers=2 --console=plain
       - name: Enable KVM
         run: |
@@ -79,6 +83,8 @@ jobs:
             modules/database/build/test-results/**/*.xml
             modules/local/build/test-results/**/*.xml
             modules/platform/build/test-results/**/*.xml
+            modules/playback/logic/build/test-results/**/*.xml
+            modules/playback/runtime/build/test-results/**/*.xml
             modules/database/build/outputs/androidTest-results/**
             build/unimusic-migration-preservation/**
           if-no-files-found: ignore

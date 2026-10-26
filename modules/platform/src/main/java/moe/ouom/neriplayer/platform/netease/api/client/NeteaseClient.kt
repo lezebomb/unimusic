@@ -872,6 +872,31 @@ class NeteaseClient(
         return request(url, params, CryptoMode.WEAPI, "POST", usePersistedCookies = true)
     }
 
+    /** Same authorized endpoint as getSongDownloadUrl, with a pinned, cancellable login session. */
+    suspend fun getSongDownloadUrlCancellable(songId: Long, level: String = "lossless"): String {
+        val session = sessionStore.currentSession()
+        suspend fun call(): String = requestCancellable(
+            "https://interface.music.163.com/eapi/song/enhance/player/url/v1",
+            mapOf("ids" to "[$songId]", "level" to level, "encodeType" to "flac"),
+            CryptoMode.EAPI, "POST", usePersistedCookies = session.hasLogin(),
+            retryHttp1OnStreamReset = true, session = session
+        )
+        var response = call()
+        if (sessionStore.currentSession() !== session) return "{\"code\":301}"
+        if (runCatching { JSONObject(response).optInt("code") }.getOrNull() == 301 && session.hasLogin()) {
+            // Preserve the existing one-time CSRF preheat, without a blocking HTTP call.
+            try {
+                requestCancellable("https://music.163.com/", emptyMap(), CryptoMode.API, "GET",
+                    usePersistedCookies = true, session = session)
+            } catch (cancelled: kotlinx.coroutines.CancellationException) {
+                throw cancelled
+            } catch (_: IOException) { /* Return the endpoint's original login response. */ }
+            if (sessionStore.currentSession() !== session) return "{\"code\":301}"
+            response = call()
+        }
+        return if (sessionStore.currentSession() === session) response else "{\"code\":301}"
+    }
+
     @Throws(IOException::class)
     fun getSongDetail(ids: List<Long>): String {
         require(ids.isNotEmpty()) { "ids must not be empty" }

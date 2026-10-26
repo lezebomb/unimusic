@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="moe.ouom.neriplayer.core.player.resolver.netease.PlayerManagerNeteaseLocalFallbackTest" tests="14" skipped="0" failures="0" errors="0" timestamp="2026-10-26T04:38:10.177Z" hostname="XUSHAOYANG" time="0.02">
+  <properties/>
+  <testcase name="metadataMatch_rejectsDurationOutsideTolerance" classname="moe.ouom.neriplayer.core.player.resolver.netease.PlayerManagerNeteaseLocalFallbackTest" time="0.002"/>
+  <testcase name="select_acceptsMetadataOnlyLocalSongAsRestrictedFallback" classname="moe.ouom.neriplayer.core.player.resolver.netease.PlayerManagerNeteaseLocalFallbackTest" time="0.008"/>
+  <testcase name="metadataMatch_rejectsUnknownDurations" classname="moe.ouom.neriplayer.core.player.resolver.netease.PlayerManagerNeteaseLocalFallbackTest" time="0.001"/>
+  <testcase name="select_ignoresNonLocalSongsEvenWhenMatched" classname="moe.ouom.neriplayer.core.player.resolver.netease.PlayerManagerNeteaseLocalFallbackTest" time="0.001"/>
+  <testcase name="lyricMatchCannotAuthorizeDifferentRecordingOrUnknownDuration" classname="moe.ouom.neriplayer.core.player.resolver.netease.PlayerManagerNeteaseLocalFallbackTest" time="0.001"/>
+  <testcase name="select_rejectsExactMatchedSongIdWhenDurationIsTooFarOff" classname="moe.ouom.neriplayer.core.player.resolver.netease.PlayerManagerNeteaseLocalFallbackTest" time="0.0"/>
+  <testcase name="select_deduplicatesSameLocalFileAcrossPlaylists" classname="moe.ouom.neriplayer.core.player.resolver.netease.PlayerManagerNeteaseLocalFallbackTest" time="0.002"/>
+  <testcase name="select_sortsExactMatchesByDurationCloseness" classname="moe.ouom.neriplayer.core.player.resolver.netease.PlayerManagerNeteaseLocalFallbackTest" time="0.001"/>
+  <testcase name="metadataMatch_rejectsDifferentArtist" classname="moe.ouom.neriplayer.core.player.resolver.netease.PlayerManagerNeteaseLocalFallbackTest" time="0.0"/>
+  <testcase name="metadataMatch_usesCustomOverrideFromManualMatch" classname="moe.ouom.neriplayer.core.player.resolver.netease.PlayerManagerNeteaseLocalFallbackTest" time="0.0"/>
+  <testcase name="metadataMatch_prefersOriginalMetadataOfRenamedNeteaseSong" classname="moe.ouom.neriplayer.core.player.resolver.netease.PlayerManagerNeteaseLocalFallbackTest" time="0.001"/>
+  <testcase name="select_qqMatchedIdIsNotAnExactMatchButCanMatchByMetadata" classname="moe.ouom.neriplayer.core.player.resolver.netease.PlayerManagerNeteaseLocalFallbackTest" time="0.0"/>
+  <testcase name="metadataMatch_normalizesCaseWhitespaceAndPunctuation" classname="moe.ouom.neriplayer.core.player.resolver.netease.PlayerManagerNeteaseLocalFallbackTest" time="0.001"/>
+  <testcase name="select_prefersExactMatchedSongIdOverFuzzyMetadata" classname="moe.ouom.neriplayer.core.player.resolver.netease.PlayerManagerNeteaseLocalFallbackTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

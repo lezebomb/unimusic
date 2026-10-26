@@ -1,0 +1,156 @@
+{
+  "date": "2026-10-26",
+  "scope": "Phase 2A existing Android playback source acquisition",
+  "baseCommit": "14da4d19",
+  "schemaVersion": 22,
+  "databaseChanged": false,
+  "initialJvmRun": {
+    "tests": 40,
+    "newTestMethods": 13,
+    "failures": 0,
+    "errors": 0,
+    "countsFrom": "All seven suite XML files were parsed after phase2a-tests.log completed. Final narrower logic run subsequently replaced two XML files.",
+    "suites": [
+      {
+        "name": "RecordingMatchPolicyTest",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0
+      },
+      {
+        "name": "PlaybackSourceResolverTest",
+        "tests": 4,
+        "failures": 0,
+        "errors": 0
+      },
+      {
+        "name": "SongUrlResolutionRetryTest",
+        "tests": 4,
+        "failures": 0,
+        "errors": 0
+      },
+      {
+        "name": "BiliRecordingMatchTest",
+        "tests": 5,
+        "failures": 0,
+        "errors": 0
+      },
+      {
+        "name": "PlayerManagerNeteaseAutoSourceSwitchTest",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0
+      },
+      {
+        "name": "PlayerManagerNeteaseLocalFallbackTest",
+        "tests": 14,
+        "failures": 0,
+        "errors": 0
+      },
+      {
+        "name": "BiliClientPlayUrlTest",
+        "tests": 7,
+        "failures": 0,
+        "errors": 0
+      }
+    ]
+  },
+  "finalJvmRerun": {
+    "tests": 4,
+    "suite": "PlaybackSourceResolverTest",
+    "reason": "Negative monotonic-clock origin cooldown fix"
+  },
+  "retainedJvmSuites": [
+    {
+      "name": "moe.ouom.neriplayer.core.player.policy.source.PlaybackSourceResolverTest",
+      "tests": "4",
+      "failures": "0",
+      "errors": "0",
+      "timestamp": "2026-10-26T04:42:52.376Z"
+    },
+    {
+      "name": "moe.ouom.neriplayer.core.player.resolver.netease.BiliRecordingMatchTest",
+      "tests": "5",
+      "failures": "0",
+      "errors": "0",
+      "timestamp": "2026-10-26T04:38:10.080Z"
+    },
+    {
+      "name": "moe.ouom.neriplayer.core.player.resolver.netease.PlayerManagerNeteaseAutoSourceSwitchTest",
+      "tests": "3",
+      "failures": "0",
+      "errors": "0",
+      "timestamp": "2026-10-26T04:38:10.170Z"
+    },
+    {
+      "name": "moe.ouom.neriplayer.core.player.resolver.netease.PlayerManagerNeteaseLocalFallbackTest",
+      "tests": "14",
+      "failures": "0",
+      "errors": "0",
+      "timestamp": "2026-10-26T04:38:10.177Z"
+    },
+    {
+      "name": "moe.ouom.neriplayer.platform.bilibili.api.client.BiliClientPlayUrlTest",
+      "tests": "7",
+      "failures": "0",
+      "errors": "0",
+      "timestamp": "2026-10-26T04:37:50.108Z"
+    }
+  ],
+  "retainedXmlTestCount": 33,
+  "logs": [
+    {
+      "path": "build/unimusic-toolchain/phase2a-compile.log",
+      "sha256": "793a37ba79c4af79e6ee9a3ff12d4991e3773b5eab60a2e9db171ad5eb224165",
+      "result": "success"
+    },
+    {
+      "path": "build/unimusic-toolchain/phase2a-tests.log",
+      "sha256": "0ef5f141fcaaedb67ac6e4d28f70694d81aaa9bd6e0ac80a9a45a031f8fa3945",
+      "result": "success"
+    },
+    {
+      "path": "build/unimusic-toolchain/phase2a-final.log",
+      "sha256": "5d2c92ab9f8692f2f9e45962d584e5d82dc0492e44db781563e33bfe9efebd20",
+      "result": "success"
+    },
+    {
+      "path": "build/unimusic-toolchain/phase2a-boundaries.log",
+      "sha256": "f10fd66c214b917ee89a1cfc270e44fb332b76cf9000c053f0514056d7a97e2d",
+      "result": "success"
+    }
+  ],
+  "commands": [
+    "python -X utf8 tools_pub/quality/module_boundaries.py",
+    "gradlew.bat -Dorg.gradle.java.installations.paths=D:/unimusic/.gradle-home/jdks/jdk-17.0.20.1+1 :playback:logic:testDebugUnitTest --tests '*RecordingMatchPolicyTest' --tests '*PlaybackSourceResolverTest' --tests '*SongUrlResolutionRetryTest' :playback:runtime:testDebugUnitTest --tests '*BiliRecordingMatchTest' --tests '*PlayerManagerNeteaseAutoSourceSwitchTest' --tests '*PlayerManagerNeteaseLocalFallbackTest' :platform:testDebugUnitTest --tests '*BiliClientPlayUrlTest' --continue --max-workers=2 --console=plain",
+    "gradlew.bat -Dorg.gradle.java.installations.paths=D:/unimusic/.gradle-home/jdks/jdk-17.0.20.1+1 :playback:logic:testDebugUnitTest --tests '*PlaybackSourceResolverTest' :app:assembleDebug --max-workers=2 --console=plain"
+  ],
+  "apk": {
+    "path": "app/build/outputs/apk/debug/app-debug.apk",
+    "bytes": 62275378,
+    "sha256": "28fe3950db6ef54b5e90f0a408730a606052aff6e0f25ad08251bd10b4d4610d",
+    "installedThisRound": false
+  },
+  "implemented": [
+    "metadata/version gate",
+    "strict Bili part selection",
+    "normal endpoint preview/DRM rejection",
+    "cancellable playback requests",
+    "bounded sequential first-success resolver",
+    "transient failure cooldown"
+  ],
+  "notRun": [
+    "Physical device or emulator execution",
+    "Real Netease/Bili account playback or source switching",
+    "Labeled recording-match accuracy or playable-catalog coverage",
+    "Performance/power measurement",
+    "Release signing"
+  ],
+  "notImplemented": [
+    "Unified UUID playback resolver",
+    "Persistent recording-match confirmation/overrides",
+    "Independent platform rights/capability registry",
+    "Unified search aggregation"
+  ],
+  "remoteCi": "To be checked for the new pushed commit; previous 14da4d19 CI succeeded, run 40169373912"
+}

@@ -9,6 +9,17 @@ import org.junit.Test
 
 class PlayerManagerNeteaseLocalFallbackTest {
 
+    @Test fun lyricMatchCannotAuthorizeDifferentRecordingOrUnknownDuration() {
+        val target = neteaseSong(123, "晴天", "周杰伦", 269_000)
+        listOf("Live", "翻唱", "伴奏", "Remix", "变速").forEach { tag ->
+            val local = localSong("/music/version.flac", "晴天 ($tag)", "周杰伦", 269_000,
+                "123", MusicPlatform.CLOUD_MUSIC)
+            assertTrue(selectNeteaseLocalFallbackCandidates(target, listOf(local)).isEmpty())
+        }
+        val unknown = localSong("/music/unknown.flac", "晴天", "周杰伦", 0, "123", MusicPlatform.CLOUD_MUSIC)
+        assertTrue(selectNeteaseLocalFallbackCandidates(target, listOf(unknown)).isEmpty())
+    }
+
     @Test
     fun select_prefersExactMatchedSongIdOverFuzzyMetadata() {
         val song = neteaseSong(id = 123L, name = "晴天", artist = "周杰伦", durationMs = 269_000L)

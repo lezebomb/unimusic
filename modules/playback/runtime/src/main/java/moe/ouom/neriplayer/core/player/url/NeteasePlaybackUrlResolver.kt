@@ -1,0 +1,176 @@
+package moe.ouom.neriplayer.core.player.url
+
+import android.os.SystemClock
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeoutOrNull
+import moe.ouom.neriplayer.common.R as CoreCommonR
+import moe.ouom.neriplayer.common.logging.NPLogger
+import moe.ouom.neriplayer.core.player.PlayerManager
+import moe.ouom.neriplayer.core.player.network.isPlaybackNetworkUsable
+import moe.ouom.neriplayer.core.player.quality.effectiveNeteaseQuality
+import moe.ouom.neriplayer.core.player.resolver.netease.tryResolveNeteaseAutoBiliSource
+import moe.ouom.neriplayer.core.player.resolver.netease.tryResolveNeteaseMatchedLocalSource
+import moe.ouom.neriplayer.core.player.runtime.refresh.RefreshResolverSideEffects
+import moe.ouom.neriplayer.data.model.SongItem
+import moe.ouom.neriplayer.data.model.playback.PlayerEvent
+import moe.ouom.neriplayer.data.model.playback.SongUrlResult
+import moe.ouom.neriplayer.platform.netease.api.playback.parser.NeteasePlaybackResponseParser
+
+internal suspend fun PlayerManager.getNeteaseSongUrl(
+    song: SongItem,
+    suppressError: Boolean = false,
+    sideEffects: RefreshResolverSideEffects = RefreshResolverSideEffects(),
+    allowLocalFallback: Boolean = true,
+    allowPreviewFallback: Boolean = true,
+    allowAutoBiliFallback: Boolean = true
+): SongUrlResult = withContext(Dispatchers.IO) {
+    try {
+        val effectiveQuality = effectiveNeteaseQuality()
+        val qualityCandidates = buildNeteaseQualityCandidates(effectiveQuality)
+        var previewFallback: SongUrlResult.Success? = null
+        var lastFailureReason: NeteasePlaybackResponseParser.FailureReason? = null
+        var requiresLogin = false
+        val deadline = SystemClock.elapsedRealtime() + 8_000L
+
+        for ((index, quality) in qualityCandidates.withIndex()) {
+            val remainingMs = deadline - SystemClock.elapsedRealtime()
+            if (remainingMs <= 0L) break
+            val resp = withTimeoutOrNull(minOf(3_000L, remainingMs)) {
+                neteaseClient.getSongDownloadUrlCancellable(song.id, level = quality)
+            } ?: break
+            NPLogger.d("NERI-PlayerManager", "Netease URL response: id=${song.id}, requestedQuality=$quality")
+
+            when (val parsed = NeteasePlaybackResponseParser.parsePlayback(resp, song.durationMs)) {
+                is NeteasePlaybackResponseParser.PlaybackResult.RequiresLogin -> {
+                    requiresLogin = true
+                    if (shouldRetryNeteaseWithLowerQualityAfterLogin(
+                            qualityIndex = index,
+                            lastQualityIndex = qualityCandidates.lastIndex
+                        )
+                    ) {
+                        NPLogger.w(
+                            "NERI-PlayerManager",
+                            "当前音质需要登录，继续尝试更低音质: id=${song.id}, level=$quality"
+                        )
+                        continue
+                    }
+                    break
+                }
+
+                is NeteasePlaybackResponseParser.PlaybackResult.Success -> {
+                    val success = buildNeteaseSuccessResult(
+                        parsed = parsed,
+                        resolvedQualityKey = quality,
+                        fallbackDurationMs = song.durationMs,
+                        getLocalizedString = { getLocalizedString(it) }
+                    ).let { result ->
+                        if (parsed.notice == NeteasePlaybackResponseParser.Notice.PREVIEW_CLIP) {
+                            result.copy(
+                                cacheKeyOverride = buildNeteasePreviewCacheKey(
+                                    songId = song.id,
+                                    preferredQuality = quality
+                                )
+                            )
+                        } else {
+                            result
+                        }
+                    }
+                    if (parsed.notice != NeteasePlaybackResponseParser.Notice.PREVIEW_CLIP) {
+                        if (quality != effectiveQuality) {
+                            NPLogger.w(
+                                "NERI-PlayerManager",
+                                "当前音质不可用，已自动降级: id=${song.id}, preferred=$effectiveQuality, resolved=$quality"
+                            )
+                        }
+                        return@withContext success
+                    }
+
+                    previewFallback = success
+                    if (index < qualityCandidates.lastIndex) {
+                        NPLogger.w(
+                            "NERI-PlayerManager",
+                            "当前音质仅返回试听片段，继续尝试更低音质: id=${song.id}, level=$quality"
+                        )
+                        continue
+                    }
+                }
+
+                is NeteasePlaybackResponseParser.PlaybackResult.Failure -> {
+                    lastFailureReason = parsed.reason
+                    if (index < qualityCandidates.lastIndex &&
+                        shouldRetryNeteaseWithLowerQuality(parsed.reason)
+                    ) {
+                        NPLogger.w(
+                            "NERI-PlayerManager",
+                            "当前音质不可播放，继续尝试更低音质: id=${song.id}, level=$quality, reason=${parsed.reason}"
+                        )
+                        continue
+                    }
+                    break
+                }
+            }
+        }
+
+        // These are independent local/opt-in sources, not retries that bypass Netease access checks.
+        resolveNeteaseAlternates(song, sideEffects, allowLocalFallback, allowAutoBiliFallback)?.let {
+            return@withContext it
+        }
+
+        if (allowPreviewFallback) {
+            previewFallback?.let { return@withContext it }
+        }
+
+        if (requiresLogin) {
+            return@withContext SongUrlResult.RequiresLogin
+        }
+
+        if (!suppressError) {
+            val messageRes = when (lastFailureReason) {
+                NeteasePlaybackResponseParser.FailureReason.NO_PERMISSION ->
+                    CoreCommonR.string.player_netease_no_permission_switch_platform
+                NeteasePlaybackResponseParser.FailureReason.NO_PLAY_URL,
+                NeteasePlaybackResponseParser.FailureReason.UNKNOWN,
+                null -> CoreCommonR.string.error_no_play_url
+            }
+            sideEffects.emitError {
+                postPlayerEvent(PlayerEvent.ShowError(getLocalizedString(messageRes)))
+            }
+        }
+        SongUrlResult.Failure
+    } catch (e: Exception) {
+        if (e is CancellationException) throw e
+        resolveNeteaseAlternates(song, sideEffects, allowLocalFallback, allowAutoBiliFallback)?.let {
+            return@withContext it
+        }
+        NPLogger.w("NERI-PlayerManager", "Netease URL resolution failed: type=${e.javaClass.simpleName}")
+        if (!suppressError && isPlaybackNetworkUsable(application)) {
+            sideEffects.emitError {
+                postPlayerEvent(
+                    PlayerEvent.ShowError(
+                        getLocalizedString(
+                            CoreCommonR.string.player_playback_url_error_detail,
+                            e.javaClass.simpleName
+                        )
+                    )
+                )
+            }
+        }
+        SongUrlResult.Failure
+    }
+}
+
+private suspend fun PlayerManager.resolveNeteaseAlternates(
+    song: SongItem, sideEffects: RefreshResolverSideEffects, local: Boolean, online: Boolean
+): SongUrlResult? {
+    if (local) {
+        try { tryResolveNeteaseMatchedLocalSource(song)?.let { return it } }
+        catch (cancelled: CancellationException) { throw cancelled }
+        catch (_: Exception) { NPLogger.w("NERI-PlayerManager", "Local alternate is temporarily unreadable") }
+    }
+    if (online && isPlaybackNetworkUsable(application)) {
+        return tryResolveNeteaseAutoBiliSource(song, sideEffects)
+    }
+    return null
+}

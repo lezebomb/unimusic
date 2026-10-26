@@ -30,6 +30,8 @@ import java.util.concurrent.TimeUnit
 import kotlin.math.max
 import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.CancellationException
+import moe.ouom.neriplayer.network.http.awaitResponse
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
@@ -1082,9 +1084,7 @@ class BiliClient(
             .get()
             .build()
 
-        return http.newCall(req).executeOrThrow().use { resp ->
-            resp.body.string()
-        }
+        return http.newCall(req).awaitBiliText()
     }
 
     private suspend fun getJsonWbi(baseUrl: String, params: Map<String, String>): JSONObject {
@@ -1168,6 +1168,7 @@ class BiliClient(
         return try {
             fetchMixinKeyFromNav()
         } catch (e: Exception) {
+            if (e is CancellationException) throw e
             NPLogger.w(TAG, "Fetch Wbi key from nav failed, fallback to ticket", e)
             fetchMixinKeyFromTicket()
         }
@@ -1184,7 +1185,7 @@ class BiliClient(
             .get()
             .build()
 
-        val text = http.newCall(req).executeOrThrow().use { it.body.string() }
+        val text = http.newCall(req).awaitBiliText()
         val jo = JSONObject(text)
         val data = jo.optJSONObject("data") ?: JSONObject()
         val wbiImg = data.optJSONObject("wbi_img") ?: JSONObject()
@@ -1213,7 +1214,7 @@ class BiliClient(
             .post(ByteArray(0).toRequestBody(null))
             .build()
 
-        val text = http.newCall(req).executeOrThrow().use { it.body.string() }
+        val text = http.newCall(req).awaitBiliText()
         val jo = JSONObject(text)
         val data = jo.optJSONObject("data") ?: JSONObject()
         val nav = data.optJSONObject("nav") ?: JSONObject()
@@ -1325,6 +1326,12 @@ class BiliClient(
             throw BiliHttpStatusException(code, text)
         }
         return resp
+    }
+
+    private suspend fun okhttp3.Call.awaitBiliText(): String = awaitResponse { response ->
+        val text = response.body.string()
+        if (!response.isSuccessful) throw BiliHttpStatusException(response.code, text)
+        text
     }
 
     private fun md5(s: String): String {

@@ -35,7 +35,7 @@ SYNC_DOMAIN_FAMILIES = tuple(
 )
 PLAYER_POLICY_FAMILIES = tuple(
     f"core/player/policy/{family}"
-    for family in ("audio", "command", "offload", "pending", "progress", "service", "skip", "storage", "wake")
+    for family in ("audio", "command", "offload", "pending", "progress", "service", "skip", "source", "storage", "wake")
 )
 PLAYER_AUDIO_FAMILIES = ("core/player/audio/processing", "core/player/audio/reactive")
 DOWNLOAD_RULE_FAMILIES = (

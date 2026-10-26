@@ -6,7 +6,7 @@ import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import moe.ouom.neriplayer.platform.bilibili.api.http.BILI_FINGERPRINT_URL
 import moe.ouom.neriplayer.platform.bilibili.api.http.BILI_FINGERPRINT_USER_AGENT
-import moe.ouom.neriplayer.platform.bilibili.api.http.executeBiliOrThrow
+import moe.ouom.neriplayer.network.http.awaitResponse
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.json.JSONObject
@@ -49,7 +49,8 @@ internal class BiliCookieSession(
             .header("User-Agent", BILI_FINGERPRINT_USER_AGENT)
             .get()
             .build()
-        val data = http.newCall(request).executeBiliOrThrow().use { response ->
+        val data = http.newCall(request).awaitResponse { response ->
+            if (!response.isSuccessful) throw java.io.IOException("HTTP ${response.code}")
             JSONObject(response.body.string()).optJSONObject("data") ?: JSONObject()
         }
         listOf(
