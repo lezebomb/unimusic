@@ -12,6 +12,7 @@ class SourceMatchBackend(context: Context) {
     suspend fun matches(songId: String, song: SongItem) = store.matches(songId, song)
     suspend fun subjectId(song: SongItem) = store.subjectId(song)
     suspend fun isRejected(song: SongItem, key: SongSourceKey) = store.isRejected(song, key)
+    suspend fun decisionStamp(song: SongItem, key: SongSourceKey) = store.decisionStamp(song, key)
     suspend fun observe(song: SongItem, candidate: RecordingSourceCandidate) = store.observe(song, candidate)
     suspend fun decide(song: SongItem, candidate: RecordingSourceCandidate, decision: SourceMatchDecision) = store.decide(song, candidate, decision)
     suspend fun clear(song: SongItem, key: SongSourceKey) = store.clear(song, key)

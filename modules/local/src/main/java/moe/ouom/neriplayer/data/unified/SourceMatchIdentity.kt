@@ -43,12 +43,6 @@ internal fun sourceMatchFingerprint(metadata: UnifiedSongMetadata): String {
 
 internal fun positiveSourceId(value: String): Boolean = value.toLongOrNull()?.takeIf { it > 0 }?.toString() == value
 
-internal fun validMatchKey(key: SongSourceKey): Boolean = key.recordingContext.isEmpty() && when (key.provider) {
-    "netease", "kuwo" -> positiveSourceId(key.resourceId) && key.subResourceId.isEmpty()
-    "bilibili" -> positiveSourceId(key.resourceId) && positiveSourceId(key.subResourceId)
-    "youtube_music" -> key.resourceId.matches(Regex("[A-Za-z0-9_-]{11}")) && key.subResourceId.isEmpty()
-    "local" -> runCatching { UUID.fromString(key.resourceId).toString() == key.resourceId }.getOrDefault(false) && key.subResourceId.isEmpty()
-    else -> false
-}
+internal fun validMatchKey(key: SongSourceKey) = MusicSourceRegistry.validKey(key)
 
-internal fun nativeMatchKey(key: SongSourceKey) = validMatchKey(key) && key.provider != "kuwo"
+internal fun nativeMatchKey(key: SongSourceKey) = MusicSourceRegistry.canResolveAudio(key)

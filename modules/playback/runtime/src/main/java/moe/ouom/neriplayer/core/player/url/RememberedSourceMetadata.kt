@@ -1,9 +1,16 @@
 package moe.ouom.neriplayer.core.player.url
 
 import moe.ouom.neriplayer.core.player.policy.source.RecordingMetadata
+import moe.ouom.neriplayer.core.player.policy.source.SourceFailure
 import moe.ouom.neriplayer.data.model.SongItem
 import moe.ouom.neriplayer.platform.netease.mapping.parseNeteaseSongDetail
 import org.json.JSONObject
+
+internal fun neteaseDetailsAccessFailure(raw: String): SourceFailure? = when (JSONObject(raw).optInt("code", -1)) {
+    200 -> null
+    301 -> SourceFailure.AUTH_REQUIRED
+    else -> SourceFailure.UNAVAILABLE
+}
 
 /** Titles alone can hide Live/edit tags supplied in aliases or translated release names. */
 internal fun refreshedNeteaseSource(raw: String, resourceId: String): Pair<SongItem, RecordingMetadata>? {

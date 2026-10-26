@@ -1,6 +1,6 @@
 # UniMusic 分阶段实施与验收
 
-状态日期：2026-10-27。Phase 1A、1B、1C 操作入口及 2A–2F 已完成，Room 当前 v23；2E 远端 CI 已通过。2F 增加精确 UUID 临播适配、四源元数据菜单、会话复核/预取保护及北京时间每日快照。UI/队列仍保留 SongItem 兼容路径，新的跨设备映射同步、反馈事件与双标签 UI 继续推进。真实账号/设备播放和性能验收未执行。
+状态日期：2026-10-27。Phase 1A、1B、1C操作入口及2A–2G已完成，Room保持v23；2F远端CI已成功。2G补来源实现能力登记、显式单来源地址校验、失败类型展示与精确人工决策戳复核，未新增平台播放授权。UI/队列仍保留SongItem兼容；新映射同步、推荐反馈事件、双标签UI及真实账号/设备与性能验收继续待办。
 
 ## 执行约定
 
@@ -68,6 +68,8 @@
 2D 将该目录以独立 Catalog 类型接入聚合界面，严格限制官方外链，并保留 Song 专用播放队列。修复全角版本识别，查询排名移出主线程、缓存同查询分数并限制版本偏好权重，详见 [2D](PHASE_2D_CATALOG_SEARCH.md)。这不是酷我完整音频接入或可信跨平台录音合并。
 
 2E 已完成 [持久匹配/人工覆盖、导入界面和本地推荐初版](PHASE_2E_SOURCE_CHOICES_AND_LIBRARY.md)，含独立 22→23 增量迁移；拒绝/清除修订能使在途旧结果失效。2F 已提供精确 UUID 反查和临播兼容入口、四源候选及会话/预取保护，详见 [2F](PHASE_2F_UUID_RESOLUTION_AND_DAILY_CACHE.md)；UI与队列仍是兼容SongItem，没有独立权利注册表，规则分不是校准概率。
+
+2G完成 [来源能力与显式音频地址校验](PHASE_2G_SOURCE_AVAILABILITY.md)。能力登记不是权利注册，用户点击后只解析单个合格来源；检查成功不等于实际播放完成。
 
 1. 先做匹配安全基座：Normalization、VersionClassification、SongMatch/Override repository、硬冲突拒绝、来源资格类型。分析上游加分与分 P 双重累计，旧 70 分阈值不能迁成概率。
 2. `UnifiedSearchEngine` 使用 Flow/Coroutines、supervisorScope/每源预算、平台限流、去抖和请求取消。先返回本地/首个远端批次，合并有证明的同录音；页游标、错误和加载状态按 provider 保存。

@@ -28,11 +28,13 @@ class SourceMatchRoomStoreTest {
         try {
             val first = SourceMatchRoomStore(db)
             val rejected = first.decide(subject, candidate, SourceMatchDecision.REJECTED)
+            val rejectedStamp = first.decisionStamp(subject, candidate.key)
             assertTrue(first.isRejected(subject, candidate.key))
             db.close()
             db = Room.databaseBuilder(context, NeriUserDataDatabase::class.java, file).allowMainThreadQueries().build()
             val reopened = SourceMatchRoomStore(db)
             val oldWork = reopened.observe(subject, candidate)
+            assertEquals(rejectedStamp, reopened.decisionStamp(subject, candidate.key))
             assertEquals(rejected.id, oldWork.id)
             assertEquals(rejected.songId, oldWork.songId)
             assertEquals(SourceMatchDecision.REJECTED, oldWork.decision)
@@ -40,6 +42,7 @@ class SourceMatchRoomStoreTest {
             assertTrue(confirmed.current)
             assertTrue(confirmed.revision > rejected.revision)
             reopened.clear(subject, candidate.key)
+            assertNotEquals(rejectedStamp, reopened.decisionStamp(subject, candidate.key))
             assertEquals(SourceMatchDecision.NONE, reopened.matches(subject).single().decision)
         } finally { db.close(); context.deleteDatabase(file) }
     }

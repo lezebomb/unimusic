@@ -54,4 +54,19 @@
     <string name="unimusic_sources_saved">已保存，下次解析时生效。</string>
     <string name="unimusic_sources_cleared">已清除此来源的选择。</string>
     <string name="unimusic_sources_account_changed">平台账号或 YouTube 开关已变化，旧候选已清除。请刷新后重新选择。</string>
+    <string name="unimusic_sources_check">校验此来源</string>
+    <string name="unimusic_sources_checking">正在检查此来源，最长约 8 秒…</string>
+    <string name="unimusic_sources_check_address">本次接口已返回音频地址；尚未验证实际播放。</string>
+    <string name="unimusic_sources_check_local">本次已确认本地文件可读；尚未开始播放。</string>
+    <string name="unimusic_sources_check_unsupported">此来源的标识或音频能力不受支持。</string>
+    <string name="unimusic_sources_check_disabled">此来源已关闭，请在设置中启用后重试。</string>
+    <string name="unimusic_sources_check_offline">当前无法联网，未请求在线音频地址。</string>
+    <string name="unimusic_sources_check_rejected">此来源已被拒绝；清除选择后可重新校验。</string>
+    <string name="unimusic_sources_check_mismatch">最新录音元数据或版本不符；请刷新候选后再选择。</string>
+    <string name="unimusic_sources_check_permission">未取得可读取的音频，请检查来源与访问权限。</string>
+    <string name="unimusic_sources_check_preview">返回音频的试听或长度检查未通过，未选为完整来源。</string>
+    <string name="unimusic_sources_check_external">此内容需要原平台播放器，未尝试独立音频播放。</string>
+    <string name="unimusic_sources_check_network">读取来源失败，请检查网络或平台状态。</string>
+    <string name="unimusic_sources_check_unavailable">来源暂未返回符合要求的音频，请稍后重试。</string>
+    <string name="unimusic_sources_check_context">校验期间账号、开关或选择已变化，旧结果已作废。</string>
 </resources>

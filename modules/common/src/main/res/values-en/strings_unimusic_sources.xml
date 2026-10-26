@@ -54,4 +54,19 @@
     <string name="unimusic_sources_saved">Saved for the next playback resolution.</string>
     <string name="unimusic_sources_cleared">The choice for this source has been cleared.</string>
     <string name="unimusic_sources_account_changed">A platform account or the YouTube setting changed. Previous candidates were cleared; refresh before choosing again.</string>
+    <string name="unimusic_sources_check">Check source</string>
+    <string name="unimusic_sources_checking">Checking this source, up to about 8 seconds…</string>
+    <string name="unimusic_sources_check_address">The API returned an audio address for this check; playback has not been verified.</string>
+    <string name="unimusic_sources_check_local">The local file was readable during this check; playback has not started.</string>
+    <string name="unimusic_sources_check_unsupported">This source identity or audio adapter is unsupported.</string>
+    <string name="unimusic_sources_check_disabled">This source is disabled. Enable it in settings before retrying.</string>
+    <string name="unimusic_sources_check_offline">Offline: no online audio address was requested.</string>
+    <string name="unimusic_sources_check_rejected">This source was rejected. Clear the decision before checking again.</string>
+    <string name="unimusic_sources_check_mismatch">The latest recording metadata or version did not match. Refresh candidates before choosing.</string>
+    <string name="unimusic_sources_check_permission">No readable audio was obtained. Check the source and access permissions.</string>
+    <string name="unimusic_sources_check_preview">The preview or length check failed; this was not accepted as a full recording.</string>
+    <string name="unimusic_sources_check_external">This content requires the platform player; standalone audio was not attempted.</string>
+    <string name="unimusic_sources_check_network">The source request failed. Check the network or platform status.</string>
+    <string name="unimusic_sources_check_unavailable">The source did not return suitable audio. Try again later.</string>
+    <string name="unimusic_sources_check_context">The account, setting or decision changed during the check. The old result was discarded.</string>
 </resources>

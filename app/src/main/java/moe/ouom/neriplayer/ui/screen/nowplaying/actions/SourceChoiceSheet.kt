@@ -35,6 +35,9 @@ import moe.ouom.neriplayer.data.model.unified.RecordingMismatch
 import moe.ouom.neriplayer.data.model.unified.RecordingSourceCandidate
 import moe.ouom.neriplayer.data.model.unified.RecordingSourceMatch
 import moe.ouom.neriplayer.data.model.unified.RecordingVersion
+import moe.ouom.neriplayer.data.model.unified.MusicSourceRegistry
+import moe.ouom.neriplayer.data.model.unified.SourceCheckResult
+import moe.ouom.neriplayer.data.model.unified.SourceCheckStatus
 import moe.ouom.neriplayer.data.model.unified.SourceMatchDecision
 import moe.ouom.neriplayer.data.unified.sourceCandidateForSong
 import moe.ouom.neriplayer.ui.component.overlay.DensityScaledModalBottomSheet as ModalBottomSheet
@@ -93,15 +96,16 @@ private fun SourceChoiceContent(song: SongItem, state: SourceChoiceState, owner:
                 if (!state.youtubeEnabled) Text(stringResource(CoreCommonR.string.unimusic_sources_youtube_disabled),
                     style = MaterialTheme.typography.bodySmall)
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                    HapticTextButton(onClick = owner::refresh, enabled = !state.loading && !state.saving) {
+                    HapticTextButton(onClick = owner::refresh, enabled = !state.loading && !state.saving && state.checking == null) {
                         Text(stringResource(CoreCommonR.string.unimusic_sources_refresh))
                     }
                     Text(stringResource(CoreCommonR.string.unimusic_sources_count, candidates.size),
                         modifier = Modifier.padding(vertical = 12.dp), style = MaterialTheme.typography.labelMedium)
                 }
-                if (state.loading || state.saving) {
+                if (state.loading || state.saving || state.checking != null) {
                     LinearProgressIndicator(Modifier.fillMaxWidth())
-                    Text(stringResource(if (state.saving) CoreCommonR.string.unimusic_sources_saving
+                    Text(stringResource(if (state.checking != null) CoreCommonR.string.unimusic_sources_checking
+                        else if (state.saving) CoreCommonR.string.unimusic_sources_saving
                         else CoreCommonR.string.unimusic_sources_loading), style = MaterialTheme.typography.bodySmall)
                 }
                 state.notice?.let { notice ->
@@ -121,8 +125,11 @@ private fun SourceChoiceContent(song: SongItem, state: SourceChoiceState, owner:
         }
         items(candidates, key = { it.key.toString() }) { candidate ->
             SourceChoiceCard(song, candidate, records[candidate.key],
-                enabled = !state.loading && !state.saving && state.song == song,
-                confirmationEnabled = candidate.key.provider != "youtube_music" || state.youtubeEnabled,
+                enabled = !state.loading && !state.saving && state.checking == null && state.song == song,
+                confirmationEnabled = (candidate.key.provider != "youtube_music" || state.youtubeEnabled) &&
+                    state.checks[candidate.key]?.status != SourceCheckStatus.METADATA_MISMATCH,
+                checkResult = state.checks[candidate.key],
+                onCheck = { owner.check(candidate) },
                 onConfirm = { owner.decide(candidate, SourceMatchDecision.CONFIRMED) },
                 onReject = { owner.decide(candidate, SourceMatchDecision.REJECTED) },
                 onClear = { owner.clear(candidate) })
@@ -138,12 +145,14 @@ private fun SourceChoiceCard(
     record: RecordingSourceMatch?,
     enabled: Boolean,
     confirmationEnabled: Boolean,
+    checkResult: SourceCheckResult?,
+    onCheck: () -> Unit,
     onConfirm: () -> Unit,
     onReject: () -> Unit,
     onClear: () -> Unit
 ) {
     val assessment = remember(song, candidate) { assessSourceChoice(song, candidate) }
-    val supported = candidate.key.provider in setOf("local", "bilibili", "netease", "youtube_music")
+    val supported = MusicSourceRegistry.canResolveAudio(candidate.key)
     val metadata = candidate.metadata
     Card(Modifier.fillMaxWidth().padding(horizontal = 16.dp)) {
         Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -167,6 +176,11 @@ private fun SourceChoiceCard(
             } else if (!assessment.accepted) {
                 Text(stringResource(assessment.reason.mismatchRes()), style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
+            checkResult?.let { SourceChoiceCheckResult(it) }
+            HapticTextButton(onClick = onCheck, enabled = enabled && confirmationEnabled && supported &&
+                assessment.accepted && record?.decision != SourceMatchDecision.REJECTED) {
+                Text(stringResource(CoreCommonR.string.unimusic_sources_check))
             }
             Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                 HapticTextButton(onClick = onConfirm,

@@ -43,9 +43,13 @@ class SourceMatchRoomStore(private val db: NeriUserDataDatabase, private val now
         unified.registerSource(key, sourceMatchMetadata(song), legacy).id
     }
 
-    suspend fun isRejected(song: SongItem, key: SongSourceKey): Boolean = db.withTransaction {
-        val row = find(subjectId(song), key) ?: return@withTransaction false
-        dao.override(row.matchId)?.decision == SourceMatchDecision.REJECTED.name
+    suspend fun isRejected(song: SongItem, key: SongSourceKey): Boolean =
+        decisionStamp(song, key).decision == SourceMatchDecision.REJECTED
+
+    suspend fun decisionStamp(song: SongItem, key: SongSourceKey): SourceDecisionStamp = db.withTransaction {
+        val row = find(subjectId(song), key) ?: return@withTransaction SourceDecisionStamp()
+        val override = dao.override(row.matchId) ?: return@withTransaction SourceDecisionStamp()
+        SourceDecisionStamp(SourceMatchDecision.valueOf(override.decision), override.revision)
     }
 
     suspend fun observe(song: SongItem, candidate: RecordingSourceCandidate): RecordingSourceMatch = db.withTransaction {

@@ -2,6 +2,8 @@ package moe.ouom.neriplayer.data.model.unified
 
 enum class SourceMatchDecision { CONFIRMED, REJECTED, NONE }
 
+data class SourceDecisionStamp(val decision: SourceMatchDecision = SourceMatchDecision.NONE, val revision: Long = 0)
+
 /** Stable IDs and metadata only. Never contains a signed URL, token or local file path. */
 data class RecordingSourceCandidate(val key: SongSourceKey, val metadata: UnifiedSongMetadata)
 

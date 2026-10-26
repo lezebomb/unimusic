@@ -93,3 +93,9 @@ Phase 1 先保留现有 2.0 数据同步，不让新字段意外混入旧序列�
 `SongMatch` 当前以目标 song UUID + 精确候选键唯一，保存候选元数据、目标指纹、算法版本和观察时间。人工决策单独按 match UUID 保存 CONFIRMED/REJECTED/NONE、递增 revision 和时间；尚无跨设备因果合并，不应接入旧2.0同步直接传输。确认既不合并 UUID 也不改变 SongSource 的 METADATA_ONLY 权限默认值。
 
 后台观察不更改人工决策，已确认记录的证据也只由显式操作更新；目标修改使指纹不符后旧确认失效。清除保存NONE修订墓碑。在途播放解析完成时重读修订，拒绝或清除优先。原表保持原样，冻结22 schema迁移验证逐表逐字段比较；无删除迁移。
+
+## 7. 设备内校验结果与能力登记（不变更v23）
+
+2G的MusicSourceRegistry只描述已实现的适配器及合法结构的来源键，不给SongSource增加AUTHORIZED_AUDIO或新的权利。SourceCheckResult为短期内存状态，只含枚举和检查时间，不进入Room、备份或同步，没有音频URL。
+
+人工决策戳通过目标UUID/精确候选键直接读取决策和revision，不经200项展示列表；新观察NONE/0不使校验失效，人工确认/拒绝/清除增加revision使旧校验失效。没有新表、字段或迁移，schema23保持不变。
