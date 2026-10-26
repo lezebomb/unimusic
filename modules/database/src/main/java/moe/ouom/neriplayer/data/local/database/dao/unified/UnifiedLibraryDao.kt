@@ -102,6 +102,9 @@ interface UnifiedLibraryDao {
         "AND remote_playlist_id = :remoteId")
     suspend fun origin(provider: String, accountKey: String, remoteId: String): PlaylistOriginEntity?
 
+    @Query("SELECT * FROM playlist_origin ORDER BY origin_id")
+    fun observeOrigins(): Flow<List<PlaylistOriginEntity>>
+
     @Query("UPDATE playlist_origin SET linked = 0 WHERE origin_id = :originId")
     suspend fun unlinkOrigin(originId: String)
 }

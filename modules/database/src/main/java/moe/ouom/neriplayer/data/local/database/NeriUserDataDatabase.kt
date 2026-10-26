@@ -98,8 +98,12 @@ import moe.ouom.neriplayer.data.local.database.entity.unified.PlaylistImportItem
 import moe.ouom.neriplayer.data.local.database.entity.unified.PlaylistImportReceiptEntity
 import moe.ouom.neriplayer.data.local.database.dao.unified.PlaylistImportDao
 import moe.ouom.neriplayer.data.local.database.migration.library.PlaylistImportMigration
+import moe.ouom.neriplayer.data.local.database.migration.library.SourceMatchMigration
+import moe.ouom.neriplayer.data.local.database.dao.unified.SourceMatchDao
+import moe.ouom.neriplayer.data.local.database.entity.unified.SongMatchEntity
+import moe.ouom.neriplayer.data.local.database.entity.unified.UserMatchOverrideEntity
 
-private const val NERI_USER_DATA_FINAL_VERSION = 22
+private const val NERI_USER_DATA_FINAL_VERSION = 23
 
 @Database(
     entities = [
@@ -153,7 +157,9 @@ private const val NERI_USER_DATA_FINAL_VERSION = 22
         PlaylistOriginEntity::class,
         PlaylistImportJobEntity::class,
         PlaylistImportItemEntity::class,
-        PlaylistImportReceiptEntity::class
+        PlaylistImportReceiptEntity::class,
+        SongMatchEntity::class,
+        UserMatchOverrideEntity::class
     ],
     version = NERI_USER_DATA_FINAL_VERSION,
     exportSchema = true
@@ -194,6 +200,7 @@ abstract class NeriUserDataDatabase : RoomDatabase() {
 
     abstract fun unifiedLibraryDao(): UnifiedLibraryDao
     abstract fun playlistImportDao(): PlaylistImportDao
+    abstract fun sourceMatchDao(): SourceMatchDao
 
     companion object {
         const val DATABASE_NAME = "neri_user_data.db"
@@ -253,7 +260,8 @@ abstract class NeriUserDataDatabase : RoomDatabase() {
             MIGRATION_18_19,
             MIGRATION_19_20,
             MIGRATION_20_21,
-            MIGRATION_21_22
+            MIGRATION_21_22,
+            MIGRATION_22_23
         )
 
         private fun checkMainProcess(context: Context) {
@@ -286,6 +294,7 @@ abstract class NeriUserDataDatabase : RoomDatabase() {
         val MIGRATION_19_20: Migration = PlaybackStatsPagedMigration
         val MIGRATION_20_21: Migration = UnifiedLibraryMigration
         val MIGRATION_21_22: Migration = PlaylistImportMigration
+        val MIGRATION_22_23: Migration = SourceMatchMigration
 
         const val FINAL_DB_VERSION = NERI_USER_DATA_FINAL_VERSION
     }

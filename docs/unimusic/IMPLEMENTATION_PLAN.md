@@ -1,6 +1,6 @@
 # UniMusic 分阶段实施与验收
 
-状态日期：2026-10-26。Phase 1A、1B 导入后台和 2A–2C 已完成，Room 当前 v22，2C 远端 CI 已通过。本轮完成 [2D 目录搜索与排名修正](PHASE_2D_CATALOG_SEARCH.md)：酷我仅元数据结果进入聚合界面并保留官方跳转，与播放队列隔离；修复全角版本漏判、后台执行聚合排名并缓存同次查询分数。22 个定向测试及 Debug 构建通过。尚无真实账号或设备播放验证；统一 UUID 解析、持久匹配和完整播放闭环仍待完成。
+状态日期：2026-10-26。Phase 1A、1B、1C 导入操作入口及 2A–2E 已完成，Room 当前 v23。2D CI 已通过；2E 本地编译与定向测试见报告/证据。新增独立本地推荐初版、持久来源确认/拒绝及下次播放适配，不把这些工作标成完整 Phase 2/3。尚无真实账号或设备播放验证；统一 UUID 解析、新映射跨设备同步和推荐事件/每日快照继续推进。
 
 ## 执行约定
 
@@ -38,7 +38,7 @@
 
 ### 1B：入站 Provider 与导入任务
 
-1B.1 与 1B.2 的后台实现已完成，见 [Provider](PHASE_1B_PROVIDER.md) 和 [后台报告](PHASE_1B_BACKEND.md)。失败明细保存在快照条目中；导入凭证跨快照保留用户移除记录。WorkManager 导入器与旧库回填 Worker 分开，尚未接入导入 UI、定期自动刷新或真实账号验收。
+1B.1 与 1B.2 的后台实现已完成，见 [Provider](PHASE_1B_PROVIDER.md) 和 [后台报告](PHASE_1B_BACKEND.md)。失败明细保存在快照条目中；导入凭证跨快照保留用户移除记录。WorkManager 导入器与旧库回填 Worker 分开，1C 已加入导入 UI；尚无定期自动刷新或真实账号验收。
 
 - model 定义 PlaylistImportProvider contract；platform 新增 Netease adapter，复用安全 session、分页歌单与可取消详情调用。
 - local 新增导入 coordinator/WorkManager Worker，页级事务 checkpoint、账号检查、失败项重试、取消/恢复、一次性与持续关联。
@@ -47,6 +47,8 @@
 - 验证：两次导入单一歌单、保留顺序/封面/元数据、空远端不删除、取消后恢复、失败明细重试、解除来源保留本地修改；只选覆盖这些行为的紧凑测试。
 
 ### 1C：现有库接入与操作入口
+
+状态：操作入口已在 2E 并行完成，详见 [2E](PHASE_2E_SOURCE_CHOICES_AND_LIBRARY.md)；当前统一库通过旧库兼容投影展示，真实账号/Compose交互验收待设备。
 
 - 修改 `LibraryViewModel.kt`、现有 library screen/歌单菜单和 AppContainer 依赖装配。
 - 新增导入选择/进度状态、重试/取消/解除关联入口；统一库由 provider 无关列表呈现，来源详情仅在菜单显示。
@@ -64,6 +66,8 @@
 2C 完成 [酷我仅目录 Provider 与 B 站候选优化](PHASE_2C_CATALOG_AND_MATCHING.md)，并用最新 REA 6.8 CLI 完成 [提供样本的安全静态审计](APK_SOURCE_AUDIT.md)。酷我普通 HTTPS 搜索已在本机取得 5 条元数据，尚无音频可用性结论；新目录 Provider 仅后台装配，未混入可播放 SongItem。新增 6 个测试方法通过。
 
 2D 将该目录以独立 Catalog 类型接入聚合界面，严格限制官方外链，并保留 Song 专用播放队列。修复全角版本识别，查询排名移出主线程、缓存同查询分数并限制版本偏好权重，详见 [2D](PHASE_2D_CATALOG_SEARCH.md)。这不是酷我完整音频接入或可信跨平台录音合并。
+
+2E 已完成 [持久匹配/人工覆盖、导入界面和本地推荐初版](PHASE_2E_SOURCE_CHOICES_AND_LIBRARY.md)，含独立 22→23 增量迁移；拒绝/清除修订能使在途旧结果失效。当前仍非独立 UUID SourceResolver，规则分不是校准概率。
 
 1. 先做匹配安全基座：Normalization、VersionClassification、SongMatch/Override repository、硬冲突拒绝、来源资格类型。分析上游加分与分 P 双重累计，旧 70 分阈值不能迁成概率。
 2. `UnifiedSearchEngine` 使用 Flow/Coroutines、supervisorScope/每源预算、平台限流、去抖和请求取消。先返回本地/首个远端批次，合并有证明的同录音；页游标、错误和加载状态按 provider 保存。
@@ -96,7 +100,7 @@
 ## 下一步顺序与未决条件
 
 1. 工具链与 1A 迁移验证已完成；无需重复下载或重做 Phase 0。
-2. 用户要求音源优先，本地 APK 静态参考已完成：继续目录结果与播放能力的明确分离、正常音频接口核实、持久匹配/确认/拒绝和统一 UUID 解析；1C UI 延后。不能以元数据搜索/导入成功代替真实在线播放验收，不移植会员破解、内置凭据或 DRM 绕过。
+2. 用户要求音源优先，本地 APK 静态参考已完成：继续目录结果与播放能力的明确分离、正常音频接口核实、持久匹配/确认/拒绝和统一 UUID 解析；1C 操作入口已在 2E 交付。不能以元数据搜索/导入成功代替真实在线播放验收，不移植会员破解、内置凭据或 DRM 绕过。
 3. `unimusic_smoke.yml` 已覆盖 main 的定向 JVM/Android 迁移和音源检查，保留原有完整 CI；远端 Actions 执行结果需单独确认，本地检查结果不冒充远端结果。
 4. 实际账号/平台授权仅用于线上验收，不阻塞 Fake provider 开发；任何平台暂不可接入时明确标记其 capability 与降级方式。
 

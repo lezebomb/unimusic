@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="unimusic_recommendations_title">UniMusic local recommendations</string>
+    <string name="unimusic_recommendations_refresh">Refresh local recommendations</string>
+    <string name="unimusic_recommendations_description">Picked from your library using recent and frequent listening on this device. Recommendation ranking does not upload history.</string>
+    <string name="unimusic_recommendations_empty">Add songs to a local playlist or import a playlist to get recommendations here.</string>
+    <string name="unimusic_recommendations_offline_empty">Offline recommendations use local files in your library.</string>
+    <string name="unimusic_recommendations_error">Your music library is temporarily unavailable. Refresh to try again.</string>
+    <string name="unimusic_recommendations_statistics_unavailable">Listening statistics are unavailable. Recommendations currently use library content.</string>
+    <string name="unimusic_recommendations_reason_explore">Explore more of your library</string>
+    <string name="unimusic_recommendations_reason_added">Recently added to your library</string>
+    <string name="unimusic_recommendations_reason_artist">From an artist you often listen to</string>
+    <string name="unimusic_recommendations_reason_rediscover">Rediscover a song you have not heard in a while</string>
+    <string name="unimusic_recommendations_reason_less_played">You have listened before; give it another spin</string>
+    <string name="unimusic_recommendations_source_file">Library · Local file</string>
+    <string name="unimusic_recommendations_source_netease">Library · NetEase source</string>
+    <string name="unimusic_recommendations_source_bilibili">Library · Bilibili source</string>
+    <string name="unimusic_recommendations_source_youtube">Library · YouTube Music source</string>
+    <string name="unimusic_recommendations_source_library">From your on-device library</string>
+</resources>

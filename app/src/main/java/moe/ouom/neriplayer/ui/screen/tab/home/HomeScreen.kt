@@ -258,6 +258,7 @@ fun HomeScreen(
         }
     )
     val ui by vm.uiState.collectAsStateWithLifecycle()
+    val localRecommendations by vm.localRecommendations.collectAsStateWithLifecycle()
     var localPlaylistRepo by remember { mutableStateOf<LocalPlaylistRepository?>(null) }
     var localPlaylists by remember {
         mutableStateOf<List<LocalPlaylist>>(
@@ -467,7 +468,7 @@ fun HomeScreen(
     }
 
     val hasVisibleSections =
-            showContinue || (showOnlineFeeds && (showNeteaseTrending || showNeteaseRadar || showRecommendedCard || isInternational))
+            showContinue || showRecommendedCard || (showOnlineFeeds && (showNeteaseTrending || showNeteaseRadar || isInternational))
 
     Box(Modifier.fillMaxSize()) {
         Column(
@@ -483,6 +484,7 @@ fun HomeScreen(
                     HapticIconButton(
                         enabled = !offlineMode,
                         onClick = {
+                            vm.refreshLocalRecommendations()
                             if (isInternational) {
                                 vm.refreshYtMusicHome()
                             } else {
@@ -592,6 +594,20 @@ fun HomeScreen(
                             } else {
                                 SectionLoadingState(homeLoadingText)
                             }
+                        }
+                    }
+
+                    if (showRecommendedCard) {
+                        item(
+                            key = registerGridItemKey("home:unimusic:local-recommendations"),
+                            span = { GridItemSpan(maxLineSpan) }
+                        ) {
+                            HomeLocalRecommendationsSection(
+                                state = localRecommendations,
+                                offlineMode = offlineMode,
+                                onRefresh = vm::refreshLocalRecommendations,
+                                onSongClick = onSongClick
+                            )
                         }
                     }
 

@@ -1,11 +1,14 @@
 package moe.ouom.neriplayer.platform.bilibili.api.client
 
+import java.io.IOException
+import kotlinx.coroutines.runBlocking
 import moe.ouom.neriplayer.data.model.bilibili.search.SearchVideoItem
 import moe.ouom.neriplayer.data.model.bilibili.video.UgcSeason
 import moe.ouom.neriplayer.data.model.bilibili.video.VideoPage
 import moe.ouom.neriplayer.data.model.bilibili.video.VideoStats
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertThrows
 import org.junit.Test
 
 class BiliClientVideoInfoTest {
@@ -108,6 +111,18 @@ class BiliClientVideoInfoTest {
             ),
             page.items
         )
+    }
+
+    @Test
+    fun `search surfaces platform errors instead of returning no matches`() = biliClientTest(
+        route = { request ->
+            json("""{"code":-352,"message":"risk control"}""")
+                .takeIf { request.url.encodedPath == SEARCH_PATH }
+        }
+    ) { _, client ->
+        val error = assertThrows(IOException::class.java) { runBlocking { client.searchVideos("lofi") } }
+
+        assertEquals("Bili video search failed: code=-352, message=risk control", error.message)
     }
 
     @Test

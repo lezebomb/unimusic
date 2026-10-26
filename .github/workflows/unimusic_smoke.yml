@@ -11,6 +11,15 @@ on:
       - 'modules/playback/**'
       - 'modules/common/src/**/search/**'
       - 'modules/common/src/main/res/*/strings_search.xml'
+      - 'modules/common/src/main/res/*/strings_unimusic*.xml'
+      - 'app/src/main/res/*/strings_unimusic*.xml'
+      - 'app/src/main/java/moe/ouom/neriplayer/ui/screen/nowplaying/actions/**'
+      - 'app/src/main/java/moe/ouom/neriplayer/ui/screen/tab/library/**'
+      - 'app/src/main/java/moe/ouom/neriplayer/ui/screen/tab/home/**'
+      - 'app/src/main/java/moe/ouom/neriplayer/ui/viewmodel/tab/PlaylistImportViewModel.kt'
+      - 'app/src/main/java/moe/ouom/neriplayer/ui/viewmodel/tab/HomeViewModel.kt'
+      - 'app/src/main/java/moe/ouom/neriplayer/ui/viewmodel/tab/home/**'
+      - 'app/src/test/java/moe/ouom/neriplayer/ui/viewmodel/tab/PlaylistImport*.kt'
       - 'app/src/main/java/moe/ouom/neriplayer/ui/viewmodel/tab/Explore*.kt'
       - 'app/src/main/java/moe/ouom/neriplayer/ui/screen/tab/explore/**'
       - 'app/src/test/java/moe/ouom/neriplayer/ui/viewmodel/tab/Explore*.kt'
@@ -57,11 +66,11 @@ jobs:
           chmod +x gradlew
           python3 -X utf8 tools_pub/quality/module_boundaries.py
           ./gradlew -Dorg.gradle.java.installations.paths="$JAVA_HOME_17_X64" \
-            :database:testDebugUnitTest --tests '*RegisteredMigrationChainTest' --tests '*NeriUserDataDatabaseVersionTest' --tests '*PlaylistImportMigrationTest' \
-            :local:testDebugUnitTest --tests '*UnifiedLibraryRoomStoreTest' --tests '*PlaylistImportCoordinatorTest' --tests '*LocalPlaylistSyncMutationDecoderTest' \
+            :database:testDebugUnitTest --tests '*RegisteredMigrationChainTest' --tests '*NeriUserDataDatabaseVersionTest' --tests '*PlaylistImportMigrationTest' --tests '*SourceMatchMigrationTest' \
+            :local:testDebugUnitTest --tests '*UnifiedLibraryRoomStoreTest' --tests '*PlaylistImportCoordinatorTest' --tests '*LocalPlaylistSyncMutationDecoderTest' --tests '*SourceMatchRoomStoreTest' --tests '*LocalRecommendationRankerTest' \
             :common:testDebugUnitTest --tests '*FederatedSearchEngineTest' \
-            :app:testDebugUnitTest --tests '*ExploreCatalogSearchTest' --tests '*ExploreSearchResultRankingTest' --tests '*ExploreScreenYouTubeGateTest' --tests '*ExploreViewModelYouTubeGateTest' --tests '*ExploreSearchPaginationTest' \
-            :platform:testDebugUnitTest --tests '*NeteasePlaylistImportProviderTest' --tests '*BiliClientPlayUrlTest' --tests '*NeteaseRequestSessionTest' --tests '*NeteaseClientTest' --tests '*KuwoCatalogProviderTest' \
+            :app:testDebugUnitTest --tests '*ExploreCatalogSearchTest' --tests '*ExploreSearchResultRankingTest' --tests '*ExploreScreenYouTubeGateTest' --tests '*ExploreViewModelYouTubeGateTest' --tests '*ExploreSearchPaginationTest' --tests '*PlaylistImportUiPolicyTest' \
+            :platform:testDebugUnitTest --tests '*NeteasePlaylistImportProviderTest' --tests '*BiliClientPlayUrlTest' --tests '*BiliClientVideoInfoTest' --tests '*NeteaseRequestSessionTest' --tests '*NeteaseClientTest' --tests '*KuwoCatalogProviderTest' \
             :playback:logic:testDebugUnitTest --tests '*RecordingMatchPolicyTest' --tests '*PlaybackSourceResolverTest' --tests '*RecordingDiscoveryRankerTest' --tests '*SongUrlResolutionRetryTest' \
             :playback:runtime:testDebugUnitTest --tests '*BiliRecordingMatchTest' --tests '*PlayerManagerNeteaseAutoSourceSwitchTest' --tests '*PlayerManagerNeteaseLocalFallbackTest' \
             :platform:verifyDomainDependencies :database:assembleDebugAndroidTest --max-workers=2 --console=plain

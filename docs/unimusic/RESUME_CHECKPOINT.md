@@ -1,6 +1,6 @@
 # UniMusic 续跑检查点
 
-更新：2026-10-26（Asia/Shanghai）。本轮继续音源/搜索优先，完成 2D 的目录接入与匹配/排名修正。提供 APK 的 REA 静态审计上一阶段已完成；暂缓 1C 导入 UI。旧单次定时任务 `3-unimusic` 已删除，不要重新创建。
+更新：2026-10-26（Asia/Shanghai）。本轮 2E 已加入持久来源选择、导入操作与本地推荐，Room v23。继续 UUID 临播入口和推荐持久快照。旧单次定时任务 `3-unimusic` 已删除，不要重新创建。
 
 ## 已完成和推送
 
@@ -13,15 +13,18 @@
 - Phase 2A：`bea4d48e`，原网易云/本地/B 站路径的版本/元数据门槛、分 P 歧义拒绝、可取消且有预算的地址解析、首个成功即返回、失败冷却。[对应 CI](https://github.com/lezebomb/unimusic/actions/runs/40270887580) 已成功。
 - Phase 2B：`7022b9b6`，四个已有来源的聚合搜索、独立分页/预算/状态、版本排序及可取消网易云预热。[对应 CI](https://github.com/lezebomb/unimusic/actions/runs/40274273540) 已成功。
 - Phase 2C：`b6a67864`，酷我 metadata-only 目录后台、实际 B 站自动候选预筛选与排序、精确平台依赖登记及静态审计。[对应 CI](https://github.com/lezebomb/unimusic/actions/runs/40276481535) 已成功。
-- Phase 2D：本检查点所在提交完成混合 Catalog 聚合入口、目录/队列隔离、官方页面校验、全角版本修复和后台缓存排名。Room 仍为 v22，用 git log/status 确认提交推送和新 CI，勿用 2C 旧绿色结果替代本轮验收。
+- Phase 2D：`3b6afc00` 完成混合 Catalog 聚合入口、目录/队列隔离、官方页面校验、全角版本修复和后台缓存排名。该阶段 Room 为 v22，[对应 CI](https://github.com/lezebomb/unimusic/actions/runs/40279029813) 已成功。
+- Phase 2E：本检查点所在提交完成持久 SongMatch/Override 和 22→23、来源菜单/下次播放适配、网易云导入界面、本地推荐初版；报告见 [2E](PHASE_2E_SOURCE_CHOICES_AND_LIBRARY.md)。用 git log/status 确认提交和新 CI。
 
 ## 实际验证
+
+- Phase 2E：本地关键集合、模块边界、平台依赖边界、Debug APK 和 database AndroidTest APK 构建，实际结果/命令/哈希见 `evidence/2026-10-26/phase2e/validation.json`。本轮没有设备或真实账号验收。
 
 - Phase 2D：22 个定向 JVM 测试通过，新增 5 个方法并扩展全角版本断言；模块边界与 Debug APK 构建通过，见 [2D](PHASE_2D_CATALOG_SEARCH.md) 和 `evidence/2026-10-26/phase2d/`。没有设备、App 联网搜索/跳转/播放或性能测量，不把已编译 UI 当成设备验收。
 - Phase 2C：9 个定向测试通过，新增 6 个方法；酷我 3 个检查在实体夹具/超时修正后重跑。模块边界、平台依赖边界及最终 APK 构建结果见 `evidence/2026-10-26/phase2c/`。本机普通酷我 HTTPS 搜索实际返回 HTTP 200 和 5 条元数据，没有请求音频；Android Provider 未经真实设备/账号联网验收。
 - Phase 2B：42 个定向 JVM 测试通过，新增 6 个方法；Debug APK 与模块边界检查通过。原始 XML/命令/哈希见 `evidence/2026-10-26/phase2b/`，实现见 [2B](PHASE_2B_SEARCH.md)。无新平台、外部脚本兼容、真实网络播放或设备交互验证；当前四个来源仍是原有本地/网易云/B 站/YouTube。
 - 2026-10-26：音源相关 40 个定向 JVM 测试通过（其中新增 13 个方法）；修正冷却时钟后仅重跑解析器 4 个测试并构建 Debug APK，均成功；模块边界检查通过。新拆出的 URL 文件已参与最终编译。详情见 [Phase 2A](PHASE_2A_SOURCES.md) 与 `evidence/2026-10-26/`。
-- 本轮无手机/模拟器、未安装新 APK，未做真实账号联网播放、实际切源或覆盖率/性能测量。当前只有保守元数据门槛，没有经标注校准的同录音概率，也没有独立来源权利注册表、持久匹配覆盖或 `SourceResolver(unifiedSongId)`；不承诺商业曲库全部免费。
+- 本轮无手机/模拟器、未安装新 APK，未做真实账号联网播放、实际切源或覆盖率/性能测量。2A 时只有保守元数据门槛；2E 已增加持久人工覆盖，仍没有经标注校准的同录音概率、独立来源权利注册表或完整 `SourceResolver(unifiedSongId)`；不承诺商业曲库全部免费。
 - 2026-10-25：7 个新导入集成测试 + 1 个冻结 v21→v22 Room 迁移测试通过；数据层、Debug APK、database 测试 APK 构建通过，模块边界检查通过。旧 store / outbox 解码 / Provider 也做了定向检查，没有运行完整上游测试。
 - 2026-10-25 的迁移测试使用 Robolectric/本机 SQLite；当轮没有设备执行。详情见 [Phase 1B.2](PHASE_1B_BACKEND.md) 与 `evidence/2026-10-25/`。不能把已导入元数据标成已可播放。
 
@@ -34,16 +37,16 @@
 - SQLite JVM 长路径问题已修复：Robolectric 的长方法名产生 259 字符路径，WAL 超出 Windows 限制；缩短方法名后原断言全部通过，未修改生产 journal mode。
 - [Phase 1A 报告](PHASE_1A.md)、[Provider 报告](PHASE_1B_PROVIDER.md)、`evidence/2026-10-21/phase1a-validation.json` 与保存的 XML 为依据。性能和真实账号/真机验收未执行。
 
-## 下一步：继续音源能力与持久匹配
+## 下一步：统一 UUID 解析、推荐与同步
 
 1. 阅读 IMPLEMENTATION_PLAN.md、DATA_MODEL_AND_MIGRATION.md 和上述报告；先查 git status 和已有 Gradle 进程，避免重复构建。
-2. 当前数据库为 v22，20→21 与 21→22 均不可重写；新结构使用后续独立迁移，不可 destructive migration。
+2. 当前数据库为 v23，20→21、21→22 与 22→23 均不可重写；新结构使用后续独立迁移，不可 destructive migration。
 3. 提供 APK 的静态审计已完成，见 APK_SOURCE_AUDIT.md。最新 REA 6.8 CLI 已实际复核；旧 MCP 连接仍自报 6.5，未混淆版本。样本为 com.hihonor.cloudmusic 1.5.30 + LSPatch/附加模块/Node 来源层，不凭文件名认作官方网易云 9.1。原始样本已忽略，保留本机，不执行/分发；自动审批拒绝完整破解 Hook 方法体，未间接绕过或移植会员/DRM逻辑。
    酷我 `AppContainer.kuwoCatalogProvider` 只提供目录，现以独立 Catalog 结果接入聚合 UI 和官方查看入口，仍未接音频播放/下载/收藏/队列。不要把酷我ID交给网易云播放器；正常音频能力需另外核实，不以 PAY/COPYRIGHT 字段推断授权。
 4. 当前 LINKED 支持显式刷新，尚无定期自动刷新；ONE_SHOT 不关联，普通 refresh 不会重新关联已解除来源。重新 enqueue 是明确重新导入/关联动作。
 5. FakeMusicProvider 与 PlaylistImportCoordinatorTest 已覆盖磁盘重开续跑、批次回滚、取消换号、部分失败、用户修改和同步恢复。后续只跑改动相关的小集合。
-6. UI/播放器/同步仍使用旧兼容路径，新导入后台会原子写入这些旧表。当前解析器仍基于 SongItem；不要误标为完成 UUID SourceResolver。后续 1C 复用 AppContainer.playlistImportBackend 的现有接口，不要再写独立导入器。
-   聚合快照现在为 `FederatedSearchSnapshot<ExploreSearchResult>`，Song/Catalog 混合展示，searchSongItems 只提取 Song。ExploreSearchRankingSession 每查询最多缓存 2048 个分数，数据变化失效；在 Default 排名后回 Main 校验 generation。后续补来源能力、持久匹配/用户确认与拒绝，再迁统一 UUID 解析。
+6. UI/播放器/同步仍使用旧兼容路径，新导入后台会原子写入这些旧表。当前解析器仍基于 SongItem；不要误标为完成 UUID SourceResolver。1C 操作界面已复用 AppContainer.playlistImportBackend；不要再写独立导入器。
+   聚合快照现在为 `FederatedSearchSnapshot<ExploreSearchResult>`，Song/Catalog 混合展示，searchSongItems 只提取 Song。ExploreSearchRankingSession 每查询最多缓存 2048 个分数，数据变化失效；在 Default 排名后回 Main 校验 generation。2E 已补本地持久匹配/用户确认与拒绝，下一步迁统一 UUID 解析；新决策暂不跨设备同步。
 7. 每个完成子阶段自行 commit + push 到 https://github.com/lezebomb/unimusic；保留用户数据，准确区分本地验证与远端 Actions、模拟器与真机结果。
 
 ## 复用环境与日志
@@ -52,6 +55,6 @@
 - SDK：`D:/Collect/.tooling/android-sdk`，包均已安装，无需重复下载。
 - Gradle 参数：`-Dorg.gradle.java.installations.paths=D:/unimusic/.gradle-home/jdks/jdk-17.0.20.1+1`；通常 `--max-workers=2 --console=plain`。
 - 独立 AVD：`.gradle-home/avd/UniMusicMigrationAPI35.avd`，设置当前进程 ANDROID_AVD_HOME 后复用，WHPX 已验证；本轮结束正常关闭以节省资源。
-- 本轮日志：`build/unimusic-toolchain/phase2d-tests.log`、`phase2d-final.log`、`phase2d-boundaries.log`；22 个检查有 XML，本轮无需重复平台/迁移检查。2B/2C 的历史结果保留在独立 evidence 子目录。
+- 本轮日志：`build/unimusic-toolchain/phase2e-tests.log`、`phase2e-final.log`、`phase2e-boundaries.log`；本轮关键集合有 XML，避免重跑完整上游套件。2B/2C 的历史结果保留在独立 evidence 子目录。
 - 运行 Python 检查时 Windows 使用 `python -X utf8`，避免默认 GBK 读取 UTF-8 源文件失败。
 - 本机普通沙箱执行器此前初始化失败，必要 shell 使用 require_escalated 入口。Git 单次加 `-c safe.directory=D:/unimusic`，网络再加 `-c http.sslBackend=openssl`，不改全局安全设置。

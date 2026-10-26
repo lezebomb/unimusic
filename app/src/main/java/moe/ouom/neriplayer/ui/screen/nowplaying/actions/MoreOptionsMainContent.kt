@@ -142,6 +142,7 @@ internal fun MoreOptionsMainContent(
             .padding(bottom = 32.dp)
     ) {
         MoreOptionsGroup {
+            SourceChoiceAction(originalSong, enabled = !isDismissing)
             MetadataAndPlaybackActions(
                 audioInfo = currentPlaybackAudioInfo,
                 isDismissing = isDismissing,
@@ -622,7 +623,7 @@ private fun MoreOptionsGroup(content: @Composable ColumnScope.() -> Unit) {
 }
 
 @Composable
-private fun MoreOptionsItem(
+internal fun MoreOptionsItem(
     title: String,
     icon: ImageVector,
     hue: Color,

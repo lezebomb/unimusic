@@ -1,0 +1,3 @@
+Domain dependencies: {'platform-bilibili-client': 76, 'platform-netease-client': 53, 'platform-youtube-client': 298, 'platform-lyrics-client': 20, 'platform-search-client': 19, 'platform-bilibili-repository': 90, 'platform-bilibili-auth': 7, 'platform-netease-repository': 50, 'platform-netease-auth': 7, 'platform-youtube-repository': 6, 'platform-youtube-auth': 76, 'platform-comments': 36, 'platform-lyrics-provider': 104}, 0 violations
+BUILD SUCCESSFUL in 1m 29s
+450 actionable tasks: 47 executed, 403 up-to-date

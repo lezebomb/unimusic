@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="moe.ouom.neriplayer.platform.bilibili.api.client.BiliClientVideoInfoTest" tests="7" skipped="0" failures="0" errors="0" timestamp="2026-10-26T07:34:59.996Z" hostname="XUSHAOYANG" time="0.662">
+  <properties/>
+  <testcase name="basic info joins desc_v2 text and maps owner stats pages and season" classname="moe.ouom.neriplayer.platform.bilibili.api.client.BiliClientVideoInfoTest" time="0.604"/>
+  <testcase name="search without data falls back to the requested page" classname="moe.ouom.neriplayer.platform.bilibili.api.client.BiliClientVideoInfoTest" time="0.007"/>
+  <testcase name="search keeps only video results and parses durations and optional counters" classname="moe.ouom.neriplayer.platform.bilibili.api.client.BiliClientVideoInfoTest" time="0.008"/>
+  <testcase name="search surfaces platform errors instead of returning no matches" classname="moe.ouom.neriplayer.platform.bilibili.api.client.BiliClientVideoInfoTest" time="0.015"/>
+  <testcase name="stats by bvid read the view endpoint" classname="moe.ouom.neriplayer.platform.bilibili.api.client.BiliClientVideoInfoTest" time="0.007"/>
+  <testcase name="basic info by avid falls back to plain desc and empty objects" classname="moe.ouom.neriplayer.platform.bilibili.api.client.BiliClientVideoInfoTest" time="0.007"/>
+  <testcase name="page list is read by bvid or aid and skips malformed entries" classname="moe.ouom.neriplayer.platform.bilibili.api.client.BiliClientVideoInfoTest" time="0.007"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

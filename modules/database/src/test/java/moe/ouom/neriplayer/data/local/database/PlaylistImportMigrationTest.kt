@@ -44,10 +44,10 @@ class PlaylistImportMigrationTest {
             } }
         }
         val room = Room.databaseBuilder(context, NeriUserDataDatabase::class.java, file.name)
-            .addMigrations(NeriUserDataDatabase.MIGRATION_21_22).allowMainThreadQueries().build()
+            .addMigrations(NeriUserDataDatabase.MIGRATION_21_22, NeriUserDataDatabase.MIGRATION_22_23).allowMainThreadQueries().build()
         try {
-            val db = room.openHelper.writableDatabase // Room validates every v22 table and index.
-            assertEquals(22, db.version)
+            val db = room.openHelper.writableDatabase // Room validates every current table and index.
+            assertEquals(NeriUserDataDatabase.FINAL_DB_VERSION, db.version)
             tables.forEach { table -> db.query("SELECT * FROM $table").use { cursor ->
                 val after = buildList { while (cursor.moveToNext()) add((0 until cursor.columnCount).map { if (cursor.isNull(it)) null else cursor.getString(it) }) }
                 assertEquals(table, before[table], after)

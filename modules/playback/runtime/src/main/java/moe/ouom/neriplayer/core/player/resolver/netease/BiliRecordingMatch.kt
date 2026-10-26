@@ -22,9 +22,10 @@ internal fun biliAutoSourceAccessFailure(info: PlayInfo, expectedDurationMs: Lon
     return null
 }
 
-internal fun selectStrictBiliPage(song: SongItem, info: VideoBasicInfo, searchTitle: String): BiliPageSelection {
+internal fun selectStrictBiliPage(song: SongItem, info: VideoBasicInfo, searchTitle: String, selectedCid: Long? = null): BiliPageSelection {
     val expected = song.recordingMetadata()
     val pages = info.pages.filter { page ->
+        if (selectedCid != null && page.cid != selectedCid) return@filter false
         if (page.cid <= 0) return@filter false
         val genericPart = page.part.trim().matches(Regex("(?i)(?:p?1|正片|视频|音频|默认|video|audio)"))
         val title = if (info.pages.size == 1 && genericPart) info.title else page.part
@@ -41,11 +42,11 @@ internal fun selectStrictBiliPage(song: SongItem, info: VideoBasicInfo, searchTi
     }
 }
 
-internal fun SongItem.recordingMetadata() = RecordingMetadata(
+fun SongItem.recordingMetadata() = RecordingMetadata(
     originalName ?: name, originalArtist ?: artist, durationMs, versionContext = album)
 
 /** Uploader text is metadata evidence only. It never establishes a playback entitlement. */
-internal fun biliRecordingMetadata(
+fun biliRecordingMetadata(
     expected: RecordingMetadata, title: String, context: String, author: String, durationMs: Long
 ): RecordingMetadata {
     val artist = expected.artist.trim()

@@ -49,6 +49,7 @@ import moe.ouom.neriplayer.common.R as CoreCommonR
 import moe.ouom.neriplayer.platform.netease.api.client.mergeNeteaseSessionCookies
 import moe.ouom.neriplayer.data.model.youtube.music.YouTubeMusicHomeShelf
 import moe.ouom.neriplayer.core.di.AppContainer
+import moe.ouom.neriplayer.ui.viewmodel.tab.home.HomeLocalRecommendationsController
 import moe.ouom.neriplayer.data.model.youtube.auth.YouTubeAuthBundle
 import moe.ouom.neriplayer.platform.youtube.auth.buildRefreshObserverFingerprint
 import moe.ouom.neriplayer.data.model.SongItem
@@ -207,6 +208,11 @@ data class HomeUiState(
 )
 
 class HomeViewModel(application: Application) : AndroidViewModel(application) {
+
+    private val localRecommendationController = HomeLocalRecommendationsController(application, viewModelScope)
+    val localRecommendations = localRecommendationController.state
+
+    fun refreshLocalRecommendations() = localRecommendationController.refresh()
 
     private val repo = AppContainer.neteaseCookieRepo
     private val client = AppContainer.neteaseClient

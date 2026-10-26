@@ -183,6 +183,14 @@ internal suspend fun PlayerManager.resolveSongUrl(
         shouldPreferListenTogetherSourceBeforeNeteaseFallback(
             listenerAudioLinkSharingActive = isListenTogetherAudioLinkFallbackEnabled()
         )
+    if (!shouldDeferNeteaseAlternateSources && initialListenTogetherFallback == null && song.streamUrl.isNullOrBlank()) {
+        tryResolveRememberedSource(song, sideEffects)?.let {
+            // Skip segments belong to a physical video/CID, never to an alternate recording URL.
+            BiliSponsorBlockPlaybackController.onAlternativeSourceSelected()
+            BiliVideoSkipPlaybackController.onAlternativeSourceSelected()
+            return it
+        }
+    }
     if (isLocalSong(song)) {
         val localResolution = resolvePermittedLocalPlaybackWithRetry(
             song = song,
@@ -928,6 +936,7 @@ internal fun PlayerManager.refreshCurrentSongUrlImpl(
     if (isLocalSong(song) && !allowLocalSongRecovery) return
     if (isPlaybackNetworkUsable(application)) {
         NeteaseAutoSourceState.failed(song, currentPlaybackCacheKeyForRecovery(), reason)
+        RememberedSourceState.failed(song, currentPlaybackCacheKeyForRecovery(), reason)
     }
     NPLogger.d(
         "NERI-PlayerManager",
@@ -1758,7 +1767,7 @@ private suspend fun PlayerManager.getBiliAudioUrl(
     }
 }
 
-private suspend fun PlayerManager.getYouTubeMusicAudioUrl(
+internal suspend fun PlayerManager.getYouTubeMusicAudioUrl(
     song: SongItem,
     suppressError: Boolean = false,
     forceRefresh: Boolean = false,

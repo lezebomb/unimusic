@@ -16,7 +16,10 @@ data class PlaylistImportProgress(
     val failed: Int,
     val skipped: Int,
     val lastError: ImportFailureKind?,
-    val retryAt: Long
+    val retryAt: Long,
+    val playlistName: String? = null,
+    val mode: PlaylistImportMode = PlaylistImportMode.ONE_SHOT,
+    val linked: Boolean = false
 )
 
 data class PlaylistImportFailure(

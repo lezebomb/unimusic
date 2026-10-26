@@ -20,8 +20,13 @@ class PlaylistImportRoomStore(
     internal val library = database.unifiedLibraryDao()
     internal val songs = UnifiedLibraryRoomStore(database, now)
 
-    fun observeJobs() = dao.observeJobs().map { jobs -> jobs.map { it.progress() } }
-    suspend fun progress(id: String): PlaylistImportProgress? = dao.job(id)?.progress()
+    fun observeJobs() = kotlinx.coroutines.flow.combine(dao.observeJobs(), library.observeOrigins()) { jobs, origins ->
+        val byKey = origins.associateBy { Triple(it.provider, it.accountKey, it.remotePlaylistId) }
+        jobs.map { job -> job.progress(byKey[Triple(job.provider, job.accountKey, job.remotePlaylistId)]) }
+    }
+    suspend fun progress(id: String): PlaylistImportProgress? = dao.job(id)?.let { job ->
+        job.progress(library.origin(job.provider, job.accountKey, job.remotePlaylistId))
+    }
 
     suspend fun failures(id: String, limit: Int = 100, offset: Int = 0): List<PlaylistImportFailure> {
         require(limit in 1..200 && offset >= 0)
@@ -137,6 +142,7 @@ class PlaylistImportRoomStore(
 
 internal fun retryDelay(attempt: Int): Long = 30_000L * (1L shl (attempt - 1).coerceIn(0, 6))
 
-private fun PlaylistImportJobEntity.progress() = PlaylistImportProgress(jobId, provider, accountKey, remotePlaylistId,
+private fun PlaylistImportJobEntity.progress(origin: moe.ouom.neriplayer.data.local.database.entity.unified.PlaylistOriginEntity?) = PlaylistImportProgress(jobId, provider, accountKey, remotePlaylistId,
     playlistId, PlaylistImportState.valueOf(state), total, importedCount, failedCount, skippedCount,
-    lastError?.let(ImportFailureKind::valueOf), retryAt)
+    lastError?.let(ImportFailureKind::valueOf), retryAt, remoteName,
+    PlaylistImportMode.valueOf(importMode), origin?.linked == true)

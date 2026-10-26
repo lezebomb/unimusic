@@ -1,0 +1,74 @@
+package moe.ouom.neriplayer.ui.viewmodel.tab.home
+
+import android.app.Application
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.channelFlow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.conflate
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.stateIn
+import moe.ouom.neriplayer.data.local.playlist.LocalPlaylistRepository
+import moe.ouom.neriplayer.data.recommendation.LocalRecommendationRepository
+import moe.ouom.neriplayer.data.recommendation.LocalRecommendations
+import moe.ouom.neriplayer.data.stats.PlaybackStatsRepository
+import java.io.IOException
+
+data class HomeLocalRecommendationsState(
+    val recommendations: LocalRecommendations = LocalRecommendations(),
+    val loading: Boolean = true,
+    val failed: Boolean = false
+)
+
+/** Kept separate from remote Home state so account changes cannot replace the local section. */
+internal class HomeLocalRecommendationsController(application: Application, scope: CoroutineScope) {
+    private val refreshVersion = MutableStateFlow(0L)
+    val state = channelFlow {
+        var latest = LocalRecommendations()
+        refreshVersion.collectLatest {
+            send(HomeLocalRecommendationsState(latest, loading = true))
+            try {
+                val library = LocalPlaylistRepository.getInstance(application)
+                if (!library.awaitInitialized()) throw IOException("Local library unavailable")
+                val statistics = PlaybackStatsRepository.getInstance(application)
+                val recommendations = LocalRecommendationRepository(application, statistics)
+                combine(
+                    library.playlists,
+                    statistics.revisionFlow.catch { failure ->
+                        if (failure is CancellationException) throw failure
+                        emit(-1L)
+                    },
+                ) { playlists, _ -> playlists.map { it.copy(songs = it.songs.toMutableList()) } }
+                    .conflate()
+                    .collectLatest { playlists ->
+                        send(HomeLocalRecommendationsState(latest, loading = true))
+                        try {
+                            latest = recommendations.recommend(playlists)
+                            send(HomeLocalRecommendationsState(latest, loading = false))
+                        } catch (failure: Exception) {
+                            if (failure is CancellationException) throw failure
+                            latest = LocalRecommendations()
+                            send(HomeLocalRecommendationsState(loading = false, failed = true))
+                        }
+                    }
+            } catch (failure: Exception) {
+                if (failure is CancellationException) throw failure
+                latest = LocalRecommendations()
+                send(HomeLocalRecommendationsState(loading = false, failed = true))
+            }
+        }
+    }.flowOn(Dispatchers.IO).stateIn(
+        scope,
+        SharingStarted.WhileSubscribed(stopTimeoutMillis = 5_000),
+        HomeLocalRecommendationsState()
+    )
+
+    fun refresh() {
+        refreshVersion.value += 1L
+    }
+}

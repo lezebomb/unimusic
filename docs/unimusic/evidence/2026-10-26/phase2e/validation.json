@@ -1,0 +1,137 @@
+{
+  "date": "2026-10-26",
+  "phase": "2E",
+  "roomVersion": 23,
+  "suites": [
+    {
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "name": "SourceMatchMigrationTest",
+      "path": "modules/database/build/test-results/testDebugUnitTest/TEST-moe.ouom.neriplayer.data.local.database.SourceMatchMigrationTest.xml"
+    },
+    {
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "name": "RegisteredMigrationChainTest",
+      "path": "modules/database/build/test-results/testDebugUnitTest/TEST-moe.ouom.neriplayer.data.local.database.migration.RegisteredMigrationChainTest.xml"
+    },
+    {
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "name": "SourceMatchRoomStoreTest",
+      "path": "modules/local/build/test-results/testDebugUnitTest/TEST-moe.ouom.neriplayer.data.unified.SourceMatchRoomStoreTest.xml"
+    },
+    {
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "name": "LocalRecommendationRankerTest",
+      "path": "modules/local/build/test-results/testDebugUnitTest/TEST-moe.ouom.neriplayer.data.recommendation.LocalRecommendationRankerTest.xml"
+    },
+    {
+      "tests": 7,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "name": "PlaylistImportCoordinatorTest",
+      "path": "modules/local/build/test-results/testDebugUnitTest/TEST-moe.ouom.neriplayer.data.unified.PlaylistImportCoordinatorTest.xml"
+    },
+    {
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "name": "PlaylistImportUiPolicyTest",
+      "path": "app/build/test-results/testDebugUnitTest/TEST-moe.ouom.neriplayer.ui.viewmodel.tab.PlaylistImportUiPolicyTest.xml"
+    },
+    {
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "name": "BiliRecordingMatchTest",
+      "path": "modules/playback/runtime/build/test-results/testDebugUnitTest/TEST-moe.ouom.neriplayer.core.player.resolver.netease.BiliRecordingMatchTest.xml"
+    },
+    {
+      "tests": 7,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "name": "BiliClientVideoInfoTest",
+      "path": "modules/platform/build/test-results/testDebugUnitTest/TEST-moe.ouom.neriplayer.platform.bilibili.api.client.BiliClientVideoInfoTest.xml"
+    },
+    {
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "name": "PlaylistImportMigrationTest",
+      "path": "modules/database/build/test-results/testDebugUnitTest/TEST-moe.ouom.neriplayer.data.local.database.PlaylistImportMigrationTest.xml"
+    }
+  ],
+  "totalTests": 32,
+  "checks": {
+    "moduleBoundaries": "passed",
+    "platformDomainDependencies": "passed",
+    "debugApk": "built",
+    "databaseAndroidTestApk": "built",
+    "instrumentation": "not run",
+    "device": "not connected",
+    "accountPlayback": "not run",
+    "performance": "not measured",
+    "remoteCI": "pending new commit"
+  },
+  "artifacts": [
+    {
+      "path": "app/build/outputs/apk/debug/app-debug.apk",
+      "size": 62546006,
+      "sha256": "c24456839e6b9e03dc99f1c78a602df711d00de8f384f884f05a1718b2aeb370"
+    },
+    {
+      "path": "modules/database/build/outputs/apk/androidTest/debug/database-debug-androidTest.apk",
+      "size": 12976229,
+      "sha256": "a62d00734198842234661a41b4538a37589f7f878398bfad6a1d921242498f53"
+    },
+    {
+      "path": "modules/database/schemas/moe.ouom.neriplayer.data.local.database.NeriUserDataDatabase/23.json",
+      "size": 159181,
+      "sha256": "6945804ef89cb399c531ccc3e5f3a123b2eb2b5feefc5b133ce1f22be7d392de"
+    }
+  ],
+  "logs": [
+    {
+      "path": "build/unimusic-toolchain/phase2e-tests.log",
+      "size": 25634,
+      "sha256": "a46bf6f6c8457f5a23e8f37606488dd157be0e1b49f3f30a29a000029217d45f"
+    },
+    {
+      "path": "build/unimusic-toolchain/phase2e-final.log",
+      "size": 31977,
+      "sha256": "f7bc86ed31763c332ee5566026f34f0fbdf9ddf18b5b26d5e94d087f9d537b72"
+    },
+    {
+      "path": "build/unimusic-toolchain/phase2e-migration-final.log",
+      "size": 3708,
+      "sha256": "4d394c4aa009424a52246f9017d5c7888fc9936838e5f1f92ec06301e50bf00c"
+    },
+    {
+      "path": "build/unimusic-toolchain/phase2e-boundaries.log",
+      "size": 27,
+      "sha256": "f10fd66c214b917ee89a1cfc270e44fb332b76cf9000c053f0514056d7a97e2d"
+    }
+  ],
+  "commands": [
+    "gradlew <JDK17 path> :database:testDebugUnitTest --tests '*SourceMatchMigrationTest' --tests '*RegisteredMigrationChainTest' :local:testDebugUnitTest --tests '*SourceMatchRoomStoreTest' --tests '*LocalRecommendationRankerTest' --tests '*PlaylistImportCoordinatorTest' :app:testDebugUnitTest --tests '*PlaylistImportUiPolicyTest' :playback:runtime:compileDebugKotlin --continue --max-workers=2 --console=plain",
+    "gradlew <JDK17 path> :platform:testDebugUnitTest --tests '*BiliClientVideoInfoTest' :playback:runtime:testDebugUnitTest --tests '*BiliRecordingMatchTest' :database:testDebugUnitTest --tests '*PlaylistImportMigrationTest' :app:assembleDebug :database:assembleDebugAndroidTest :platform:verifyDomainDependencies --max-workers=2 --console=plain",
+    "gradlew <JDK17 path> :database:testDebugUnitTest --tests '*SourceMatchMigrationTest' --tests '*RegisteredMigrationChainTest' --tests '*PlaylistImportMigrationTest' --max-workers=2 --console=plain",
+    "python -X utf8 tools_pub/quality/module_boundaries.py"
+  ],
+  "note": "Final database filters are combined to retain all three XML reports; an earlier filtered Gradle invocation replaced prior XML."
+}

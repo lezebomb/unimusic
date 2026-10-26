@@ -52,6 +52,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -96,6 +97,8 @@ import moe.ouom.neriplayer.ui.viewmodel.tab.LibraryViewModel
 import moe.ouom.neriplayer.ui.viewmodel.tab.PlaylistSummary
 import moe.ouom.neriplayer.ui.viewmodel.tab.YouTubeMusicPlaylist
 import moe.ouom.neriplayer.ui.haptic.HapticIconButton
+import moe.ouom.neriplayer.ui.haptic.HapticTextButton
+import moe.ouom.neriplayer.R
 import moe.ouom.neriplayer.ui.util.currentWindowWidthDp
 
 enum class LibraryTab(val labelResId: Int) {
@@ -254,6 +257,7 @@ fun LibraryScreen(
 ) {
     val vm: LibraryViewModel = viewModel()
     val ui by vm.uiState.collectAsStateWithLifecycle()
+    var showPlaylistImport by rememberSaveable { mutableStateOf(false) }
     val context = LocalContext.current
     val defaultPlaylistName = stringResource(CoreCommonR.string.library_create_playlist_default)
     val localPlaylistRepo = remember(context) {
@@ -368,6 +372,9 @@ fun LibraryScreen(
                 scrolledContainerColor = Color.Transparent
             ),
             actions = {
+                HapticTextButton(onClick = { showPlaylistImport = true }) {
+                    Text(stringResource(R.string.unimusic_import_entry))
+                }
                 HapticIconButton(onClick = onOpenStats) {
                     Icon(
                         Icons.Filled.BarChart,
@@ -503,5 +510,8 @@ fun LibraryScreen(
             }
         }
     }
+    }
+    if (showPlaylistImport) {
+        PlaylistImportSheet(offlineMode = offlineMode, onDismiss = { showPlaylistImport = false })
     }
 }

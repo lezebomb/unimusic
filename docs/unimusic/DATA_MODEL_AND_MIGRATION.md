@@ -30,7 +30,7 @@
 | PlayEvent / `play_event` | UUID eventId、song UUID、PLAY/SKIP/COMPLETE/REPEAT/DISLIKE、有效收听量/时间和设备；事件去重、保留策略和聚合水位 |
 | RecommendationSnapshot / `recommendation_snapshot` | snapshot UUID、日期/算法版本/栏目、song UUID 有序条目、解释原因、PLATFORM/UNIMUSIC 来源标记；必要反馈单独存储 |
 
-v21 实现前 6 项的最小字段；v22 通过独立 21→22 迁移实现任务、有序快照/失败和凭证 3 张表。Source 尚未增加独立匹配证据/质量信息，成员因果 tokens 仍由旧表保存。匹配实体、PlayEvent/RecommendationSnapshot 分属 Phase 2/3，不提前堆叠不可验证 schema。每次新增表均独立增量迁移，不能重写已提交的迁移。
+v21 实现前 6 项的最小字段；v22 通过独立 21→22 迁移实现任务、有序快照/失败和凭证 3 张表。Source 尚未增加独立匹配证据/质量信息，成员因果 tokens 仍由旧表保存。v23 通过独立 22→23 迁移增加 song_match 与 user_match_override；PlayEvent/RecommendationSnapshot 属于后续 Phase 3。每次新增表均独立增量迁移，不能重写已提交的迁移。
 
 ## 3. Room v20 → v21 与回填
 
@@ -51,7 +51,7 @@ v21 实现前 6 项的最小字段；v22 通过独立 21→22 迁移实现任务
 
 ### 回滚的实际边界
 
-- 关闭新增功能，使用旧 repository/旧 UI 读取保留表；应用回滚修复构建必须保留用户已升级到的 schema（当前 v22）。
+- 关闭新增功能，使用旧 repository/旧 UI 读取保留表；应用回滚修复构建必须保留用户已升级到的 schema（当前 v23）。
 - 直接安装 v20 二进制会被现有版本检查拒绝打开 v21 数据库，不能承诺二进制降级兼容；不自动创建向下删除迁移。
 - 需要回到原 NeriPlayer 时，使用兼容导出导入或迁移前一致性备份；还原覆盖数据必须由用户明确选择，保留现有数据库副本。
 - 新 UUID 和人工映射在回滚旧功能时保留；后续恢复新读路径能够继续使用，不能重分配身份。
@@ -87,3 +87,9 @@ Phase 1 先保留现有 2.0 数据同步，不让新字段意外混入旧序列�
 同一来源被两台离线设备首次导入时可能产生不同 UUID；合并需按来源唯一键建立 UUID alias 并选择确定的 canonical UUID，重定向成员、匹配和事件引用，保留旧 UUID 可解析。没有共享精确来源或可信映射的同名歌曲不能因此合并。用户 REJECT 和删除 tombstone 不可被旧自动结果覆盖。
 
 只同步统一身份、元数据、来源 ID/版本、人工映射、因果成员、推荐反馈/聚合统计和必要设置；不传账号 cookie/token/password、私有文件路径、签名 URL、未授权音频或导入任务的设备执行锁。测试旧客户端读写往返、离线编辑、删除冲突、重复导入及恢复备份后再启用。
+
+## 6. v22→v23 来源匹配和人工决策
+
+`SongMatch` 当前以目标 song UUID + 精确候选键唯一，保存候选元数据、目标指纹、算法版本和观察时间。人工决策单独按 match UUID 保存 CONFIRMED/REJECTED/NONE、递增 revision 和时间；尚无跨设备因果合并，不应接入旧2.0同步直接传输。确认既不合并 UUID 也不改变 SongSource 的 METADATA_ONLY 权限默认值。
+
+后台观察不更改人工决策，已确认记录的证据也只由显式操作更新；目标修改使指纹不符后旧确认失效。清除保存NONE修订墓碑。在途播放解析完成时重读修订，拒绝或清除优先。原表保持原样，冻结22 schema迁移验证逐表逐字段比较；无删除迁移。

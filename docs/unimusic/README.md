@@ -2,7 +2,7 @@
 
 基于 NeriPlayer 继续开发的原生 Android 统一音乐客户端；保留上游实现和 GPL 许可，采用渐进模型/数据库迁移。
 
-当前：Phase 1A、1B 导入后台及 2A–2D 音源/搜索子阶段已完成。聚合现有本地/网易云/B 站/可关闭的 YouTube，并显示酷我独立目录结果与官方页面入口；酷我完整音频尚未接入。修复全角版本漏判，聚合排名移到后台并缓存同次查询分数。Room 保持 v22，本轮 22 个定向测试与 Debug 构建通过；持久匹配、统一 UUID 临播与真实账号/设备播放验收仍待完成。
+当前：已完成统一库、网易云持久导入后台及 2A–2E 音源/搜索子阶段，并接入歌单导入界面、本地推荐和持久来源选择。Room 当前 v23；用户确认/拒绝不会被后台旧结果覆盖。酷我仍为独立元数据目录。真实账号/设备播放、统一 UUID 临播与跨设备新映射同步继续开发，验证依据见阶段报告。
 
 - [源码架构审计](ARCHITECTURE_AUDIT.md)
 - [真实构建/检查基线和恢复条件](BASELINE.md)
@@ -14,6 +14,7 @@
 - [Phase 2B 聚合搜索、分页与版本排序](PHASE_2B_SEARCH.md)
 - [Phase 2C 酷我目录后台与自动候选优化](PHASE_2C_CATALOG_AND_MATCHING.md)
 - [Phase 2D 目录接入、身份隔离与排名修正](PHASE_2D_CATALOG_SEARCH.md)
+- [Phase 2E 持久来源选择、导入操作和本地推荐](PHASE_2E_SOURCE_CHOICES_AND_LIBRARY.md)
 - [提供 APK 的 REA 6.8 静态审计与证据](APK_SOURCE_AUDIT.md)
 - [MusicFree、LX、InnerTune 与 Spotube 音源机制调研](MUSIC_SOURCE_RESEARCH.md)
 - [分阶段开发、文件清单与验收](IMPLEMENTATION_PLAN.md)

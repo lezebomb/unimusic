@@ -17,6 +17,11 @@ import moe.ouom.neriplayer.core.player.quality.effectiveBiliQuality
 import moe.ouom.neriplayer.platform.bilibili.playback.quality.selectStreamByPreference
 import moe.ouom.neriplayer.common.logging.NPLogger
 import kotlin.math.absoluteValue
+import moe.ouom.neriplayer.data.unified.SourceMatchBackend
+import moe.ouom.neriplayer.data.model.unified.RecordingSourceCandidate
+import moe.ouom.neriplayer.data.model.unified.SongSourceKey
+import moe.ouom.neriplayer.data.model.unified.SourceMatchDecision
+import moe.ouom.neriplayer.data.model.unified.UnifiedSongMetadata
 
 private const val NETEASE_AUTO_SOURCE_SEARCH_LIMIT = 6
 private val autoSourceCacheKeyUnsafeRegex = Regex("[^A-Za-z0-9_.-]+")
@@ -83,14 +88,17 @@ private suspend fun PlayerManager.fetchBiliAutoSourceCandidates(song: SongItem, 
     }
 }
 
-private suspend fun PlayerManager.resolveStrictBiliSource(
-    song: SongItem, candidate: SearchVideoItem, sideEffects: RefreshResolverSideEffects
+internal suspend fun PlayerManager.resolveStrictBiliSource(
+    song: SongItem, candidate: SearchVideoItem, sideEffects: RefreshResolverSideEffects, selectedCid: Long? = null
 ): SourceAttempt<SongUrlResult.Success> {
     try {
         val info = if (candidate.bvid.isNotBlank()) biliClient.getVideoBasicInfoByBvid(candidate.bvid)
             else biliClient.getVideoBasicInfoByAvid(candidate.aid)
-        val selection = selectStrictBiliPage(song, info, candidate.titlePlain)
+        val selection = selectStrictBiliPage(song, info, candidate.titlePlain, selectedCid)
         val page = selection.page ?: return SourceAttempt.Rejected(selection.rejection ?: SourceFailure.NO_MATCH)
+        val matchBackend = SourceMatchBackend(application)
+        val sourceKey = SongSourceKey("bilibili", info.aid.toString(), page.cid.toString())
+        if (matchBackend.isRejected(song, sourceKey)) return SourceAttempt.Rejected(SourceFailure.NO_MATCH)
         val playInfo = biliClient.getPlayInfoByBvid(info.bvid, page.cid, PlayOptions(tryLook = 0))
         biliAutoSourceAccessFailure(playInfo, song.durationMs)?.let { return SourceAttempt.Rejected(it) }
         val available = with(biliClient) { playInfo.toAudioStreamInfos() }
@@ -98,6 +106,12 @@ private suspend fun PlayerManager.resolveStrictBiliSource(
         val stream = selected?.takeIf { it.url.isNotBlank() }
             ?: return SourceAttempt.Rejected(SourceFailure.NO_PERMISSION)
         val duration = page.durationSec.takeIf { it > 0 }?.times(1000L) ?: info.durationSec * 1000L
+        val expected = song.recordingMetadata()
+        val title = if (info.pages.size == 1 && page.part.matches(Regex("(?i)(?:p?1|正片|视频|音频|默认|video|audio)"))) info.title else page.part
+        val metadata = biliRecordingMetadata(expected, title, "${info.title} ${page.part}", info.ownerName, duration)
+        val observed = matchBackend.observe(song, RecordingSourceCandidate(sourceKey,
+            UnifiedSongMetadata(metadata.title, metadata.artist, metadata.versionContext, metadata.durationMs)))
+        if (observed.decision == SourceMatchDecision.REJECTED) return SourceAttempt.Rejected(SourceFailure.NO_MATCH)
         sideEffects.updateDuration { maybeUpdateSongDuration(song, duration) }
         return SourceAttempt.Ready(SongUrlResult.Success(
             url = stream.url, candidateUrls = stream.candidateUrls, durationMs = duration,

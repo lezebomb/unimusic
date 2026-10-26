@@ -1,6 +1,6 @@
 [English](./README_EN.md) | [中文](./README.md)
 
-> **UniMusic 开发仓库**：基于 NeriPlayer 源码与 GPL-3.0 继续开发。当前处于源码审计/基线阶段，尚未发布 UniMusic APK。开发状态、真实构建限制和后续计划见 [UniMusic 开发记录](docs/unimusic/README.md)。以下保留上游文档，其中下载和社群链接指向 NeriPlayer。
+> **UniMusic 开发仓库**：基于 NeriPlayer 源码与 GPL-3.0 继续开发。当前已实现统一库、批量导入、聚合搜索及来源选择，Debug 构建可用，尚未发布正式版。开发状态、真实构建限制和后续计划见 [UniMusic 开发记录](docs/unimusic/README.md)。以下保留上游文档，其中下载和社群链接指向 NeriPlayer。
 
 <h1 align="center">NeriPlayer (音理音理!)</h1>
 

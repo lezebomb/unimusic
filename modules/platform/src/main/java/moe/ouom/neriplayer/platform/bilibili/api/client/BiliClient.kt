@@ -387,7 +387,7 @@ class BiliClient(
             "page" to page.toString()
         )
         val jo = getJsonWbi(SEARCH_TYPE_URL, params)
-        val data = jo.optJSONObject("data") ?: JSONObject()
+        val data = jo.requireSuccessfulData("video search")
         val itemsArr = data.optJSONArray("result") ?: JSONArray()
         val items = ArrayList<SearchVideoItem>(itemsArr.length())
         for (i in 0 until itemsArr.length()) {

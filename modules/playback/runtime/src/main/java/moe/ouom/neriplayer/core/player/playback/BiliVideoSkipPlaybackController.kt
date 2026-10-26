@@ -45,6 +45,8 @@ object BiliVideoSkipPlaybackController {
     private val lock = Any()
     private var targetLoadJob: Job? = null
     private var activeTrack: ActiveTrack? = null
+
+    fun onAlternativeSourceSelected() = synchronized(lock) { clearActiveTrackLocked() }
     private var latestPlaybackRequest: PlaybackRequest? = null
     private val _activeTrackGeneration = MutableStateFlow(0L)
 

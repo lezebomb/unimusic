@@ -39,6 +39,13 @@ class BiliRecordingMatchTest {
         assertNull(selectStrictBiliPage(song.copy(name = "A", artist = "Sia"), asia, asia.title).page)
     }
 
+    @Test fun confirmedCidDisambiguatesOnlyTheSelectedCompatiblePage() {
+        val info = video(page(11, "晴天"), page(22, "晴天"), page(33, "晴天 Live"))
+        assertEquals(22L, selectStrictBiliPage(song, info, info.title, selectedCid = 22).page?.cid)
+        assertNull(selectStrictBiliPage(song, info, info.title, selectedCid = 33).page)
+        assertNull(selectStrictBiliPage(song, info, info.title, selectedCid = 99).page)
+    }
+
     @Test fun previewDrmAndIncompleteStreamsAreNotFullSongSources() {
         fun info(raw: String, duration: Long? = 269_000) = PlayInfo(0, "", null, null, duration,
             emptyList(), emptyList(), emptyList(), emptyList(), emptyList(), null, null, JSONObject(raw))

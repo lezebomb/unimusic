@@ -27,6 +27,8 @@ internal object BiliSponsorBlockPlaybackController {
     private var segmentLoadJob: Job? = null
     private var activeTrack: ActiveTrack? = null
 
+    fun onAlternativeSourceSelected() = synchronized(lock) { clearActiveTrackLocked() }
+
     fun onPlaybackRequestStarted(song: SongItem, requestToken: Long) {
         synchronized(lock) {
             val track = activeTrack ?: return

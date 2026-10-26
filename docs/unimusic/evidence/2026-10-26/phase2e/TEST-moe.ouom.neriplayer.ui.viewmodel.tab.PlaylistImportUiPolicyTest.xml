@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="moe.ouom.neriplayer.ui.viewmodel.tab.PlaylistImportUiPolicyTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-10-26T07:01:24.738Z" hostname="XUSHAOYANG" time="0.069">
+  <properties/>
+  <testcase name="only pending running and paused work can be cancelled" classname="moe.ouom.neriplayer.ui.viewmodel.tab.PlaylistImportUiPolicyTest" time="0.044"/>
+  <testcase name="public account input becomes a canonical positive ID only" classname="moe.ouom.neriplayer.ui.viewmodel.tab.PlaylistImportUiPolicyTest" time="0.02"/>
+  <testcase name="retry offers recovery for pauses but never recreates a removed target" classname="moe.ouom.neriplayer.ui.viewmodel.tab.PlaylistImportUiPolicyTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
