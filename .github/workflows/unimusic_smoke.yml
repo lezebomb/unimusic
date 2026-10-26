@@ -9,6 +9,12 @@ on:
       - 'modules/local/**'
       - 'modules/platform/**'
       - 'modules/playback/**'
+      - 'modules/common/src/**/search/**'
+      - 'modules/common/src/main/res/*/strings_search.xml'
+      - 'app/src/main/java/moe/ouom/neriplayer/ui/viewmodel/tab/Explore*.kt'
+      - 'app/src/main/java/moe/ouom/neriplayer/ui/screen/tab/explore/**'
+      - 'app/src/test/java/moe/ouom/neriplayer/ui/viewmodel/tab/Explore*.kt'
+      - 'app/src/test/java/moe/ouom/neriplayer/ui/screen/tab/Explore*.kt'
       - 'tools_pub/quality/module_boundaries.py'
       - 'app/src/main/java/moe/ouom/neriplayer/NeriPlayerApplication.kt'
       - 'app/src/main/java/moe/ouom/neriplayer/core/di/AppContainer.kt'
@@ -52,7 +58,9 @@ jobs:
           ./gradlew -Dorg.gradle.java.installations.paths="$JAVA_HOME_17_X64" \
             :database:testDebugUnitTest --tests '*RegisteredMigrationChainTest' --tests '*NeriUserDataDatabaseVersionTest' --tests '*PlaylistImportMigrationTest' \
             :local:testDebugUnitTest --tests '*UnifiedLibraryRoomStoreTest' --tests '*PlaylistImportCoordinatorTest' --tests '*LocalPlaylistSyncMutationDecoderTest' \
-            :platform:testDebugUnitTest --tests '*NeteasePlaylistImportProviderTest' --tests '*BiliClientPlayUrlTest' \
+            :common:testDebugUnitTest --tests '*FederatedSearchEngineTest' \
+            :app:testDebugUnitTest --tests '*ExploreSearchResultRankingTest' --tests '*ExploreScreenYouTubeGateTest' --tests '*ExploreViewModelYouTubeGateTest' --tests '*ExploreSearchPaginationTest' \
+            :platform:testDebugUnitTest --tests '*NeteasePlaylistImportProviderTest' --tests '*BiliClientPlayUrlTest' --tests '*NeteaseRequestSessionTest' --tests '*NeteaseClientTest' \
             :playback:logic:testDebugUnitTest --tests '*RecordingMatchPolicyTest' --tests '*PlaybackSourceResolverTest' --tests '*SongUrlResolutionRetryTest' \
             :playback:runtime:testDebugUnitTest --tests '*BiliRecordingMatchTest' --tests '*PlayerManagerNeteaseAutoSourceSwitchTest' --tests '*PlayerManagerNeteaseLocalFallbackTest' \
             :database:assembleDebugAndroidTest --max-workers=2 --console=plain
@@ -83,6 +91,8 @@ jobs:
             modules/database/build/test-results/**/*.xml
             modules/local/build/test-results/**/*.xml
             modules/platform/build/test-results/**/*.xml
+            modules/common/build/test-results/**/*.xml
+            app/build/test-results/**/*.xml
             modules/playback/logic/build/test-results/**/*.xml
             modules/playback/runtime/build/test-results/**/*.xml
             modules/database/build/outputs/androidTest-results/**

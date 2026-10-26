@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="moe.ouom.neriplayer.ui.viewmodel.tab.ExploreSearchPaginationTest" tests="6" skipped="0" failures="0" errors="0" timestamp="2026-10-26T05:22:00.068Z" hostname="XUSHAOYANG" time="0.007">
+  <properties/>
+  <testcase name="scroll threshold prefetches next page near list end" classname="moe.ouom.neriplayer.ui.viewmodel.tab.ExploreSearchPaginationTest" time="0.002"/>
+  <testcase name="merge keeps existing order and removes duplicate stable keys" classname="moe.ouom.neriplayer.ui.viewmodel.tab.ExploreSearchPaginationTest" time="0.001"/>
+  <testcase name="known total count controls whether another page exists" classname="moe.ouom.neriplayer.ui.viewmodel.tab.ExploreSearchPaginationTest" time="0.0"/>
+  <testcase name="load more failure waits for explicit retry" classname="moe.ouom.neriplayer.ui.viewmodel.tab.ExploreSearchPaginationTest" time="0.0"/>
+  <testcase name="page size fallback handles APIs without a total count" classname="moe.ouom.neriplayer.ui.viewmodel.tab.ExploreSearchPaginationTest" time="0.0"/>
+  <testcase name="youtube linked song has deterministic thumbnail fallback" classname="moe.ouom.neriplayer.ui.viewmodel.tab.ExploreSearchPaginationTest" time="0.004"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

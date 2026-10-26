@@ -27,6 +27,7 @@ class ExploreScreenYouTubeGateTest {
         assertFalse(sources.contains(SearchSource.YOUTUBE_MUSIC))
         assertEquals(
             listOf(
+                SearchSource.ALL,
                 SearchSource.NETEASE,
                 SearchSource.BILIBILI,
                 SearchSource.LINK_RECOGNITION
@@ -36,13 +37,14 @@ class ExploreScreenYouTubeGateTest {
     }
 
     @Test
-    fun `international search keeps YouTube first when enabled`() {
+    fun `aggregate search leads while international platform order keeps YouTube first`() {
         val sources = exploreSearchSourceDisplayOrder(
             isInternational = true,
             youtubeEnabled = true
         )
 
-        assertEquals(SearchSource.YOUTUBE_MUSIC, sources.first())
+        assertEquals(SearchSource.ALL, sources.first())
+        assertEquals(SearchSource.YOUTUBE_MUSIC, sources[1])
         assertEquals(SearchSource.LINK_RECOGNITION, sources.last())
     }
 

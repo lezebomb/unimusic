@@ -34,6 +34,8 @@ import moe.ouom.neriplayer.network.http.isTransientHttp2StreamReset
 import moe.ouom.neriplayer.common.io.readBytesLimited
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import moe.ouom.neriplayer.network.http.nonReplayable
 import okhttp3.Cookie
 import okio.ByteString.Companion.encodeUtf8
@@ -383,6 +385,7 @@ class NeteaseClient(
     }
 
     private val sessionStore = NeteaseRequestSessionStore()
+    private val cancellablePreheatMutex = Mutex()
     private val neteaseMainUrl = "https://$NETEASE_MAIN_HOST/".toHttpUrl()
 
     fun evictConnections() {
@@ -394,6 +397,9 @@ class NeteaseClient(
 
     /** Opaque in-memory identity for rejecting import results after login/logout changes. */
     internal fun importSessionIdentity(): Any = sessionStore.currentSession()
+
+    /** Opaque context for dropping public-search results after login/logout changes. Contains no token API. */
+    fun searchSessionIdentity(): Any = sessionStore.currentSession()
 
     fun commentCacheSessionKey(): String? =
         sessionStore.currentSession().persistedCookiesSnapshot()["MUSIC_U"]
@@ -514,8 +520,15 @@ class NeteaseClient(
         session: NeteaseRequestSession = sessionStore.currentSession()
     ): String {
         if (mode == CryptoMode.WEAPI) {
-            withContext(Dispatchers.IO) {
-                ensureWeapiSessionIfNeeded(session, mode, usePersistedCookies)
+            cancellablePreheatMutex.withLock {
+                if (session.needsWeapiSessionPreheat(neteaseMainUrl, usePersistedCookies)) {
+                    requestCancellable("https://music.163.com/", emptyMap(), CryptoMode.API, "GET",
+                        usePersistedCookies = usePersistedCookies, session = session)
+                    session.markPersonalizedSessionPreheated(session.authCookieFingerprint(), neteaseMainUrl)
+                    if (session.needsWeapiSessionPreheat(neteaseMainUrl, usePersistedCookies)) {
+                        throw IOException("NetEase session preheat did not provide __csrf")
+                    }
+                }
             }
         }
         val request = buildRequest(
@@ -817,13 +830,16 @@ class NeteaseClient(
             "offset" to offset.toString(),
             "total" to "true"
         )
-        return requestCancellable(
+        val session = sessionStore.currentSession()
+        val response = requestCancellable(
             url = url,
             params = params,
             mode = CryptoMode.WEAPI,
             method = "POST",
-            usePersistedCookies = usePersistedCookies
+            usePersistedCookies = usePersistedCookies,
+            session = session
         )
+        return if (sessionStore.currentSession() === session) response else "{\"code\":301}"
     }
 
     /**

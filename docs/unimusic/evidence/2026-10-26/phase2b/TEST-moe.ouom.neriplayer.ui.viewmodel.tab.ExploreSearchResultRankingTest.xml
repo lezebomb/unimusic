@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="moe.ouom.neriplayer.ui.viewmodel.tab.ExploreSearchResultRankingTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-10-26T05:22:00.076Z" hostname="XUSHAOYANG" time="0.039">
+  <properties/>
+  <testcase name="latin search ignores case in song metadata" classname="moe.ouom.neriplayer.ui.viewmodel.tab.ExploreSearchResultRankingTest" time="0.031"/>
+  <testcase name="bare title prefers unmodified recording while explicit version stays discoverable" classname="moe.ouom.neriplayer.ui.viewmodel.tab.ExploreSearchResultRankingTest" time="0.006"/>
+  <testcase name="pinyin query promotes matching Chinese song title" classname="moe.ouom.neriplayer.ui.viewmodel.tab.ExploreSearchResultRankingTest" time="0.001"/>
+  <testcase name="equal metadata from different sources remains separate and stable" classname="moe.ouom.neriplayer.ui.viewmodel.tab.ExploreSearchResultRankingTest" time="0.001"/>
+  <testcase name="title pinyin match ranks ahead of artist pinyin match" classname="moe.ouom.neriplayer.ui.viewmodel.tab.ExploreSearchResultRankingTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

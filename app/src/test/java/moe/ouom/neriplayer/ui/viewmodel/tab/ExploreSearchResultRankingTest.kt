@@ -41,6 +41,21 @@ class ExploreSearchResultRankingTest {
         assertEquals("LOFI Dream", ranked.first().name)
     }
 
+    @Test
+    fun `bare title prefers unmodified recording while explicit version stays discoverable`() {
+        val songs = listOf(song(1, "晴天 (Live)"), song(2, "晴天 (翻唱)"), song(3, "晴天"))
+        assertEquals(3L, rankExploreSongSearchResults("晴天", songs).first().id)
+        assertEquals(1L, rankExploreSongSearchResults("晴天 Live", songs).first().id)
+        assertEquals(2L, rankExploreSongSearchResults("晴天 翻唱", songs).first().id)
+    }
+
+    @Test
+    fun `equal metadata from different sources remains separate and stable`() {
+        val songs = listOf(song(1, "Dream").copy(channelId = "netease"),
+            song(1, "Dream").copy(channelId = "bilibili"))
+        assertEquals(songs, rankExploreSongSearchResults("Ｄｒｅａｍ", songs))
+    }
+
     private fun song(id: Long, name: String, artist: String = "周杰伦"): SongItem {
         return SongItem(
             id = id,

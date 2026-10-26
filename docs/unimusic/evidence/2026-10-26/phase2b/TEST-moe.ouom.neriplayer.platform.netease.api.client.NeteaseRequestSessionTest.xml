@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="moe.ouom.neriplayer.platform.netease.api.client.NeteaseRequestSessionTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-10-26T05:19:30.603Z" hostname="XUSHAOYANG" time="0.005">
+  <properties/>
+  <testcase name="weapi preheat is needed only for persisted logins without csrf" classname="moe.ouom.neriplayer.platform.netease.api.client.NeteaseRequestSessionTest" time="0.0"/>
+  <testcase name="session cookie merge only adopts non-blank runtime NMTID and csrf" classname="moe.ouom.neriplayer.platform.netease.api.client.NeteaseRequestSessionTest" time="0.001"/>
+  <testcase name="expired csrf response cookie revokes an earlier preheat" classname="moe.ouom.neriplayer.platform.netease.api.client.NeteaseRequestSessionTest" time="0.001"/>
+  <testcase name="response cookies replace by name domain and path while blank values delete" classname="moe.ouom.neriplayer.platform.netease.api.client.NeteaseRequestSessionTest" time="0.001"/>
+  <testcase name="preheat marker requires the current login fingerprint and a csrf cookie" classname="moe.ouom.neriplayer.platform.netease.api.client.NeteaseRequestSessionTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

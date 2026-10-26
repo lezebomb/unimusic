@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Search -->
+    <string name="explore_tab_all_sources">All sources</string>
+    <string name="explore_source_login">Sign in required</string>
+    <string name="explore_source_disabled">Disabled</string>
+    <string name="explore_source_unavailable">Unavailable</string>
+    <string name="explore_aggregate_hint">Search local files, NetEase, Bilibili and enabled YouTube together. Results remain separate; availability is checked at playback.</string>
+    <string name="explore_aggregate_retry">Some sources are unavailable. Tap to retry</string>
     <string name="search_keyword">Search Keyword</string>
     <string name="search_keywords">Search Keywords</string>
     <string name="search_video">Search Videos</string>

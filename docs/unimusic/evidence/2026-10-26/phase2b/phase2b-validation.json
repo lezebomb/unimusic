@@ -1,0 +1,111 @@
+{
+  "date": "2026-10-26",
+  "scope": "Phase 2B existing-source federation and search ranking",
+  "baseCommit": "bea4d48e8211267ce810b5f7fe81c19901cbfd3d",
+  "schemaVersion": 22,
+  "databaseChanged": false,
+  "jvmTests": 42,
+  "newTestMethods": 6,
+  "suites": [
+    {
+      "name": "moe.ouom.neriplayer.common.search.FederatedSearchEngineTest",
+      "tests": "4",
+      "failures": "0",
+      "errors": "0",
+      "timestamp": "2026-10-26T05:18:51.516Z"
+    },
+    {
+      "name": "moe.ouom.neriplayer.ui.screen.tab.ExploreScreenYouTubeGateTest",
+      "tests": "8",
+      "failures": "0",
+      "errors": "0",
+      "timestamp": "2026-10-26T05:21:59.624Z"
+    },
+    {
+      "name": "moe.ouom.neriplayer.ui.viewmodel.tab.ExploreSearchPaginationTest",
+      "tests": "6",
+      "failures": "0",
+      "errors": "0",
+      "timestamp": "2026-10-26T05:22:00.068Z"
+    },
+    {
+      "name": "moe.ouom.neriplayer.ui.viewmodel.tab.ExploreSearchResultRankingTest",
+      "tests": "5",
+      "failures": "0",
+      "errors": "0",
+      "timestamp": "2026-10-26T05:22:00.076Z"
+    },
+    {
+      "name": "moe.ouom.neriplayer.ui.viewmodel.tab.ExploreViewModelYouTubeGateTest",
+      "tests": "5",
+      "failures": "0",
+      "errors": "0",
+      "timestamp": "2026-10-26T05:22:00.120Z"
+    },
+    {
+      "name": "moe.ouom.neriplayer.platform.netease.api.client.NeteaseClientTest",
+      "tests": "9",
+      "failures": "0",
+      "errors": "0",
+      "timestamp": "2026-10-26T05:19:30.361Z"
+    },
+    {
+      "name": "moe.ouom.neriplayer.platform.netease.api.client.NeteaseRequestSessionTest",
+      "tests": "5",
+      "failures": "0",
+      "errors": "0",
+      "timestamp": "2026-10-26T05:19:30.603Z"
+    }
+  ],
+  "logs": [
+    {
+      "path": "build/unimusic-toolchain/phase2b-tests.log",
+      "sha256": "5115c69d3f7d041e9f89e1a77a7824dd864ea8c4da622a8b9aeee5b1ddf79574",
+      "result": "success"
+    },
+    {
+      "path": "build/unimusic-toolchain/phase2b-final.log",
+      "sha256": "efb36d5b8f59fa8f62733522fde2b49b16d1f2a03e22f6b9e56a86c61ddef839",
+      "result": "success"
+    },
+    {
+      "path": "build/unimusic-toolchain/phase2b-boundaries.log",
+      "sha256": "f10fd66c214b917ee89a1cfc270e44fb332b76cf9000c053f0514056d7a97e2d",
+      "result": "success"
+    }
+  ],
+  "apk": {
+    "path": "app/build/outputs/apk/debug/app-debug.apk",
+    "bytes": 62300482,
+    "sha256": "5f7660029a06e251b0eeca94b2ce17a0b5aefc83ce6251abbb94fb563654793e",
+    "installedThisRound": false
+  },
+  "commands": [
+    "gradlew.bat -Dorg.gradle.java.installations.paths=D:/unimusic/.gradle-home/jdks/jdk-17.0.20.1+1 :common:testDebugUnitTest --tests '*FederatedSearchEngineTest' :app:testDebugUnitTest --tests '*ExploreSearchResultRankingTest' --tests '*ExploreScreenYouTubeGateTest' --tests '*ExploreViewModelYouTubeGateTest' --tests '*ExploreSearchPaginationTest' :platform:testDebugUnitTest --tests '*NeteaseRequestSessionTest' --tests '*NeteaseClientTest' --continue --max-workers=2 --console=plain",
+    "gradlew.bat -Dorg.gradle.java.installations.paths=D:/unimusic/.gradle-home/jdks/jdk-17.0.20.1+1 :app:assembleDebug --max-workers=2 --console=plain",
+    "python -X utf8 tools_pub/quality/module_boundaries.py"
+  ],
+  "sourcesReused": [
+    "local",
+    "netease",
+    "bilibili",
+    "youtube (feature gated)"
+  ],
+  "newPlatformsAdded": [],
+  "remoteCi": "Previous bea4d48e run 40270887580 succeeded. New commit CI must be checked after push.",
+  "notRun": [
+    "APK install or device/emulator execution",
+    "Real account/network search and playback",
+    "Real catalog coverage or recording-match accuracy",
+    "UI visual/interaction acceptance on Android",
+    "Performance/power measurement",
+    "Release signing"
+  ],
+  "notImplemented": [
+    "Persistent recording-match overrides",
+    "Unified UUID playback resolver",
+    "Cross-platform verified recording merge",
+    "External script/plugin compatibility",
+    "Additional platform audio integration"
+  ]
+}

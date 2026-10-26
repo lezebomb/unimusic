@@ -1,6 +1,6 @@
 # UniMusic 分阶段实施与验收
 
-状态日期：2026-10-26。[Phase 1A](PHASE_1A.md)、[1B.1 Provider](PHASE_1B_PROVIDER.md) 和 [1B.2 导入后台](PHASE_1B_BACKEND.md) 已完成，Room 当前 v22，1B.2 远端 CI 已通过。按用户最新优先级，暂缓 1C UI，先完成 [Phase 2A 音源获取与候选筛选](PHASE_2A_SOURCES.md)：已接入原有网易云/本地/B 站临播链路，40 个定向测试和 Debug 构建通过。尚无真实账号或设备播放验证；统一 UUID 解析、持久匹配和完整播放闭环仍待完成，不能宣称全部曲目免费可听。
+状态日期：2026-10-26。Phase 1A、1B 导入后台和 [2A 临播音源筛选](PHASE_2A_SOURCES.md) 已完成，Room 当前 v22，2A 远端 CI 已通过。按用户优先级继续音源与搜索，完成 [2B 聚合搜索](PHASE_2B_SEARCH.md)：复用本地/网易云/B 站/已开启的 YouTube 并行发现、独立分页/错误与版本排序，42 个定向测试和 Debug APK 构建通过。尚无真实账号或设备播放验证；更多新平台、统一 UUID 解析、持久匹配和完整播放闭环仍待完成，不能宣称全部曲目免费可听。
 
 ## 执行约定
 
@@ -59,6 +59,8 @@
 
 2A 已完成现有播放路径的元数据/版本门槛、分 P 歧义拒绝、可取消/有预算的临播解析和暂时失败冷却，详情见 [实现与边界](PHASE_2A_SOURCES.md)。这不是完整 Phase 2：来源权利能力注册、SongMatch/Override 持久化、统一搜索和 `SourceResolver(unifiedSongId)` 尚未实现。合成测试没有建立实际错误率或覆盖率结论。
 
+2B 已增加现有四来源聚合搜索与版本排序，复用原搜索的 300ms 输入去抖及 generation 取消，独立游标/预算/失败可见；点击播放才解析 URL。现阶段保留跨平台候选，不做无证据的录音合并。音源机制参考与实际范围见 [调研](MUSIC_SOURCE_RESEARCH.md) 和 [2B 报告](PHASE_2B_SEARCH.md)。后续仍需来源权利能力、持久匹配/拒绝和统一 UUID 临播入口。
+
 1. 先做匹配安全基座：Normalization、VersionClassification、SongMatch/Override repository、硬冲突拒绝、来源资格类型。分析上游加分与分 P 双重累计，旧 70 分阈值不能迁成概率。
 2. `UnifiedSearchEngine` 使用 Flow/Coroutines、supervisorScope/每源预算、平台限流、去抖和请求取消。先返回本地/首个远端批次，合并有证明的同录音；页游标、错误和加载状态按 provider 保存。
 3. 复用 SearchTextMatcher 做展示相关性，新增版本/歌手别名/发行/时长/ISRC/MBID/可信渠道证据，不为搜索列表批量解析 URL。缓存按平台政策 TTL 与账号上下文隔离。
@@ -90,7 +92,7 @@
 ## 下一步顺序与未决条件
 
 1. 工具链与 1A 迁移验证已完成；无需重复下载或重做 Phase 0。
-2. 用户要求音源优先：继续 Phase 2 的来源能力、持久匹配/确认/拒绝和统一 UUID 解析；1C UI 延后。不能以元数据通过门槛或导入成功代替真实在线播放验收。
+2. 用户要求音源优先，并提供本地 APK 供静态参考：先核实其来源适配与公开接口，再继续新 Provider、来源能力、持久匹配/确认/拒绝和统一 UUID 解析；1C UI 延后。不能以元数据搜索/导入成功代替真实在线播放验收，不移植会员破解、内置凭据或 DRM 绕过。
 3. `unimusic_smoke.yml` 已覆盖 main 的定向 JVM/Android 迁移和音源检查，保留原有完整 CI；远端 Actions 执行结果需单独确认，本地检查结果不冒充远端结果。
 4. 实际账号/平台授权仅用于线上验收，不阻塞 Fake provider 开发；任何平台暂不可接入时明确标记其 capability 与降级方式。
 

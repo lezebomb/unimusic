@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Search -->
+    <string name="explore_tab_all_sources">聚合</string>
+    <string name="explore_source_login">待登录</string>
+    <string name="explore_source_disabled">未开启</string>
+    <string name="explore_source_unavailable">暂不可用</string>
+    <string name="explore_aggregate_hint">一次搜索本地、网易云、B 站和已开启的 YouTube。各来源独立显示结果，播放时检查可用性。</string>
+    <string name="explore_aggregate_retry">部分音源暂不可用，点击重试</string>
     <string name="search_keyword">搜索关键词</string>
     <string name="search_keywords">搜索关键字</string>
     <string name="search_video">搜索视频</string>

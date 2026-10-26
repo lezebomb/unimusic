@@ -202,9 +202,10 @@ internal fun exploreSearchSourceDisplayOrder(
     youtubeEnabled: Boolean
 ): List<SearchSource> {
     return if (!youtubeEnabled) {
-        listOf(SearchSource.NETEASE, SearchSource.BILIBILI, SearchSource.LINK_RECOGNITION)
+        listOf(SearchSource.ALL, SearchSource.NETEASE, SearchSource.BILIBILI, SearchSource.LINK_RECOGNITION)
     } else if (isInternational) {
         listOf(
+            SearchSource.ALL,
             SearchSource.YOUTUBE_MUSIC,
             SearchSource.NETEASE,
             SearchSource.BILIBILI,
@@ -212,6 +213,7 @@ internal fun exploreSearchSourceDisplayOrder(
         )
     } else {
         listOf(
+            SearchSource.ALL,
             SearchSource.NETEASE,
             SearchSource.BILIBILI,
             SearchSource.YOUTUBE_MUSIC,
@@ -318,6 +320,7 @@ internal fun shouldShowBiliPartsPicker(song: SongItem): Boolean {
 @Composable
 private fun searchSourceLabel(source: SearchSource): String {
     return when (source) {
+        SearchSource.ALL -> stringResource(CoreCommonR.string.explore_tab_all_sources)
         SearchSource.YOUTUBE_MUSIC -> stringResource(CoreCommonR.string.explore_tab_youtube)
         SearchSource.NETEASE -> stringResource(CoreCommonR.string.platform_netease_short)
         SearchSource.BILIBILI -> stringResource(CoreCommonR.string.platform_bilibili)
@@ -908,6 +911,9 @@ fun ExploreScreen(
                     }
                 }
 
+            if (ui.selectedSearchSource == SearchSource.ALL && searchQuery.isNotBlank()) {
+                AggregateSearchStatus(ui.aggregateSnapshot, vm::loadMoreSearchResults)
+            }
             HorizontalPager(
                 state = pagerState,
                 modifier = Modifier
@@ -918,7 +924,7 @@ fun ExploreScreen(
                 if (searchQuery.isNotEmpty()) {
                     if (shouldRenderExploreSearchResults(page, pagerState.currentPage)) {
                         when {
-                            ui.searching -> {
+                            ui.searching && ui.searchItems.isEmpty() -> {
                                 Box(
                                     Modifier
                                         .fillMaxSize()
@@ -1127,6 +1133,12 @@ fun ExploreScreen(
                     }
                 } else {
                     when (currentSource) {
+                        SearchSource.ALL -> {
+                            Box(Modifier.fillMaxSize(), Alignment.Center) {
+                                Text(stringResource(CoreCommonR.string.explore_aggregate_hint), Modifier.padding(24.dp),
+                                    style = MaterialTheme.typography.bodyLarge)
+                            }
+                        }
                         SearchSource.NETEASE -> {
                             NeteaseDefaultContent(
                                 gridState = gridState,

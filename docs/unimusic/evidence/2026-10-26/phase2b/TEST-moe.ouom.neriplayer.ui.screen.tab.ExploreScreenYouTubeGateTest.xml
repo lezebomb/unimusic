@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="moe.ouom.neriplayer.ui.screen.tab.ExploreScreenYouTubeGateTest" tests="8" skipped="0" failures="0" errors="0" timestamp="2026-10-26T05:21:59.624Z" hostname="XUSHAOYANG" time="0.101">
+  <properties/>
+  <testcase name="only the active pager page owns the search list" classname="moe.ouom.neriplayer.ui.screen.tab.ExploreScreenYouTubeGateTest" time="0.064"/>
+  <testcase name="search sources exclude YouTube when disabled" classname="moe.ouom.neriplayer.ui.screen.tab.ExploreScreenYouTubeGateTest" time="0.009"/>
+  <testcase name="same search context does not reset result scroll" classname="moe.ouom.neriplayer.ui.screen.tab.ExploreScreenYouTubeGateTest" time="0.019"/>
+  <testcase name="entering or leaving link recognition clears incompatible query" classname="moe.ouom.neriplayer.ui.screen.tab.ExploreScreenYouTubeGateTest" time="0.0"/>
+  <testcase name="aggregate search leads while international platform order keeps YouTube first" classname="moe.ouom.neriplayer.ui.screen.tab.ExploreScreenYouTubeGateTest" time="0.002"/>
+  <testcase name="youtube search type contributes to scroll context" classname="moe.ouom.neriplayer.ui.screen.tab.ExploreScreenYouTubeGateTest" time="0.0"/>
+  <testcase name="search results reserve the visible mini player height" classname="moe.ouom.neriplayer.ui.screen.tab.ExploreScreenYouTubeGateTest" time="0.0"/>
+  <testcase name="changed search context resets result scroll" classname="moe.ouom.neriplayer.ui.screen.tab.ExploreScreenYouTubeGateTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

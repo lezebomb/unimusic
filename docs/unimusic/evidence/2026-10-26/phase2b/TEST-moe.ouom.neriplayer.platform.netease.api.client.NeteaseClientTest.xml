@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="moe.ouom.neriplayer.platform.netease.api.client.NeteaseClientTest" tests="9" skipped="0" failures="0" errors="0" timestamp="2026-10-26T05:19:30.361Z" hostname="XUSHAOYANG" time="0.239">
+  <properties/>
+  <testcase name="radarPlaylistMetadataParams_rejectNonPositivePlaylistId" classname="moe.ouom.neriplayer.platform.netease.api.client.NeteaseClientTest" time="0.003"/>
+  <testcase name="sessionStore_doesNotRestoreAnOlderAccountSnapshotAfterSwitching" classname="moe.ouom.neriplayer.platform.netease.api.client.NeteaseClientTest" time="0.211"/>
+  <testcase name="sessionStore_preservesSessionWhenOnlyRuntimeCookiesChange" classname="moe.ouom.neriplayer.platform.netease.api.client.NeteaseClientTest" time="0.002"/>
+  <testcase name="mergeRequestCookies_keepsRuntimeSessionCookies" classname="moe.ouom.neriplayer.platform.netease.api.client.NeteaseClientTest" time="0.0"/>
+  <testcase name="setPersistedCookies_dropsThePreviousLoginSession" classname="moe.ouom.neriplayer.platform.netease.api.client.NeteaseClientTest" time="0.014"/>
+  <testcase name="musicUOnlyLogin_requiresWeapiSessionPreheat" classname="moe.ouom.neriplayer.platform.netease.api.client.NeteaseClientTest" time="0.0"/>
+  <testcase name="sessionStore_keepsLateCookiesInTheOriginalAccountSession" classname="moe.ouom.neriplayer.platform.netease.api.client.NeteaseClientTest" time="0.002"/>
+  <testcase name="requestCookies_includePersonalizationContextBeforeFirstResponse" classname="moe.ouom.neriplayer.platform.netease.api.client.NeteaseClientTest" time="0.002"/>
+  <testcase name="radarPlaylistMetadataParams_includeMgcContextAndMetadataLimit" classname="moe.ouom.neriplayer.platform.netease.api.client.NeteaseClientTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

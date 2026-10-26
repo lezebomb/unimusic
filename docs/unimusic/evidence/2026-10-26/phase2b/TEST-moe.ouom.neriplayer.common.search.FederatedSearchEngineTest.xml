@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="moe.ouom.neriplayer.common.search.FederatedSearchEngineTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-10-26T05:18:51.516Z" hostname="XUSHAOYANG" time="0.415">
+  <properties/>
+  <testcase name="parentCancellationStopsWorkAndDisabledSourceCannotBePaged" classname="moe.ouom.neriplayer.common.search.FederatedSearchEngineTest" time="0.377"/>
+  <testcase name="concurrencyIsBoundedAndQueueTimeCountsAgainstBudget" classname="moe.ouom.neriplayer.common.search.FederatedSearchEngineTest" time="0.015"/>
+  <testcase name="pagingRetriesOnlyPendingSourcesAndDeduplicatesWithinEachSource" classname="moe.ouom.neriplayer.common.search.FederatedSearchEngineTest" time="0.007"/>
+  <testcase name="fastResultsSurviveOtherSourcesFailingOrTimingOut" classname="moe.ouom.neriplayer.common.search.FederatedSearchEngineTest" time="0.009"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
