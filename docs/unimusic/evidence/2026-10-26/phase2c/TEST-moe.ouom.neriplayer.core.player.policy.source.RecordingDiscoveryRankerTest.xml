@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="moe.ouom.neriplayer.core.player.policy.source.RecordingDiscoveryRankerTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-10-26T05:39:44.611Z" hostname="XUSHAOYANG" time="0.154">
+  <properties/>
+  <testcase name="sameLengthAloneNeverOutranksCompleteRecordingMetadata" classname="moe.ouom.neriplayer.core.player.policy.source.RecordingDiscoveryRankerTest" time="0.133"/>
+  <testcase name="discoveryRetainsUnknownContextForDetailChecksWithoutApprovingIt" classname="moe.ouom.neriplayer.core.player.policy.source.RecordingDiscoveryRankerTest" time="0.01"/>
+  <testcase name="conflictingVersionsCannotFillTheDiscoveryWindowAheadOfTheOriginal" classname="moe.ouom.neriplayer.core.player.policy.source.RecordingDiscoveryRankerTest" time="0.004"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

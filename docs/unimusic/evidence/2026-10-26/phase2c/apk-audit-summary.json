@@ -1,0 +1,21 @@
+{
+  "cliVersion": "6.8.0",
+  "connectedMcpVersionDuringAudit": "6.5.0",
+  "signatureVerification": false,
+  "apkExecuted": false,
+  "methodBodyExported": false,
+  "inputZipSha256": "d99303c1c27b925259e474848ebca06a0d72bb01185183983703f64bf554e404",
+  "inputApkSha256": "674286d6e9522d95e1d168f47b98336b44d40819b41010a605cf95df0b2f3fef",
+  "declaredHostPackage": "com.hihonor.cloudmusic",
+  "declaredHostVersion": "1.5.30",
+  "declaredModulePackage": "com.raincat.dolby_beta",
+  "declaredModuleVersion": "4.0.0",
+  "jsEvidenceId": "ev_d480ec29c7f7318a7aad87d2728da5c6775b86ec78edd6b45f18bd0609726034",
+  "hostEvidenceId": "ev_2e64cdd9807b85076e2bbc369dd5555314b3b7579e1945e06ac8452be08153d5",
+  "moduleEvidenceId": "ev_4e52fcd21717c91cdb024c46846e245a4fcbfd0b81719397f9841820ae23f983",
+  "hookDeclarationEvidenceId": "ev_c5209efaa1ec079e68ef57e6077466a86db5c1a97d004184a8aa73c23c75d5bc",
+  "localBundleSha256": "b1d32e257caf17a9fc3a11dad9921d163cf237aca6842f765b1b8d4166f2dcf9",
+  "coverage": "Selected 6 JavaScript files plus package.json and package/class declarations; partial static evidence, no runtime playback",
+  "blockedOperation": "Full MainHook.handleLoadPackage method-body output",
+  "blockedReason": "Automatic approval review rejected possible actionable membership/DRM bypass details; not retried or bypassed"
+}

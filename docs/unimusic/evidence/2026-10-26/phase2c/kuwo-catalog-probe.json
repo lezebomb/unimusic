@@ -1,0 +1,20 @@
+{
+  "endpoint": "https://search.kuwo.cn/r.s",
+  "https": true,
+  "query": "Beethoven",
+  "params": {
+    "all": "Beethoven",
+    "ft": "music",
+    "pn": "0",
+    "rn": "5",
+    "rformat": "json",
+    "encoding": "utf8"
+  },
+  "status": 200,
+  "contentType": "text/plain; charset=utf-8",
+  "bytes": 12740,
+  "sha256": "7f2db5fc8ca1fec85cbebec938c9e02f9a47cf5165d3dd9c5ab72aa44a0f1842",
+  "format": "single-quoted object literals; parsed without execution",
+  "itemCount": 5,
+  "audioRequested": false
+}

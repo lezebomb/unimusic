@@ -53,6 +53,7 @@ import moe.ouom.neriplayer.BuildConfig
 import moe.ouom.neriplayer.platform.search.api.client.CloudMusicSearchApi
 import moe.ouom.neriplayer.data.model.music.MusicPlatform
 import moe.ouom.neriplayer.platform.search.api.client.QQMusicSearchApi
+import moe.ouom.neriplayer.platform.search.api.client.KuwoCatalogProvider
 import moe.ouom.neriplayer.platform.lyrics.search.SearchManager
 import moe.ouom.neriplayer.platform.youtube.api.client.YouTubeMusicClient
 import moe.ouom.neriplayer.platform.youtube.api.client.YouTubeAccountProfileClient
@@ -373,6 +374,8 @@ object AppContainer {
     }
 
     val biliClient by lazy { BiliClient(biliCookieRepo, client = sharedOkHttpClient) }
+    // Discovery only. This provider must never be treated as a Netease SongItem/playable URL.
+    val kuwoCatalogProvider by lazy { KuwoCatalogProvider(sharedOkHttpClient) }
 
     private val commentCache = CommentMemoryCache()
     private val neteaseComments = NeteaseCommentRepository(commentCache) { neteaseClient }

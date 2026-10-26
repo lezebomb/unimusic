@@ -16,6 +16,7 @@ on:
       - 'app/src/test/java/moe/ouom/neriplayer/ui/viewmodel/tab/Explore*.kt'
       - 'app/src/test/java/moe/ouom/neriplayer/ui/screen/tab/Explore*.kt'
       - 'tools_pub/quality/module_boundaries.py'
+      - 'config/quality/domain-dependencies.json'
       - 'app/src/main/java/moe/ouom/neriplayer/NeriPlayerApplication.kt'
       - 'app/src/main/java/moe/ouom/neriplayer/core/di/AppContainer.kt'
       - '.github/workflows/unimusic_smoke.yml'
@@ -60,10 +61,10 @@ jobs:
             :local:testDebugUnitTest --tests '*UnifiedLibraryRoomStoreTest' --tests '*PlaylistImportCoordinatorTest' --tests '*LocalPlaylistSyncMutationDecoderTest' \
             :common:testDebugUnitTest --tests '*FederatedSearchEngineTest' \
             :app:testDebugUnitTest --tests '*ExploreSearchResultRankingTest' --tests '*ExploreScreenYouTubeGateTest' --tests '*ExploreViewModelYouTubeGateTest' --tests '*ExploreSearchPaginationTest' \
-            :platform:testDebugUnitTest --tests '*NeteasePlaylistImportProviderTest' --tests '*BiliClientPlayUrlTest' --tests '*NeteaseRequestSessionTest' --tests '*NeteaseClientTest' \
-            :playback:logic:testDebugUnitTest --tests '*RecordingMatchPolicyTest' --tests '*PlaybackSourceResolverTest' --tests '*SongUrlResolutionRetryTest' \
+            :platform:testDebugUnitTest --tests '*NeteasePlaylistImportProviderTest' --tests '*BiliClientPlayUrlTest' --tests '*NeteaseRequestSessionTest' --tests '*NeteaseClientTest' --tests '*KuwoCatalogProviderTest' \
+            :playback:logic:testDebugUnitTest --tests '*RecordingMatchPolicyTest' --tests '*PlaybackSourceResolverTest' --tests '*RecordingDiscoveryRankerTest' --tests '*SongUrlResolutionRetryTest' \
             :playback:runtime:testDebugUnitTest --tests '*BiliRecordingMatchTest' --tests '*PlayerManagerNeteaseAutoSourceSwitchTest' --tests '*PlayerManagerNeteaseLocalFallbackTest' \
-            :database:assembleDebugAndroidTest --max-workers=2 --console=plain
+            :platform:verifyDomainDependencies :database:assembleDebugAndroidTest --max-workers=2 --console=plain
       - name: Enable KVM
         run: |
           sudo sh -c 'echo "KERNEL==\"kvm\", GROUP=\"kvm\", MODE=\"0666\", OPTIONS+=\"static_node=kvm\"" > /etc/udev/rules.d/99-kvm4all.rules'

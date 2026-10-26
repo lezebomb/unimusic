@@ -1,0 +1,80 @@
+{
+  "date": "2026-10-26",
+  "baseCommit": "7022b9b62642e5b136c9d8d162ad1cf24e06184a",
+  "scope": "Phase 2C metadata-only Kuwo catalog and actual Bili candidate discovery ranking",
+  "schemaVersion": 22,
+  "databaseChanged": false,
+  "jvmTests": 9,
+  "newTestMethods": 6,
+  "suites": [
+    {
+      "name": "moe.ouom.neriplayer.core.player.policy.source.RecordingDiscoveryRankerTest",
+      "tests": "3",
+      "failures": "0",
+      "errors": "0",
+      "timestamp": "2026-10-26T05:39:44.611Z"
+    },
+    {
+      "name": "moe.ouom.neriplayer.core.player.policy.source.RecordingMatchPolicyTest",
+      "tests": "3",
+      "failures": "0",
+      "errors": "0",
+      "timestamp": "2026-10-26T05:39:44.768Z"
+    },
+    {
+      "name": "moe.ouom.neriplayer.platform.search.api.client.KuwoCatalogProviderTest",
+      "tests": "3",
+      "failures": "0",
+      "errors": "0",
+      "timestamp": "2026-10-26T05:47:10.926Z"
+    }
+  ],
+  "logs": [
+    {
+      "path": "build/unimusic-toolchain/phase2c-tests.log",
+      "sha256": "b82a42bd4c12872f5b3a1c234fc32a5e6489f97f310b38f3d2c534998d31e65c",
+      "result": "success"
+    },
+    {
+      "path": "build/unimusic-toolchain/phase2c-complete.log",
+      "sha256": "839b08a9a50fb6e4e91b481c14745e1839e1676fada34eac733912bed0363235",
+      "result": "success"
+    },
+    {
+      "path": "build/unimusic-toolchain/phase2c-boundaries.log",
+      "sha256": "f10fd66c214b917ee89a1cfc270e44fb332b76cf9000c053f0514056d7a97e2d",
+      "result": "success"
+    }
+  ],
+  "apk": {
+    "path": "app/build/outputs/apk/debug/app-debug.apk",
+    "bytes": 62310398,
+    "sha256": "988897b0f5e4b45112ef3820f7d171d4e185eadd750fe76c41420acf2821e510",
+    "installedThisRound": false
+  },
+  "platformDomainBoundary": {
+    "result": "passed",
+    "reportSha256": "929059ca494b63ccbbdaf93237cfb36944bca5e3ae099fa40351b554035345e2",
+    "scope": "Exact reviewed classes added for catalog and existing import/cancellation code; no package wildcard expansion"
+  },
+  "catalogCapability": "METADATA_ONLY",
+  "catalogWiredIntoAppContainer": true,
+  "catalogInAggregateUi": false,
+  "kuwoAudioPlaybackImplemented": false,
+  "publicMetadataProbe": "kuwo-catalog-probe.json",
+  "apkStaticAudit": "apk-audit-summary.json",
+  "commands": [
+    "gradlew.bat -Dorg.gradle.java.installations.paths=D:/unimusic/.gradle-home/jdks/jdk-17.0.20.1+1 :playback:logic:testDebugUnitTest --tests '*RecordingDiscoveryRankerTest' --tests '*RecordingMatchPolicyTest' :platform:testDebugUnitTest --tests '*KuwoCatalogProviderTest' :playback:runtime:compileDebugKotlin --continue --max-workers=2 --console=plain",
+    "gradlew.bat -Dorg.gradle.java.installations.paths=D:/unimusic/.gradle-home/jdks/jdk-17.0.20.1+1 :platform:testDebugUnitTest --tests '*KuwoCatalogProviderTest' :platform:verifyDomainDependencies :app:assembleDebug --max-workers=2 --console=plain",
+    "python -X utf8 tools_pub/quality/module_boundaries.py"
+  ],
+  "remoteCi": "Prior 7022b9b6 CI run 40274273540 succeeded. New pushed commit must be checked separately.",
+  "notRun": [
+    "APK install/device or emulator run",
+    "Real-account playback or automatic source switching",
+    "Live Android-provider catalog calls",
+    "Kuwo audio URL acquisition/playback",
+    "Performance/power or match-accuracy measurement",
+    "Release signing"
+  ]
+}

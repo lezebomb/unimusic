@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="moe.ouom.neriplayer.platform.search.api.client.KuwoCatalogProviderTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-10-26T05:47:10.926Z" hostname="XUSHAOYANG" time="0.288">
+  <properties/>
+  <testcase name="malformedPagesAndInvalidCursorsFailInsteadOfAppearingAsNoResults" classname="moe.ouom.neriplayer.platform.search.api.client.KuwoCatalogProviderTest" time="0.062"/>
+  <testcase name="singleQuotedMetadataIsDecodedWithoutTurningPaymentFlagsIntoAudioAccess" classname="moe.ouom.neriplayer.platform.search.api.client.KuwoCatalogProviderTest" time="0.012"/>
+  <testcase name="ordinarySearchIsHttpsCancellableAndUsesOnlyCatalogParameters" classname="moe.ouom.neriplayer.platform.search.api.client.KuwoCatalogProviderTest" time="0.21"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

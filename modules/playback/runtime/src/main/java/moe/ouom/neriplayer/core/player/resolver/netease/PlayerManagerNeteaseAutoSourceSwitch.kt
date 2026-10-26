@@ -46,8 +46,14 @@ internal suspend fun PlayerManager.tryResolveNeteaseAutoBiliSource(
         }
         NeteaseAutoSourceState.previous(song)?.let { offer(it) }
         for (query in queries) {
-            fetchBiliAutoSourceCandidates(song, query)
-                .sortedByDescending { scoreNeteaseAutoBiliCandidate(song, it) }
+            val expected = song.recordingMetadata()
+            val found = fetchBiliAutoSourceCandidates(song, query)
+            RecordingDiscoveryRanker.rank(expected, found.map { candidate ->
+                RecordingDiscoveryCandidate(NeteaseAutoSourceState.candidateId(candidate),
+                    biliRecordingMetadata(expected, candidate.titlePlain, candidate.titlePlain,
+                        candidate.author, candidate.durationSec * 1000L),
+                    candidate, scoreNeteaseAutoBiliCandidate(song, candidate))
+            })
                 .take(NETEASE_AUTO_SOURCE_SEARCH_LIMIT).forEach { offer(it) }
         }
     }
