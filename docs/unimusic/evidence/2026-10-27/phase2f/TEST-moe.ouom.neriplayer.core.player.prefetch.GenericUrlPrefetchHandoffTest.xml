@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="moe.ouom.neriplayer.core.player.prefetch.GenericUrlPrefetchHandoffTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-10-26T18:34:21.866Z" hostname="XUSHAOYANG" time="1.113">
+  <properties/>
+  <testcase name="fresh prefetched url is handed over exactly once" classname="moe.ouom.neriplayer.core.player.prefetch.GenericUrlPrefetchHandoffTest" time="1.109"/>
+  <testcase name="decision bound alternate urls require fresh resolution instead of cached handover" classname="moe.ouom.neriplayer.core.player.prefetch.GenericUrlPrefetchHandoffTest" time="0.004"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[Mockito is currently self-attaching to enable the inline-mock-maker. This will no longer work in future releases of the JDK. Please add Mockito as an agent to your build as described in Mockito's documentation: https://javadoc.io/doc/org.mockito/mockito-core/latest/org.mockito/org/mockito/Mockito.html#0.3
+WARNING: A Java agent has been loaded dynamically (C:\Users\24981\.gradle\caches\modules-2\files-2.1\net.bytebuddy\byte-buddy-agent\1.17.7\fbf3d6d649ed37fc9e9c59480a05be0a26e3c2da\byte-buddy-agent-1.17.7.jar)
+WARNING: If a serviceability tool is in use, please run with -XX:+EnableDynamicAgentLoading to hide this warning
+WARNING: If a serviceability tool is not in use, please run with -Djdk.instrument.traceUsage for more information
+WARNING: Dynamic loading of agents will be disallowed by default in a future release
+]]></system-err>
+</testsuite>

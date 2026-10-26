@@ -20,12 +20,17 @@ data class LocalRecommendations(
     val statisticsAvailable: Boolean = true
 )
 
-/** No network calls, writes, new feedback events, or changes to playback identities. */
+/** No network calls or new feedback events; only a disposable private recommendation cache is written. */
 class LocalRecommendationRepository(
     private val context: Context,
-    private val playbackStats: PlaybackStatsRepository
+    private val playbackStats: PlaybackStatsRepository,
+    private val dailySnapshots: DailyRecommendationStore = DailyRecommendationStore.getInstance(context)
 ) {
-    suspend fun recommend(playlists: List<LocalPlaylist>, nowMillis: Long = System.currentTimeMillis()): LocalRecommendations {
+    suspend fun recommend(
+        playlists: List<LocalPlaylist>,
+        nowMillis: Long = System.currentTimeMillis(),
+        forceRefresh: Boolean = false
+    ): LocalRecommendations {
         val candidates = withContext(Dispatchers.Default) {
             playlists.flatMap { playlist ->
                 val favorite = FavoritesPlaylist.isSystemPlaylist(playlist, context)
@@ -43,6 +48,10 @@ class LocalRecommendationRepository(
                 }
             }
         }
+        return dailySnapshots.getOrCreate(candidates, nowMillis, forceRefresh) { rankFresh(candidates, nowMillis) }
+    }
+
+    private suspend fun rankFresh(candidates: List<LocalRecommendationCandidate>, nowMillis: Long): LocalRecommendations {
         if (candidates.isEmpty()) return LocalRecommendations()
         var statisticsAvailable = true
         val statistics = try {

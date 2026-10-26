@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="moe.ouom.neriplayer.core.player.playback.BiliVideoSkipPlaybackControllerTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2026-10-26T18:34:21.678Z" hostname="XUSHAOYANG" time="0.097">
+  <properties/>
+  <testcase name="alternate sources clear only the matching active playback request" classname="moe.ouom.neriplayer.core.player.playback.BiliVideoSkipPlaybackControllerTest" time="0.093"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

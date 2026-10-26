@@ -90,6 +90,8 @@ private fun SourceChoiceContent(song: SongItem, state: SourceChoiceState, owner:
                     style = MaterialTheme.typography.bodySmall)
                 Text(stringResource(CoreCommonR.string.unimusic_sources_discovery_scope),
                     style = MaterialTheme.typography.bodySmall)
+                if (!state.youtubeEnabled) Text(stringResource(CoreCommonR.string.unimusic_sources_youtube_disabled),
+                    style = MaterialTheme.typography.bodySmall)
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                     HapticTextButton(onClick = owner::refresh, enabled = !state.loading && !state.saving) {
                         Text(stringResource(CoreCommonR.string.unimusic_sources_refresh))
@@ -107,6 +109,11 @@ private fun SourceChoiceContent(song: SongItem, state: SourceChoiceState, owner:
                         color = if (notice == SourceChoiceNotice.SAVE_FAILED || notice == SourceChoiceNotice.LOAD_FAILED)
                             MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant)
                 }
+                state.failures.forEach { (provider, failure) ->
+                    Text(stringResource(CoreCommonR.string.unimusic_sources_failure,
+                        sourceProviderName(provider), stringResource(failure.messageRes())),
+                        style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
                 if (!state.loading && candidates.isEmpty()) {
                     Text(stringResource(CoreCommonR.string.unimusic_sources_empty))
                 }
@@ -115,6 +122,7 @@ private fun SourceChoiceContent(song: SongItem, state: SourceChoiceState, owner:
         items(candidates, key = { it.key.toString() }) { candidate ->
             SourceChoiceCard(song, candidate, records[candidate.key],
                 enabled = !state.loading && !state.saving && state.song == song,
+                confirmationEnabled = candidate.key.provider != "youtube_music" || state.youtubeEnabled,
                 onConfirm = { owner.decide(candidate, SourceMatchDecision.CONFIRMED) },
                 onReject = { owner.decide(candidate, SourceMatchDecision.REJECTED) },
                 onClear = { owner.clear(candidate) })
@@ -129,6 +137,7 @@ private fun SourceChoiceCard(
     candidate: RecordingSourceCandidate,
     record: RecordingSourceMatch?,
     enabled: Boolean,
+    confirmationEnabled: Boolean,
     onConfirm: () -> Unit,
     onReject: () -> Unit,
     onClear: () -> Unit
@@ -161,7 +170,7 @@ private fun SourceChoiceCard(
             }
             Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                 HapticTextButton(onClick = onConfirm,
-                    enabled = enabled && supported && assessment.accepted &&
+                    enabled = enabled && confirmationEnabled && supported && assessment.accepted &&
                         (record?.decision != SourceMatchDecision.CONFIRMED || record?.current != true)) {
                     Text(stringResource(CoreCommonR.string.unimusic_sources_confirm))
                 }
@@ -191,6 +200,21 @@ private fun sourceLabel(candidate: RecordingSourceCandidate): String = when (can
 
 private fun durationText(durationMs: Long): String =
     if (durationMs <= 0) "—" else "${durationMs / 60_000}:${(durationMs / 1000 % 60).toString().padStart(2, '0')}"
+
+@Composable
+private fun sourceProviderName(provider: String): String = when (provider) {
+    "local" -> stringResource(CoreCommonR.string.unimusic_sources_provider_local)
+    "bilibili" -> stringResource(CoreCommonR.string.unimusic_sources_provider_bilibili)
+    "netease" -> stringResource(CoreCommonR.string.unimusic_sources_provider_netease)
+    "youtube_music" -> stringResource(CoreCommonR.string.unimusic_sources_provider_youtube)
+    else -> provider
+}
+
+private fun SourceChoiceFailure.messageRes(): Int = when (this) {
+    SourceChoiceFailure.TIMED_OUT -> CoreCommonR.string.unimusic_sources_failure_timeout
+    SourceChoiceFailure.AUTH_REQUIRED -> CoreCommonR.string.unimusic_sources_failure_login
+    SourceChoiceFailure.UNAVAILABLE -> CoreCommonR.string.unimusic_sources_failure_unavailable
+}
 
 private fun RecordingMismatch?.mismatchRes(): Int = when (this) {
     RecordingMismatch.VERSION -> CoreCommonR.string.unimusic_sources_mismatch_version

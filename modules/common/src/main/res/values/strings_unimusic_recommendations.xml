@@ -2,9 +2,9 @@
 <resources>
     <string name="unimusic_recommendations_title">UniMusic 本地推荐</string>
     <string name="unimusic_recommendations_refresh">刷新本地推荐</string>
-    <string name="unimusic_recommendations_description">从音乐库挑选，参考本机近期与常听记录；推荐计算不会上传历史。</string>
-    <string name="unimusic_recommendations_empty">将歌曲加入本地歌单或导入歌单后，这里会为你推荐。</string>
-    <string name="unimusic_recommendations_offline_empty">离线模式仅推荐音乐库中的本地文件。</string>
+    <string name="unimusic_recommendations_description">按北京时间每日生成，刷新可重选。使用本机音乐库与收听记录，推荐计算不会上传历史。</string>
+    <string name="unimusic_recommendations_empty">将歌曲加入本地歌单或导入歌单后，可刷新本地推荐。</string>
+    <string name="unimusic_recommendations_offline_empty">离线模式仅推荐本地文件；添加或下载后可刷新。</string>
     <string name="unimusic_recommendations_error">音乐库暂时无法读取，请刷新重试。</string>
     <string name="unimusic_recommendations_statistics_unavailable">收听统计暂不可用，当前按音乐库内容推荐。</string>
     <string name="unimusic_recommendations_reason_explore">探索音乐库里的更多歌曲</string>

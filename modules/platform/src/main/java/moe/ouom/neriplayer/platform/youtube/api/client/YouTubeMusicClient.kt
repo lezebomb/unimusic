@@ -33,7 +33,9 @@ import java.net.URLEncoder
 import java.util.Locale
 import java.util.TimeZone
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.withContext
+import moe.ouom.neriplayer.network.http.awaitResponse
 import moe.ouom.neriplayer.platform.youtube.api.auth.YouTubeAuthProvider
 import moe.ouom.neriplayer.platform.youtube.api.auth.YouTubeAuthRefresher
 import moe.ouom.neriplayer.platform.youtube.api.auth.shouldStartYouTubeWebAuthRecovery
@@ -296,12 +298,16 @@ class YouTubeMusicClient(
                 )
                 .header("Accept", "application/json")
                 .build()
-            runCatching {
-                okHttpClient.newCall(request).execute().use { response ->
-                    if (!response.isSuccessful) return@use null
+            try {
+                okHttpClient.newCall(request).awaitResponse { response ->
+                    if (!response.isSuccessful) return@awaitResponse null
                     parseYouTubeMusicVideoMetadata(response.body.readTextWithLimit(YOUTUBE_TEXT_RESPONSE_MAX_BYTES))
                 }
-            }.getOrNull()
+            } catch (cancelled: CancellationException) {
+                throw cancelled
+            } catch (_: Exception) {
+                null
+            }
         }
 
     suspend fun debugBootstrap(
@@ -1359,7 +1365,7 @@ class YouTubeMusicClient(
         var workingCookieHeader = cookieHeader
         var userAgent = cacheUserAgent
         val requestLocale = YouTubeMusicLocaleResolver.preferred()
-        fun fetchBootstrapConfig(): YouTubeMusicBootstrapConfig {
+        suspend fun fetchBootstrapConfig(): YouTubeMusicBootstrapConfig {
             val pageAuth = workingAuth.copy(
                 cookieHeader = workingCookieHeader,
                 cookies = emptyMap()
@@ -1441,7 +1447,7 @@ class YouTubeMusicClient(
         ).also { bootstrapCache = it }
     }
 
-    private fun postMusicBrowse(
+    private suspend fun postMusicBrowse(
         bootstrap: YouTubeMusicBootstrapConfig,
         payload: JSONObject,
         requestLocale: YouTubeMusicRequestLocale
@@ -1471,7 +1477,7 @@ class YouTubeMusicClient(
         )
     }
 
-    private fun postMusicSearch(
+    private suspend fun postMusicSearch(
         bootstrap: YouTubeMusicBootstrapConfig,
         payload: JSONObject,
         requestLocale: YouTubeMusicRequestLocale
@@ -1502,7 +1508,7 @@ class YouTubeMusicClient(
         )
     }
 
-    private fun postMusicPlayer(
+    private suspend fun postMusicPlayer(
         bootstrap: YouTubeMusicBootstrapConfig,
         videoId: String,
         requestLocale: YouTubeMusicRequestLocale
@@ -1531,7 +1537,7 @@ class YouTubeMusicClient(
         )
     }
 
-    private fun postMusicNext(
+    private suspend fun postMusicNext(
         bootstrap: YouTubeMusicBootstrapConfig,
         videoId: String,
         requestLocale: YouTubeMusicRequestLocale
@@ -1762,19 +1768,18 @@ class YouTubeMusicClient(
             )
     }
 
-    private fun executeJson(request: Request): JSONObject {
+    private suspend fun executeJson(request: Request): JSONObject {
         return JSONObject(executeText(request))
     }
 
-    private fun executeText(request: Request): String {
-        okHttpClient.newCall(request).execute().use { response ->
+    private suspend fun executeText(request: Request): String =
+        okHttpClient.newCall(request).awaitResponse { response ->
             if (!response.isSuccessful) {
                 val preview = response.body.readErrorPreviewWithLimit(YOUTUBE_ERROR_RESPONSE_MAX_BYTES)
                 throw IOException("YouTube Music request failed: ${response.code} $preview")
             }
-            return response.body.readTextWithLimit(YOUTUBE_TEXT_RESPONSE_MAX_BYTES)
+            response.body.readTextWithLimit(YOUTUBE_TEXT_RESPONSE_MAX_BYTES)
         }
-    }
 
     private fun utcOffsetMinutes(): Int {
         return TimeZone.getDefault().getOffset(System.currentTimeMillis()) / (60 * 1000)

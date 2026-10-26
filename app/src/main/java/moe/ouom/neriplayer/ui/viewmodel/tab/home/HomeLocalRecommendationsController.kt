@@ -4,6 +4,7 @@ import android.app.Application
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.catch
@@ -12,10 +13,12 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.stateIn
 import moe.ouom.neriplayer.data.local.playlist.LocalPlaylistRepository
 import moe.ouom.neriplayer.data.recommendation.LocalRecommendationRepository
 import moe.ouom.neriplayer.data.recommendation.LocalRecommendations
+import moe.ouom.neriplayer.data.recommendation.BeijingRecommendationDay
 import moe.ouom.neriplayer.data.stats.PlaybackStatsRepository
 import java.io.IOException
 
@@ -28,9 +31,10 @@ data class HomeLocalRecommendationsState(
 /** Kept separate from remote Home state so account changes cannot replace the local section. */
 internal class HomeLocalRecommendationsController(application: Application, scope: CoroutineScope) {
     private val refreshVersion = MutableStateFlow(0L)
+    private var handledRefreshVersion = 0L
     val state = channelFlow {
         var latest = LocalRecommendations()
-        refreshVersion.collectLatest {
+        refreshVersion.collectLatest { requestedRefreshVersion ->
             send(HomeLocalRecommendationsState(latest, loading = true))
             try {
                 val library = LocalPlaylistRepository.getInstance(application)
@@ -43,12 +47,17 @@ internal class HomeLocalRecommendationsController(application: Application, scop
                         if (failure is CancellationException) throw failure
                         emit(-1L)
                     },
-                ) { playlists, _ -> playlists.map { it.copy(songs = it.songs.toMutableList()) } }
+                    recommendationDays()
+                ) { playlists, _, _ -> playlists.map { it.copy(songs = it.songs.toMutableList()) } }
                     .conflate()
                     .collectLatest { playlists ->
                         send(HomeLocalRecommendationsState(latest, loading = true))
                         try {
-                            latest = recommendations.recommend(playlists)
+                            latest = recommendations.recommend(
+                                playlists,
+                                forceRefresh = requestedRefreshVersion > handledRefreshVersion
+                            )
+                            handledRefreshVersion = requestedRefreshVersion
                             send(HomeLocalRecommendationsState(latest, loading = false))
                         } catch (failure: Exception) {
                             if (failure is CancellationException) throw failure
@@ -70,5 +79,13 @@ internal class HomeLocalRecommendationsController(application: Application, scop
 
     fun refresh() {
         refreshVersion.value += 1L
+    }
+
+    private fun recommendationDays() = flow {
+        while (true) {
+            val now = System.currentTimeMillis()
+            emit(BeijingRecommendationDay.key(now))
+            delay((BeijingRecommendationDay.nextStartMillis(now) - now).coerceAtLeast(1L))
+        }
     }
 }

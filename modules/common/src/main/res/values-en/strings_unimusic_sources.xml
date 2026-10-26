@@ -2,7 +2,16 @@
 <resources>
     <string name="unimusic_sources_title">Choose audio source</string>
     <string name="unimusic_sources_description">Remember a preferred source for the next playback resolution. Current playback continues. Sources may require login or membership or have regional restrictions; confirming grants no additional playback rights.</string>
-    <string name="unimusic_sources_discovery_scope">Find candidates in local library files and normal Bilibili search. Every video part is listed separately. Conflicting version, artist, or duration evidence prevents confirmation.</string>
+    <string name="unimusic_sources_discovery_scope">Find candidates in local files, Bilibili, signed-in NetEase Music, and normal YouTube Music song search when enabled. Video parts are listed separately. Conflicting version, artist, or duration evidence prevents confirmation.</string>
+    <string name="unimusic_sources_youtube_disabled">YouTube Music is disabled, so no search requests are sent to it. Existing choices can be cleared or rejected.</string>
+    <string name="unimusic_sources_provider_local">Local files</string>
+    <string name="unimusic_sources_provider_bilibili">Bilibili</string>
+    <string name="unimusic_sources_provider_netease">NetEase Music</string>
+    <string name="unimusic_sources_provider_youtube">YouTube Music</string>
+    <string name="unimusic_sources_failure">%1$s: %2$s</string>
+    <string name="unimusic_sources_failure_timeout">Search timed out. Refresh to retry.</string>
+    <string name="unimusic_sources_failure_login">Sign in or sign in again, then refresh.</string>
+    <string name="unimusic_sources_failure_unavailable">Temporarily unavailable. Refresh to retry.</string>
     <string name="unimusic_sources_refresh">Refresh candidates</string>
     <string name="unimusic_sources_count">%1$d sources</string>
     <string name="unimusic_sources_artist_duration">%1$s · %2$s</string>
@@ -44,5 +53,5 @@
     <string name="unimusic_sources_save_failed">Could not confirm the saved choice. Refresh to check and retry.</string>
     <string name="unimusic_sources_saved">Saved for the next playback resolution.</string>
     <string name="unimusic_sources_cleared">The choice for this source has been cleared.</string>
-    <string name="unimusic_sources_account_changed">The Bilibili account changed. Previous candidates were cleared; refresh before choosing again.</string>
+    <string name="unimusic_sources_account_changed">A platform account or the YouTube setting changed. Previous candidates were cleared; refresh before choosing again.</string>
 </resources>

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="moe.ouom.neriplayer.platform.youtube.api.client.YouTubeMusicClientBrowseTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-10-26T18:30:21.037Z" hostname="XUSHAOYANG" time="0.408">
+  <properties/>
+  <testcase name="video metadata comes from oembed and failures resolve to null" classname="moe.ouom.neriplayer.platform.youtube.api.client.YouTubeMusicClientBrowseTest" time="0.345"/>
+  <testcase name="video metadata and search cancellation cancels the underlying call" classname="moe.ouom.neriplayer.platform.youtube.api.client.YouTubeMusicClientBrowseTest" time="0.06"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -1,0 +1,6 @@
+RememberedSourceMetadataTest > freshNativeIdentityAndAliasVersionMustBothMatch FAILED
+1 test completed, 1 failed
+> Task :playback:runtime:testDebugUnitTest FAILED
+Domain dependencies: {'platform-bilibili-client': 76, 'platform-netease-client': 53, 'platform-youtube-client': 298, 'platform-lyrics-client': 20, 'platform-search-client': 19, 'platform-bilibili-repository': 90, 'platform-bilibili-auth': 7, 'platform-netease-repository': 50, 'platform-netease-auth': 7, 'platform-youtube-repository': 6, 'platform-youtube-auth': 76, 'platform-comments': 36, 'platform-lyrics-provider': 104}, 0 violations
+BUILD FAILED in 5m 24s
+450 actionable tasks: 89 executed, 361 up-to-date

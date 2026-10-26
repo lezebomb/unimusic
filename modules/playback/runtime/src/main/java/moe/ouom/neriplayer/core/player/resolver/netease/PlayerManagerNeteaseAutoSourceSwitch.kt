@@ -8,6 +8,7 @@ import moe.ouom.neriplayer.core.player.runtime.refresh.RefreshResolverSideEffect
 import moe.ouom.neriplayer.core.player.url.buildBiliPlaybackAudioInfo
 import moe.ouom.neriplayer.core.player.url.buildBiliRepresentationIdentity
 import moe.ouom.neriplayer.core.player.url.inferBiliQualityKey
+import moe.ouom.neriplayer.core.player.url.sourceResolutionSession
 import moe.ouom.neriplayer.data.model.SongItem
 import moe.ouom.neriplayer.data.model.bilibili.search.SearchVideoItem
 import moe.ouom.neriplayer.data.model.bilibili.playback.BiliAudioStreamInfo
@@ -92,8 +93,11 @@ internal suspend fun PlayerManager.resolveStrictBiliSource(
     song: SongItem, candidate: SearchVideoItem, sideEffects: RefreshResolverSideEffects, selectedCid: Long? = null
 ): SourceAttempt<SongUrlResult.Success> {
     try {
+        val session = sourceResolutionSession("bilibili")
         val info = if (candidate.bvid.isNotBlank()) biliClient.getVideoBasicInfoByBvid(candidate.bvid)
             else biliClient.getVideoBasicInfoByAvid(candidate.aid)
+        if ((candidate.aid > 0 && info.aid != candidate.aid) ||
+            (candidate.bvid.isNotBlank() && info.bvid != candidate.bvid)) return SourceAttempt.Rejected(SourceFailure.NO_MATCH)
         val selection = selectStrictBiliPage(song, info, candidate.titlePlain, selectedCid)
         val page = selection.page ?: return SourceAttempt.Rejected(selection.rejection ?: SourceFailure.NO_MATCH)
         val matchBackend = SourceMatchBackend(application)
@@ -112,6 +116,7 @@ internal suspend fun PlayerManager.resolveStrictBiliSource(
         val observed = matchBackend.observe(song, RecordingSourceCandidate(sourceKey,
             UnifiedSongMetadata(metadata.title, metadata.artist, metadata.versionContext, metadata.durationMs)))
         if (observed.decision == SourceMatchDecision.REJECTED) return SourceAttempt.Rejected(SourceFailure.NO_MATCH)
+        if (session != sourceResolutionSession("bilibili")) return SourceAttempt.Rejected(SourceFailure.AUTH_REQUIRED)
         sideEffects.updateDuration { maybeUpdateSongDuration(song, duration) }
         return SourceAttempt.Ready(SongUrlResult.Success(
             url = stream.url, candidateUrls = stream.candidateUrls, durationMs = duration,

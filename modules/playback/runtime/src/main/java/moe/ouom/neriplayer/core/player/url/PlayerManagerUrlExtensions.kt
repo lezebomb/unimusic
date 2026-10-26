@@ -160,14 +160,15 @@ internal fun inspectCachedResourceSpans(
     )
 }
 
-internal suspend fun PlayerManager.resolveSongUrl(
+internal suspend fun PlayerManager.resolveSongUrlFromLegacySource(
     song: SongItem,
     forceRefresh: Boolean = false,
     youtubeRecoveryStrategy: YouTubePlaybackRecoveryStrategy? = null,
     sideEffects: RefreshResolverSideEffects = RefreshResolverSideEffects(),
     allowGenericPrefetchCache: Boolean = true,
     playbackRequestTokenOverride: Long? = null,
-    shouldApplyCacheMutation: () -> Boolean = { true }
+    shouldApplyCacheMutation: () -> Boolean = { true },
+    unifiedSongId: String? = null
 ): SongUrlResult {
     NPLogger.d(
         "NERI-PlayerManager",
@@ -183,11 +184,14 @@ internal suspend fun PlayerManager.resolveSongUrl(
         shouldPreferListenTogetherSourceBeforeNeteaseFallback(
             listenerAudioLinkSharingActive = isListenTogetherAudioLinkFallbackEnabled()
         )
-    if (!shouldDeferNeteaseAlternateSources && initialListenTogetherFallback == null && song.streamUrl.isNullOrBlank()) {
-        tryResolveRememberedSource(song, sideEffects)?.let {
+    if (unifiedSongId != null && !shouldDeferNeteaseAlternateSources && initialListenTogetherFallback == null && song.streamUrl.isNullOrBlank()) {
+        tryResolveRememberedSource(unifiedSongId, song, sideEffects)?.let {
             // Skip segments belong to a physical video/CID, never to an alternate recording URL.
-            BiliSponsorBlockPlaybackController.onAlternativeSourceSelected()
-            BiliVideoSkipPlaybackController.onAlternativeSourceSelected()
+            val request = playbackRequestTokenOverride ?: playbackRequestToken
+            if (shouldApplyCacheMutation() && request == playbackRequestToken) {
+                BiliSponsorBlockPlaybackController.onAlternativeSourceSelected(song, request)
+                BiliVideoSkipPlaybackController.onAlternativeSourceSelected(song, request)
+            }
             return it
         }
     }

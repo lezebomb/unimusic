@@ -7,6 +7,8 @@ import moe.ouom.neriplayer.core.player.PlayerManager
 import moe.ouom.neriplayer.core.player.network.isPlaybackNetworkUsable
 import moe.ouom.neriplayer.core.player.policy.source.*
 import moe.ouom.neriplayer.core.player.resolver.netease.resolveStrictBiliSource
+import moe.ouom.neriplayer.core.player.resolver.netease.recordingMetadata
+import moe.ouom.neriplayer.core.player.resolver.netease.biliRecordingMetadata
 import moe.ouom.neriplayer.core.player.resolver.netease.tryResolveNeteaseMatchedLocalSource
 import moe.ouom.neriplayer.core.player.runtime.refresh.RefreshResolverSideEffects
 import moe.ouom.neriplayer.data.identity.stableKey
@@ -32,11 +34,11 @@ internal object RememberedSourceState {
     }
 }
 
-internal suspend fun PlayerManager.tryResolveRememberedSource(song: SongItem,
+internal suspend fun PlayerManager.tryResolveRememberedSource(unifiedSongId: String, song: SongItem,
     sideEffects: RefreshResolverSideEffects): SongUrlResult.Success? {
     try {
         val backend = SourceMatchBackend(application)
-        val confirmed = backend.matches(song).filter { it.current && it.decision == SourceMatchDecision.CONFIRMED }
+        val confirmed = backend.matches(unifiedSongId, song).filter { it.current && it.decision == SourceMatchDecision.CONFIRMED }
         if (confirmed.isEmpty()) return null
         val candidates = flow {
             confirmed.forEach { match ->
@@ -44,11 +46,17 @@ internal suspend fun PlayerManager.tryResolveRememberedSource(song: SongItem,
                 val allowed = (provider == "local" || isPlaybackNetworkUsable(application)) &&
                     (provider != "youtube_music" || YouTubeFeatureGate.isEnabled())
                 emit(PlaybackSourceCandidate(match.id, allowed) {
-                    val result = resolveRememberedCandidate(song, match, sideEffects)
+                    val session = sourceResolutionSession(provider)
+                    val result = try { resolveRememberedCandidate(song, match, sideEffects) }
+                    catch (cancelled: CancellationException) { throw cancelled }
+                    catch (network: java.io.IOException) { throw network }
+                    catch (_: Exception) { null } // Malformed provider metadata must not block another confirmed source.
                     // A rejection/reset while the network was in flight must win over the old result.
-                    val current = backend.matches(song).any { it.id == match.id && it.revision == match.revision &&
+                    val current = backend.matches(unifiedSongId, song).any { it.id == match.id && it.revision == match.revision &&
                         it.current && it.decision == SourceMatchDecision.CONFIRMED }
-                    if (result != null && current) SourceAttempt.Ready(result.copy(
+                    if (session != sourceResolutionSession(provider)) SourceAttempt.Rejected(SourceFailure.AUTH_REQUIRED)
+                    else if (provider != "local" && !isPlaybackNetworkUsable(application)) SourceAttempt.Rejected(SourceFailure.NETWORK)
+                    else if (result != null && current) SourceAttempt.Ready(result.copy(
                         cacheKeyOverride = "match-${match.id}-${result.cacheKeyOverride ?: provider}"))
                     else SourceAttempt.Rejected(SourceFailure.UNAVAILABLE)
                 })
@@ -79,13 +87,20 @@ private suspend fun PlayerManager.resolveRememberedCandidate(subject: SongItem, 
             tryResolveNeteaseMatchedLocalSource(subject, local)
         }
         "netease" -> {
-            val item = SongItem(source.resourceId.toLong(), meta.title, meta.artist, meta.album, 0, meta.durationMs,
-                null, channelId = "netease", audioId = source.resourceId)
+            val fresh = refreshedNeteaseSource(neteaseClient.getSongDetailCancellable(listOf(source.resourceId.toLong())), source.resourceId)
+                ?.takeIf { RecordingMatchPolicy.assess(subject.recordingMetadata(), it.second).accepted }
+                ?: return null
+            val item = fresh.first
             (getNeteaseSongUrl(item, suppressError = true, sideEffects = sideEffects, allowLocalFallback = false,
                 allowPreviewFallback = false, allowAutoBiliFallback = false) as? SongUrlResult.Success)
                 ?.copy(cacheKeyOverride = computeCacheKey(item))
         }
         "youtube_music" -> {
+            val fresh = youtubeMusicClient.getVideoMetadata(source.resourceId) ?: return null
+            val expected = subject.recordingMetadata()
+            val artist = fresh.authorName.removeSuffix(" - Topic").trim()
+            val metadata = biliRecordingMetadata(expected, fresh.title, fresh.title, artist, meta.durationMs)
+            if (!RecordingMatchPolicy.assess(expected, metadata).accepted) return null
             val item = SongItem(stableYouTubeMusicId(source.resourceId), meta.title, meta.artist, meta.album, 0,
                 meta.durationMs, null, mediaUri = buildYouTubeMusicMediaUri(source.resourceId),
                 channelId = "youtubeMusic", audioId = source.resourceId)

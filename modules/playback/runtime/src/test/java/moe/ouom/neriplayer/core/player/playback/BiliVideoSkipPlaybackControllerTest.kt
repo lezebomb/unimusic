@@ -11,6 +11,24 @@ import org.junit.Test
 
 class BiliVideoSkipPlaybackControllerTest {
     @Test
+    fun `alternate sources clear only the matching active playback request`() {
+        val active = song(id = 8_010_020L)
+        val other = song(id = 8_010_021L)
+        val target = BiliVideoSkipTarget("BV1active", 20L)
+        BiliVideoSkipPlaybackController.onPlaybackRequestStarted(active, 220L)
+        BiliVideoSkipPlaybackController.onBiliTrackResolved(active, target, 220L)
+        try {
+            BiliVideoSkipPlaybackController.onAlternativeSourceSelected(other, 220L)
+            BiliVideoSkipPlaybackController.onAlternativeSourceSelected(active, 219L)
+            assertEquals(target, BiliVideoSkipPlaybackController.activeTargetFor(active))
+            BiliVideoSkipPlaybackController.onAlternativeSourceSelected(active, 220L)
+            assertNull(BiliVideoSkipPlaybackController.activeTargetFor(active))
+        } finally {
+            BiliVideoSkipPlaybackController.onPlaybackRequestStarted(other, 221L)
+        }
+    }
+
+    @Test
     fun `target resolution retries are bounded with increasing delays`() {
         assertEquals(1_000L, resolveBiliVideoSkipTargetLoadRetryDelayMs(1))
         assertEquals(2_000L, resolveBiliVideoSkipTargetLoadRetryDelayMs(2))

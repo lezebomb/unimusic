@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="moe.ouom.neriplayer.data.recommendation.DailyRecommendationStoreTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-10-26T18:26:09.415Z" hostname="XUSHAOYANG" time="0.351">
+  <properties/>
+  <testcase name="Beijing midnight and explicit refresh rebuild while UTC midnight does not" classname="moe.ouom.neriplayer.data.recommendation.DailyRecommendationStoreTest" time="0.276"/>
+  <testcase name="reopen keeps daily order and real UUIDs but restores only current library metadata" classname="moe.ouom.neriplayer.data.recommendation.DailyRecommendationStoreTest" time="0.028"/>
+  <testcase name="corrupt unknown or oversized caches rebuild and failed IO still returns recommendations" classname="moe.ouom.neriplayer.data.recommendation.DailyRecommendationStoreTest" time="0.041"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

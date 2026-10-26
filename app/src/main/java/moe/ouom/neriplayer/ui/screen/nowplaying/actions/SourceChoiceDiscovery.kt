@@ -16,19 +16,26 @@ import moe.ouom.neriplayer.core.player.resolver.netease.recordingMetadata
 import moe.ouom.neriplayer.data.local.media.LocalSongSupport
 import moe.ouom.neriplayer.data.local.playlist.LocalPlaylistRepository
 import moe.ouom.neriplayer.data.model.SongItem
+import moe.ouom.neriplayer.data.model.auth.SavedCookieAuthState
 import moe.ouom.neriplayer.data.model.unified.RecordingMatchPolicy
 import moe.ouom.neriplayer.data.model.unified.RecordingMetadata
 import moe.ouom.neriplayer.data.model.unified.RecordingSourceCandidate
 import moe.ouom.neriplayer.data.model.unified.RecordingVersion
 import moe.ouom.neriplayer.data.model.unified.SongSourceKey
 import moe.ouom.neriplayer.data.model.unified.UnifiedSongMetadata
+import moe.ouom.neriplayer.data.model.youtube.music.YouTubeMusicSearchFilter
 import moe.ouom.neriplayer.data.traffic.isOfflineModeNow
 import moe.ouom.neriplayer.data.unified.sourceCandidateForSong
+import moe.ouom.neriplayer.platform.youtube.config.YouTubeFeatureDisabledException
+import moe.ouom.neriplayer.platform.youtube.config.YouTubeFeatureGate
+
+internal enum class SourceChoiceFailure { TIMED_OUT, AUTH_REQUIRED, UNAVAILABLE }
 
 internal data class SourceChoiceDiscoveryResult(
     val candidates: List<RecordingSourceCandidate>,
     val incomplete: Boolean = false,
-    val offline: Boolean = false
+    val offline: Boolean = false,
+    val failures: Map<String, SourceChoiceFailure> = emptyMap()
 )
 
 internal fun assessSourceChoice(song: SongItem, candidate: RecordingSourceCandidate) =
@@ -40,33 +47,79 @@ private fun RecordingSourceCandidate.recordingMetadata() = metadata.let {
 }
 
 /** Metadata discovery only: no audio URLs, unlock services, or entitlement changes. */
-internal suspend fun discoverSourceChoices(context: Context, song: SongItem): SourceChoiceDiscoveryResult =
+internal suspend fun discoverSourceChoices(
+    context: Context, song: SongItem, youtubeEnabled: Boolean
+): SourceChoiceDiscoveryResult =
     supervisorScope {
         val offline = context.isOfflineModeNow()
-        val local = async { boundedCandidates { discoverLocalChoices(context, song) } }
+        val local = async { boundedCandidates("local") { discoverLocalChoices(context, song) } }
         val bili = async {
             if (offline) SourceChoiceDiscoveryResult(emptyList())
-            else boundedCandidates { discoverBiliChoices(song) }
+            else boundedCandidates("bilibili") { discoverBiliChoices(song) }
         }
-        val results = listOf(local, bili).awaitAll()
+        val netease = async {
+            if (offline) SourceChoiceDiscoveryResult(emptyList())
+            else boundedCandidates("netease") { discoverNeteaseChoices(song) }
+        }
+        val youtube = async {
+            if (offline || !youtubeEnabled) SourceChoiceDiscoveryResult(emptyList())
+            else boundedCandidates("youtube_music") { discoverYouTubeChoices(song) }
+        }
+        val results = listOf(local, bili, netease, youtube).awaitAll()
         val originalKey = sourceCandidateForSong(song)?.key
         SourceChoiceDiscoveryResult(
-            candidates = results.flatMap { it.candidates }.filter { it.key != originalKey }.distinctBy { it.key }
-                .sortedByDescending { assessSourceChoice(song, it).accepted }.take(24),
+            candidates = results.flatMap { result -> result.candidates.filter { it.key != originalKey }
+                .sortedByDescending { assessSourceChoice(song, it).accepted }.take(8) }
+                .distinctBy { it.key }.sortedByDescending { assessSourceChoice(song, it).accepted },
             incomplete = results.any { it.incomplete },
-            offline = offline
+            offline = offline,
+            failures = results.flatMap { it.failures.entries }.associate { it.toPair() }
         )
     }
 
 private suspend fun boundedCandidates(
+    provider: String,
     discover: suspend () -> SourceChoiceDiscoveryResult
 ): SourceChoiceDiscoveryResult = try {
-    withTimeoutOrNull(8_000) { discover() }
-        ?: SourceChoiceDiscoveryResult(emptyList(), incomplete = true)
+    withTimeoutOrNull(8_000) { discover() }?.let { result ->
+        if (result.incomplete) result.copy(failures = result.failures + (provider to SourceChoiceFailure.UNAVAILABLE))
+        else result
+    } ?: failedSource(provider, SourceChoiceFailure.TIMED_OUT)
 } catch (cancelled: CancellationException) {
     throw cancelled
+} catch (_: SourceChoiceAuthRequiredException) {
+    failedSource(provider, SourceChoiceFailure.AUTH_REQUIRED)
 } catch (_: Exception) {
-    SourceChoiceDiscoveryResult(emptyList(), incomplete = true)
+    failedSource(provider, SourceChoiceFailure.UNAVAILABLE)
+}
+
+private fun failedSource(provider: String, reason: SourceChoiceFailure) = SourceChoiceDiscoveryResult(
+    emptyList(), incomplete = true, failures = mapOf(provider to reason))
+
+private fun sourceChoiceQuery(song: SongItem): String = song.recordingMetadata().let {
+    listOf(it.title, it.artist).filter(String::isNotBlank).joinToString(" ")
+}
+
+private suspend fun discoverNeteaseChoices(song: SongItem): SourceChoiceDiscoveryResult {
+    if (AppContainer.neteaseCookieRepo.getAuthHealthOnce().state == SavedCookieAuthState.Missing) {
+        throw SourceChoiceAuthRequiredException()
+    }
+    val client = AppContainer.neteaseClient
+    val session = client.searchSessionIdentity()
+    val query = sourceChoiceQuery(song)
+    if (query.isBlank()) return SourceChoiceDiscoveryResult(emptyList())
+    val raw = client.searchSongsCancellable(query, limit = 12, type = 1, usePersistedCookies = true)
+    if (session !== client.searchSessionIdentity()) throw SourceChoiceAuthRequiredException()
+    return SourceChoiceDiscoveryResult(parseSourceChoiceNetease(raw))
+}
+
+private suspend fun discoverYouTubeChoices(song: SongItem): SourceChoiceDiscoveryResult {
+    if (!YouTubeFeatureGate.isEnabled()) throw YouTubeFeatureDisabledException()
+    val query = sourceChoiceQuery(song)
+    if (query.isBlank()) return SourceChoiceDiscoveryResult(emptyList())
+    val results = AppContainer.youtubeMusicClient.search(query, limit = 12, filter = YouTubeMusicSearchFilter.Song)
+    if (!YouTubeFeatureGate.isEnabled()) throw YouTubeFeatureDisabledException()
+    return SourceChoiceDiscoveryResult(results.mapNotNull(::sourceChoiceYouTube).distinctBy { it.key })
 }
 
 private suspend fun discoverLocalChoices(context: Context, song: SongItem): SourceChoiceDiscoveryResult =

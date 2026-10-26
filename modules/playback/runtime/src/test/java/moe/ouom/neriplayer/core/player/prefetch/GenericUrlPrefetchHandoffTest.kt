@@ -51,6 +51,14 @@ class GenericUrlPrefetchHandoffTest {
     }
 
     @Test
+    fun `decision bound alternate urls require fresh resolution instead of cached handover`() = runTest {
+        for (sourceKey in listOf("match-00000000-0000-0000-0000-000000000000-bilibili", "bili-auto-BVfixture-11")) {
+            manager.genericUrlPrefetchCache.put(KEY, RESULT.copy(cacheKeyOverride = sourceKey), NOW_MS)
+            assertNull(manager.consumeGenericUrlPrefetch(KEY, SONG))
+        }
+    }
+
+    @Test
     fun `expired prefetched url is dropped instead of handed over`() = runTest {
         manager.genericUrlPrefetchCache.put(KEY, RESULT, NOW_MS - GENERIC_URL_PREFETCH_TTL_MS)
 

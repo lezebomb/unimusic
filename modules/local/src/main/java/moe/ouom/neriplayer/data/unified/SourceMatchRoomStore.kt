@@ -17,8 +17,20 @@ class SourceMatchRoomStore(private val db: NeriUserDataDatabase, private val now
 
     suspend fun matches(song: SongItem): List<RecordingSourceMatch> = db.withTransaction {
         val id = subjectId(song)
+        matchesForSubject(id, song)
+    }
+
+    /** No implicit registration: an incorrect UUID must never resolve another queue recording. */
+    suspend fun matches(songId: String, song: SongItem): List<RecordingSourceMatch> = db.withTransaction {
+        if (!canonicalUuid(songId) || library.sourceForLegacy(song.stableKey())?.songId != songId) {
+            return@withTransaction emptyList()
+        }
+        matchesForSubject(songId, song)
+    }
+
+    private suspend fun matchesForSubject(id: String, song: SongItem): List<RecordingSourceMatch> {
         val fingerprint = sourceMatchFingerprint(sourceMatchMetadata(song))
-        dao.matches(id).map { row -> model(row, dao.override(row.matchId), fingerprint, sourceMatchMetadata(song)) }
+        return dao.matches(id).map { row -> model(row, dao.override(row.matchId), fingerprint, sourceMatchMetadata(song)) }
             .sortedWith(compareBy<RecordingSourceMatch> { it.decision != SourceMatchDecision.CONFIRMED }.thenByDescending { it.updatedAt })
     }
 

@@ -20,7 +20,8 @@ data class LocalRecommendation(
     val song: SongItem,
     val identityKey: String,
     val reason: LocalRecommendationReason,
-    val source: LocalRecommendationSource
+    val source: LocalRecommendationSource,
+    val unifiedSongId: String? = null
 )
 
 /**
@@ -29,7 +30,7 @@ data class LocalRecommendation(
  * Identity keys are supplied by the existing repository adapter; titles never merge recordings.
  */
 object LocalRecommendationRanker {
-    const val ALGORITHM_VERSION = 1
+    const val ALGORITHM_VERSION = 2
     private const val DAY_MS = 86_400_000L
 
     fun rank(
@@ -39,8 +40,7 @@ object LocalRecommendationRanker {
         limit: Int = 12
     ): List<LocalRecommendation> {
         if (limit <= 0) return emptyList()
-        // Fixed UTC day boundaries keep a refresh deterministic without storing private history again.
-        val today = nowMillis.coerceAtLeast(0L) / DAY_MS * DAY_MS
+        val today = BeijingRecommendationDay.startMillis(nowMillis)
         val stats = statistics.associateBy { it.identityKey }
         val artistAffinity = statistics.filter { artistKey(it.customArtist ?: it.artist).isNotBlank() }
             .groupBy { artistKey(it.customArtist ?: it.artist) }
@@ -48,14 +48,7 @@ object LocalRecommendationRanker {
                 val age = ageDays(today, track.lastPlayedAt)
                 ln(1.0 + track.totalListenMs.coerceAtLeast(0L) / 180_000.0) / (1.0 + age / 30.0)
             } }
-        val ranked = candidates.groupBy { it.identityKey }.values.map { duplicates ->
-            duplicates.minWith(compareBy<LocalRecommendationCandidate>(
-                { it.source != LocalRecommendationSource.LOCAL_FILE }, { it.source.ordinal }, { !it.favorite },
-                { it.song.customName ?: it.song.name }, { it.song.customArtist ?: it.song.artist },
-                { -(it.song.membershipAddedAtMs?.takeIf { time -> time > 0L } ?: it.song.addedAt).coerceAtLeast(0L) },
-                { it.song.mediaUri.orEmpty() }, { it.song.localFilePath.orEmpty() }
-            )).copy(favorite = duplicates.any { it.favorite })
-        }
+        val ranked = canonicalCandidates(candidates)
             .map { candidate -> score(candidate, stats[candidate.identityKey], artistAffinity, today) }
             .toMutableList()
         val selected = ArrayList<LocalRecommendation>(limit.coerceAtMost(ranked.size))
@@ -74,6 +67,16 @@ object LocalRecommendationRanker {
         }
         return selected
     }
+
+    internal fun canonicalCandidates(candidates: List<LocalRecommendationCandidate>): List<LocalRecommendationCandidate> =
+        candidates.groupBy { it.identityKey }.values.map { duplicates ->
+            duplicates.minWith(compareBy<LocalRecommendationCandidate>(
+                { it.source != LocalRecommendationSource.LOCAL_FILE }, { it.source.ordinal }, { !it.favorite },
+                { it.song.customName ?: it.song.name }, { it.song.customArtist ?: it.song.artist },
+                { -(it.song.membershipAddedAtMs?.takeIf { time -> time > 0L } ?: it.song.addedAt).coerceAtLeast(0L) },
+                { it.song.mediaUri.orEmpty() }, { it.song.localFilePath.orEmpty() }
+            )).copy(favorite = duplicates.any { it.favorite })
+        }
 
     private data class Scored(
         val candidate: LocalRecommendationCandidate,

@@ -36,6 +36,11 @@ interface UnifiedLibraryDao {
         "ON link.source_id = source.source_id WHERE link.identity_key = :key")
     suspend fun sourceForLegacy(key: String): SongSourceEntity?
 
+    @Query("SELECT track.* FROM track JOIN legacy_song_link AS link ON track.identity_key = link.identity_key " +
+        "JOIN song_source AS source ON source.source_id = link.source_id WHERE source.song_id = :songId " +
+        "ORDER BY track.identity_key LIMIT 32")
+    suspend fun legacyTracksForSong(songId: String): List<TrackEntity>
+
     @Query("SELECT track.* FROM track LEFT JOIN legacy_song_link AS link " +
         "ON track.identity_key = link.identity_key WHERE link.identity_key IS NULL " +
         "ORDER BY track.identity_key LIMIT :limit")

@@ -8,14 +8,15 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import moe.ouom.neriplayer.core.di.AppContainer
 import moe.ouom.neriplayer.data.model.SongItem
 import moe.ouom.neriplayer.data.model.unified.RecordingSourceCandidate
 import moe.ouom.neriplayer.data.model.unified.RecordingSourceMatch
 import moe.ouom.neriplayer.data.model.unified.SourceMatchDecision
+import moe.ouom.neriplayer.platform.youtube.config.YouTubeFeatureGate
 
 internal enum class SourceChoiceNotice { INCOMPLETE, OFFLINE, LOAD_FAILED, SAVE_FAILED, SAVED, CLEARED, ACCOUNT_CHANGED }
 
@@ -25,13 +26,16 @@ internal data class SourceChoiceState(
     val candidates: List<RecordingSourceCandidate> = emptyList(),
     val loading: Boolean = false,
     val saving: Boolean = false,
-    val notice: SourceChoiceNotice? = null
+    val notice: SourceChoiceNotice? = null,
+    val youtubeEnabled: Boolean = true,
+    val failures: Map<String, SourceChoiceFailure> = emptyMap()
 )
 
 /** This owner remembers metadata decisions; saving never interrupts current playback. */
 internal class SourceChoiceViewModel(application: Application) : AndroidViewModel(application) {
     private val backend get() = AppContainer.sourceMatchBackend
-    private val _state = MutableStateFlow(SourceChoiceState())
+    private var youtubeEnabled = YouTubeFeatureGate.isEnabled()
+    private val _state = MutableStateFlow(SourceChoiceState(youtubeEnabled = youtubeEnabled))
     val state = _state.asStateFlow()
     private var work: Job? = null
     private var generation = 0L
@@ -39,15 +43,22 @@ internal class SourceChoiceViewModel(application: Application) : AndroidViewMode
 
     init {
         viewModelScope.launch {
-            AppContainer.biliCookieRepo.cookieFlow.map { cookies ->
-                listOf(cookies["DedeUserID"], cookies["SESSDATA"], cookies["bili_jct"])
+            combine(
+                AppContainer.biliCookieRepo.cookieFlow,
+                AppContainer.neteaseCookieRepo.cookieFlow,
+                AppContainer.youtubeAuthRepo.authFlow,
+                AppContainer.settingsRepo.youtubeEnabledFlow
+            ) { bili, netease, youtube, enabled ->
+                sourceChoiceSession(bili, netease, youtube, enabled)
             }.distinctUntilChanged().collect { current ->
+                youtubeEnabled = current.youtubeEnabled
                 if (account != current) {
                     account = current
                     generation++
                     work?.cancel()
                     _state.value = _state.value.copy(candidates = emptyList(), loading = false,
-                        saving = false, notice = SourceChoiceNotice.ACCOUNT_CHANGED)
+                        saving = false, youtubeEnabled = youtubeEnabled, failures = emptyMap(),
+                        notice = if (_state.value.song != null) SourceChoiceNotice.ACCOUNT_CHANGED else null)
                 }
             }
         }
@@ -55,7 +66,7 @@ internal class SourceChoiceViewModel(application: Application) : AndroidViewMode
 
     fun bind(song: SongItem) {
         close()
-        _state.value = SourceChoiceState(song = song)
+        _state.value = SourceChoiceState(song = song, youtubeEnabled = youtubeEnabled)
         refresh()
     }
 
@@ -63,7 +74,7 @@ internal class SourceChoiceViewModel(application: Application) : AndroidViewMode
         generation++
         work?.cancel()
         work = null
-        _state.value = SourceChoiceState()
+        _state.value = SourceChoiceState(youtubeEnabled = youtubeEnabled)
     }
 
     fun refresh() {
@@ -72,15 +83,15 @@ internal class SourceChoiceViewModel(application: Application) : AndroidViewMode
         work?.cancel()
         val token = ++generation
         val session = accountSnapshot()
-        _state.value = _state.value.copy(loading = true, notice = null, candidates = emptyList())
+        _state.value = _state.value.copy(loading = true, notice = null, candidates = emptyList(), failures = emptyMap())
         work = viewModelScope.launch {
             try {
                 val matches = backend.matches(song)
                 if (!isCurrent(token, session)) return@launch
                 _state.value = _state.value.copy(matches = matches)
-                val result = discoverSourceChoices(getApplication(), song)
+                val result = discoverSourceChoices(getApplication(), song, session.youtubeEnabled)
                 if (!isCurrent(token, session)) return@launch
-                _state.value = _state.value.copy(candidates = result.candidates, loading = false,
+                _state.value = _state.value.copy(candidates = result.candidates, loading = false, failures = result.failures,
                     notice = when {
                         result.incomplete -> SourceChoiceNotice.INCOMPLETE
                         result.offline -> SourceChoiceNotice.OFFLINE
@@ -109,6 +120,8 @@ internal class SourceChoiceViewModel(application: Application) : AndroidViewMode
         if (snapshot.loading || snapshot.saving) return
         if (account != accountSnapshot()) return
         if ((snapshot.candidates + snapshot.matches.map { it.candidate }).none { it == candidate }) return
+        if (decision == SourceMatchDecision.CONFIRMED && candidate.key.provider == "youtube_music" &&
+            (!youtubeEnabled || !YouTubeFeatureGate.isEnabled())) return
         if (decision == SourceMatchDecision.CONFIRMED && !assessSourceChoice(song, candidate).accepted) return
         val token = ++generation
         val session = accountSnapshot()
@@ -130,10 +143,13 @@ internal class SourceChoiceViewModel(application: Application) : AndroidViewMode
         }
     }
 
-    private fun isCurrent(token: Long, session: List<String?>): Boolean =
+    private fun isCurrent(token: Long, session: SourceChoiceSession): Boolean =
         generation == token && accountSnapshot() == session
 
-    private fun accountSnapshot(): List<String?> = AppContainer.biliCookieRepo.cookieFlow.value.let {
-        listOf(it["DedeUserID"], it["SESSDATA"], it["bili_jct"])
-    }
+    private fun accountSnapshot(): SourceChoiceSession = sourceChoiceSession(
+        AppContainer.biliCookieRepo.cookieFlow.value,
+        AppContainer.neteaseCookieRepo.cookieFlow.value,
+        AppContainer.youtubeAuthRepo.authFlow.value,
+        youtubeEnabled
+    )
 }

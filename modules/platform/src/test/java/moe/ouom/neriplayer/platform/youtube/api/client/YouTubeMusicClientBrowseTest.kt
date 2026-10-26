@@ -3,6 +3,15 @@ package moe.ouom.neriplayer.platform.youtube.api.client
 import java.io.IOException
 import java.util.Locale
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.cancelAndJoin
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withTimeout
+import okhttp3.OkHttpClient
+import okhttp3.Protocol
+import okhttp3.Response
+import okhttp3.ResponseBody.Companion.toResponseBody
 import moe.ouom.neriplayer.data.model.youtube.music.YouTubeMusicCreatorBrowseEndpoint
 import moe.ouom.neriplayer.data.model.youtube.music.YouTubeMusicCreatorSummary
 import moe.ouom.neriplayer.data.model.youtube.music.YouTubeMusicLyrics
@@ -266,6 +275,39 @@ class YouTubeMusicClientBrowseTest {
         assertEquals("json", request.url.queryParameter("format"))
         assertEquals("application/json", request.header("Accept"))
         assertEquals(3, http.calls.size)
+    }
+
+    @Test
+    fun `video metadata and search cancellation cancels the underlying call`() = runBlocking {
+        for (search in listOf(false, true)) {
+            val started = CompletableDeferred<Unit>()
+            val cancelled = CompletableDeferred<Unit>()
+            val http = OkHttpClient.Builder().addInterceptor { chain ->
+                if (search && chain.request().url.encodedPath == "/") {
+                    return@addInterceptor Response.Builder().request(chain.request()).protocol(Protocol.HTTP_1_1)
+                        .code(200).message("test bootstrap").body(bootstrapPage().body.toResponseBody()).build()
+                }
+                started.complete(Unit)
+                val deadline = System.nanoTime() + 5_000_000_000L
+                while (!chain.call().isCanceled() && System.nanoTime() < deadline) Thread.sleep(5)
+                if (chain.call().isCanceled()) cancelled.complete(Unit)
+                throw IOException("metadata request stopped")
+            }.build()
+            val client = YouTubeMusicClient(FakeYouTubeAuth(GUEST_AUTH), http)
+            val job = launch {
+                if (search) client.search("song", limit = 1) else client.getVideoMetadata("dQw4w9WgXcQ")
+            }
+            try {
+                withTimeout(5_000) { started.await() }
+                job.cancelAndJoin()
+                withTimeout(5_000) { cancelled.await() }
+                assertTrue(job.isCancelled)
+            } finally {
+                job.cancelAndJoin()
+                http.dispatcher.executorService.shutdown()
+                http.connectionPool.evictAll()
+            }
+        }
     }
 
     @Test

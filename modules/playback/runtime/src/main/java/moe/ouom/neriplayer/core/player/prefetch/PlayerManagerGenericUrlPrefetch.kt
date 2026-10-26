@@ -65,6 +65,7 @@ internal fun PlayerManager.prefetchNextGenericTrackUrl() {
             )
             // 本地兜底命中的受限歌曲同样值得预取, 否则消费方会白等一个不落盘的任务
             if (result is SongUrlResult.Success &&
+                !requiresFreshSourceDecision(result) &&
                 !result.url.startsWith(OFFLINE_CACHE_URL_PREFIX) &&
                 (isDirectStreamUrl(result.url) || LocalSongSupport.isLocalMediaUri(result.url))
             ) {
@@ -215,6 +216,8 @@ private suspend fun PlayerManager.consumeValidGenericUrlPrefetch(
     song: SongItem
 ): SongUrlResult.Success? {
     val result = genericUrlPrefetchCache.consume(cacheKey, SystemClock.elapsedRealtime()) ?: return null
+    // A rejected/reset match or changed account after prefetch must not reuse an old alternate URL.
+    if (requiresFreshSourceDecision(result)) return null
     // 预取到消费之间开关可能被关掉或文件失效, 复验不过就丢弃走全新解析
     if (result.isNeteaseLocalFallback &&
         LocalSongSupport.isLocalMediaUri(result.url)
@@ -242,3 +245,6 @@ private suspend fun PlayerManager.consumeValidGenericUrlPrefetch(
     NPLogger.d("NERI-PlayerManager", "generic URL prefetch cache hit: key=$cacheKey")
     return result
 }
+
+internal fun requiresFreshSourceDecision(result: SongUrlResult.Success): Boolean =
+    result.cacheKeyOverride?.let { it.startsWith("match-") || it.startsWith("bili-auto-") } == true
