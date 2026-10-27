@@ -6,6 +6,9 @@ import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 
+/** Explicit YouTube playback may need the upstream 12s cipher preparation; automatic fallback stays fast. */
+fun primarySourceResolutionBudgetMs(isYouTube: Boolean): Long = if (isYouTube) 20_000 else 8_000
+
 /** One deadline across preferred, primary and alternate stages; nested stages cannot reset it. */
 class SourceResolutionBudget(
     private val durationMs: Long,

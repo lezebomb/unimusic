@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="moe.ouom.neriplayer.platform.youtube.repository.YouTubeAnonymousAccessTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-10-27T08:03:57.251Z" hostname="local" time="0.821">
+  <properties/>
+  <testcase name="contentUnavailableAndSignInDecisionsStayDistinct" classname="moe.ouom.neriplayer.platform.youtube.repository.YouTubeAnonymousAccessTest" time="0.079"/>
+  <testcase name="anonymousDenialStopsAfterOneClientSweepWithoutRestartingBootstrap" classname="moe.ouom.neriplayer.platform.youtube.repository.YouTubeAnonymousAccessTest" time="0.736"/>
+  <testcase name="authenticatedUncertainAndPartlyPlayableSweepsRetainRecovery" classname="moe.ouom.neriplayer.platform.youtube.repository.YouTubeAnonymousAccessTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

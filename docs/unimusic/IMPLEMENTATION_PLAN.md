@@ -1,6 +1,6 @@
 # UniMusic 分阶段实施与验收
 
-状态日期：2026-10-27。2L已补QQ正常账号标准MP3取流和酷我官网免费音频、并发自动匹配、来源/聚合列表可播性排序；Room仍v23。26个定向JVM检查、Mate60生产播放器及QQ匿名拒绝2个真机检查、最终APK/测试包和边界通过。用户已授权该设备测试及本机安装验证，充电常亮与播放源兜底已开启。真实QQ账号正向取流、完整歌曲和多网络性能仍待验证；不把一个样本成功当作全曲库结论。详见 [2L](PHASE_2L_NATIVE_AUDIO_AND_PLAYABILITY.md)。
+状态日期：2026-10-27。最新 2O 已对照原版预热/共享缓存/客户端回退，调整明确 YouTube 播放与快速自动切源的预算，精确处理匿名平台拒绝。9 个相关 JVM 检查、APK/测试包与边界通过，已覆盖安装 Mate60；YouTube 仍未播通，真实反馈为 LOGIN_REQUIRED，不能用搜索或诊断成功代替音频验收。网易云真实登录/导入 5 首/原生播放已在 2M 验证，其他来源范围见各阶段证据。详见 [2O](PHASE_2O_UPSTREAM_PLAYBACK_AND_ACCESS_FEEDBACK.md)。
 
 ## 执行约定
 
@@ -84,6 +84,8 @@
 2M 已完成网易云真实账号登录及两份 5 首歌单的顺序/UUID/无重复重导，正常原生音频、B站及 GD 样本真机播放通过。YouTube 播放失败和 QQ 账号正向未验收明确保留；修复登录页日志隐私、底部视口及旧 CI 能力断言。详见 [2M](PHASE_2M_ACCOUNT_IMPORT_AND_DEVICE_AUDIO.md)，后续先定位 YouTube 和 B站等待，不重复短信登录或导入全部歌单。
 
 2N 已完成 YouTube 文本 HTTP 的取消与阶段预算、共享任务截止及去除整套外层重试，并增加只含阶段/类型的真机诊断。9 个关键 JVM 检查和最终构建通过，但 YouTube 实际播放仍失败；正常界面也复核无地址，不能因搜索有结果标记接通。B站此次是缓存样本，不据此报告冷启动提升；详见 [2N](PHASE_2N_PLAYBACK_CANCELLATION_AND_DIAGNOSTICS.md)。
+
+2O 对照原版预热与 12 秒签名窗口，修正直接 YouTube 播放/共享后台的预算并保持自动回退 8 秒。新增完整匿名客户端轮次后明确拒绝、来源 AUTH_REQUIRED 与专属登录提示，实际仍未返回音频。9 个关键检查及最终构建通过，详见 [2O](PHASE_2O_UPSTREAM_PLAYBACK_AND_ACCESS_FEEDBACK.md)。
 
 1. 先做匹配安全基座：Normalization、VersionClassification、SongMatch/Override repository、硬冲突拒绝、来源资格类型。分析上游加分与分 P 双重累计，旧 70 分阈值不能迁成概率。
 2. `UnifiedSearchEngine` 使用 Flow/Coroutines、supervisorScope/每源预算、平台限流、去抖和请求取消。先返回本地/首个远端批次，合并有证明的同录音；页游标、错误和加载状态按 provider 保存。

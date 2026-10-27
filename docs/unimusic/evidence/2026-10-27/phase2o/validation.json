@@ -1,0 +1,139 @@
+{
+  "date": "2026-10-27",
+  "phase": "2O",
+  "base_commit": "f17094dc62e255102f38ee2df9c88d22c2502f81",
+  "room_version": 23,
+  "source_reference": {
+    "repository": "https://github.com/cwuom/NeriPlayer",
+    "original_baseline": "b9b6caf39bc65ca252f1c6a632ec24320cec68bb",
+    "fetched_master": "0d9ce69fae19c371ec2e23d0dd6fc86b5a2b589b",
+    "method": "git source comparison; no wholesale merge, original APK install or original-binary playback claim",
+    "findings": [
+      "Original startup warms WebPo session, bootstrap and EJS/player script; on-demand playback shares queue prefetch",
+      "Upstream cipher resolution timeout is 12000ms, longer than UniMusic 2N shared 8000ms",
+      "Latest upstream changes under YouTube are auth persistence rather than a replacement playback protocol"
+    ]
+  },
+  "implementation": {
+    "anonymous_denial": "After one complete normal client/locale sweep, only known explicit rejection statuses with no OK/network failure return typed denial. Signed-in, uncertain and partly OK cases retain original recovery.",
+    "runtime": "YouTube denial maps to RequiresLogin / source AUTH_REQUIRED with source-aware UI; unavailable content has separate feedback",
+    "timing": {
+      "explicit_youtube_primary_ms": 20000,
+      "native_primary_and_automatic_fallback_ms": 8000,
+      "shared_youtube_warmup_resolution_ms": 30000,
+      "text_http_request_ms": 3000,
+      "shared_bootstrap_http_load_ms": 8000
+    },
+    "inheritance": "Nested direct YouTube budget cannot extend an existing short automatic deadline; UUID lookup time is subtracted from primary budget",
+    "privacy": "No original responses, cookies, account IDs or signed media URLs emitted by diagnostic"
+  },
+  "jvm": {
+    "passed": 9,
+    "suites": [
+      {
+        "name": "moe.ouom.neriplayer.core.player.policy.source.SourceResolutionBudgetTest",
+        "tests": "3",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0"
+      },
+      {
+        "name": "moe.ouom.neriplayer.platform.youtube.repository.YouTubeAnonymousAccessTest",
+        "tests": "3",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0"
+      },
+      {
+        "name": "moe.ouom.neriplayer.platform.youtube.repository.YouTubeMusicPlaybackRepositoryTest",
+        "tests": "3",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0"
+      }
+    ],
+    "new_methods": 4,
+    "logs": [
+      "build/unimusic-toolchain/phase2o-corrected-final-validation.log",
+      "build/unimusic-toolchain/phase2o-cold-start-budget-final.log"
+    ]
+  },
+  "device": {
+    "model": "Huawei Mate60 / BRA-AL00",
+    "api": 31,
+    "opt_in": "unimusicLiveOtherSources=true",
+    "install": "final app and test APK installed with -r; no data clear, account logout or new OTP",
+    "before": {
+      "log": "phase2o-upstream-warmup-before.log",
+      "address_ready": false,
+      "elapsed_ms": 13413,
+      "player_responses": 12,
+      "bootstrap_responses": 2,
+      "statuses": "one UNPLAYABLE + five LOGIN_REQUIRED per sweep; formats=0",
+      "audio_passed": false
+    },
+    "after": {
+      "log": "phase2o-device-final.log",
+      "tests": 2,
+      "passed": 0,
+      "failed": 2,
+      "seconds": 29.433,
+      "positive_audio_playback": false,
+      "warmup_diagnostic": {
+        "elapsed_ms": 4958,
+        "player_responses": 6,
+        "statuses": "one UNPLAYABLE + five LOGIN_REQUIRED; formats=0",
+        "outcome": "typed LOGIN_REQUIRED rejection; no address"
+      },
+      "production_player": {
+        "first_address_observed_ms": -1,
+        "first_player_error_ms": 5818,
+        "player_error_kind": "LOGIN_REQUIRED",
+        "pending_media_load_at_end": false,
+        "remaining_youtube_http_calls_at_observation_end": 0
+      }
+    },
+    "normal_ui": {
+      "youtube_specific_sign_in_message_verified": true,
+      "dialog_dismissed": true,
+      "playback_paused": true
+    },
+    "comparison_limit": "Before/after public query and retained caches are not a controlled cold-network comparison; no latency percentile or percentage claimed",
+    "test_executions": 3,
+    "failed_audio_executions": 3
+  },
+  "build": {
+    "result": "passed",
+    "seconds": 84,
+    "log": "build/unimusic-toolchain/phase2o-cold-start-budget-final.log",
+    "domain_dependencies": "passed",
+    "module_boundaries": "passed",
+    "module_log": "build/unimusic-toolchain/phase2o-final-module-boundaries.log"
+  },
+  "app": {
+    "path": "app/build/outputs/apk/debug/app-debug.apk",
+    "bytes": 62740438,
+    "sha256": "cebe5307f7124fd0f2417489b79fd945bea89eb814311d4a10ef3dfcc8d3768e"
+  },
+  "android_test": {
+    "path": "app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk",
+    "bytes": 8076963,
+    "sha256": "7e78e85143811affc690dc90322350b74d8edc122f70549848ecb743a21a4706"
+  },
+  "earlier_attempts": [
+    "Diagnostic sandbox property lacked a direct test dependency; removed optional property",
+    "Registered the three exact new denial types for the existing YouTube auth boundary",
+    "Test initially conflated legacy/current TV clients sharing one numeric ID; use client ID and version pair, then rerun only affected class"
+  ],
+  "previous_ci": {
+    "url": "https://github.com/lezebomb/unimusic/actions/runs/40468361983",
+    "conclusion": "success"
+  },
+  "not_verified": [
+    "Successful YouTube full audio, including after real Google account login",
+    "Real signed-in YouTube refresh on this device",
+    "QQ positive account audio",
+    "Full-track, background endurance, multiple-network performance and labeled original-recording accuracy",
+    "Positive cold-cipher completion on the new 20s direct budget; only virtual-time behavior checked"
+  ]
+}

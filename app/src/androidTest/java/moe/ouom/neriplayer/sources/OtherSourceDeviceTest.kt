@@ -5,6 +5,8 @@ import android.content.Context
 import android.media.AudioManager
 import android.os.Bundle
 import android.os.SystemClock
+import java.util.Collections
+import moe.ouom.neriplayer.platform.youtube.repository.YouTubeMusicPlaybackRepository
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import kotlinx.coroutines.CoroutineStart
@@ -72,6 +74,55 @@ class OtherSourceDeviceTest {
             0, metadata.getLong("dt"), null, channelId = "netease", audioId = id.toString(),
             streamUrl = streamOnlyPlaybackUrl(audio.url))
         play("gdstudio_netease", song, SystemClock.elapsedRealtime() - start)
+    }
+
+    /** Mirrors the upstream warm-bootstrap -> shared resolver path; emits no request payloads. */
+    @Test fun youtubeUpstreamWarmupDiagnostics() = runBlocking {
+        enabled()
+        val traces = Collections.synchronizedList(mutableListOf<String>())
+        val client = AppContainer.sharedOkHttpClient.newBuilder().addInterceptor { chain ->
+            val request = chain.request()
+            val kind = when {
+                request.url.encodedPath.startsWith("/youtubei/") -> "PLAYER"
+                request.url.encodedPath.contains("/s/player/") -> "PLAYER_JS"
+                request.url.encodedPath == "/" -> "BOOTSTRAP"
+                else -> "OTHER"
+            }
+            val began = SystemClock.elapsedRealtime()
+            try {
+                val response = chain.proceed(request)
+                val root = if (kind == "PLAYER") runCatching {
+                    JSONObject(response.peekBody(512 * 1024).string())
+                }.getOrNull() else null
+                val status = root?.optJSONObject("playabilityStatus")?.optString("status")
+                    ?.takeIf { it in setOf("OK", "ERROR", "LOGIN_REQUIRED", "UNPLAYABLE", "LIVE_STREAM_OFFLINE", "CONTENT_CHECK_REQUIRED", "AGE_CHECK_REQUIRED") } ?: "NONE"
+                val formats = root?.optJSONObject("streamingData")?.optJSONArray("adaptiveFormats")?.length() ?: 0
+                traces += "$kind http=${response.code} status=$status formats=$formats ms=${SystemClock.elapsedRealtime() - began}"
+                response
+            } catch (failure: Exception) {
+                traces += "$kind failure=${failure.javaClass.simpleName} ms=${SystemClock.elapsedRealtime() - began}"
+                throw failure
+            }
+        }.build()
+        val repository = YouTubeMusicPlaybackRepository(client,
+            authProvider = AppContainer.youtubeAuthRepo::getAuthOnce,
+            applicationContext = instrumentation.targetContext.applicationContext)
+        val started = SystemClock.elapsedRealtime()
+        var ready = false
+        try {
+            val track = withTimeout(8_000) { AppContainer.youtubeMusicClient.search("Canon", limit = 3,
+                filter = YouTubeMusicSearchFilter.Song).first { it.videoId.isNotBlank() } }
+            withTimeout(12_000) { repository.warmBootstrap() }
+            ready = withTimeout(12_000) { repository.getBestPlayableAudio(track.videoId) } != null
+        } finally {
+            instrumentation.sendStatus(2, Bundle().apply {
+                putString("diagnostic", "UPSTREAM_WARMUP_PATH")
+                putBoolean("address_ready", ready)
+                putLong("elapsed_ms", SystemClock.elapsedRealtime() - started)
+                putStringArrayList("http_trace", ArrayList(synchronized(traces) { traces.toList() }))
+            })
+        }
+        assertTrue("Warmup path did not return an audio address; inspect redacted stage metrics", ready)
     }
 
     private suspend fun play(provider: String, song: SongItem, discoveryMs: Long) = coroutineScope {

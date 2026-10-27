@@ -2,7 +2,9 @@
 
 > 2026-10-27 的02:20和07:25两次单次续跑已执行，对应任务均已删除；没有新建重复计划。10月26日暂停交接仅为历史记录，按本文最新检查点接续。
 
-更新：2026-10-27（Asia/Shanghai）。最新 2N 已把 YouTube bootstrap/player/STS 文本请求改为可取消且单请求 3 秒，后台共享 bootstrap/取流各显式 8 秒，去掉运行时重复重启完整 YouTube 流程；保留内部重试与原唱门槛，B站重试未变。9 个定向 JVM 检查、最终 APK/测试包和边界通过，已保留数据覆盖安装。YouTube 真机仍无地址/无法播放，首次超时事件 8684ms，20 秒观察末共享客户端相关 HTTP Call 为 0；不能标记接通。B站本次缓存样本 2.7 秒观察到进度，不能与旧冷启动比较。见 [2N报告](PHASE_2N_PLAYBACK_CANCELLATION_AND_DIAGNOSTICS.md)。2M 的 CI 已成功；网易云既有登录及两份 5 首导入保留，不重复登录或全选导入。QQ 正向账号取流仍未验收。
+更新：2026-10-27（Asia/Shanghai）。最新 2O 对照原版 b9b6caf3 和已 fetch 的最新上游 0d9ce69f，保留预热/缓存/客户端回退。修复 8 秒共享任务短于原版 12 秒签名窗口的预算冲突：明确 YouTube 主播放 20 秒、共享后台 30 秒，其他主源/自动切源仍 8 秒且不能被嵌套延长。真实匿名响应是 UNPLAYABLE/LOGIN_REQUIRED、无音频格式；新增一轮后明确拒绝与来源 AUTH_REQUIRED、YouTube 专属登录提示，避免重复刷新和泛化超时。9 个关键 JVM 检查、最终 APK/测试包及边界通过，已覆盖安装到 Mate60。YouTube 仍未播通：最终播放器本次 5818ms 提示 LOGIN_REQUIRED，预热诊断一轮 6 次请求后明确拒绝，普通 UI 提示已核对。见 [2O报告](PHASE_2O_UPSTREAM_PLAYBACK_AND_ACCESS_FEEDBACK.md)。2N CI 已成功；网易云登录及 5 首导入保留，不重发验证码。未做 Google 登录，QQ 正向仍待验收。
+
+此前阶段：2026-10-27（Asia/Shanghai）。最新 2N 已把 YouTube bootstrap/player/STS 文本请求改为可取消且单请求 3 秒，后台共享 bootstrap/取流各显式 8 秒，去掉运行时重复重启完整 YouTube 流程；保留内部重试与原唱门槛，B站重试未变。9 个定向 JVM 检查、最终 APK/测试包和边界通过，已保留数据覆盖安装。YouTube 真机仍无地址/无法播放，首次超时事件 8684ms，20 秒观察末共享客户端相关 HTTP Call 为 0；不能标记接通。B站本次缓存样本 2.7 秒观察到进度，不能与旧冷启动比较。见 [2N报告](PHASE_2N_PLAYBACK_CANCELLATION_AND_DIAGNOSTICS.md)。2M 的 CI 已成功；网易云既有登录及两份 5 首导入保留，不重复登录或全选导入。QQ 正向账号取流仍未验收。
 
 此前阶段：2026-10-27（Asia/Shanghai）。最新 2M 已完成网易云真实短信网页登录、两份歌单共 5 首导入、顺序/UUID/重复导入无重复和正常网易云完整音频真机播放验证；B站/GD 也实际播放通过，YouTube 搜索成功但播放等待 20 秒失败，QQ 正向账号取流仍未验收。6 个定向 JVM 检查通过，设备 5 个检查中 4 通过 / 1 YouTube 失败，最新 APK/测试包构建和模块边界通过。见 [2M报告](PHASE_2M_ACCOUNT_IMPORT_AND_DEVICE_AUDIO.md) 及 phase2m 证据。已保存账号与导入库，勿重复发送验证码、清空数据或再次导入所有歌单。未连接 Gmail；凭证与联系方式不要写入日志/提交。2L 远端 CI 失败的旧能力断言已在 2M 修复，后续 CI 以实际状态为准。
 
@@ -10,11 +12,13 @@
 
 原D:/Collect/.tooling开发包被用户清理，Android包已按需恢复到项目内已忽略的D:/unimusic/.android-sdk；复用项目内JDK17与C:/Users/24981/.gradle，local.properties指向新SDK。原生模块显式固定NDK27/CMake3.31.6。后续不要继续引用已删除的JDK21/current或旧SDK。可直接使用 `tools_pub/unimusic/build_android.ps1`，它只为当前进程设置项目JDK/SDK；`-GradleArgs`可传任务和`--offline`。
 
-历史报告中“无设备”“酷我仅目录”“QQ未接音频”只描述对应旧阶段；当前以最新 [2N报告](PHASE_2N_PLAYBACK_CANCELLATION_AND_DIAGNOSTICS.md) 及对应阶段证据为准。
+历史报告中“无设备”“酷我仅目录”“QQ未接音频”只描述对应旧阶段；当前以最新 [2O报告](PHASE_2O_UPSTREAM_PLAYBACK_AND_ACCESS_FEEDBACK.md) 及对应阶段证据为准。
 
 ## 已完成和推送
 
-- Phase 2N：本检查点所在提交优化可取消取流、共享任务生命周期、失败诊断及日志隐私；以 git log/status 确认提交推送。YouTube 未取得正向播放，不得将构建或诊断通过当音源接通。
+- Phase 2O：本检查点所在提交复核原版预热、分离直接/自动预算、类型化匿名拒绝与实际登录反馈；以 git log/status 确认提交推送。YouTube 真实音频未成功，不得标记全音源验收。
+
+- Phase 2N：`f17094dc` 优化可取消取流、共享任务生命周期、失败诊断及日志隐私；以 git log/status 确认提交推送。YouTube 未取得正向播放，不得将构建或诊断通过当音源接通。
 
 - Phase 2M：`ba5bb77d` 完成真实账号/导入/原生音频与其他来源设备验证，修复登录页隐私及视口和旧 CI 断言；以 git log/status 确认提交推送，详见 [2M](PHASE_2M_ACCOUNT_IMPORT_AND_DEVICE_AUDIO.md)。
 

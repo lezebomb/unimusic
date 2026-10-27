@@ -2850,6 +2850,9 @@
     "name": "platform-youtube-auth",
     "package": "moe.ouom.neriplayer.platform.youtube.",
     "allowed_classes": [
+      "moe.ouom.neriplayer.platform.youtube.api.playback.YouTubePlaybackDenialReason",
+      "moe.ouom.neriplayer.platform.youtube.api.playback.YouTubePlaybackDeniedException",
+      "moe.ouom.neriplayer.platform.youtube.api.playback.YouTubePlaybackDenialKt",
       "android.content.Context",
       "android.content.SharedPreferences",
       "android.content.SharedPreferences$Editor",

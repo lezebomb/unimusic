@@ -70,6 +70,7 @@ import moe.ouom.neriplayer.data.identity.recoverNeteaseRemoteSourceFromStaleLoca
 import moe.ouom.neriplayer.data.model.bilibili.playback.BiliAudioStreamInfo
 import moe.ouom.neriplayer.data.model.bilibili.skip.BiliVideoSkipTarget
 import moe.ouom.neriplayer.platform.youtube.api.transport.extractYouTubeMusicVideoId
+import moe.ouom.neriplayer.platform.youtube.api.playback.YouTubePlaybackDeniedException
 import moe.ouom.neriplayer.data.model.SongItem
 import moe.ouom.neriplayer.common.logging.NPLogger
 import moe.ouom.neriplayer.data.local.media.LocalSongSupport
@@ -1848,6 +1849,12 @@ internal suspend fun PlayerManager.getYouTubeMusicAudioUrl(
             }
             SongUrlResult.Failure
         }
+    } catch (denied: YouTubePlaybackDeniedException) {
+        if (denied.requiresLogin) return@withContext SongUrlResult.RequiresLogin
+        if (!suppressError) sideEffects.emitError {
+            postPlayerEvent(PlayerEvent.ShowError(getLocalizedString(CoreCommonR.string.unimusic_youtube_unavailable)))
+        }
+        SongUrlResult.Failure
     } catch (e: Exception) {
         if (e is CancellationException) throw e
         NPLogger.e(

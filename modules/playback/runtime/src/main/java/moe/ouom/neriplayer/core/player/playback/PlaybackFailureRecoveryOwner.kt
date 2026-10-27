@@ -89,7 +89,11 @@ internal val playbackFailureRecoveryOwner = PlaybackFailureRecoveryOwner(
                     )
                     PlayerManager.postPlayerEvent(
                         PlayerEvent.ShowLoginPrompt(
-                            PlayerManager.getLocalizedString(CoreCommonR.string.player_playback_login_required)
+                            PlayerManager.getLocalizedString(
+                                if (PlayerManager._currentSongFlow.value?.let { PlayerManager.isYouTubeMusicTrack(it) } == true)
+                                    CoreCommonR.string.unimusic_youtube_login_required
+                                else CoreCommonR.string.player_playback_login_required
+                            )
                         )
                     )
                 }

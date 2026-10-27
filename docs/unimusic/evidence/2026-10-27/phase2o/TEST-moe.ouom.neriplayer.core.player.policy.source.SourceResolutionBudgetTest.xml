@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="moe.ouom.neriplayer.core.player.policy.source.SourceResolutionBudgetTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-10-27T08:06:52.949Z" hostname="local" time="0.396">
+  <properties/>
+  <testcase name="explicitYoutubeCanPrepareCipherWithoutExtendingAnAutomaticFallbackDeadline" classname="moe.ouom.neriplayer.core.player.policy.source.SourceResolutionBudgetTest" time="0.372"/>
+  <testcase name="nestedRecoveryCannotResetTheDeadlineAndStandaloneChecksKeepTheirBudget" classname="moe.ouom.neriplayer.core.player.policy.source.SourceResolutionBudgetTest" time="0.011"/>
+  <testcase name="primaryAndFallbackShareOneDeadlineAndDoNotAddIndependentWaits" classname="moe.ouom.neriplayer.core.player.policy.source.SourceResolutionBudgetTest" time="0.008"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

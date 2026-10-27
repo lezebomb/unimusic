@@ -1,0 +1,52 @@
+
+moe.ouom.neriplayer.sources.OtherSourceDeviceTest:INSTRUMENTATION_STATUS: address_ready=false
+INSTRUMENTATION_STATUS: diagnostic=UPSTREAM_WARMUP_PATH
+INSTRUMENTATION_STATUS: elapsed_ms=13413
+INSTRUMENTATION_STATUS: http_trace=[BOOTSTRAP http=200 status=NONE formats=0 ms=436, PLAYER_JS http=200 status=NONE formats=0 ms=378, PLAYER http=200 status=UNPLAYABLE formats=0 ms=1849, PLAYER http=200 status=LOGIN_REQUIRED formats=0 ms=391, PLAYER http=200 status=LOGIN_REQUIRED formats=0 ms=407, PLAYER http=200 status=LOGIN_REQUIRED formats=0 ms=401, PLAYER http=200 status=LOGIN_REQUIRED formats=0 ms=381, PLAYER http=200 status=LOGIN_REQUIRED formats=0 ms=394, BOOTSTRAP http=200 status=NONE formats=0 ms=408, PLAYER http=200 status=UNPLAYABLE formats=0 ms=398, PLAYER http=200 status=LOGIN_REQUIRED formats=0 ms=475, PLAYER http=200 status=LOGIN_REQUIRED formats=0 ms=404, PLAYER http=200 status=LOGIN_REQUIRED formats=0 ms=378, PLAYER http=200 status=LOGIN_REQUIRED formats=0 ms=384, PLAYER http=200 status=LOGIN_REQUIRED formats=0 ms=381]
+INSTRUMENTATION_STATUS_CODE: 2
+
+Error in youtubeUpstreamWarmupDiagnostics(moe.ouom.neriplayer.sources.OtherSourceDeviceTest):
+java.lang.AssertionError: Warmup path did not return an audio address; inspect redacted stage metrics
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.assertTrue(Assert.java:42)
+	at moe.ouom.neriplayer.sources.OtherSourceDeviceTest$youtubeUpstreamWarmupDiagnostics$1.invokeSuspend(OtherSourceDeviceTest.kt:125)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:34)
+	at kotlinx.coroutines.internal.ScopeCoroutine.afterResume(Scopes.kt:35)
+	at kotlinx.coroutines.AbstractCoroutine.resumeWith(AbstractCoroutine.kt:101)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:47)
+	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:100)
+	at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:256)
+	at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:54)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlockingImpl(Builders.kt:30)
+	at kotlinx.coroutines.BuildersKt.runBlockingImpl(Unknown Source:1)
+	at kotlinx.coroutines.BuildersKt__Builders_concurrentKt.runBlockingK(Builders.concurrent.kt:172)
+	at kotlinx.coroutines.BuildersKt.runBlockingK(Unknown Source:1)
+	at kotlinx.coroutines.BuildersKt__Builders_concurrentKt.runBlockingK$default(Builders.concurrent.kt:157)
+	at kotlinx.coroutines.BuildersKt.runBlockingK$default(Unknown Source:1)
+	at moe.ouom.neriplayer.sources.OtherSourceDeviceTest.youtubeUpstreamWarmupDiagnostics(OtherSourceDeviceTest.kt:80)
+
+
+Time: 13.433
+There was 1 failure:
+1) youtubeUpstreamWarmupDiagnostics(moe.ouom.neriplayer.sources.OtherSourceDeviceTest)
+java.lang.AssertionError: Warmup path did not return an audio address; inspect redacted stage metrics
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.assertTrue(Assert.java:42)
+	at moe.ouom.neriplayer.sources.OtherSourceDeviceTest$youtubeUpstreamWarmupDiagnostics$1.invokeSuspend(OtherSourceDeviceTest.kt:125)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:34)
+	at kotlinx.coroutines.internal.ScopeCoroutine.afterResume(Scopes.kt:35)
+	at kotlinx.coroutines.AbstractCoroutine.resumeWith(AbstractCoroutine.kt:101)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:47)
+	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:100)
+	at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:256)
+	at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:54)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlockingImpl(Builders.kt:30)
+	at kotlinx.coroutines.BuildersKt.runBlockingImpl(Unknown Source:1)
+	at kotlinx.coroutines.BuildersKt__Builders_concurrentKt.runBlockingK(Builders.concurrent.kt:172)
+	at kotlinx.coroutines.BuildersKt.runBlockingK(Unknown Source:1)
+	at kotlinx.coroutines.BuildersKt__Builders_concurrentKt.runBlockingK$default(Builders.concurrent.kt:157)
+	at kotlinx.coroutines.BuildersKt.runBlockingK$default(Unknown Source:1)
+	at moe.ouom.neriplayer.sources.OtherSourceDeviceTest.youtubeUpstreamWarmupDiagnostics(OtherSourceDeviceTest.kt:80)
+
+FAILURES!!!
+Tests run: 1,  Failures: 1

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="moe.ouom.neriplayer.platform.youtube.repository.YouTubeMusicPlaybackRepositoryTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-10-27T08:01:40.828Z" hostname="local" time="0.467">
+  <properties/>
+  <testcase name="kickoffPlayableAudioPrefetch_reusesInflightResolutionForImmediatePlayback" classname="moe.ouom.neriplayer.platform.youtube.repository.YouTubeMusicPlaybackRepositoryTest" time="0.385"/>
+  <testcase name="getBestPlayableAudio_skipsWebRemixOnRetryAfterEjsCannotResolveDirectStream" classname="moe.ouom.neriplayer.platform.youtube.repository.YouTubeMusicPlaybackRepositoryTest" time="0.066"/>
+  <testcase name="getBestPlayableAudio_usesInjectedCipherResolverForPlayerApiDirectStream" classname="moe.ouom.neriplayer.platform.youtube.repository.YouTubeMusicPlaybackRepositoryTest" time="0.016"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

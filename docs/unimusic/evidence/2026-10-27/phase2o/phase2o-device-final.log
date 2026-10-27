@@ -1,0 +1,93 @@
+
+moe.ouom.neriplayer.sources.OtherSourceDeviceTest:INSTRUMENTATION_STATUS: failure_type=TimeoutCancellationException
+INSTRUMENTATION_STATUS: outcome=FAILED
+INSTRUMENTATION_STATUS: source=youtube_music
+INSTRUMENTATION_STATUS_CODE: 2
+INSTRUMENTATION_STATUS: diagnostic_source=youtube_music
+INSTRUMENTATION_STATUS: first_address_observed_ms=-1
+INSTRUMENTATION_STATUS: first_player_error_ms=5818
+INSTRUMENTATION_STATUS: observed_http_stages=YOUTUBE_BOOTSTRAP,YOUTUBE_PLAYER_JS,YOUTUBE_PLAYER_API
+INSTRUMENTATION_STATUS: pending_media_load=false
+INSTRUMENTATION_STATUS: player_error_kind=LOGIN_REQUIRED
+INSTRUMENTATION_STATUS: remaining_youtube_http_calls=0
+INSTRUMENTATION_STATUS_CODE: 2
+
+Error in youtubeMusicSampleDecodes(moe.ouom.neriplayer.sources.OtherSourceDeviceTest):
+java.lang.AssertionError: youtube_music playback failed (TimeoutCancellationException)
+	at moe.ouom.neriplayer.sources.OtherSourceDeviceTest$play$2.invokeSuspend(OtherSourceDeviceTest.kt:191)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:34)
+	at kotlinx.coroutines.internal.ScopeCoroutine.afterResume(Scopes.kt:35)
+	at kotlinx.coroutines.AbstractCoroutine.resumeWith(AbstractCoroutine.kt:101)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:47)
+	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:98)
+	at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:256)
+	at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:54)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlockingImpl(Builders.kt:30)
+	at kotlinx.coroutines.BuildersKt.runBlockingImpl(Unknown Source:1)
+	at kotlinx.coroutines.BuildersKt__Builders_concurrentKt.runBlockingK(Builders.concurrent.kt:172)
+	at kotlinx.coroutines.BuildersKt.runBlockingK(Unknown Source:1)
+	at kotlinx.coroutines.BuildersKt__Builders_concurrentKt.runBlockingK$default(Builders.concurrent.kt:157)
+	at kotlinx.coroutines.BuildersKt.runBlockingK$default(Unknown Source:1)
+	at moe.ouom.neriplayer.sources.OtherSourceDeviceTest.youtubeMusicSampleDecodes(OtherSourceDeviceTest.kt:52)
+INSTRUMENTATION_STATUS: address_ready=false
+INSTRUMENTATION_STATUS: diagnostic=UPSTREAM_WARMUP_PATH
+INSTRUMENTATION_STATUS: elapsed_ms=4958
+INSTRUMENTATION_STATUS: http_trace=[PLAYER http=200 status=UNPLAYABLE formats=0 ms=389, PLAYER http=200 status=LOGIN_REQUIRED formats=0 ms=389, PLAYER http=200 status=LOGIN_REQUIRED formats=0 ms=436, PLAYER http=200 status=LOGIN_REQUIRED formats=0 ms=363, PLAYER http=200 status=LOGIN_REQUIRED formats=0 ms=363, PLAYER http=200 status=LOGIN_REQUIRED formats=0 ms=423]
+INSTRUMENTATION_STATUS_CODE: 2
+
+Error in youtubeUpstreamWarmupDiagnostics(moe.ouom.neriplayer.sources.OtherSourceDeviceTest):
+moe.ouom.neriplayer.platform.youtube.api.playback.YouTubePlaybackDeniedException: YouTube playback rejected: LOGIN_REQUIRED
+	at moe.ouom.neriplayer.platform.youtube.repository.YouTubeMusicPlaybackRepository.resolvePlayableAudio(YouTubeMusicPlaybackRepository.kt:666)
+	at moe.ouom.neriplayer.platform.youtube.repository.YouTubeMusicPlaybackRepository.access$resolvePlayableAudio(YouTubeMusicPlaybackRepository.kt:281)
+	at moe.ouom.neriplayer.platform.youtube.repository.YouTubeMusicPlaybackRepository$resolvePlayableAudio$1.invokeSuspend(Unknown Source:24)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:34)
+	at kotlinx.coroutines.internal.ScopeCoroutine.afterResume(Scopes.kt:35)
+	at kotlinx.coroutines.AbstractCoroutine.resumeWith(AbstractCoroutine.kt:101)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:47)
+	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:100)
+	at kotlinx.coroutines.internal.LimitedDispatcher$Worker.run(LimitedDispatcher.kt:124)
+	at kotlinx.coroutines.scheduling.TaskImpl.run(Tasks.kt:89)
+	at kotlinx.coroutines.scheduling.CoroutineScheduler.runSafely(CoroutineScheduler.kt:586)
+	at kotlinx.coroutines.scheduling.CoroutineScheduler$Worker.executeTask(CoroutineScheduler.kt:798)
+	at kotlinx.coroutines.scheduling.CoroutineScheduler$Worker.runWorker(CoroutineScheduler.kt:717)
+	at kotlinx.coroutines.scheduling.CoroutineScheduler$Worker.run(CoroutineScheduler.kt:704)
+
+
+Time: 29.433
+There were 2 failures:
+1) youtubeMusicSampleDecodes(moe.ouom.neriplayer.sources.OtherSourceDeviceTest)
+java.lang.AssertionError: youtube_music playback failed (TimeoutCancellationException)
+	at moe.ouom.neriplayer.sources.OtherSourceDeviceTest$play$2.invokeSuspend(OtherSourceDeviceTest.kt:191)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:34)
+	at kotlinx.coroutines.internal.ScopeCoroutine.afterResume(Scopes.kt:35)
+	at kotlinx.coroutines.AbstractCoroutine.resumeWith(AbstractCoroutine.kt:101)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:47)
+	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:98)
+	at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:256)
+	at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:54)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlockingImpl(Builders.kt:30)
+	at kotlinx.coroutines.BuildersKt.runBlockingImpl(Unknown Source:1)
+	at kotlinx.coroutines.BuildersKt__Builders_concurrentKt.runBlockingK(Builders.concurrent.kt:172)
+	at kotlinx.coroutines.BuildersKt.runBlockingK(Unknown Source:1)
+	at kotlinx.coroutines.BuildersKt__Builders_concurrentKt.runBlockingK$default(Builders.concurrent.kt:157)
+	at kotlinx.coroutines.BuildersKt.runBlockingK$default(Unknown Source:1)
+	at moe.ouom.neriplayer.sources.OtherSourceDeviceTest.youtubeMusicSampleDecodes(OtherSourceDeviceTest.kt:52)
+2) youtubeUpstreamWarmupDiagnostics(moe.ouom.neriplayer.sources.OtherSourceDeviceTest)
+moe.ouom.neriplayer.platform.youtube.api.playback.YouTubePlaybackDeniedException: YouTube playback rejected: LOGIN_REQUIRED
+	at moe.ouom.neriplayer.platform.youtube.repository.YouTubeMusicPlaybackRepository.resolvePlayableAudio(YouTubeMusicPlaybackRepository.kt:666)
+	at moe.ouom.neriplayer.platform.youtube.repository.YouTubeMusicPlaybackRepository.access$resolvePlayableAudio(YouTubeMusicPlaybackRepository.kt:281)
+	at moe.ouom.neriplayer.platform.youtube.repository.YouTubeMusicPlaybackRepository$resolvePlayableAudio$1.invokeSuspend(Unknown Source:24)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:34)
+	at kotlinx.coroutines.internal.ScopeCoroutine.afterResume(Scopes.kt:35)
+	at kotlinx.coroutines.AbstractCoroutine.resumeWith(AbstractCoroutine.kt:101)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:47)
+	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:100)
+	at kotlinx.coroutines.internal.LimitedDispatcher$Worker.run(LimitedDispatcher.kt:124)
+	at kotlinx.coroutines.scheduling.TaskImpl.run(Tasks.kt:89)
+	at kotlinx.coroutines.scheduling.CoroutineScheduler.runSafely(CoroutineScheduler.kt:586)
+	at kotlinx.coroutines.scheduling.CoroutineScheduler$Worker.executeTask(CoroutineScheduler.kt:798)
+	at kotlinx.coroutines.scheduling.CoroutineScheduler$Worker.runWorker(CoroutineScheduler.kt:717)
+	at kotlinx.coroutines.scheduling.CoroutineScheduler$Worker.run(CoroutineScheduler.kt:704)
+
+FAILURES!!!
+Tests run: 2,  Failures: 2

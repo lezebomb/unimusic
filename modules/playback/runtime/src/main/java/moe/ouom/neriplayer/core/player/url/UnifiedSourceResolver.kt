@@ -1,10 +1,13 @@
 package moe.ouom.neriplayer.core.player.url
 
+import android.os.SystemClock
+import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.coroutines.CancellationException
 import moe.ouom.neriplayer.common.logging.NPLogger
 import moe.ouom.neriplayer.common.R as CoreCommonR
 import moe.ouom.neriplayer.core.player.PlayerManager
 import moe.ouom.neriplayer.core.player.policy.source.withSourceResolutionBudget
+import moe.ouom.neriplayer.core.player.policy.source.primarySourceResolutionBudgetMs
 import moe.ouom.neriplayer.core.player.runtime.refresh.RefreshResolverSideEffects
 import moe.ouom.neriplayer.core.player.runtime.refresh.YouTubePlaybackRecoveryStrategy
 import moe.ouom.neriplayer.data.model.SongItem
@@ -22,7 +25,7 @@ internal suspend fun PlayerManager.resolveSongUrl(
     playbackRequestTokenOverride: Long? = null,
     shouldApplyCacheMutation: () -> Boolean = { true }
 ): SongUrlResult {
-    val result = withSourceResolutionBudget {
+    val result = withSourceResolutionBudget(primarySourceResolutionBudgetMs(isYouTubeMusicTrack(song))) {
         val target = if (song.streamUrl.isNullOrBlank()) {
             try { UnifiedPlaybackBackend(application).identify(song) }
             catch (cancelled: CancellationException) { throw cancelled }
@@ -46,13 +49,22 @@ internal suspend fun PlayerManager.resolveUnifiedSongUrl(
     forceRefresh: Boolean = false,
     sideEffects: RefreshResolverSideEffects = RefreshResolverSideEffects()
 ): SongUrlResult {
-    val result = withSourceResolutionBudget {
-        val target = try { UnifiedPlaybackBackend(application).load(unifiedSongId) }
+    val started = SystemClock.elapsedRealtime()
+    val target = withTimeoutOrNull(8_000) {
+        try { UnifiedPlaybackBackend(application).load(unifiedSongId) }
         catch (cancelled: CancellationException) { throw cancelled }
         catch (error: Exception) {
             NPLogger.w("NERI-PlayerManager", "Unified recording unavailable: type=${error.javaClass.simpleName}")
             null
-        } ?: return@withSourceResolutionBudget SongUrlResult.Failure
+        }
+    } ?: return SongUrlResult.Failure
+    val remaining = primarySourceResolutionBudgetMs(isYouTubeMusicTrack(target.song)) -
+        (SystemClock.elapsedRealtime() - started)
+    if (remaining <= 0) {
+        emitSourceResolutionTimeout(sideEffects)
+        return SongUrlResult.Failure
+    }
+    val result = withSourceResolutionBudget(remaining) {
         resolveSongUrlFromLegacySource(target.song, forceRefresh = forceRefresh,
             sideEffects = sideEffects, unifiedSongId = target.songId)
     }

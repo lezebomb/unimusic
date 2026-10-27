@@ -192,8 +192,11 @@ internal suspend fun PlayerManager.resolveSourceCandidate(subject: SongItem, can
             val item = SongItem(stableYouTubeMusicId(source.resourceId), meta.title, meta.artist, meta.album, 0,
                 meta.durationMs, null, mediaUri = buildYouTubeMusicMediaUri(source.resourceId),
                 channelId = "youtubeMusic", audioId = source.resourceId)
-            val response = getYouTubeMusicAudioUrl(item, suppressError = true, sideEffects = sideEffects) as? SongUrlResult.Success
-                ?: return SourceAttempt.Rejected(SourceFailure.UNAVAILABLE)
+            val response = when (val resolved = getYouTubeMusicAudioUrl(item, suppressError = true, sideEffects = sideEffects)) {
+                is SongUrlResult.Success -> resolved
+                SongUrlResult.RequiresLogin -> return SourceAttempt.Rejected(SourceFailure.AUTH_REQUIRED)
+                else -> return SourceAttempt.Rejected(SourceFailure.UNAVAILABLE)
+            }
             if (response.isPreviewClip) return SourceAttempt.Rejected(SourceFailure.PREVIEW_ONLY)
             val duration = response.durationMs?.takeIf { it > 0 } ?: return SourceAttempt.Rejected(SourceFailure.UNAVAILABLE)
             if (kotlin.math.abs(duration - subject.durationMs) > 4_000) return SourceAttempt.Rejected(SourceFailure.NO_MATCH)

@@ -65,6 +65,9 @@ import moe.ouom.neriplayer.data.model.youtube.playback.YouTubePlaybackSourcePref
 import moe.ouom.neriplayer.data.model.youtube.playback.YouTubePlayerClientProfile
 import moe.ouom.neriplayer.data.model.youtube.playback.YouTubePlayerPlayabilityStatus
 import moe.ouom.neriplayer.platform.youtube.api.playback.YouTubePlayableAudioSelection
+import moe.ouom.neriplayer.platform.youtube.api.playback.YouTubePlaybackDenialReason
+import moe.ouom.neriplayer.platform.youtube.api.playback.YouTubePlaybackDeniedException
+import moe.ouom.neriplayer.platform.youtube.api.playback.terminalAnonymousPlaybackDenial
 import moe.ouom.neriplayer.platform.youtube.api.playback.YouTubePlaybackStreamAccessOwner
 import moe.ouom.neriplayer.platform.youtube.api.playback.isTrustedYouTubeDirectUrlForStrictRecovery
 import moe.ouom.neriplayer.platform.youtube.api.playback.playableAudioMimePreferenceScore
@@ -107,6 +110,8 @@ private const val WEB_REMIX_PLAYBACK_MAX_CANDIDATES = 2
 // EJS solver 内部按 solverLock 串行, 预取并发再高也不增加求解吞吐
 // 只会把用户点击前面的排队深度成倍拉长, 每首歌还要占 sig 和 n 两次
 private const val MAX_CONCURRENT_PREFETCH_RESOLVES = 1
+// Shared warmup outlives a fast fallback caller, but remains bounded and account-generation guarded.
+private const val SHARED_AUDIO_RESOLUTION_TIMEOUT_MS = 30_000L
 
 /**
  * 记录哪些 player client 正在稳定地拒绝请求
@@ -269,7 +274,8 @@ private class InFlightPlayableAudioEntry(
 
 private data class PlayerAudioResolution(
     val playableAudio: YouTubePlayableAudio? = null,
-    val metadata: YouTubeAudioMetadata? = null
+    val metadata: YouTubeAudioMetadata? = null,
+    val accessDenial: YouTubePlaybackDenialReason? = null
 )
 
 class YouTubeMusicPlaybackRepository(
@@ -657,6 +663,8 @@ class YouTubeMusicPlaybackRepository(
             return playableAudio
         }
 
+        playerResolution?.accessDenial?.let { throw YouTubePlaybackDeniedException(it) }
+
         if (!shouldUseAnonymousYouTubeNewPipeFallback(authProvider().normalized().hasLoginCookies())) {
             NPLogger.d(
                 "YouTubeMusicPlayback",
@@ -751,7 +759,7 @@ class YouTubeMusicPlaybackRepository(
                     )
                     try {
                         // 按需解析不受闸门约束, 避免被排队中的预取堵住
-                        val resolved = withTimeoutOrNull(8_000) {
+                        val resolved = withTimeoutOrNull(SHARED_AUDIO_RESOLUTION_TIMEOUT_MS) {
                             if (isPrefetch) {
                                 prefetchResolveGate.withPrefetchSlot(onDemandSignal) {
                                     resolvePlayableAudio(
@@ -935,6 +943,7 @@ class YouTubeMusicPlaybackRepository(
             var sawBootstrapSuspectOutcome = false
             var sawTerminalFallbackOutcome = false
             var sawPlayerRequestFailure = false
+            val responseStatuses = mutableSetOf<String>()
             val candidateProfiles = selectUsablePlayerClients(
                 profiles = playerClientProfiles(
                     sourcePreference = sourcePreference,
@@ -958,6 +967,7 @@ class YouTubeMusicPlaybackRepository(
                         )
                         PlayerClientHealthTracker.recordSuccess(profile.clientName)
                         val playability = YouTubeMusicPlaybackParser.parsePlayabilityStatus(root)
+                        responseStatuses += playability.status.uppercase(Locale.ROOT)
                         if (playability.status.equals("OK", ignoreCase = true)) {
                             sawOkResponse = true
                         }
@@ -1272,6 +1282,11 @@ class YouTubeMusicPlaybackRepository(
                     playableAudio = bestPlayableAudio.mergeMetadataFrom(bestMetadata),
                     metadata = bestMetadata
                 )
+            }
+
+            terminalAnonymousPlaybackDenial(responseStatuses, auth.hasLoginCookies(), sawOkResponse,
+                sawPlayerRequestFailure)?.let { denial ->
+                return PlayerAudioResolution(metadata = bestMetadata, accessDenial = denial)
             }
 
             if (

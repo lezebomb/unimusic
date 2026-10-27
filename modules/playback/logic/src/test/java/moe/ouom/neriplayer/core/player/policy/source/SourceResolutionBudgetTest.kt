@@ -45,4 +45,25 @@ class SourceResolutionBudgetTest {
         assertTrue(nestedStopped)
         assertEquals(100L, testScheduler.currentTime)
     }
+
+    @Test fun explicitYoutubeCanPrepareCipherWithoutExtendingAnAutomaticFallbackDeadline() = runTest {
+        val direct = SourceResolutionBudget(primarySourceResolutionBudgetMs(true)) { testScheduler.currentTime }
+        val ready = withContext(direct) {
+            withSourceResolutionBudget(primarySourceResolutionBudgetMs(true)) {
+                delay(12_000)
+                "prepared audio"
+            }
+        }
+        assertEquals("prepared audio", ready)
+        val start = testScheduler.currentTime
+        val fast = SourceResolutionBudget(primarySourceResolutionBudgetMs(false)) { testScheduler.currentTime }
+        val timedOut = withContext(fast) {
+            withSourceResolutionBudget(primarySourceResolutionBudgetMs(true)) {
+                delay(12_000)
+                "late fallback"
+            }
+        }
+        assertNull(timedOut)
+        assertEquals(8_000L, testScheduler.currentTime - start)
+    }
 }
