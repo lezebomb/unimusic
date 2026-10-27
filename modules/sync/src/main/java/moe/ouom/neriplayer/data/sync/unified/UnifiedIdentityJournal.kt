@@ -72,6 +72,45 @@ class UnifiedIdentityJournal(
         plan.result
     }
 
+    suspend fun decisionSnapshot(): IdentityDecisionSnapshot = transaction { old ->
+        IdentityDecisionSnapshot(coordination.revision.value, UnifiedIdentityMerger.merge(old.dataset, UnifiedIdentityDataset()))
+    }
+
+    /** Explicitly choose a displayed branch and acknowledge the unchanged local view atomically. */
+    suspend fun resolveConflict(songId: String, expectedRevision: Long, chosen: PortableSongMetadata?,
+        localSongs: List<LocalIdentityMetadata>): UnifiedIdentityMergeResult = transaction { old ->
+        if (coordination.revision.value != expectedRevision) throw StaleIdentityDecisionException()
+        val baseline = UnifiedIdentityMerger.merge(old.dataset, UnifiedIdentityDataset())
+        val canonical = requireNotNull(baseline.aliases[songId]) { "Unknown conflict identity" }
+        val current = baseline.songs.firstOrNull { it.songId == canonical }
+        require(localSongs.map { it.songId }.distinct().size == localSongs.size) { "Duplicate local conflict metadata" }
+        localSongs.forEach {
+            require(baseline.aliases[it.songId] == canonical) { "Local conflict belongs to another recording" }
+            UnifiedIdentityValidation.validateMetadata(it.metadata)
+        }
+        require(current?.concurrentRevisions?.any { it.metadata == chosen } == true ||
+            (chosen != null && localSongs.any { it.metadata == chosen })) { "Conflict choice is no longer available" }
+        var counter = old.counter
+        val merged = if (current != null && current.concurrentRevisions.all { it.metadata == chosen }) baseline else {
+            require(counter < Long.MAX_VALUE - 1) { "Causal counter exhausted" }
+            val context = mutableMapOf<String, Long>()
+            current?.concurrentRevisions?.forEach { revision ->
+                (revision.context + (revision.dot.deviceId to revision.dot.counter)).forEach { (actor, count) ->
+                    context[actor] = maxOf(context[actor] ?: 0L, count)
+                }
+            }
+            val revision = UnifiedSongRevision(canonical, UnifiedSyncDot(old.deviceId, ++counter), context.toSortedMap(), chosen)
+            UnifiedIdentityMerger.merge(baseline.dataset, UnifiedIdentityDataset(
+                identities = baseline.dataset.identities.filter { it.songId == canonical }, revisions = listOf(revision)))
+        }
+        val acknowledged = old.baselines.associate { it.songId to it.metadata }.toMutableMap()
+        localSongs.forEach { acknowledged[it.songId] = it.metadata }
+        val next = old.copy(counter = counter, dataset = merged.dataset,
+            baselines = acknowledged.toSortedMap().map { IdentityCaptureBaseline(it.key, it.value) })
+        if (next != old) persist(next)
+        merged
+    }
+
     suspend fun upsert(songId: String, metadata: PortableSongMetadata, sources: List<PortableSongIdentity>): UnifiedIdentityMergeResult =
         change(songId, metadata, sources, allowRestore = false)
 

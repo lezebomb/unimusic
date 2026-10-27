@@ -74,6 +74,41 @@ class UnifiedIdentitySyncBackend private constructor(
             canonical, local.take(32), revision)
     }
 
+    suspend fun conflictsPage(offset: Int = 0, limit: Int = 20): IdentityConflictPage = withContext(Dispatchers.IO) {
+        require(offset >= 0 && limit in 1..20)
+        val captured = captureRoom()
+        val snapshot = journal.decisionSnapshot()
+        val pending = captured.journal.localConflictSongIds.map { snapshot.state.aliases[it] ?: it }.toSet()
+        val states = snapshot.state.songs.associateBy { it.songId }
+        val groups = (snapshot.state.songs.filter { it.hasConflict }.map { it.songId } + pending).distinct().sorted()
+        val selected = groups.drop(offset).take(limit)
+        val originals = snapshot.state.aliases.keys.filter { snapshot.state.aliases[it] in selected }
+        val localRows = database.withTransaction {
+            originals.chunked(200).flatMap { database.unifiedLibraryDao().songsByIds(it) }
+        }.mapNotNull { row ->
+            val metadata = PortableSongMetadata(row.title, row.artist, row.album, row.durationMs, row.recordingVersion)
+            try { UnifiedIdentityValidation.validateMetadata(metadata);LocalIdentityMetadata(row.songId, metadata) }
+            catch (_: IllegalArgumentException) { null }
+        }.groupBy { snapshot.state.aliases.getValue(it.songId) }
+        IdentityConflictPage(groups.size, offset, selected.map { canonical ->
+            val local = localRows[canonical].orEmpty().sortedBy { it.songId }
+            val metadata = (local.map { it.metadata } + states[canonical]?.concurrentRevisions.orEmpty().map { it.metadata }).distinct()
+            IdentityConflictView(canonical, snapshot.revision, metadata.map { value ->
+                IdentityConflictChoice(value, value != null && local.any { it.metadata == value })
+            }, local)
+        })
+    }
+
+    suspend fun resolveConflict(view: IdentityConflictView, choice: IdentityConflictChoice) = withContext(Dispatchers.IO) {
+        require(choice in view.choices) { "Unknown conflict choice" }
+        val current = database.withTransaction {
+            view.localSongs.map { it.songId }.chunked(200).flatMap { database.unifiedLibraryDao().songsByIds(it) }
+        }.map { LocalIdentityMetadata(it.songId, PortableSongMetadata(it.title, it.artist, it.album, it.durationMs, it.recordingVersion)) }
+            .sortedBy { it.songId }
+        if (current != view.localSongs.sortedBy { it.songId }) throw StaleIdentityDecisionException()
+        journal.resolveConflict(view.songId, view.revision, choice.metadata, view.localSongs)
+    }
+
     fun isAliasRevisionCurrent(revision: Long): Boolean = journal.revision.value == revision
 
     suspend fun snapshot() = withContext(Dispatchers.IO) { journal.snapshot() }

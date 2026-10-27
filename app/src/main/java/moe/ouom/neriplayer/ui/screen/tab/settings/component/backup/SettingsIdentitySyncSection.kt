@@ -37,9 +37,11 @@ private data class IdentitySyncSummary(val live: Int, val deleted: Int, val conf
 internal fun SettingsIdentitySyncSection(configured: Boolean, onConfigure: () -> Unit) {
     val context = LocalContext.current.applicationContext
     val scope = rememberCoroutineScope()
+    var showConflicts by remember { mutableStateOf(false) }
     var busy by remember { mutableStateOf(false) }
     var result by remember { mutableStateOf<IdentitySyncSummary?>(null) }
     var error by remember { mutableStateOf<Int?>(null) }
+    if (showConflicts) IdentityConflictDialog(onDismiss = { showConflicts = false }, onChanged = { result = null })
     Column {
         ListItem(
             headlineContent = { Text(stringResource(CoreCommonR.string.unimusic_identity_sync_title)) },
@@ -72,6 +74,9 @@ internal fun SettingsIdentitySyncSection(configured: Boolean, onConfigure: () ->
             },
             colors = ListItemDefaults.colors(containerColor = Color.Transparent)
         )
+        MiuixSettingsTextButton(onClick = { if (!busy) showConflicts = true }, modifier = Modifier.padding(horizontal = 16.dp)) {
+            Text(stringResource(CoreCommonR.string.unimusic_identity_conflicts_title))
+        }
         error?.let { Text(stringResource(it), Modifier.padding(horizontal = 16.dp), color = MaterialTheme.colorScheme.error) }
         result?.let { value ->
             Text(stringResource(CoreCommonR.string.unimusic_identity_sync_result,

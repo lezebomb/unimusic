@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="unimusic_identity_conflicts_title">Resolve song record conflicts</string>
+    <string name="unimusic_identity_conflicts_description">Choose the information to keep for cross-device records. Local songs and files are kept. Sync identities again to send your choices.</string>
+    <string name="unimusic_identity_conflicts_loading">Loading…</string>
+    <string name="unimusic_identity_conflicts_count">%1$d records need a choice.</string>
+    <string name="unimusic_identity_conflicts_saved">Choice saved. Sync identities again to send it.</string>
+    <string name="unimusic_identity_conflicts_stale">The record changed. Review the refreshed options and choose again.</string>
+    <string name="unimusic_identity_conflicts_delete">Keep the deletion marker for this sync record</string>
+    <string name="unimusic_identity_conflicts_local">Information on this device</string>
+    <string name="unimusic_identity_conflicts_synced">Information from sync</string>
+    <string name="unimusic_identity_conflicts_metadata">%1$s · %2$s · %3$d s · %4$s</string>
+    <string name="unimusic_identity_conflicts_previous">Previous</string>
+    <string name="unimusic_identity_conflicts_next">Next</string>
+    <string name="unimusic_identity_version_studio">Studio</string>
+    <string name="unimusic_identity_version_live">Live</string>
+    <string name="unimusic_identity_version_cover">Cover</string>
+    <string name="unimusic_identity_version_instrumental">Instrumental</string>
+    <string name="unimusic_identity_version_remix">Remix</string>
+    <string name="unimusic_identity_version_edit">Edit</string>
+    <string name="unimusic_identity_version_speed">Speed altered</string>
+    <string name="unimusic_identity_version_remaster">Remaster</string>
+    <string name="unimusic_identity_version_rerecording">Rerecording</string>
+    <string name="unimusic_identity_version_unknown">Version unknown</string>
+</resources>

@@ -1,0 +1,22 @@
+{
+  "phase": "3D.7",
+  "date": "2026-10-28",
+  "jvm": {
+    "tests": 3,
+    "failures": 0,
+    "errors": 0
+  },
+  "build": "Debug APK passed; phase3d7-explicit-conflicts.log",
+  "moduleBoundaries": "Module boundaries: passed",
+  "apk": {
+    "path": "app/build/outputs/apk/debug/app-debug.apk",
+    "sha256": "bdd8550cfb695129c2905ea6890f4a708ed8bfef9f0de5c7edbad57d1bf0df52",
+    "bytes": 62966747
+  },
+  "notRun": [
+    "phone installation/UI/visual layout",
+    "real conflict accounts/cloud",
+    "actual cross-device sync",
+    "audio/performance"
+  ]
+}

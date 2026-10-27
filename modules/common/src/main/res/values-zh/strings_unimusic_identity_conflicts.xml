@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="unimusic_identity_conflicts_title">处理歌曲记录冲突</string>
+    <string name="unimusic_identity_conflicts_description">为跨设备记录选择要保留的信息。本机歌曲和文件保持原样，选择后再次同步标识即可发送。</string>
+    <string name="unimusic_identity_conflicts_loading">正在读取…</string>
+    <string name="unimusic_identity_conflicts_count">%1$d项记录待选择。</string>
+    <string name="unimusic_identity_conflicts_saved">选择已保存，再次同步标识即可发送。</string>
+    <string name="unimusic_identity_conflicts_stale">记录已变化，请查看刷新后的选项重新选择。</string>
+    <string name="unimusic_identity_conflicts_delete">保留这条同步记录的删除标记</string>
+    <string name="unimusic_identity_conflicts_local">本机信息</string>
+    <string name="unimusic_identity_conflicts_synced">同步信息</string>
+    <string name="unimusic_identity_conflicts_metadata">%1$s · %2$s · %3$d秒 · %4$s</string>
+    <string name="unimusic_identity_conflicts_previous">上一页</string>
+    <string name="unimusic_identity_conflicts_next">下一页</string>
+    <string name="unimusic_identity_version_studio">录音室版</string>
+    <string name="unimusic_identity_version_live">现场版</string>
+    <string name="unimusic_identity_version_cover">翻唱版</string>
+    <string name="unimusic_identity_version_instrumental">伴奏或纯音乐</string>
+    <string name="unimusic_identity_version_remix">混音版</string>
+    <string name="unimusic_identity_version_edit">剪辑版</string>
+    <string name="unimusic_identity_version_speed">变速版</string>
+    <string name="unimusic_identity_version_remaster">重制版</string>
+    <string name="unimusic_identity_version_rerecording">重录版</string>
+    <string name="unimusic_identity_version_unknown">版本未知</string>
+</resources>

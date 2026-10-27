@@ -12,7 +12,8 @@ data class UnifiedIdentityCaptureResult(
     val merged: UnifiedIdentityMergeResult,
     val changedSongs: Int,
     val suppressedDeletedSongs: Int,
-    val conflictingLocalGroups: Int
+    val conflictingLocalGroups: Int,
+    val localConflictSongIds: List<String> = emptyList()
 )
 
 internal data class IdentityCapturePlan(
@@ -39,6 +40,7 @@ internal object UnifiedIdentityCapturePlanner {
         var nextCounter = counter
         var suppressed = 0
         var conflicts = 0
+        val conflictingIds = mutableListOf<String>()
         observations.groupBy { baseline.aliases.getValue(it.songId) }.toSortedMap().forEach { (canonical, entries) ->
             val current = states[canonical]
             val changes = entries.filter { entry ->
@@ -54,6 +56,7 @@ internal object UnifiedIdentityCapturePlanner {
             } || changes.map { it.metadata }.distinct().size > 1) {
                 // A snapshot cannot infer which edits the user actually observed. Require explicit resolution.
                 conflicts++
+                conflictingIds += canonical
                 return@forEach // Keep prior baselines so a subsequent capture still exposes this conflict.
             } else if (changes.isNotEmpty()) {
                 val metadata = changes.first().metadata
@@ -73,7 +76,7 @@ internal object UnifiedIdentityCapturePlanner {
         }
         val merged = if (revisions.isEmpty()) baseline else UnifiedIdentityMerger.merge(baseline.dataset,
             UnifiedIdentityDataset(identities = identities, revisions = revisions))
-        return IdentityCapturePlan(UnifiedIdentityCaptureResult(merged, revisions.size, suppressed, conflicts), nextCounter,
+        return IdentityCapturePlan(UnifiedIdentityCaptureResult(merged, revisions.size, suppressed, conflicts, conflictingIds.toList()), nextCounter,
             nextBaselines.toSortedMap())
     }
 }

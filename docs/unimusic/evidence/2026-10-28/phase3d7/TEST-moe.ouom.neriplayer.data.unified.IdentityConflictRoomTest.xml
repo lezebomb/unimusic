@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<testsuite name="moe.ouom.neriplayer.data.unified.IdentityConflictRoomTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2026-10-27T22:19:36.905Z" hostname="local" time="5.748">
+  <properties />
+  <testcase name="freshLocalChoice" classname="moe.ouom.neriplayer.data.unified.IdentityConflictRoomTest" time="5.082" />
+  <system-out />
+  <system-err />
+</testsuite>
