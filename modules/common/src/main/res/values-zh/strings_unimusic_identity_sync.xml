@@ -11,4 +11,5 @@
     <string name="unimusic_identity_sync_excluded">%1$d个本地或不支持的来源保留在本机。</string>
     <string name="unimusic_identity_sync_local_conflict">本地和远端元数据有差异，自动捕获已保留现有版本。</string>
     <string name="unimusic_identity_sync_pending">有新的本地变更待发送，可再次同步。</string>
+    <string name="unimusic_identity_sync_configure_github">配置GitHub</string>
 </resources>

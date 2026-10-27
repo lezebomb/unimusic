@@ -70,7 +70,10 @@ internal fun IdentityConflictDialog(onDismiss: () -> Unit, onChanged: () -> Unit
                                                 CoreCommonR.string.unimusic_identity_conflicts_stale else CoreCommonR.string.unimusic_identity_sync_failed
                                         } finally {
                                             try { page = AppContainer.unifiedIdentitySyncBackend.conflictsPage() }
-                                            catch (failure: Exception) { if (failure is CancellationException) throw failure }
+                                            catch (failure: Exception) {
+                                                if (failure is CancellationException) throw failure
+                                                page = null;message = CoreCommonR.string.unimusic_identity_sync_failed
+                                            }
                                             busy = false
                                         }
                                     }

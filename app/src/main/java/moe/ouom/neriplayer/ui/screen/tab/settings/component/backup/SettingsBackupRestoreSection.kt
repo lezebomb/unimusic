@@ -823,7 +823,11 @@ internal fun SettingsBackupRestoreSection(
                 highlightPulse = highlightPulse,
                 onHighlightFinished = onHighlightFinished
             )
-
+            HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
+            androidx.compose.runtime.key(showGitHubConfigDialog, githubState.isConfigured) {
+                SettingsIdentitySyncSection(configured = githubState.isConfigured, onConfigure = onOpenGitHubConfig,
+                    destination = IdentitySyncDestination.GITHUB)
+            }
             }
 
             if (cardIndex == null) BackupDetailGap(showHeader)

@@ -1,0 +1,24 @@
+{
+  "phase": "3D.8",
+  "date": "2026-10-28",
+  "jvm": {
+    "tests": 2,
+    "failures": 0,
+    "errors": 0,
+    "http": "synthetic interceptor only"
+  },
+  "build": "Initial and final Debug passed; phase3d8-github-identity-sync.log / phase3d8-final-package-build.log",
+  "moduleBoundaries": "Module boundaries: passed",
+  "apk": {
+    "path": "app/build/outputs/apk/debug/app-debug.apk",
+    "sha256": "11acf5504d1e697b00ed1df2c8ee83c8ff68204bfecc0c7866f12fdc79fc926c",
+    "bytes": 62977923
+  },
+  "notRun": [
+    "real GitHub configuration/token access",
+    "actual GitHub data upload",
+    "phone install/UI",
+    "actual two-device/old-client roundtrip",
+    "audio/performance"
+  ]
+}

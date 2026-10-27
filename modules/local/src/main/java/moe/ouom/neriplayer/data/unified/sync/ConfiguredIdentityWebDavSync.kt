@@ -1,6 +1,8 @@
-package moe.ouom.neriplayer.data.unified
+package moe.ouom.neriplayer.data.unified.sync
 
 import android.content.Context
+import moe.ouom.neriplayer.data.unified.IdentityBackendSyncResult
+import moe.ouom.neriplayer.data.unified.UnifiedIdentitySyncBackend
 import java.io.IOException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext

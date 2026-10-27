@@ -11,4 +11,5 @@
     <string name="unimusic_identity_sync_excluded">%1$d local or unsupported sources were kept on this device.</string>
     <string name="unimusic_identity_sync_local_conflict">Local and remote metadata differ; automatic capture kept the existing versions.</string>
     <string name="unimusic_identity_sync_pending">New local changes are pending. Sync again to send them.</string>
+    <string name="unimusic_identity_sync_configure_github">Configure GitHub</string>
 </resources>

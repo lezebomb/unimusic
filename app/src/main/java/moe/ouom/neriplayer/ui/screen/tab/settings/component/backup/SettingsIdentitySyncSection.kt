@@ -21,20 +21,27 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import moe.ouom.neriplayer.common.R as CoreCommonR
 import moe.ouom.neriplayer.core.di.AppContainer
-import moe.ouom.neriplayer.data.unified.ConfiguredIdentityWebDavSync
-import moe.ouom.neriplayer.data.unified.IdentityWebDavNotConfiguredException
+import moe.ouom.neriplayer.data.unified.sync.ConfiguredIdentityWebDavSync
+import moe.ouom.neriplayer.data.unified.sync.ConfiguredIdentityGitHubSync
+import moe.ouom.neriplayer.data.unified.sync.IdentityGitHubNotConfiguredException
+import moe.ouom.neriplayer.data.unified.sync.IdentityWebDavNotConfiguredException
 import moe.ouom.neriplayer.data.sync.unified.IdentitySyncConfigurationChangedException
 import moe.ouom.neriplayer.data.sync.unified.UnifiedIdentitySyncConflictException
 import moe.ouom.neriplayer.ui.screen.tab.settings.miuix.MiuixSettingsTextButton
+
+internal enum class IdentitySyncDestination { WEBDAV, GITHUB }
 
 private data class IdentitySyncSummary(val live: Int, val deleted: Int, val conflicts: Int, val excluded: Int,
     val localConflicts: Int, val pending: Boolean)
 
 /** Scope is cancelled when the settings page leaves composition; credentials never enter UI state. */
 @Composable
-internal fun SettingsIdentitySyncSection(configured: Boolean, onConfigure: () -> Unit) {
+internal fun SettingsIdentitySyncSection(configured: Boolean, onConfigure: () -> Unit,
+    destination: IdentitySyncDestination = IdentitySyncDestination.WEBDAV) {
     val context = LocalContext.current.applicationContext
     val scope = rememberCoroutineScope()
     var showConflicts by remember { mutableStateOf(false) }
@@ -53,7 +60,12 @@ internal fun SettingsIdentitySyncSection(configured: Boolean, onConfigure: () ->
                         busy = true;error = null;result = null
                         scope.launch {
                             try {
-                                val synced = ConfiguredIdentityWebDavSync(context, AppContainer.sharedOkHttpClient).synchronize()
+                                val synced = withContext(Dispatchers.IO) {
+                                    when (destination) {
+                                        IdentitySyncDestination.WEBDAV -> ConfiguredIdentityWebDavSync(context, AppContainer.sharedOkHttpClient).synchronize()
+                                        IdentitySyncDestination.GITHUB -> ConfiguredIdentityGitHubSync(context, AppContainer.sharedOkHttpClient).synchronize()
+                                    }
+                                }
                                 result = IdentitySyncSummary(synced.remote.liveRecordings, synced.remote.deletedRecordings,
                                     synced.remote.conflicts, synced.capture.excludedDeviceSources + synced.capture.excludedUnsupportedSources,
                                     synced.capture.journal.conflictingLocalGroups, synced.remote.pendingLocalChanges)
@@ -62,6 +74,7 @@ internal fun SettingsIdentitySyncSection(configured: Boolean, onConfigure: () ->
                                 if (failure is CancellationException) throw failure
                                 error = when (failure) {
                                     is IdentityWebDavNotConfiguredException -> CoreCommonR.string.unimusic_identity_sync_configure
+                                    is IdentityGitHubNotConfiguredException -> CoreCommonR.string.unimusic_identity_sync_configure_github
                                     is IdentitySyncConfigurationChangedException -> CoreCommonR.string.unimusic_identity_sync_changed
                                     is UnifiedIdentitySyncConflictException -> CoreCommonR.string.unimusic_identity_sync_racing
                                     else -> CoreCommonR.string.unimusic_identity_sync_failed
@@ -70,6 +83,7 @@ internal fun SettingsIdentitySyncSection(configured: Boolean, onConfigure: () ->
                         }
                     }
                 }) { Text(stringResource(if (configured) CoreCommonR.string.unimusic_identity_sync_action
+                    else if (destination == IdentitySyncDestination.GITHUB) CoreCommonR.string.unimusic_identity_sync_configure_github
                     else CoreCommonR.string.unimusic_identity_sync_configure)) }
             },
             colors = ListItemDefaults.colors(containerColor = Color.Transparent)

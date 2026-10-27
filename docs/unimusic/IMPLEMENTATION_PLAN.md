@@ -105,13 +105,9 @@
 
 ## Phase 3：本地推荐与同步
 
-3D.1已实现独立身份/因果合并/严格编码契约，4项JVM与Debug构建通过，见[3D.1](PHASE_3D1_PORTABLE_IDENTITY_CONTRACT.md)。3D.2已补持久dot原子日志和显式恢复门槛，新增3项/相关共7项JVM与构建通过，见[3D.2](PHASE_3D2_DURABLE_IDENTITY_JOURNAL.md)。3D.3已补只读Room批量身份捕获、私有本地基线与冲突/删除保护，10项定向JVM、构建通过，见[3D.3](PHASE_3D3_ROOM_IDENTITY_CAPTURE.md)。3D.4已补独立条件同步/WebDAV后台，4项合成JVM和构建通过，见[3D.4](PHASE_3D4_CONDITIONAL_IDENTITY_WEBDAV.md)。3D.5已补只读远端UUID到本地播放适配与过期修订保护，7项唯一JVM/最终构建通过，见[3D.5](PHASE_3D5_FOREIGN_UUID_PLAYBACK_ADAPTER.md)。3D.6已加WebDAV显式标识同步入口/配置代次保护，2项JVM与构建通过，见[3D.6](PHASE_3D6_MANUAL_IDENTITY_SYNC_ENTRY.md)。3D.7已补显式分页冲突选择与过期快照保护，3项JVM/构建通过，见[3D.7](PHASE_3D7_EXPLICIT_IDENTITY_CONFLICTS.md)。完整Room远端应用、GitHub身份传输及真实云上传/设备UI仍未验收，不标记完整同步验收。
+3A/3B/3C已交付本机暂不推荐/撤销/恢复、播放反馈及关闭/清除，实际Media3采样/异常耐久尚未验收。3D.1～3D.8已交付独立身份/因果合并、持久日志、只读Room捕获、本机基线、条件WebDAV/GitHub后台与手动入口、显式冲突及外来UUID适配，见[3D.8](PHASE_3D8_GITHUB_IDENTITY_SYNC.md)与续跑检查点。3D.7远端CI成功，3D.8新2项合成JVM/最终APK/边界通过。
 
-3B已接精确身份的本机播放反馈、私有有界事件存储与推荐v3，见 [3B报告](PHASE_3B_PLAYBACK_RECOMMENDATION_SIGNALS.md)。这是实现与合成验证，实际Media3采样/异常持久性未验收；旧统计不回推事件，反馈未进入独立UUID dataset同步。
-
-3A 已交付精确歌曲的本机暂不推荐、撤销与恢复，见 [3A报告](PHASE_3A_LOCAL_RECOMMENDATION_FEEDBACK.md)。没有 SKIP/COMPLETE/REPEAT 事件或独立 dataset 同步；持久偏好与每日缓存分开保存，不删除音乐库内容。
-
-推荐初版已接入首页；2F 完成北京时间日内快照、实际已桥接UUID、私有白名单JSON与删除过滤，未建立显式SKIP/DISLIKE/COMPLETE事件或新dataset同步。
+这仍是身份/元数据子集：不改旧同步路径，不上传反馈/凭据/设备路径/播放权，不自动重写Room本机ID、显示字段或完整歌单。真实服务器账号、双设备、旧客户端往返、设备UI和完整Room远端应用未验收，不标记完整Phase3交付。
 
 - 保留平台每日推荐/私人 FM/雷达入口；新增本地内容/规则排序、显式 SKIP/DISLIKE/COMPLETE/REPEAT 事件和去重汇总。
 - 每日快照保存 song UUID、栏目、理由、算法版本及来源标签；时间衰减、跳过降权、新颖性与歌手多样性，避免只推已熟悉歌曲。

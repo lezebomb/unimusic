@@ -1,42 +1,43 @@
 # UniMusic 续跑检查点
 
-更新：2026-10-28（Asia/Shanghai）。00:25 单次任务已触发并删除；05:30单次续跑也已触发并删除，未建立每日计划。额度重置后工具已恢复。接续本检查点，不重复工作。
+更新：2026-10-28（Asia/Shanghai）。00:25和05:30单次任务均已触发并删除，没有每日计划。05:30额度重置后工具已恢复，继续自主开发直到额度/外部阻塞，完成阶段commit并push；不重复旧阶段或已通过的无关测试。
 
-**最新用户要求：暂停 YouTube 取流排查，先开发其他部分。Google/网易云登录与既有两份 5 首导入保留，不重复登录或重新导入。** 2P 已证实 Google 服务端账号成功，YouTube 音频仍失败；旧文“下一步排查取流”已被最新用户优先级覆盖。
+**当前优先级：暂停YouTube取流排查，继续其他功能。** 保留已登录的Google/网易云及既有两份共5首导入，不重新登录/收验证码或重导全部歌单。YouTube实际音频仍未接通，其他来源/实际播放范围看2L/2M/2P报告，不扩大结论。
 
-最新3D.7：分页显式歌曲记录冲突选择、本机/同步/已有删除分支、全前沿因果确认、本机基线确认与过期日志/Room快照拒绝已完成，3项关键JVM/最终Debug APK/边界通过；见[3D.7](PHASE_3D7_EXPLICIT_IDENTITY_CONFLICTS.md)。只选择同步标识记录，不自动上传/不覆盖本机显示字段；无手机UI/真实云/双设备验收。下一步GitHub独立身份传输与入口。3D.6已推送`6cdf8732`。
+## 最新可接续状态
 
-最新3D.6：设置WebDAV卡片的显式“同步歌曲标识”入口、已有加密配置适配、请求前后配置代次复核与固定隐私文案已实现；2项关键JVM、最终Debug APK与边界通过，见[3D.6](PHASE_3D6_MANUAL_IDENTITY_SYNC_ENTRY.md)。没有实际调用用户配置、真实服务器/账号上传、手机安装/界面或双设备验收，不默认开启同步。冲突仅显示计数，选择界面仍待实现；下一步显式冲突处理和GitHub身份传输。3D.5已推送`bf4b881a`；最新CI另核对，旧run因后续提交取代取消不作通过声明。
+- 3D.1～3D.8完成独立歌曲标识契约、精确来源UUID别名、因果删除/冲突、持久dot日志、只读Room批量捕获、本机基线、WebDAV/GitHub条件同步后台及显式入口、冲突选择、外来UUID临播适配与修订复核。最新见[3D.8](PHASE_3D8_GITHUB_IDENTITY_SYNC.md)，代码以git log/status为准。
+- 这是身份/元数据子集；歌单仍走原同步，不上传推荐反馈/凭据/设备路径或可播权限。不自动启用云同步，不重写Room原ID、歌单关系和本机显示字段。Room仍v23，无新迁移。
+- 3D.8新2项合成HTTP/Debug/最终边界通过；结构超限已归类解决，最终日志`phase3d8-final-package-build.log`。3D.7[CI 40594234079](https://github.com/lezebomb/unimusic/actions/runs/40594234079)已成功，包含此前新增身份关键集；更新后的CI需另核对。被后续提交替代取消的旧run不能算失败或成功。
+- 下一步可优化按变更范围执行CI，避免无结构变更仍反复跑Android迁移；随后继续有价值后台/搜索优化。全库远端应用、真实双设备/旧客户端往返、真实GitHub/WebDAV账号上传与设备UI仍未验收。
 
-最新3D.5：精确别名只读映射本地歌曲、同文件修订缓存和UUID临播/缓存后复核已实现，7个唯一JVM通过，补保护后只重跑2个新检查；最终Debug与边界通过，见[3D.5](PHASE_3D5_FOREIGN_UUID_PLAYBACK_ADAPTER.md)。不搬动旧ID/关系，不应用跨设备删除，不新增播放权；无设备/真实音频/账号/双设备验收。下一步显式同步/冲突入口。3D.4已推送`6d686368`，3D.1/3D.2远端run被后续提交替代取消，不当成测试失败或成功，后续以最新CI为准。
+## 当前工具链与设备限制
 
-最新3D.4：独立条件同步协调器/WebDAV身份同目录专用文件已完成，强ETag/创建条件头、412有界重读合并和pending本地变化保护，4项定向JVM/最终Debug APK/边界通过；见[3D.4](PHASE_3D4_CONDITIONAL_IDENTITY_WEBDAV.md)。仅合成HTTP，未真实账号/云上传/UI/Room应用；没有开启同步或动旧同步文件。下一步只读UUID别名到现有本地歌曲的播放适配，然后显式同步/冲突入口。3D.3已推送`f6f91686`。
+复用项目JDK17 `.gradle-home/jdks/jdk-17.0.20.1+1`、`.android-sdk`和用户Gradle缓存；API37.0/BuildTools37/NDK27.0.12077973/CMake3.31.6已安装。`tools_pub/unimusic/build_android.ps1 -GradleArgs ... --offline`可构建，不重复下载，不重做Phase0。本机无JDK21；3B延期的两个旧runtime检查已在远端JDK21上通过，不改写本机未执行记录。
 
-最新3D.3：Room分页只读快照、一次批量日志写与本地基线、远端编辑保护/删除抑制、冲突报告和AppContainer lazy入口已完成，新增3项/共10项定向JVM、最终Debug APK与边界通过；见[3D.3](PHASE_3D3_ROOM_IDENTITY_CAPTURE.md)。Room仍v23，无自动启动、实际用户库捕获、生产上传或远端Room应用。设备安装/账号/音频未重做。下一步独立条件远端写与冲突重试，然后Room别名投影。3D.2已推送`54802520`。
+此前连接Mate60；3B最后设备测试为合成反馈落盘，播放器暂停。3C三次覆盖安装被华为系统中止，之后不重复尝试，所以3C及3D新UI/新APK未安装/验收。不要清数据、卸载、重登录或重复输入系统验证。手机密码、联系方式、验证码、Cookie只按原授权本地使用，不能写进日志/文档/Git。
 
-最新3D.2：持久actor/counter原子日志、重开与同进程多实例串行、严格导入/导出和显式恢复门槛已实现。新增3项/受影响4项共7项JVM、最终Debug APK与模块边界通过，见[3D.2](PHASE_3D2_DURABLE_IDENTITY_JOURNAL.md)。未接生产Room应用/上传、无设备安装、跨进程或断电验收。下一步只读Room批量快照和本地基线，避免重复覆盖远端编辑。3D.1已推送`cbcce273`，远端结果另核对。
+## 本轮完成的开发阶段
 
-最新05:30阶段：3D.1已实现独立精确身份同步契约、UUID别名/因果删除合并与严格白名单编码，4个JVM、最终Debug APK和边界通过，见[3D.1报告](PHASE_3D1_PORTABLE_IDENTITY_CONTRACT.md)。尚未接生产网络/Room应用，仍不等于完整UUID同步。3C的[远端CI](https://github.com/lezebomb/unimusic/actions/runs/40564167581)已确认成功。下一步实现持久dot原子日志，然后接快照/别名投影；暂不重复安装手机或重做账号。
+| 阶段 | 提交 | 实际关键验证 |
+| --- | --- | --- |
+| 4A 双标签/我的入口 | `9bb6fe89` | 7 JVM、APK、Mate60导航 |
+| 3A 隐藏/撤销/恢复推荐 | `be36116e` | 3 JVM、APK、Mate60流程 |
+| 1D 可选已关联歌单每日刷新 | `35ed256a` | 3 JVM、APK、Mate60调度1项；最终关闭 |
+| 4B 本地搜索后台化 | `1ad712db` | 7 JVM、APK、Mate60搜索 |
+| 4C UniMusic名称/图标/构建版本 | `c8211f95` | 3 JVM、APK、Mate60关于页 |
+| 3B SKIP/COMPLETE/REPEAT本机反馈 | `38707973` | 7 JVM、APK、设备合成存储1项；无真实采样验收 |
+| 3C 反馈关闭/清除 | `f0606947` | 3 JVM、APK；设备安装中止，新UI未验收 |
+| 3D.1 身份/因果合并/编码 | `cbcce273` | 4 JVM、APK |
+| 3D.2 持久actor/counter日志 | `54802520` | 新3项/相关共7 JVM、APK |
+| 3D.3 只读Room批量捕获 | `f6f91686` | 新3项/相关共10 JVM、APK |
+| 3D.4 条件WebDAV后台 | `6d686368` | 4 JVM、APK；仅合成HTTP |
+| 3D.5 外来UUID本地适配 | `bf4b881a` | 7唯一JVM、补保护后重查2项、最终APK |
+| 3D.6 显式入口/配置guard | `6cdf8732` | 2 JVM、APK；无真实账号/UI |
+| 3D.7 显式冲突选择 | `a76c7612` | 3 JVM、APK；无真实账号/UI |
+| 3D.8 GitHub标识同步/入口 | 本检查点提交 | 2 JVM、最终APK/边界；无真实账号/UI |
 
-Phase 4A 已完成“发现／我的”两标签、我的导入/历史/下载/统计入口、设置与调试入口及父子返回兼容。7 个定向 JVM 检查、Debug APK 和模块边界通过；Mate60 数据保留覆盖安装、搜索/设置返回、下载进出及导入弹层开关通过。没有重新验收账号、音频、平板或性能，详见 [4A报告](PHASE_4A_DISCOVER_AND_MY_LIBRARY.md)。APK/哈希、7项 XML 与设备检查保存在 `evidence/2026-10-28/phase4a/`。本阶段已推送；每个完成阶段 commit/push 后接着推进。
-
-Phase 3A 也已完成：精确歌曲30天暂不推荐、撤销和恢复全部隐藏，摘要/期限本机原子保存、过期与旧撤销保护；3个关键JVM、最终Debug构建、边界及Mate60隐藏/撤销/进程重开/恢复通过，播放器保持暂停，测试偏好最终清空。实际范围见 [3A报告](PHASE_3A_LOCAL_RECOMMENDATION_FEEDBACK.md)，不是SKIP/COMPLETE/REPEAT或跨设备同步。4A已推送 `9bb6fe89`，其[CI](https://github.com/lezebomb/unimusic/actions/runs/40543256303)已确认成功。3A已推送 `be36116e`，其[CI](https://github.com/lezebomb/unimusic/actions/runs/40545377816)已确认成功。
-
-Phase 1D已完成已关联歌单的可选每日刷新，默认关闭。3个直接相关JVM、主/测试APK、模块边界、Mate60一个调度测试及入口检查通过；仅健康完成的关联歌单自动刷新，不重启取消/失败/暂停，也不关联一次性导入。设备开关最终关闭，没有进行真实远端刷新或等待24小时；见 [1D报告](PHASE_1D_OPTIONAL_LINKED_REFRESH.md) 与 `evidence/2026-10-28/phase1d/`。1D已推送 `35ed256a`，其[CI](https://github.com/lezebomb/unimusic/actions/runs/40547749753)已确认成功，保留全部账号和库数据。
-
-Phase 4B已把本地歌单匹配与艺人构建/筛选/排序移后台，120ms去抖、取消过期查询、每快照复用单个艺人索引，无关键词歌单立即恢复；7个定向JVM、Debug构建、模块边界及Mate60搜索/清空/分类检查通过。没有大库性能数字或新的音频验收，见 [4B报告](PHASE_4B_BACKGROUND_LIBRARY_SEARCH.md)。4B已提交推送 `1ad712db`，以实际CI状态为准。
-
-Phase 4C已完成UniMusic名称与Debug覆盖、原创U音符启动图标、自己的源码与独立上游入口/GPL署名，并修复版本no_commit问题。3个构建Git检查、最终APK/边界和Mate60关于页/目视图标/返回检查通过，见 [4C报告](PHASE_4C_PROJECT_IDENTITY.md) 及 [包名签名说明](PACKAGE_AND_SIGNING.md)。APK为实际基础Git修订+dirty的工作树构建；无Release/新包名迁移或Android13真机图标结论。下一步完善推荐所需的真实SKIP/COMPLETE/REPEAT反馈，先核对现有PlaybackStatsTracker与用户操作入口，避免把取流失败或拖动进度误记为不喜欢。
-
-Phase 3B已完成本机播放反馈实现、精确摘要有界存储与推荐规则v3，7个定向JVM、主/测试APK、模块边界、Mate60合成存储测试1项通过，见 [3B报告](PHASE_3B_PLAYBACK_RECOMMENDATION_SIGNALS.md)。真机仅验证合成队列/落盘/去重/清理，未验证实际Media3 SKIP/COMPLETE/REPEAT；不把构建或合成事件当真实播放。2个旧Runtime约定本机因缺JDK21未执行，已交给有JDK21的CI；最终构建日志 `phase3b-final-maintenance-build.log`，原始证据 `evidence/2026-10-28/phase3b/`。Room23不变、账号/歌单保留、测试键清理、播放器暂停。前5阶段CI均已成功；3B要按实际新run确认。
-
-下一步先看3B远端结果，继续完善推荐反馈的用户控制/后续价值事项；实际媒体采样、极端时序、性能和独立UUID dataset同步仍未验收。4C已推送 `c8211f95`。
-
-Phase 3B已提交推送`38707973`；远端[CI](https://github.com/lezebomb/unimusic/actions/runs/40562535680)截至本次记录仍运行，两个需要JDK21的旧runtime测试不能标成本地通过。
-
-Phase 3C已实现发现页推荐偏好、关闭学习与独立清除播放信号、持久开关/旧排队水位和采样周期复位，3个JVM、最终Debug构建与模块边界通过，见[3C报告](PHASE_3C_RECOMMENDATION_PRIVACY_CONTROLS.md)。本阶段Mate60覆盖安装被系统中止3次，新APK/界面未验收，原版本仍可打开且未清理数据；不要重复尝试安装或重做账号。下一轮若需要设备验证先核对系统安装条件。先继续不依赖设备的功能；按用户要求保存检查点、阶段commit/push。
-
-Phase 3C已推送`f0606947`，其CI运行`40564167581`仍待最终结果。3B远端[CI](https://github.com/lezebomb/unimusic/actions/runs/40562535680)现已确认成功，包含此前本机缺JDK21而延期的两个旧runtime测试；不改写本机未执行记录。下一阶段源码接入梳理见[3D接续设计](PHASE_3D_SYNC_HANDOFF.md)，仅设计、未导出统一库或推荐数据。现有dataset只承载旧播放统计，不能声称UUID数据集已上线。05:30任务仍为单次，触发后删除，不新建每日计划。
+各阶段报告及`evidence/2026-10-28/phase*/validation.json`给出确切日志/哈希/XML和未执行项；不把构建/合成检查当真实音频或性能验收。以下保留较早历史，仅用于接续，不覆盖上述当前状态。
 
 ## 历史阶段（以最新用户优先级和上述状态为准）
 
