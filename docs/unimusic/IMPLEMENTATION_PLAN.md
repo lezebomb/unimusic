@@ -63,6 +63,8 @@
 
 ## Phase 2：统一搜索与高精度匹配
 
+2X隔离播放候选内部超时/取消/解析错误并继续备用，原生并行源即使自行取消也报告完成；父取消与严格门槛保持。新4/共11项JVM、Debug通过，见[2X](PHASE_2X_SOURCE_FAILURE_ISOLATION.md)。真实故障切源/音频未验收。
+
 2W新增可展开的每源本批次搜索耗时与明确超时分类，7项JVM、Debug通过，见[2W](PHASE_2W_SEARCH_TIMINGS.md)。虚拟时序不是线上速度，实际UI/计时待真机验收。
 
 2V复用不可变查询规范化/分词，内层评分去掉中间列表；7项关键JVM及Debug通过，见[2V](PHASE_2V_PREPARED_SEARCH_QUERY.md)。未测真实CPU/网络性能，不更改匹配阈值。

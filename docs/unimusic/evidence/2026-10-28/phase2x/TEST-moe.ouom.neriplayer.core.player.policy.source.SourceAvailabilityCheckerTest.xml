@@ -1,0 +1,10 @@
+<?xml version='1.0' encoding='utf-8'?>
+<testsuite name="moe.ouom.neriplayer.core.player.policy.source.SourceAvailabilityCheckerTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-10-27T23:53:09.661Z" hostname="local" time="0.075">
+  <properties />
+  <testcase name="timeoutCancelsTheRequestAndCallerCancellationPropagates" classname="moe.ouom.neriplayer.core.player.policy.source.SourceAvailabilityCheckerTest" time="0.052" />
+  <testcase name="capabilityIdentityAndRecordingGatesNeverResolveAnAudioUrl" classname="moe.ouom.neriplayer.core.player.policy.source.SourceAvailabilityCheckerTest" time="0.006" />
+  <testcase name="anAdaptersOwnTimeoutIsACompletedCheckRatherThanACancelledCaller" classname="moe.ouom.neriplayer.core.player.policy.source.SourceAvailabilityCheckerTest" time="0.005" />
+  <testcase name="resultsAreTransientAndChangedContextWinsOverAnOldSuccess" classname="moe.ouom.neriplayer.core.player.policy.source.SourceAvailabilityCheckerTest" time="0.012" />
+  <system-out />
+  <system-err />
+</testsuite>

@@ -10,6 +10,48 @@ import org.junit.Assert.*
 import org.junit.Test
 
 class PlaybackSourceResolverTest {
+    @Test fun anAdaptersOwnTimeoutOrExceptionAdvancesToTheNextCandidate() = runTest {
+        val cooldown = SourceFailureCooldown { testScheduler.currentTime }
+        val result = PlaybackSourceResolver(cooldown).resolve("song", flowOf(
+            PlaybackSourceCandidate<String>("inner-timeout", true) { withTimeout(10) { delay(9000);SourceAttempt.Ready("late") } },
+            PlaybackSourceCandidate<String>("broken-parser", true) { throw IllegalArgumentException("fixture") },
+            PlaybackSourceCandidate("good", true) { SourceAttempt.Ready("audio") }
+        ))
+        assertEquals("audio", result.value)
+        assertEquals(listOf(SourceFailure.TIMEOUT, SourceFailure.UNAVAILABLE), result.failures)
+        assertEquals(10L, testScheduler.currentTime)
+        assertTrue(cooldown.cooling("song", "inner-timeout"))
+    }
+
+    @Test fun aSelfCancelledParallelSourceCannotLeaveTheReceiverWaitingForItsMissingResult() = runTest {
+        val result = racePlaybackSources<String>(listOf(
+            { kotlinx.coroutines.currentCoroutineContext()[kotlinx.coroutines.Job]!!.cancel();kotlinx.coroutines.awaitCancellation() },
+            { delay(10);null }
+        ))
+        assertNull(result)
+        assertEquals(10L, testScheduler.currentTime)
+        var loserStopped = false
+        assertEquals("audio", racePlaybackSources(listOf(
+            { try { delay(9000);"late" } finally { loserStopped = true } },
+            { delay(5);"audio" }
+        )))
+        assertTrue(loserStopped)
+        assertEquals(15L, testScheduler.currentTime)
+    }
+
+    @Test fun parallelRaceStillPropagatesCallerCancellationAndStopsEveryChild() = runTest {
+        var stopped = 0
+        var cancelled = false
+        try {
+            withTimeout(5) { racePlaybackSources(List(2) {
+                suspend { try { delay(9000);"late" } finally { stopped++ } }
+            }) }
+        } catch (_: CancellationException) { cancelled = true }
+        assertTrue(cancelled)
+        assertEquals(2, stopped)
+        assertEquals(5L, testScheduler.currentTime)
+    }
+
     @Test fun firstSuccessStopsDiscoveryAndSkipsIneligibleAudio() = runTest {
         var blockedCalls = 0
         var lateCalls = 0

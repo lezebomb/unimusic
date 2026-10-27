@@ -1,0 +1,31 @@
+{
+  "phase": "2X",
+  "date": "2026-10-28",
+  "jvm": [
+    {
+      "suite": "PlaybackSourceResolverTest",
+      "tests": 7,
+      "failures": 0,
+      "errors": 0
+    },
+    {
+      "suite": "SourceAvailabilityCheckerTest",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0
+    }
+  ],
+  "newTests": 4,
+  "build": "Debug passed; phase2x-isolated-source-failures.log",
+  "timing": "Virtual time only; no live source latency",
+  "apk": {
+    "path": "app/build/outputs/apk/debug/app-debug.apk",
+    "sha256": "d79392d0bf3b8a62687f8478f49b37a759549101b0fa562ca9799356cbe477a6",
+    "bytes": 62992375
+  },
+  "notRun": [
+    "new APK device installation",
+    "actual network failover/audio",
+    "new account acceptance"
+  ]
+}

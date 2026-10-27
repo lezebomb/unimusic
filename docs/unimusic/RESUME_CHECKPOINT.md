@@ -6,26 +6,25 @@
 
 ## 最新可接续状态
 
-- 2W新增可展开的每源搜索耗时（单调时钟、仅内存，含排队/元数据，不是音频），明确Socket/酷我内部超时分类；新1/共7项JVM、Debug通过，见[2W](PHASE_2W_SEARCH_TIMINGS.md)。2V已推送`5747d7b6`。下一步隔离播放适配器内部取消/超时，避免中断其他备用候选或等待失去发送方的并行结果；无新设备/真实网络耗时/音频验收。
+05:30续跑阶段均按下表报告接续，实际提交以git log/status为准。00:25/05:30单次计划已删除，无每日任务。下面“历史阶段”仅保留证据，不覆盖本节状态。
 
-- 2V已复用不可变查询分词并消除每词候选评分中间列表；7项关键JVM、Debug通过，见[2V](PHASE_2V_PREPARED_SEARCH_QUERY.md)。无CPU/内存基准或新设备/网络/音频验收。2U已推送`d0516d8f`，下一步检查各源预算/取消与失败状态是否一致，不重做已完成的取流排查。
+| 最新阶段 | 实际验证与边界 |
+| --- | --- |
+| [2X播放失败隔离](PHASE_2X_SOURCE_FAILURE_ISOLATION.md) | 新4/共11 JVM、Debug通过；内部超时继续候选，自取消并行源也报告完成，真实父取消仍传播；无新真机音频 |
+| [2W来源搜索耗时](PHASE_2W_SEARCH_TIMINGS.md) `3c8c9255` | 新1/共7 JVM、Debug；单调计时可展开，仅内存，含排队/元数据，不含音频；新UI未装机 |
+| [2V复用查询](PHASE_2V_PREPARED_SEARCH_QUERY.md) `5747d7b6` | 7 JVM、Debug；复用分词、减少中间列表；无CPU/网络基准 |
+| [2U证据并发排序](PHASE_2U_CURRENT_SEARCH_EVIDENCE.md) `d0516d8f` | 新2/共10 JVM、Debug；防旧证据排序回填及比较器时间变化 |
+| [4E设备检查](PHASE_4E_DEVICE_FEATURE_CHECK.md) `359aaa2a` | Mate60保留数据安装最终2T包；推荐偏好、GitHub/WebDAV标识入口、0冲突页；schema1本机21条标识/修订，未上传 |
+| [2T选择性重试](PHASE_2T_SELECTIVE_SEARCH_RETRY.md) `a9b81a4d` | 8 JVM、Debug；健康翻页/失败重试分离、无新增分页保护、内部超时终止；远端CI40602604349成功 |
+| [2S排序计算/键](PHASE_2S_DISCOVERY_RANKING_AND_KEYS.md) `98acab4a` | 7 JVM、Debug；远端CI40600830129成功 |
+| [2R原唱版本门槛](PHASE_2R_EXPLICIT_VERSION_AND_VOICE_GATES.md) `d9a0ce13` | 8 JVM、Debug；AI/显式版本证据、自动来源证据v3；旧CI被新提交替代取消 |
+| [2Q后台搜索调度](PHASE_2Q_AGGREGATE_SEARCH_SCHEDULING.md) `ba64d3c5` | 6 JVM、Debug；本地独立任务、5在线槽、本地索引/分页后台缓存；CI40598352766成功 |
+| [4D定向CI](PHASE_4D_CHANGED_SCOPE_CI.md) `f7202cba` | 保守身份白名单与结构迁移路由；CI40596819578成功，2T实际跳过无关Android迁移 |
+| [3D.8 GitHub标识同步](PHASE_3D8_GITHUB_IDENTITY_SYNC.md) `7d1c2879` | 新2项合成HTTP、Debug；前序3D.1～.7身份/因果/持久日志/只读Room捕获/WebDAV/冲突选择/外来UUID适配见各报告；CI覆盖后续已成功 |
 
-- 2U已修复聚合元数据与可播探测交错时旧排序覆盖，查询替换拒绝旧回填；比较器使用本轮固定证据等级。新增2/共10项JVM、Debug通过，见[2U](PHASE_2U_CURRENT_SEARCH_EVIDENCE.md)。4E已推送`359aaa2a`；本阶段APK未装机，无新网络/音频验收。下一步复用查询分词和消除匹配中间列表。
+Room仍v23，无destructive migration。标识同步是身份/元数据子集，歌单仍走原同步；不上传反馈/凭据/设备路径/播放权，不重写Room本机ID、关系或显示字段。真实GitHub/WebDAV上传、双设备/旧客户端往返、完整远端库应用、外来UUID音频、真实Media3反馈采样未验收。最后设备验证为4E的2T包，2U起新APK没有安装。实际来源播放仍看2L/2M/2P，不把编译/模拟计时/地址返回当真实音频或性能。
 
-- 4E已在Mate60保留数据安装最终2T APK，核对推荐偏好、GitHub/WebDAV标识入口与0冲突页；本机捕获schema1、21条来源标识/修订，未上传、未清除/切换偏好、结束无媒体播放。见[4E](PHASE_4E_DEVICE_FEATURE_CHECK.md)。2T远端CI40602604349成功，2S也成功。下一步修复来源批次与可播证据并发排序的一致性。
-
-- 最新2T分离健康翻页/失败源显式重试，停止无新增身份的自动分页循环，补来源内部timeout终止状态；8项JVM、最终Debug/边界通过，见[2T](PHASE_2T_SELECTIVE_SEARCH_RETRY.md)。2S已推送`98acab4a`。尚无新设备UI/真实网络/播放验收；只读ADB显示设备连接、无媒体播放、App可见。可做一次有明确流程修正的安装检查（不要盲目重试或在系统验证页消失后再发确认键），成功后只检查必要UI，保留队列/全部数据。
-
-- 最新2S已预计算候选排序证据、长度前缀编码歌曲搜索键，7项相关JVM/最终Debug/边界通过，见[2S](PHASE_2S_DISCOVERY_RANKING_AND_KEYS.md)。没有实际设备/性能/账号/音频验收；自动门槛和v3证据不变。下一步分离健康来源翻页和失败来源重试。2R已推送`d9a0ce13`。
-
-- 最新2R已补显式AI/合成人声与原歌名含版本词时的标签掩盖保护，自动来源证据v3使旧自动缓存重新验证，手动确认/拒绝及数据保留；最终8项JVM、Debug与边界通过，见[2R](PHASE_2R_EXPLICIT_VERSION_AND_VOICE_GATES.md)。没有声纹/听辨或真实设备/账号/播放验收，Room仍v23。下一步优化发现排名的重复计算与搜索键隔离。2Q已推送`ba64d3c5`。
-
-- 最新2Q已把发现聚合的本地等待/扫描/去重/索引/排序移后台，分离本地任务与5个在线槽，并缓存本地分页排名；新2项/共6项JVM、最终Debug与边界通过，见[2Q](PHASE_2Q_AGGREGATE_SEARCH_SCHEDULING.md)。虚拟时间不代表线上性能，无设备/账号/音频新验收。原唱/版本门槛未放宽，下一步保守匹配改进。4D已推送`f7202cba`，新CI状态另确认。
-
-- 3D.1～3D.8完成独立歌曲标识契约、精确来源UUID别名、因果删除/冲突、持久dot日志、只读Room批量捕获、本机基线、WebDAV/GitHub条件同步后台及显式入口、冲突选择、外来UUID临播适配与修订复核。最新见[3D.8](PHASE_3D8_GITHUB_IDENTITY_SYNC.md)，代码以git log/status为准。
-- 这是身份/元数据子集；歌单仍走原同步，不上传推荐反馈/凭据/设备路径或可播权限。不自动启用云同步，不重写Room原ID、歌单关系和本机显示字段。Room仍v23，无新迁移。
-- 3D.8新2项合成HTTP/Debug/最终边界通过；结构超限已归类解决，最终日志`phase3d8-final-package-build.log`。3D.7[CI 40594234079](https://github.com/lezebomb/unimusic/actions/runs/40594234079)已成功，包含此前新增身份关键集；更新后的CI需另核对。被后续提交替代取消的旧run不能算失败或成功。
-- 4D已实现保守CI范围选择，4个边界案例、两个真实Git范围、未知回退及YAML解析通过；见[4D](PHASE_4D_CHANGED_SCOPE_CI.md)。路由自身变更仍跑完整基线/迁移，实际远端新run和耗时待确认。没有重构建产品；3D.8已推送`7d1c2879`。下一步继续有价值后台/搜索优化。全库远端应用、真实双设备/旧客户端往返、真实GitHub/WebDAV账号上传与设备UI仍未验收。
+下一步：将在线搜索页解析/拼音排名移离UI线程（网易云和B站仍在IO返回后于调用线程处理），保留取消/账号复核；随后按实际证据继续有价值优化。复用已装工具链，不重做测试/下载或重新登录。
 
 ## 当前工具链与设备限制
 

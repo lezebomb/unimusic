@@ -1,9 +1,8 @@
 package moe.ouom.neriplayer.core.player.url
 
 import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withTimeoutOrNull
 import moe.ouom.neriplayer.core.player.PlayerManager
 import moe.ouom.neriplayer.core.player.host.PlayerDependencies
@@ -58,7 +57,7 @@ internal suspend fun PlayerManager.resolveNativeCatalogPlayback(song: SongItem, 
     resolverSideEffects: RefreshResolverSideEffects): SongUrlResult {
     val primary = try {
         withTimeoutOrNull(sourceStageBudgetMs(3_000, 5_000).coerceAtLeast(1)) { resolveNativeCatalogSource(song, candidate) }
-    } catch (cancelled: CancellationException) { throw cancelled }
+    } catch (cancelled: CancellationException) { currentCoroutineContext().ensureActive();null }
     catch (_: Exception) { null }
     if (primary is SourceAttempt.Ready) return primary.value
     if (neteaseAutoSourceSwitchEnabled) tryResolveNativeCatalogAlternate(song, resolverSideEffects)?.let { return it }
@@ -78,37 +77,27 @@ internal suspend fun PlayerManager.tryResolveNativeCatalogAlternate(song: SongIt
     val stageBudget = sourceStageBudgetMs(3_800, 4_500)
     if (stageBudget <= 0) return null
     return withTimeoutOrNull(stageBudget) {
-        coroutineScope {
-            val results = Channel<SongUrlResult.Success?>(2)
-            val repositories = PlayerDependencies.repositories
-            val backend = SourceMatchBackend(application)
-            val providers = listOf(repositories.qqMusicAudioClient, repositories.kuwoCatalogProvider)
-            val jobs = providers.map { provider -> launch {
-                var winner: SongUrlResult.Success? = null
-                try {
-                    val session = sourceResolutionSession(provider.providerId)
-                    val tracks = withTimeoutOrNull(1_200) { provider.search(song.recordingMetadata().title, null, 12).tracks }.orEmpty()
-                    val choice = automaticCatalogChoice(song.recordingMetadata(), tracks,
-                        sourceCandidateForSong(song)?.key)
-                    if (choice != null && !RememberedSourceState.cooldown.cooling(song.stableKey(), choice.key.toString())) {
-                        val stamp = backend.decisionStamp(song, choice.key)
-                        if (stamp.decision == SourceMatchDecision.NONE) {
-                            val attempt = withTimeoutOrNull(2_600) { resolveSourceCandidate(song, choice, sideEffects, automatic = true) }
-                            if (attempt is SourceAttempt.Ready && session == sourceResolutionSession(provider.providerId) &&
-                                neteaseAutoSourceSwitchEnabled && isPlaybackNetworkUsable(application)) {
-                                val stored = backend.rememberAutomatic(song, choice, stamp)
-                                if (stored != null) winner = attempt.value.copy(cacheKeyOverride = "match-${stored.id}-${attempt.value.cacheKeyOverride}")
-                            } else RememberedSourceState.cooldown.reject(song.stableKey(), choice.key.toString())
-                        }
-                    }
-                } catch (cancelled: CancellationException) { throw cancelled }
-                catch (_: Exception) { /* One failed provider must not cancel the other. */ }
-                results.send(winner)
-            } }
-            try {
-                repeat(jobs.size) { results.receive()?.let { return@coroutineScope it } }
-                null
-            } finally { jobs.forEach { it.cancel() } }
-        }
+        val repositories = PlayerDependencies.repositories
+        val backend = SourceMatchBackend(application)
+        val providers = listOf(repositories.qqMusicAudioClient, repositories.kuwoCatalogProvider)
+        racePlaybackSources(providers.map { provider -> suspend {
+            var winner: SongUrlResult.Success? = null
+            val session = sourceResolutionSession(provider.providerId)
+            val tracks = withTimeoutOrNull(1_200) { provider.search(song.recordingMetadata().title, null, 12).tracks }.orEmpty()
+            val choice = automaticCatalogChoice(song.recordingMetadata(), tracks,
+                sourceCandidateForSong(song)?.key)
+            if (choice != null && !RememberedSourceState.cooldown.cooling(song.stableKey(), choice.key.toString())) {
+                val stamp = backend.decisionStamp(song, choice.key)
+                if (stamp.decision == SourceMatchDecision.NONE) {
+                    val attempt = withTimeoutOrNull(2_600) { resolveSourceCandidate(song, choice, sideEffects, automatic = true) }
+                    if (attempt is SourceAttempt.Ready && session == sourceResolutionSession(provider.providerId) &&
+                        neteaseAutoSourceSwitchEnabled && isPlaybackNetworkUsable(application)) {
+                        val stored = backend.rememberAutomatic(song, choice, stamp)
+                        if (stored != null) winner = attempt.value.copy(cacheKeyOverride = "match-${stored.id}-${attempt.value.cacheKeyOverride}")
+                    } else RememberedSourceState.cooldown.reject(song.stableKey(), choice.key.toString())
+                }
+            }
+            winner
+        } })
     }
 }

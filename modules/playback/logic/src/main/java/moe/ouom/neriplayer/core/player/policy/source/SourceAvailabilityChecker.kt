@@ -2,6 +2,9 @@ package moe.ouom.neriplayer.core.player.policy.source
 
 import java.io.IOException
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.TimeoutCancellationException
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withTimeoutOrNull
 import moe.ouom.neriplayer.data.model.unified.*
 
@@ -47,7 +50,10 @@ class SourceAvailabilityChecker(private val now: () -> Long = System::currentTim
                 }
             } ?: SourceCheckStatus.TIMED_OUT
         } catch (cancelled: CancellationException) {
-            throw cancelled
+            currentCoroutineContext().ensureActive()
+            if (cancelled is TimeoutCancellationException) SourceCheckStatus.TIMED_OUT else SourceCheckStatus.UNAVAILABLE
+        } catch (_: java.net.SocketTimeoutException) {
+            SourceCheckStatus.TIMED_OUT
         } catch (_: IOException) {
             SourceCheckStatus.NETWORK
         } catch (_: Exception) {

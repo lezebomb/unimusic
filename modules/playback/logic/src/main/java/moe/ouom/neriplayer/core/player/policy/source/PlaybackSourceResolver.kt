@@ -2,6 +2,9 @@ package moe.ouom.neriplayer.core.player.policy.source
 
 import java.util.LinkedHashMap
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.TimeoutCancellationException
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.withTimeoutOrNull
@@ -67,9 +70,14 @@ class PlaybackSourceResolver(private val cooldown: SourceFailureCooldown = Sourc
                     withTimeoutOrNull(candidateBudgetMs) { candidate.resolve() }
                         ?: SourceAttempt.Rejected(SourceFailure.TIMEOUT)
                 } catch (cancelled: CancellationException) {
-                    throw cancelled
+                    currentCoroutineContext().ensureActive()
+                    SourceAttempt.Rejected(if (cancelled is TimeoutCancellationException) SourceFailure.TIMEOUT else SourceFailure.UNAVAILABLE)
+                } catch (_: java.net.SocketTimeoutException) {
+                    SourceAttempt.Rejected(SourceFailure.TIMEOUT)
                 } catch (_: java.io.IOException) {
                     SourceAttempt.Rejected(SourceFailure.NETWORK)
+                } catch (_: Exception) {
+                    SourceAttempt.Rejected(SourceFailure.UNAVAILABLE)
                 }
                 when (attempt) {
                     is SourceAttempt.Ready -> { selected = attempt.value; selectedId = candidate.id; true }

@@ -16,6 +16,14 @@ class SourceAvailabilityCheckerTest {
     private val candidate = RecordingSourceCandidate(SongSourceKey("bilibili", "10", "11"),
         UnifiedSongMetadata("晴天", "周杰伦", "叶惠美", 269_000))
 
+    @Test fun anAdaptersOwnTimeoutIsACompletedCheckRatherThanACancelledCaller() = runTest {
+        val result = checker.check(expected, candidate, true, true, false) {
+            kotlinx.coroutines.withTimeout(10) { kotlinx.coroutines.awaitCancellation() }
+        }
+        assertEquals(SourceCheckStatus.TIMED_OUT, result.status)
+        assertEquals(10L, testScheduler.currentTime)
+    }
+
     @Test fun capabilityIdentityAndRecordingGatesNeverResolveAnAudioUrl() = runTest {
         suspend fun refused(value: RecordingSourceCandidate, status: SourceCheckStatus,
             enabled: Boolean = true, online: Boolean = true, rejected: Boolean = false) {
