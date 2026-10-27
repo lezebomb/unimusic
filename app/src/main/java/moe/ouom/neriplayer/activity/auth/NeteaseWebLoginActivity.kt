@@ -172,7 +172,9 @@ class NeteaseWebLoginActivity : ComponentActivity() {
             val status = insets.getInsets(WindowInsetsCompat.Type.statusBars())
             val nav = insets.getInsets(WindowInsetsCompat.Type.navigationBars())
             appBar.updatePadding(top = status.top)
-            webView.updatePadding(bottom = nav.bottom)
+            // Shrink the measured viewport; WebView padding alone clips fixed HTML consent buttons.
+            root.updatePadding(bottom = nav.bottom)
+            webView.updatePadding(bottom = 0)
             insets
         }
 
@@ -292,7 +294,7 @@ class NeteaseWebLoginActivity : ComponentActivity() {
             val currentRequest = request ?: return false
             val uri = currentRequest.url
             if (!isAllowedMainFrameRequest(currentRequest) { isAllowedLoginUri(it) }) {
-                NPLogger.w("NERI-NeteaseLogin", "Blocked unexpected navigation: $uri")
+                NPLogger.w("NERI-NeteaseLogin", "Blocked unexpected login navigation")
                 return true
             }
             if (currentRequest.isForMainFrame) {
@@ -335,7 +337,7 @@ class NeteaseWebLoginActivity : ComponentActivity() {
                 NPLogger.w(
                     LOG_TAG,
                     "Web error main=${request?.isForMainFrame} " +
-                        "code=${error?.errorCode} desc=${error?.description} url=${request?.url}"
+                        "code=${error?.errorCode}"
                 )
             }
         }
@@ -350,8 +352,7 @@ class NeteaseWebLoginActivity : ComponentActivity() {
                 NPLogger.w(
                     LOG_TAG,
                     "HTTP error main=${request?.isForMainFrame} " +
-                        "status=${errorResponse?.statusCode} reason=${errorResponse?.reasonPhrase} " +
-                        "url=${request?.url}"
+                        "status=${errorResponse?.statusCode}"
                 )
             }
         }
@@ -360,15 +361,8 @@ class NeteaseWebLoginActivity : ComponentActivity() {
     private inner class InnerChromeClient : WebChromeClient() {
 
         override fun onConsoleMessage(consoleMessage: ConsoleMessage?): Boolean {
-            val message = consoleMessage ?: return super.onConsoleMessage(consoleMessage)
-            val logMessage = "Console ${message.messageLevel()} " +
-                "${message.sourceId()}:${message.lineNumber()} ${message.message().compactForLog()}"
-            when (message.messageLevel()) {
-                ConsoleMessage.MessageLevel.ERROR -> NPLogger.e(LOG_TAG, logMessage)
-                ConsoleMessage.MessageLevel.WARNING -> NPLogger.w(LOG_TAG, logMessage)
-                else -> NPLogger.d(LOG_TAG, logMessage)
-            }
-            return super.onConsoleMessage(consoleMessage)
+            // Login pages may include account details or codes in console output; consume it locally.
+            return true
         }
     }
 
@@ -397,16 +391,6 @@ class NeteaseWebLoginActivity : ComponentActivity() {
             return true
         }
         return hostMatchesAnyDomain(currentRequest.url.host, ALLOWED_LOGIN_DOMAINS)
-    }
-
-    private fun String.compactForLog(maxLength: Int = 400): String {
-        val compact = replace('\r', ' ')
-            .replace('\n', ' ')
-            .trim()
-        if (compact.length <= maxLength) {
-            return compact
-        }
-        return "${compact.take(maxLength)}..."
     }
 
     private fun isAllowedLoginUri(uri: Uri?): Boolean {

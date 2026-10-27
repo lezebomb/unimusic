@@ -1,0 +1,118 @@
+{
+  "date": "2026-10-27",
+  "phase": "2M",
+  "base_commit": "64c7d69930d8419b67119b387261a9aa24b092e5",
+  "room_version": 23,
+  "changes": [
+    "Align old UUID/native audio and official navigation tests with current QQ/Kuwo capability",
+    "Suppress login console bodies and raw request URLs/errors",
+    "Apply navigation inset to login root viewport",
+    "Add explicit opt-in source and real-account import/playback device checks"
+  ],
+  "jvm_checks": {
+    "passed": 6,
+    "suites": [
+      {
+        "name": "moe.ouom.neriplayer.data.unified.UnifiedPlaybackRoomStoreTest",
+        "tests": "2",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0"
+      },
+      {
+        "name": "moe.ouom.neriplayer.ui.viewmodel.tab.ExploreCatalogSearchTest",
+        "tests": "4",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0"
+      }
+    ],
+    "build_log": "build/unimusic-toolchain/phase2m-ci-login-privacy.log"
+  },
+  "device": {
+    "model": "Huawei Mate60 / BRA-AL00",
+    "api": 31,
+    "install": "adb install -r for app and test APK; existing account and playlists retained",
+    "screen": "charging stay-on remains 7; playback paused; volume restored"
+  },
+  "other_sources": {
+    "tests_run": 3,
+    "passed": 2,
+    "failed": 1,
+    "seconds": 48.74,
+    "log": "phase2m-other-sources-device.log",
+    "bilibili": {
+      "outcome": "PLAYED",
+      "discovery_ms": 3975,
+      "play_request_to_observed_position_ms": 10922,
+      "observed_position_ms": 2245
+    },
+    "gdstudio_netease": {
+      "outcome": "PLAYED",
+      "discovery_ms": 4126,
+      "play_request_to_observed_position_ms": 5482,
+      "observed_position_ms": 2209,
+      "path": "real GdStudioClient -> stream-only URI -> production PlayerManager; not source-sheet UI"
+    },
+    "youtube_music": {
+      "outcome": "FAILED",
+      "failure": "TimeoutCancellationException after waiting 20000ms for progress; search returned a song",
+      "root_cause": "not established; no positive playback claim"
+    }
+  },
+  "netease_real_account": {
+    "official_sms_web_login": "successful; authorization saved in app repository; no new SMS needed",
+    "account_playlist_catalog_count": 8,
+    "ui_imported_playlists": 2,
+    "memberships": 5,
+    "failed": 0,
+    "skipped": 0,
+    "device_tests_passed": 2,
+    "seconds": 23.711,
+    "log": "phase2m-netease-import-device.log",
+    "order_verified": true,
+    "uuid_verified": true,
+    "repeat_job_ids_and_no_duplicates_verified": true,
+    "foreign_key_check_rows": 0,
+    "native_playback": {
+      "outcome": "PLAYED",
+      "candidates_checked": 1,
+      "normal_standard_full_address_no_preview": true,
+      "source_fallback": false,
+      "resolve_ms": 2920,
+      "play_request_to_observed_position_ms": 5895,
+      "observed_position_ms": 2157,
+      "path": "normal NetEase API exact imported ID + parser -> stream-only direct URI -> production PlayerManager"
+    }
+  },
+  "build": {
+    "result": "passed",
+    "seconds": 38,
+    "log": "build/unimusic-toolchain/phase2m-import-final-build.log",
+    "app": {
+      "path": "app/build/outputs/apk/debug/app-debug.apk",
+      "bytes": 62727934,
+      "sha256": "f115fd60c33466aa68e4aa0c8d7bfe5b10cfa02fad906511edf11d52b7ad8005"
+    },
+    "android_test": {
+      "path": "app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk",
+      "bytes": 8075703,
+      "sha256": "5edee32aaf34ab2d71e30eafadd8d68aed8e16d650c0a9050d89d4a76924f1b1"
+    }
+  },
+  "module_boundaries": "passed",
+  "remote_ci": {
+    "previous_run": "https://github.com/lezebomb/unimusic/actions/runs/40456136285",
+    "previous_conclusion": "failure; obsolete UUID store expectation now fixed and tested locally",
+    "new_commit_run": "not yet dispatched at evidence creation"
+  },
+  "not_verified": [
+    "QQ positive account audio playback",
+    "YouTube successful audio playback or root cause",
+    "All imported tracks full playback",
+    "Full-song completion, background endurance, headphones/Bluetooth, multi-network performance",
+    "Fresh-account consent layout after root-inset fix (compiled; existing account retained)",
+    "Original-recording accuracy on a labeled corpus"
+  ],
+  "privacy": "No OTP, contact value, lock PIN, account IDs, playlist names, cookies or signed URLs are included in this evidence. No Gmail connection was made."
+}

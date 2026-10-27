@@ -1,0 +1,22 @@
+
+moe.ouom.neriplayer.sources.NeteaseImportDeviceTest:INSTRUMENTATION_STATUS: distinct_song_ids=5
+INSTRUMENTATION_STATUS: imported_memberships=5
+INSTRUMENTATION_STATUS: imported_playlists=2
+INSTRUMENTATION_STATUS: order_verified=true
+INSTRUMENTATION_STATUS: repeat_without_duplicates=true
+INSTRUMENTATION_STATUS: room_version=23
+INSTRUMENTATION_STATUS: uuid_verified=true
+INSTRUMENTATION_STATUS_CODE: 2
+.INSTRUMENTATION_STATUS: candidates_checked=1
+INSTRUMENTATION_STATUS: full_address_no_preview=true
+INSTRUMENTATION_STATUS: observed_position_ms=2157
+INSTRUMENTATION_STATUS: outcome=PLAYED
+INSTRUMENTATION_STATUS: play_request_to_observed_position_ms=5895
+INSTRUMENTATION_STATUS: resolve_ms=2920
+INSTRUMENTATION_STATUS: source=netease_account_native
+INSTRUMENTATION_STATUS_CODE: 2
+.
+
+Time: 23.711
+
+OK (2 tests)

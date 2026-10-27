@@ -38,9 +38,16 @@ class UnifiedPlaybackRoomStoreTest {
             }
             assertNull(playback.load("42"))
             assertNull(playback.load("00000000-0000-0000-0000-000000000000"))
-            val catalog = UnifiedLibraryRoomStore(db).registerSource(SongSourceKey("kuwo", "42"),
+            for (key in listOf(SongSourceKey("kuwo", "42"), SongSourceKey("qqmusic", "003OUlho2HcRHC"))) {
+                val native = UnifiedLibraryRoomStore(db).registerSource(key,
+                    UnifiedSongMetadata(song.name, song.artist, song.album, song.durationMs))
+                val restored = requireNotNull(playback.load(native.id)).song
+                assertEquals(key, sourceCandidateForSong(restored)?.key)
+                assertNull(restored.streamUrl) // Reconstructing an identity does not grant an audio URL.
+            }
+            val unsupported = UnifiedLibraryRoomStore(db).registerSource(SongSourceKey("unsupported_catalog", "42"),
                 UnifiedSongMetadata(song.name, song.artist, song.album, song.durationMs))
-            assertNull(playback.load(catalog.id))
+            assertNull(playback.load(unsupported.id))
         } finally { db.close() }
     }
 

@@ -81,6 +81,8 @@
 
 2L已接原生QQ / 酷我音频与有预算的并发自动匹配；相同录音内优先返回当前有完整地址的来源，拒绝版本/歌手/时长冲突并保留账号权限。聚合搜索每源至多异步探测三个候选（每源4.5秒，成功停止），相关性与版本门槛后提升地址校验成功的结果。详见2L报告及真机日志，QQ账号正向和曲库准确率仍待后续验收。
 
+2M 已完成网易云真实账号登录及两份 5 首歌单的顺序/UUID/无重复重导，正常原生音频、B站及 GD 样本真机播放通过。YouTube 播放失败和 QQ 账号正向未验收明确保留；修复登录页日志隐私、底部视口及旧 CI 能力断言。详见 [2M](PHASE_2M_ACCOUNT_IMPORT_AND_DEVICE_AUDIO.md)，后续先定位 YouTube 和 B站等待，不重复短信登录或导入全部歌单。
+
 1. 先做匹配安全基座：Normalization、VersionClassification、SongMatch/Override repository、硬冲突拒绝、来源资格类型。分析上游加分与分 P 双重累计，旧 70 分阈值不能迁成概率。
 2. `UnifiedSearchEngine` 使用 Flow/Coroutines、supervisorScope/每源预算、平台限流、去抖和请求取消。先返回本地/首个远端批次，合并有证明的同录音；页游标、错误和加载状态按 provider 保存。
 3. 复用 SearchTextMatcher 做展示相关性，新增版本/歌手别名/发行/时长/ISRC/MBID/可信渠道证据，不为搜索列表批量解析 URL。缓存按平台政策 TTL 与账号上下文隔离。

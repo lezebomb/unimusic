@@ -38,7 +38,11 @@ class ExploreCatalogSearchTest {
             "https://www.kuwo.cn/play_detail/2", "https://www.kuwo.cn/play_detail/1?redirect=elsewhere").forEach { url ->
             assertNull(url, catalogExternalPageUrl(track.copy(externalPageUrl = url)))
         }
-        assertNull(catalogExternalPageUrl(track.copy(playbackMode = SourcePlaybackMode.AUTHORIZED_AUDIO)))
+        assertEquals(track.externalPageUrl, catalogExternalPageUrl(track.copy(playbackMode = SourcePlaybackMode.AUTHORIZED_AUDIO)))
+        val qq = track.copy(source = SongSourceKey("qqmusic", "003OUlho2HcRHC"),
+            externalPageUrl = "https://y.qq.com/n/ryqq/songDetail/003OUlho2HcRHC")
+        assertEquals(qq.externalPageUrl, catalogExternalPageUrl(qq))
+        assertNull(catalogExternalPageUrl(qq.copy(externalPageUrl = qq.externalPageUrl + "?redirect=elsewhere")))
         assertNull(catalogExternalPageUrl(track.copy(source = SongSourceKey("other", "1"))))
     }
 

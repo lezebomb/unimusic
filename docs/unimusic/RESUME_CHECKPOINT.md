@@ -2,15 +2,19 @@
 
 > 2026-10-27 的02:20和07:25两次单次续跑已执行，对应任务均已删除；没有新建重复计划。10月26日暂停交接仅为历史记录，按本文最新检查点接续。
 
-更新：2026-10-27（Asia/Shanghai）。2L已接QQ正常标准MP3与酷我官网免费音频、并发备用源匹配、可播性排序与精确持久映射；26个定向JVM检查和Mate60上2个真机检查通过，Debug APK / AndroidTest APK、模块及平台边界通过。酷我样本已由生产播放器实际解码并观察到进度，QQ匿名拒绝被正确保留；真实QQ登录正向取流和完整歌曲/多网络耐久未验收。Room仍v23，无新迁移。手机已开启充电常亮，初次设置中已按用户要求开启播放源兜底；本地音乐权限及云同步未启用。手机密码仅在本机系统验证时输入，未保存到文件/日志/提交。
+更新：2026-10-27（Asia/Shanghai）。最新 2M 已完成网易云真实短信网页登录、两份歌单共 5 首导入、顺序/UUID/重复导入无重复和正常网易云完整音频真机播放验证；B站/GD 也实际播放通过，YouTube 搜索成功但播放等待 20 秒失败，QQ 正向账号取流仍未验收。6 个定向 JVM 检查通过，设备 5 个检查中 4 通过 / 1 YouTube 失败，最新 APK/测试包构建和模块边界通过。见 [2M报告](PHASE_2M_ACCOUNT_IMPORT_AND_DEVICE_AUDIO.md) 及 phase2m 证据。已保存账号与导入库，勿重复发送验证码、清空数据或再次导入所有歌单。未连接 Gmail；凭证与联系方式不要写入日志/提交。2L 远端 CI 失败的旧能力断言已在 2M 修复，后续 CI 以实际状态为准。
+
+此前阶段：2026-10-27（Asia/Shanghai）。2L已接QQ正常标准MP3与酷我官网免费音频、并发备用源匹配、可播性排序与精确持久映射；26个定向JVM检查和Mate60上2个真机检查通过，Debug APK / AndroidTest APK、模块及平台边界通过。酷我样本已由生产播放器实际解码并观察到进度，QQ匿名拒绝被正确保留；真实QQ登录正向取流和完整歌曲/多网络耐久未验收。Room仍v23，无新迁移。手机已开启充电常亮，初次设置中已按用户要求开启播放源兜底；本地音乐权限及云同步未启用。手机密码仅在本机系统验证时输入，未保存到文件/日志/提交。
 
 原D:/Collect/.tooling开发包被用户清理，Android包已按需恢复到项目内已忽略的D:/unimusic/.android-sdk；复用项目内JDK17与C:/Users/24981/.gradle，local.properties指向新SDK。原生模块显式固定NDK27/CMake3.31.6。后续不要继续引用已删除的JDK21/current或旧SDK。可直接使用 `tools_pub/unimusic/build_android.ps1`，它只为当前进程设置项目JDK/SDK；`-GradleArgs`可传任务和`--offline`。
 
-历史报告中“无设备”“酷我仅目录”“QQ未接音频”只描述对应旧阶段；当前以 [2L报告](PHASE_2L_NATIVE_AUDIO_AND_PLAYABILITY.md) 及phase2l证据为准。
+历史报告中“无设备”“酷我仅目录”“QQ未接音频”只描述对应旧阶段；当前以最新 [2M报告](PHASE_2M_ACCOUNT_IMPORT_AND_DEVICE_AUDIO.md) 及对应阶段证据为准。
 
 ## 已完成和推送
 
-- Phase 2L：本检查点所在提交接QQ/酷我正常音频、自动匹配与可播性排序，实际范围见 [2L](PHASE_2L_NATIVE_AUDIO_AND_PLAYABILITY.md)；以git log/status核对提交推送。
+- Phase 2M：本检查点所在提交完成真实账号/导入/原生音频与其他来源设备验证，修复登录页隐私及视口和旧 CI 断言；以 git log/status 确认提交推送，详见 [2M](PHASE_2M_ACCOUNT_IMPORT_AND_DEVICE_AUDIO.md)。
+
+- Phase 2L：`64c7d699` 接QQ/酷我正常音频、自动匹配与可播性排序，实际范围见 [2L](PHASE_2L_NATIVE_AUDIO_AND_PLAYABILITY.md)；以git log/status核对提交推送。
 
 - Phase 0：`b60d74d1`，源码审计与固定上游已归档，不需重做。
 - 工具链：`f2c53ea1`，JDK 17 + API 37.0 / Build Tools 37 / NDK 27.0.12077973 / CMake 3.31.6 均可用。
