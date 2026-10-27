@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="unimusic_nav_discover">Discover</string>
+    <string name="unimusic_nav_mine">My library</string>
+    <string name="unimusic_nav_search">Search</string>
+</resources>

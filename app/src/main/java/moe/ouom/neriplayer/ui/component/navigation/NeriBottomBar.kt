@@ -62,6 +62,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hierarchy
+import moe.ouom.neriplayer.ui.navigation.uniMusicNavigationLabel
+import moe.ouom.neriplayer.ui.navigation.isUniMusicNavigationDestinationSelected
 import moe.ouom.neriplayer.navigation.Destinations
 import moe.ouom.neriplayer.ui.effect.glass.AdvancedGlassRole
 import moe.ouom.neriplayer.ui.effect.glass.AdvancedGlassSurface
@@ -129,8 +131,8 @@ fun NeriBottomBar(
             tonalElevation = 0.dp,
         ) {
             items.forEachIndexed { index, (dest, icon) ->
-                val selected = isNeriNavigationDestinationSelected(currentDestination, dest)
-                val label = stringResource(dest.labelResId)
+                val selected = isUniMusicNavigationDestinationSelected(currentDestination, dest)
+                val label = stringResource(uniMusicNavigationLabel(dest))
                 NavigationBarItem(
                     selected = selected,
                     onClick = {

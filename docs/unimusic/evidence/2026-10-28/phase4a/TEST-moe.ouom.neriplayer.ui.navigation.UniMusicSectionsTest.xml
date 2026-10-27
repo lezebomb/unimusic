@@ -1,0 +1,9 @@
+<?xml version='1.0' encoding='utf-8'?>
+<testsuite name="moe.ouom.neriplayer.ui.navigation.UniMusicSectionsTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-10-27T16:33:07.248Z" hostname="local" time="8.976">
+  <properties />
+  <testcase name="disabled home uses search as the discover root and selects only its section" classname="moe.ouom.neriplayer.ui.navigation.UniMusicSectionsTest" time="7.351" />
+  <testcase name="legacy child startup can return and switch sections after its entry is removed" classname="moe.ouom.neriplayer.ui.navigation.UniMusicSectionsTest" time="0.071" />
+  <testcase name="search and settings retain their parent and return without looping" classname="moe.ouom.neriplayer.ui.navigation.UniMusicSectionsTest" time="0.054" />
+  <system-out />
+  <system-err />
+</testsuite>

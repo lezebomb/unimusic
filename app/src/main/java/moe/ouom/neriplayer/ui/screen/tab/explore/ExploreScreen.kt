@@ -148,6 +148,7 @@ import moe.ouom.neriplayer.ui.util.shouldAllowCollapsingTopAppBar
 import androidx.lifecycle.viewmodel.viewModelFactory
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import moe.ouom.neriplayer.ui.navigation.MainSectionBackButton
 import moe.ouom.neriplayer.common.R as CoreCommonR
 import moe.ouom.neriplayer.data.model.bilibili.video.VideoBasicInfo
 import moe.ouom.neriplayer.data.model.youtube.music.YouTubeMusicCreatorSummary
@@ -740,7 +741,8 @@ fun ExploreScreen(
         },
         topBar = {
             LargeTopAppBar(
-                title = { Text(stringResource(CoreCommonR.string.nav_explore)) },
+                title = { Text(stringResource(CoreCommonR.string.unimusic_nav_search)) },
+                navigationIcon = { MainSectionBackButton() },
                 scrollBehavior = scrollBehavior,
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = Color.Transparent,
@@ -1410,7 +1412,8 @@ private fun ExploreOfflineContent(topAppBarState: TopAppBarState) {
         containerColor = Color.Transparent,
         topBar = {
             LargeTopAppBar(
-                title = { Text(stringResource(CoreCommonR.string.nav_explore)) },
+                title = { Text(stringResource(CoreCommonR.string.unimusic_nav_search)) },
+                navigationIcon = { MainSectionBackButton() },
                 scrollBehavior = scrollBehavior,
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = Color.Transparent,

@@ -190,6 +190,10 @@ import moe.ouom.neriplayer.ui.navigation.resolveMainTabBackgroundMotionDurationM
 import moe.ouom.neriplayer.ui.navigation.resolveMainTabNavigationMotionState
 import moe.ouom.neriplayer.ui.navigation.resolveMainTabNavigationMotionTarget
 import moe.ouom.neriplayer.ui.navigation.selectMainTabRouteContent
+import moe.ouom.neriplayer.ui.navigation.LocalMainSectionBackAction
+import moe.ouom.neriplayer.ui.navigation.uniMusicSectionParent
+import moe.ouom.neriplayer.ui.navigation.navigateUniMusicSection
+import moe.ouom.neriplayer.ui.navigation.returnToUniMusicSection
 import moe.ouom.neriplayer.ui.navigation.shouldAcceptObservedMainTabRoute
 import moe.ouom.neriplayer.ui.navigation.shouldDispatchMainTabNavigation
 import moe.ouom.neriplayer.ui.navigation.shouldUseAdvancedGlassNavigationHandoff
@@ -1270,13 +1274,13 @@ private fun NeriAppContent(
                     return
                 }
                 pendingMainTabRoute = route
-                navController.navigate(route) {
-                    popUpTo(navController.graph.startDestinationId) {
-                        saveState = true
-                    }
-                    launchSingleTop = true
-                    restoreState = true
-                }
+                navController.navigateUniMusicSection(route, showHomeTab)
+            }
+            fun returnToSectionRoot(route: String) {
+                selectedMainTabRoute = route
+                pendingMainTabRoute = route
+                mainTabTransitionState.request(route)
+                navController.returnToUniMusicSection(route)
             }
             fun showLauncherShortcutToast(messageRes: Int) {
                 AppFeedback.showToast(
@@ -1406,8 +1410,8 @@ private fun NeriAppContent(
                     showNowPlaying = true
                 }
             }
-            val bottomBarItems = remember(showHomeTab, devModeEnabled) {
-                appMainTabItems(showHomeTab, devModeEnabled)
+            val bottomBarItems = remember(showHomeTab) {
+                appMainTabItems(showHomeTab)
             }
 
             val snackbarHostState = remember { SnackbarHostState() }
@@ -1499,6 +1503,9 @@ private fun NeriAppContent(
                         onOpenStats = {
                             navController.navigate(Destinations.PlaybackStats.route)
                         },
+                        onOpenSettings = { navigateToMainTab(Destinations.Settings.route) },
+                        onOpenDownloads = { navController.navigate(Destinations.DownloadManager.route) },
+                        onOpenDebug = if (devModeEnabled) ({ navigateToMainTab(Destinations.Debug.route) }) else null,
                         offlineMode = offlineMode,
                         coherentFeedbackEnabled = coherentFeedbackEnabled,
                         renderScene = { revealTop, translationY, scale, sceneDepth, sceneContent ->
@@ -1596,14 +1603,25 @@ private fun NeriAppContent(
                             )
                         }
                 }
-                selectMainTabRouteContent(
-                    route = route,
-                    home = homeContent,
-                    explore = exploreContent,
-                    library = libraryContent,
-                    settings = settingsContent,
-                    debug = debugContent
-                )?.invoke()
+                val sectionParent = uniMusicSectionParent(route, showHomeTab)
+                androidx.activity.compose.BackHandler(
+                    enabled = sectionParent != null && currentRoute == route &&
+                        navController.previousBackStackEntry == null
+                ) { sectionParent?.let(::returnToSectionRoot) }
+                CompositionLocalProvider(
+                    LocalMainSectionBackAction provides sectionParent?.let { parent ->
+                        { returnToSectionRoot(parent) }
+                    }
+                ) {
+                    selectMainTabRouteContent(
+                        route = route,
+                        home = homeContent,
+                        explore = exploreContent,
+                        library = libraryContent,
+                        settings = settingsContent,
+                        debug = debugContent
+                    )?.invoke()
+                }
             }
 
             val backgroundMode = resolveNowPlayingBackgroundMode(

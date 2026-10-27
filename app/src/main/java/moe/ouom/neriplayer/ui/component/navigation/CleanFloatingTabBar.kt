@@ -58,6 +58,8 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavDestination
+import moe.ouom.neriplayer.ui.navigation.uniMusicNavigationLabel
+import moe.ouom.neriplayer.ui.navigation.isUniMusicNavigationDestinationSelected
 import moe.ouom.neriplayer.navigation.Destinations
 import moe.ouom.neriplayer.ui.effect.glass.AdvancedGlassRole
 import moe.ouom.neriplayer.ui.effect.glass.AdvancedGlassSurface
@@ -87,7 +89,7 @@ internal fun CleanFloatingTabBar(
     val dark = colors.surface.luminance() < 0.5f
     val overBackground = LocalHasCustomBackground.current
     val selectedIndex = items.indexOfFirst { (dest, _) ->
-        isNeriNavigationDestinationSelected(currentDestination, dest)
+        isUniMusicNavigationDestinationSelected(currentDestination, dest)
     }
     val tabDrag = remember { CleanTabDragState() }
     val host = remember { LensHost() }
@@ -155,7 +157,7 @@ internal fun CleanFloatingTabBar(
             ) {
                 items.forEachIndexed { index, (dest, icon) ->
                     val selected = index == selectedIndex
-                    val label = stringResource(dest.labelResId)
+                    val label = stringResource(uniMusicNavigationLabel(dest))
                     Column(
                         modifier = Modifier
                             .weight(1f)

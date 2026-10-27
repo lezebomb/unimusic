@@ -1,11 +1,9 @@
 package moe.ouom.neriplayer.ui
 
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.BugReport
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.LibraryMusic
 import androidx.compose.material.icons.outlined.Search
-import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -54,11 +52,8 @@ internal fun resolveAppNavigationVisibility(
     return AppNavigationVisibility(destination, currentRoute, routes, owners)
 }
 
-internal fun appMainTabItems(showHomeTab: Boolean, devModeEnabled: Boolean): List<Pair<Destinations, ImageVector>> =
-    buildList {
-        if (showHomeTab) add(Destinations.Home to Icons.Outlined.Home)
-        add(Destinations.Explore to Icons.Outlined.Search)
-        add(Destinations.Library to Icons.Outlined.LibraryMusic)
-        add(Destinations.Settings to Icons.Outlined.Settings)
-        if (devModeEnabled) add(Destinations.Debug to Icons.Outlined.BugReport)
-    }
+internal fun appMainTabItems(showHomeTab: Boolean): List<Pair<Destinations, ImageVector>> = listOf(
+    if (showHomeTab) Destinations.Home to Icons.Outlined.Home
+    else Destinations.Explore to Icons.Outlined.Search,
+    Destinations.Library to Icons.Outlined.LibraryMusic
+)

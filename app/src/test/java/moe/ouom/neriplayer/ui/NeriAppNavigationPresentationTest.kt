@@ -44,13 +44,9 @@ class NeriAppNavigationPresentationTest {
     }
 
     @Test
-    fun `optional tabs preserve the order and permanent navigation destinations`() {
-        val permanent = listOf(Destinations.Explore, Destinations.Library, Destinations.Settings)
-        assertEquals(permanent, appMainTabItems(false, false).map { it.first })
-        assertEquals(listOf(Destinations.Home) + permanent, appMainTabItems(true, false).map { it.first })
-        assertEquals(permanent + Destinations.Debug, appMainTabItems(false, true).map { it.first })
-        assertEquals(listOf(Destinations.Home) + permanent + Destinations.Debug,
-            appMainTabItems(true, true).map { it.first })
+    fun `only discover and mine are visible regardless of home preference`() {
+        assertEquals(listOf(Destinations.Explore, Destinations.Library), appMainTabItems(false).map { it.first })
+        assertEquals(listOf(Destinations.Home, Destinations.Library), appMainTabItems(true).map { it.first })
     }
 
     @Test

@@ -45,7 +45,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import moe.ouom.neriplayer.ui.BottomBarLayoutInsets
 import moe.ouom.neriplayer.ui.banner.OfflineModeBottomBanner
-import moe.ouom.neriplayer.ui.component.navigation.isNeriNavigationDestinationSelected
 import moe.ouom.neriplayer.ui.component.navigation.resolveBottomBarFallbackScrimAlpha
 import moe.ouom.neriplayer.ui.component.navigation.resolveBottomBarSelectionAlpha
 import moe.ouom.neriplayer.ui.effect.glass.AdvancedGlassRole
@@ -174,8 +173,8 @@ internal fun AppNavigationRail(
                     verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterVertically)
                 ) {
                     presentation.items.forEach { (destination, icon) ->
-                        val label = stringResource(destination.labelResId)
-                        val selected = isNeriNavigationDestinationSelected(presentation.currentDestination, destination)
+                        val label = stringResource(uniMusicNavigationLabel(destination))
+                        val selected = isUniMusicNavigationDestinationSelected(presentation.currentDestination, destination)
                         NavigationRailItem(
                             selected = selected,
                             onClick = {

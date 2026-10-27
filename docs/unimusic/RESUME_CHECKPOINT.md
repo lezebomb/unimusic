@@ -1,10 +1,12 @@
 # UniMusic 续跑检查点
 
-> 2026-10-27 的02:20和07:25两次单次续跑已执行，对应任务均已删除；没有新建重复计划。10月26日暂停交接仅为历史记录，按本文最新检查点接续。
+更新：2026-10-28（Asia/Shanghai）。00:25 单次任务已触发并删除；用户另要求今天 05:30 单次续跑，任务 `unimusic-10-28-05-30` 已创建，不是每日计划。接续本检查点，不重复工作。
 
-> 当前 2P Google 登录已完成，服务端账号资料接口也确认成功；授权保存在手机且重启进程可读。不要重复登录、重置网页会话或索要密码/验证码。账号音频仍未成功，接续定位正常 OK 响应后的地址解析链路。
+**最新用户要求：暂停 YouTube 取流排查，先开发其他部分。Google/网易云登录与既有两份 5 首导入保留，不重复登录或重新导入。** 2P 已证实 Google 服务端账号成功，YouTube 音频仍失败；旧文“下一步排查取流”已被最新用户优先级覆盖。
 
-更新：2026-10-27（Asia/Shanghai）。最新 2P 已由用户在手机完成官方 Google 登录，App 保存授权、独立测试进程读回及服务端账号资料验证均确认成功。真实 WEB_REMIX 返回 OK 与 16 条带 signatureCipher 的格式，但仍没有最终地址/实际播放；剩余失败在地址解析、签名处理或流访问阶段，精确子阶段待查。不能再把本次问题说成尚未登录，也不能把账号成功当音频成功。只构建/更新测试包，主 APK 未重装；两方法真机执行 3 次均未通过音频验证，结果如实保留。见 [2P报告](PHASE_2P_GOOGLE_LOGIN_AND_AUTHENTICATED_SOURCE_PROBE.md)。2O CI 已成功，已保留 Google/网易云登录和歌单，主 App 已重新打开并暂停播放。
+Phase 4A 已完成“发现／我的”两标签、我的导入/历史/下载/统计入口、设置与调试入口及父子返回兼容。7 个定向 JVM 检查、Debug APK 和模块边界通过；Mate60 数据保留覆盖安装、搜索/设置返回、下载进出及导入弹层开关通过。没有重新验收账号、音频、平板或性能，详见 [4A报告](PHASE_4A_DISCOVER_AND_MY_LIBRARY.md)。APK/哈希、7项 XML 与设备检查保存在 `evidence/2026-10-28/phase4a/`。下一步推进可撤销本地推荐偏好；每个完成阶段 commit/push 后接着推进。
+
+## 历史阶段（以最新用户优先级和上述状态为准）
 
 此前阶段：2026-10-27（Asia/Shanghai）。最新 2O 对照原版 b9b6caf3 和已 fetch 的最新上游 0d9ce69f，保留预热/缓存/客户端回退。修复 8 秒共享任务短于原版 12 秒签名窗口的预算冲突：明确 YouTube 主播放 20 秒、共享后台 30 秒，其他主源/自动切源仍 8 秒且不能被嵌套延长。真实匿名响应是 UNPLAYABLE/LOGIN_REQUIRED、无音频格式；新增一轮后明确拒绝与来源 AUTH_REQUIRED、YouTube 专属登录提示，避免重复刷新和泛化超时。9 个关键 JVM 检查、最终 APK/测试包及边界通过，已覆盖安装到 Mate60。YouTube 仍未播通：最终播放器本次 5818ms 提示 LOGIN_REQUIRED，预热诊断一轮 6 次请求后明确拒绝，普通 UI 提示已核对。见 [2O报告](PHASE_2O_UPSTREAM_PLAYBACK_AND_ACCESS_FEEDBACK.md)。2N CI 已成功；网易云登录及 5 首导入保留，不重发验证码。未做 Google 登录，QQ 正向仍待验收。
 
@@ -101,8 +103,8 @@
 
 ## 复用环境与日志
 
-- launcher JDK 21：`D:/Collect/.tooling/jdk/current`；buildSrc JDK 17：`D:/unimusic/.gradle-home/jdks/jdk-17.0.20.1+1`。
-- SDK：`D:/Collect/.tooling/android-sdk`，包均已安装，无需重复下载。
+- JDK 17：`D:/unimusic/.gradle-home/jdks/jdk-17.0.20.1+1`；使用项目构建脚本设置当前进程环境。
+- SDK：`D:/unimusic/.android-sdk`，已恢复；不使用被删除的 `D:/Collect/.tooling`，不重复下载。
 - Gradle 参数：`-Dorg.gradle.java.installations.paths=D:/unimusic/.gradle-home/jdks/jdk-17.0.20.1+1`；通常 `--max-workers=2 --console=plain`。
 - 独立 AVD：`.gradle-home/avd/UniMusicMigrationAPI35.avd`，设置当前进程 ANDROID_AVD_HOME 后复用，WHPX 已验证；本轮结束正常关闭以节省资源。
 - 最新日志：`build/unimusic-toolchain/phase2k-final-build-io.log`、`phase2k-final-validation.log`、`phase2k-validation.log`和`phase2k-final-boundaries.log`；4个关键检查XML及匿名协议实测已归档。2J/2I/2H等保留独立证据，避免重跑完整上游套件。

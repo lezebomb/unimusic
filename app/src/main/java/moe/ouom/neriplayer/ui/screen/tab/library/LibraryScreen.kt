@@ -37,8 +37,8 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.BarChart
-import androidx.compose.material.icons.outlined.History
+import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material.icons.outlined.BugReport
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -97,7 +97,6 @@ import moe.ouom.neriplayer.ui.viewmodel.tab.LibraryViewModel
 import moe.ouom.neriplayer.ui.viewmodel.tab.PlaylistSummary
 import moe.ouom.neriplayer.ui.viewmodel.tab.YouTubeMusicPlaylist
 import moe.ouom.neriplayer.ui.haptic.HapticIconButton
-import moe.ouom.neriplayer.ui.haptic.HapticTextButton
 import moe.ouom.neriplayer.R
 import moe.ouom.neriplayer.ui.util.currentWindowWidthDp
 
@@ -253,6 +252,9 @@ fun LibraryScreen(
     onBiliPlaylistClick: (BiliPlaylist) -> Unit = {},
     onOpenRecent: () -> Unit = {},
     onOpenStats: () -> Unit = {},
+    onOpenSettings: () -> Unit = {},
+    onOpenDownloads: () -> Unit = {},
+    onOpenDebug: (() -> Unit)? = null,
     offlineMode: Boolean = false
 ) {
     val vm: LibraryViewModel = viewModel()
@@ -365,31 +367,31 @@ fun LibraryScreen(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         LargeTopAppBar(
-            title = { Text(stringResource(CoreCommonR.string.library_title)) },
+            title = { Text(stringResource(CoreCommonR.string.unimusic_nav_mine)) },
             scrollBehavior = scrollBehavior,
             colors = TopAppBarDefaults.topAppBarColors(
                 containerColor = Color.Transparent,
                 scrolledContainerColor = Color.Transparent
             ),
             actions = {
-                HapticTextButton(onClick = { showPlaylistImport = true }) {
-                    Text(stringResource(R.string.unimusic_import_entry))
+                onOpenDebug?.let { openDebug ->
+                    HapticIconButton(onClick = openDebug) {
+                        Icon(Icons.Outlined.BugReport, stringResource(CoreCommonR.string.nav_debug))
+                    }
                 }
-                HapticIconButton(onClick = onOpenStats) {
-                    Icon(
-                        Icons.Filled.BarChart,
-                        contentDescription = stringResource(CoreCommonR.string.stats_title)
-                    )
-                }
-                HapticIconButton(onClick = onOpenRecent) {
-                    Icon(
-                        Icons.Outlined.History,
-                        contentDescription = stringResource(CoreCommonR.string.library_recent_played)
-                    )
+                HapticIconButton(onClick = onOpenSettings) {
+                    Icon(Icons.Outlined.Settings, stringResource(CoreCommonR.string.nav_settings))
                 }
             }
         )
 
+        MyLibraryActions(
+            onImport = { showPlaylistImport = true },
+            onRecent = onOpenRecent,
+            onDownloads = onOpenDownloads,
+            onStats = onOpenStats,
+            modifier = Modifier.padding(horizontal = pageHorizontalPadding).widthIn(max = 1180.dp)
+        )
         Card(
             shape = neriRoundedShape(16.dp),
             colors = CardDefaults.cardColors(

@@ -1,0 +1,41 @@
+{
+  "phase": "4A",
+  "date": "2026-10-28",
+  "timezone": "Asia/Shanghai",
+  "jvm": {
+    "tests": 7,
+    "failures": 0,
+    "classes": [
+      "UniMusicSectionsTest",
+      "NeriAppNavigationPresentationTest"
+    ]
+  },
+  "build": {
+    "task": ":app:assembleDebug",
+    "offline": true,
+    "success": true,
+    "log": "build/unimusic-toolchain/phase4a-navigation-validation.log",
+    "apk": "app/build/outputs/apk/debug/app-debug.apk",
+    "bytes": 62752774,
+    "sha256": "7d51b175b1647f28003b35ec47acddbd1af209177cd6ae75d9702c6c9e61f1bc"
+  },
+  "module_boundaries": {
+    "exit_code": 0,
+    "result": "passed"
+  },
+  "device": {
+    "model": "Huawei Mate60",
+    "install": "adb install -r: Success",
+    "checks": "device-navigation.json",
+    "accounts_reauthenticated": false,
+    "audio_validation_performed": false
+  },
+  "not_run": [
+    "tablet device",
+    "all themes and font scales",
+    "account revalidation",
+    "actual audio playback",
+    "performance benchmark",
+    "full upstream suite"
+  ]
+}

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="unimusic_nav_discover">发现</string>
+    <string name="unimusic_nav_mine">我的</string>
+    <string name="unimusic_nav_search">搜索</string>
+</resources>

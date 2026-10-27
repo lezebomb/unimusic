@@ -354,14 +354,7 @@ fun HomeScreen(
         }
     }
 
-    val titleOptions = listOf(
-        stringResource(CoreCommonR.string.app_name),
-        stringResource(CoreCommonR.string.home_title_brand_loud),
-        stringResource(CoreCommonR.string.home_title_brand_wave),
-        stringResource(CoreCommonR.string.home_title_brand_call)
-    ).distinct()
-    val titleSeed = rememberSaveable { (0..Int.MAX_VALUE).random() }
-    val appBarTitle = titleOptions[titleSeed % titleOptions.size]
+    val appBarTitle = stringResource(CoreCommonR.string.unimusic_nav_discover)
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(
         state = topAppBarState,
         // follow the finger and stay put; a release snap reads as an unwanted bounce
@@ -506,7 +499,7 @@ fun HomeScreen(
                 )
             )
             val openSearch = LocalHomeOpenSearch.current
-            if (cleanStyle && openSearch != null) {
+            if (openSearch != null) {
                 HomeSearchPill(
                     onClick = openSearch,
                     modifier = Modifier
