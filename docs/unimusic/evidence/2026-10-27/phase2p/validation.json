@@ -1,0 +1,105 @@
+{
+  "date": "2026-10-27",
+  "phase": "2P",
+  "implementation_base": "f152222ad7cf4776d261606c84f1299fbbd61c25",
+  "test_preparation_commit": "1502796e",
+  "room_version": 23,
+  "login": {
+    "method": "App settings -> YouTube browser login -> official Google page",
+    "human_completed_password_and_verification": true,
+    "app_returned_from_login_and_showed_saved_authorization_actions": true,
+    "saved_login_cookies_loaded_in_fresh_instrumentation_process": true,
+    "server_account_profile_verified": true,
+    "credentials_persisted": "existing on-device encrypted YouTubeAuthRepository; no credential values exported",
+    "no_gmail_connection": true,
+    "no_new_otp_requested_by_agent": true,
+    "account_preserved": true
+  },
+  "test_changes": [
+    "Optional unimusicRequireYoutubeAccount=true waits for saved login cookies, preventing an anonymous probe from being labeled an account check",
+    "YouTube device progress observation allows 35s for the 20s direct resolution path plus engine startup",
+    "Protocol trace uses the existing bounded 8MiB response limit instead of a partial 512KiB JSON prefix; unwrap playerResponse and emit only status/count/category metrics",
+    "Profile verification emits one boolean, never profile details"
+  ],
+  "device": {
+    "model": "Huawei Mate60 / BRA-AL00",
+    "api": 31,
+    "runner": "moe.ouom.neriplayer.testing.NeriPlayerInstrumentationTestRunner",
+    "arguments": [
+      "unimusicLiveOtherSources=true",
+      "unimusicRequireYoutubeAccount=true"
+    ],
+    "test_executions": 3,
+    "audio_successes": 0,
+    "production_player": {
+      "log": "phase2p-youtube-account-device.log",
+      "seconds": 39.692,
+      "outcome": "FAILED; no address or playback observed",
+      "saved_account_loaded": true,
+      "first_player_error_ms": 5819,
+      "error_kind": "PLAYBACK_ERROR",
+      "first_address_observed_ms": -1,
+      "pending_media_load_at_end": false,
+      "remaining_youtube_http_calls_at_end": 0
+    },
+    "initial_protocol_probe": {
+      "log": "phase2p-youtube-account-protocol.log",
+      "seconds": 10.354,
+      "outcome": "FAILED; no address",
+      "diagnostic_limitation": "First player response could not be parsed from the 512KiB peek; NONE/formats=0 did not prove that the actual response lacked audio candidates"
+    },
+    "complete_protocol_probe": {
+      "log": "phase2p-youtube-account-protocol-complete.log",
+      "seconds": 13.849,
+      "elapsed_ms": 13830,
+      "account_profile_verified": true,
+      "address_ready": false,
+      "web_remix": {
+        "client_id": "67",
+        "http_code": 200,
+        "playability": "OK",
+        "adaptive_formats": 16,
+        "formats_with_signature_cipher": 16,
+        "ms": 1059
+      },
+      "tv_html5": {
+        "client_id": "7",
+        "http_code": 200,
+        "playability": "UNPLAYABLE",
+        "adaptive_formats": 0,
+        "ms": 1929
+      },
+      "conclusion": "Login and server recognition succeeded. Remaining failure is after an OK player response, within playback-address/signature/stream-access resolution; exact substage is not established."
+    },
+    "cleanup": "Main app reopened and media pause issued; no logout, cookie clearing, library deletion or app-data reset"
+  },
+  "build": {
+    "android_test_apk": "passed",
+    "initial_build_seconds": 163,
+    "initial_log": "build/unimusic-toolchain/phase2p-account-test-build.log",
+    "diagnostic_build_seconds": 42,
+    "diagnostic_log": "build/unimusic-toolchain/phase2p-protocol-diagnostic-build.log",
+    "test_apk_installed_with_data_preserving_update": true,
+    "main_app_reinstalled_this_phase": false
+  },
+  "existing_installed_app_artifact": {
+    "path": "app/build/outputs/apk/debug/app-debug.apk",
+    "bytes": 62740438,
+    "sha256": "cebe5307f7124fd0f2417489b79fd945bea89eb814311d4a10ef3dfcc8d3768e"
+  },
+  "android_test_artifact": {
+    "path": "app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk",
+    "bytes": 8076963,
+    "sha256": "af3dd9823ef31b6d9d557569a1dc8d725477735ea618298ba01e96e9df283382"
+  },
+  "previous_ci": {
+    "url": "https://github.com/lezebomb/unimusic/actions/runs/40472299289",
+    "conclusion": "success"
+  },
+  "not_verified": [
+    "Successful authenticated YouTube audio or complete song",
+    "Exact cipher/EJS/PoToken failure substage",
+    "Additional platform account playback, device endurance and multi-network latency"
+  ],
+  "privacy": "No Google account identifiers, email, phone, passwords, OTPs, cookies, lock PIN or signed stream URLs are present in reports or source changes. UI dumps remained in memory; no login screenshots were saved."
+}

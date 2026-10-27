@@ -25,6 +25,7 @@ import moe.ouom.neriplayer.data.model.playback.PlayerEvent
 import moe.ouom.neriplayer.data.model.playback.streamOnlyPlaybackUrl
 import moe.ouom.neriplayer.data.model.youtube.music.YouTubeMusicSearchFilter
 import moe.ouom.neriplayer.platform.gdstudio.api.GdStudioClient
+import moe.ouom.neriplayer.platform.youtube.api.transport.YOUTUBE_TEXT_RESPONSE_MAX_BYTES
 import moe.ouom.neriplayer.platform.youtube.api.transport.buildYouTubeMusicMediaUri
 import moe.ouom.neriplayer.platform.youtube.api.transport.stableYouTubeMusicId
 import org.json.JSONObject
@@ -95,13 +96,28 @@ class OtherSourceDeviceTest {
             val began = SystemClock.elapsedRealtime()
             try {
                 val response = chain.proceed(request)
-                val root = if (kind == "PLAYER") runCatching {
-                    JSONObject(response.peekBody(512 * 1024).string())
+                val rawRoot = if (kind == "PLAYER") runCatching {
+                    JSONObject(response.peekBody(YOUTUBE_TEXT_RESPONSE_MAX_BYTES).string())
                 }.getOrNull() else null
+                val root = rawRoot?.optJSONObject("playerResponse") ?: rawRoot
                 val status = root?.optJSONObject("playabilityStatus")?.optString("status")
                     ?.takeIf { it in setOf("OK", "ERROR", "LOGIN_REQUIRED", "UNPLAYABLE", "LIVE_STREAM_OFFLINE", "CONTENT_CHECK_REQUIRED", "AGE_CHECK_REQUIRED") } ?: "NONE"
                 val formats = root?.optJSONObject("streamingData")?.optJSONArray("adaptiveFormats")?.length() ?: 0
-                traces += "$kind http=${response.code} status=$status formats=$formats ms=${SystemClock.elapsedRealtime() - began}"
+                val reason = root?.optJSONObject("playabilityStatus")?.optString("reason").orEmpty().lowercase()
+                val reasonKind = when {
+                    reason.contains("country") || reason.contains("地区") -> "REGION"
+                    reason.contains("premium") || reason.contains("会员") -> "ENTITLEMENT"
+                    reason.contains("bot") || reason.contains("验证") -> "VERIFICATION"
+                    reason.contains("sign in") || reason.contains("登录") -> "SIGN_IN"
+                    reason.contains("age") || reason.contains("年龄") -> "AGE"
+                    reason.contains("unavailable") || reason.contains("不可用") -> "UNAVAILABLE"
+                    else -> "UNSPECIFIED"
+                }
+                val cipherFormats = root?.optJSONObject("streamingData")?.optJSONArray("adaptiveFormats")?.let { list ->
+                    (0 until list.length()).count { !list.optJSONObject(it)?.optString("signatureCipher").isNullOrBlank() }
+                } ?: 0
+                val clientId = request.header("X-YouTube-Client-Name").orEmpty().filter(Char::isDigit)
+                traces += "$kind client=$clientId http=${response.code} parsed=${root != null} status=$status reason=$reasonKind formats=$formats cipher_formats=$cipherFormats ms=${SystemClock.elapsedRealtime() - began}"
                 response
             } catch (failure: Exception) {
                 traces += "$kind failure=${failure.javaClass.simpleName} ms=${SystemClock.elapsedRealtime() - began}"
@@ -113,7 +129,13 @@ class OtherSourceDeviceTest {
             applicationContext = instrumentation.targetContext.applicationContext)
         val started = SystemClock.elapsedRealtime()
         var ready = false
+        var accountProfileVerified = false
         try {
+            if (InstrumentationRegistry.getArguments().getString("unimusicRequireYoutubeAccount") == "true") {
+                accountProfileVerified = runCatching { withTimeout(8_000) {
+                    AppContainer.youtubeAccountProfileClient.getAccountProfile(AppContainer.youtubeAuthRepo.getAuthOnce()) != null
+                } }.getOrDefault(false)
+            }
             val track = withTimeout(8_000) { AppContainer.youtubeMusicClient.search("Canon", limit = 3,
                 filter = YouTubeMusicSearchFilter.Song).first { it.videoId.isNotBlank() } }
             withTimeout(12_000) { repository.warmBootstrap() }
@@ -122,6 +144,7 @@ class OtherSourceDeviceTest {
             instrumentation.sendStatus(2, Bundle().apply {
                 putString("diagnostic", "UPSTREAM_WARMUP_PATH")
                 putBoolean("address_ready", ready)
+                putBoolean("account_profile_verified", accountProfileVerified)
                 putLong("elapsed_ms", SystemClock.elapsedRealtime() - started)
                 putStringArrayList("http_trace", ArrayList(synchronized(traces) { traces.toList() }))
             })

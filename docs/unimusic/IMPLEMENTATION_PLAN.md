@@ -1,6 +1,6 @@
 # UniMusic 分阶段实施与验收
 
-状态日期：2026-10-27。最新 2O 已对照原版预热/共享缓存/客户端回退，调整明确 YouTube 播放与快速自动切源的预算，精确处理匿名平台拒绝。9 个相关 JVM 检查、APK/测试包与边界通过，已覆盖安装 Mate60；YouTube 仍未播通，真实反馈为 LOGIN_REQUIRED，不能用搜索或诊断成功代替音频验收。网易云真实登录/导入 5 首/原生播放已在 2M 验证，其他来源范围见各阶段证据。详见 [2O](PHASE_2O_UPSTREAM_PLAYBACK_AND_ACCESS_FEEDBACK.md)。
+状态日期：2026-10-27。最新 2P 已完成真实 Google 登录、手机授权保存/重启读回和服务端账号确认；账号 player 请求返回 OK 与 16 条带签名格式，但地址解析与实际播放仍未通过。保留用户现有授权接续排查签名/流访问，不重复登录，不把账号成功当音源成功。2O 的 9 个检查、已安装主 APK 与 CI 已通过；2P 仅补构建/更新测试包，真实音频失败记录见 [2P](PHASE_2P_GOOGLE_LOGIN_AND_AUTHENTICATED_SOURCE_PROBE.md)。网易云真实登录/导入 5 首/原生播放及其他来源范围保持各阶段证据。
 
 ## 执行约定
 
@@ -86,6 +86,8 @@
 2N 已完成 YouTube 文本 HTTP 的取消与阶段预算、共享任务截止及去除整套外层重试，并增加只含阶段/类型的真机诊断。9 个关键 JVM 检查和最终构建通过，但 YouTube 实际播放仍失败；正常界面也复核无地址，不能因搜索有结果标记接通。B站此次是缓存样本，不据此报告冷启动提升；详见 [2N](PHASE_2N_PLAYBACK_CANCELLATION_AND_DIAGNOSTICS.md)。
 
 2O 对照原版预热与 12 秒签名窗口，修正直接 YouTube 播放/共享后台的预算并保持自动回退 8 秒。新增完整匿名客户端轮次后明确拒绝、来源 AUTH_REQUIRED 与专属登录提示，实际仍未返回音频。9 个关键检查及最终构建通过，详见 [2O](PHASE_2O_UPSTREAM_PLAYBACK_AND_ACCESS_FEEDBACK.md)。
+
+2P 已完成真实 Google 登录与服务端账号验证，授权在手机加密存储并重启读回。WEB_REMIX 的账号响应为 OK、有 16 条签名格式，尚未取得最终音频地址；下一步定位地址/签名/流访问环节，无需再次索要账号。详见 [2P](PHASE_2P_GOOGLE_LOGIN_AND_AUTHENTICATED_SOURCE_PROBE.md)。
 
 1. 先做匹配安全基座：Normalization、VersionClassification、SongMatch/Override repository、硬冲突拒绝、来源资格类型。分析上游加分与分 P 双重累计，旧 70 分阈值不能迁成概率。
 2. `UnifiedSearchEngine` 使用 Flow/Coroutines、supervisorScope/每源预算、平台限流、去抖和请求取消。先返回本地/首个远端批次，合并有证明的同录音；页游标、错误和加载状态按 provider 保存。
