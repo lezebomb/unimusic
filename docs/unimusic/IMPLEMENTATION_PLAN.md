@@ -63,6 +63,8 @@
 
 ## Phase 2：统一搜索与高精度匹配
 
+2R已补显式合成人声/版本词掩盖门槛与自动证据v3，8项相关JVM、最终APK/边界通过，见[2R](PHASE_2R_EXPLICIT_VERSION_AND_VOICE_GATES.md)。仍为保守元数据规则，无真实听辨/声纹或准确率结论；手动选择和Room数据保留。
+
 2Q已交付聚合本地检索后台化、本地与5个在线槽分离、按查询缓存本地分页，6项相关JVM/最终APK/边界通过，见[2Q](PHASE_2Q_AGGREGATE_SEARCH_SCHEDULING.md)。无真实网络耗时/设备性能结论，未修改原唱/权限门槛。
 
 2A 已完成现有播放路径的元数据/版本门槛、分 P 歧义拒绝、可取消/有预算的临播解析和暂时失败冷却，详情见 [实现与边界](PHASE_2A_SOURCES.md)。这不是完整 Phase 2：来源权利能力注册、SongMatch/Override 持久化、统一搜索和 `SourceResolver(unifiedSongId)` 尚未实现。合成测试没有建立实际错误率或覆盖率结论。

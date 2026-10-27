@@ -1,0 +1,26 @@
+{
+  "phase": "2R",
+  "date": "2026-10-28",
+  "jvm": {
+    "tests": 8,
+    "failures": 0,
+    "errors": 0,
+    "newTests": 4
+  },
+  "build": "Initial Debug passed; final direct set and Debug passed in phase2r-final-version-cache-validation.log",
+  "moduleBoundaries": "Module boundaries: passed",
+  "automaticEvidenceVersion": 3,
+  "databaseVersion": 23,
+  "apk": {
+    "path": "app/build/outputs/apk/debug/app-debug.apk",
+    "sha256": "9f44b493fe56cc3609b2a470d329d91207aa391e518e411668eb54a44a896e21",
+    "bytes": 62982695
+  },
+  "notRun": [
+    "device install/UI",
+    "real original-vocal listening labels",
+    "audio fingerprint validation",
+    "platform/account playback",
+    "performance"
+  ]
+}

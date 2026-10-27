@@ -150,4 +150,24 @@ class SourceMatchRoomStoreTest {
             assertNull(store.rememberAutomatic(subject, candidate.copy(key = SongSourceKey("kuwo", "09")), SourceDecisionStamp()))
         } finally { db.close() }
     }
+    @Test fun olderAutomaticEvidenceNeedsRecheckWhileManualChoicesRemain() = runTest {
+        val db = Room.inMemoryDatabaseBuilder(ApplicationProvider.getApplicationContext<Context>(),
+            NeriUserDataDatabase::class.java).allowMainThreadQueries().build()
+        try {
+            val store = SourceMatchRoomStore(db) { 10_000L }
+            val resolved = store.rememberAutomatic(subject, candidate, SourceDecisionStamp())!!
+            val dao = db.sourceMatchDao()
+            val row = dao.matches(resolved.songId).single()
+            assertEquals(3, row.algorithmVersion)
+            dao.upsertMatch(row.copy(algorithmVersion = 2))
+            assertTrue(store.automaticMatches(subject).isEmpty())
+            assertEquals(resolved.id, store.matches(subject).single().id)
+            assertNotNull(store.rememberAutomatic(subject, candidate, SourceDecisionStamp()))
+            assertEquals(1, store.automaticMatches(subject).size)
+            val confirmed = store.decide(subject, candidate, SourceMatchDecision.CONFIRMED)
+            assertEquals(SourceMatchDecision.CONFIRMED, store.matches(subject).single().decision)
+            assertEquals(confirmed.revision, store.decisionStamp(subject, candidate.key).revision)
+        } finally { db.close() }
+    }
+
 }

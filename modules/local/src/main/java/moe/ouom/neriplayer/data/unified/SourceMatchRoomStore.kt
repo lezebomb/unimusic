@@ -12,9 +12,9 @@ import moe.ouom.neriplayer.data.model.unified.*
 /** User decisions are separate from observations so stale automatic work cannot erase a rejection. */
 class SourceMatchRoomStore(private val db: NeriUserDataDatabase, private val now: () -> Long = System::currentTimeMillis) {
     companion object {
-        // v1: discovery/probe evidence; v2: strict automatic match + a fresh eligible address.
+        // v1: discovery/probe; v2: eligible automatic address; v3: explicit version/synthetic-voice gates.
         // Reuses the existing algorithm_version column; no schema or user-data migration.
-        private const val AUTOMATIC_RESOLUTION_VERSION = 2
+        private const val AUTOMATIC_RESOLUTION_VERSION = 3
         private const val AUTOMATIC_TTL_MS = 24 * 60 * 60_000L
     }
     private val dao = db.sourceMatchDao()

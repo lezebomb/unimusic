@@ -17,6 +17,10 @@ data class RecordingMatch(val accepted: Boolean, val reason: RecordingMismatch? 
 
 /** Conservative metadata gate, not a calibrated recording-identity probability. */
 object RecordingMatchPolicy {
+    private val syntheticVoice = Regex(
+        """(?<![A-Za-z0-9])ai(?![A-Za-z0-9])[^;\n|]{0,32}(?:翻唱|生成|合成|换声|音色|声线|歌声|人声)|人工智能[^;\n|]{0,16}(?:合成|生成|人声|歌声|翻唱)|声音克隆|人声合成|声线克隆|\b(?:ai[- ]+(?:generated|vocals?|voice|sung|cover(?:ed)?)|voice clon(?:e|ed|ing)|voice conversion)\b""",
+        RegexOption.IGNORE_CASE
+    )
     private val markers = linkedMapOf(
         RecordingVersion.LIVE to Regex("现场|演唱会|\\blive\\b", RegexOption.IGNORE_CASE),
         RecordingVersion.COVER to Regex("翻唱|翻弹|翻奏|\\bcover(?:ed)?\\b", RegexOption.IGNORE_CASE),
@@ -30,14 +34,32 @@ object RecordingMatchPolicy {
     private val brackets = Regex("[\\[（(【][^\\]）)】]*[\\]）)】]")
     private val decorations = Regex("^(?:hi[ -]?res|flac|wav|mp3|4k|1080p|mv|official(?: music)? video|official audio|lyrics?|无损(?:音质)?|高音质|高清|原版|官方(?:音频|mv)?|歌词(?:版)?|备份)$", RegexOption.IGNORE_CASE)
 
+    private val versionSuffix = Regex("(?:\\s*[-–—|:]\\s*|\\s+)(?:live|cover|instrumental|remix|remastered?|radio edit|sped up|slowed)\\s*$", RegexOption.IGNORE_CASE)
+
     fun versions(metadata: RecordingMetadata): Set<RecordingVersion> = buildSet {
         if (metadata.version != RecordingVersion.UNKNOWN && metadata.version != RecordingVersion.STUDIO) add(metadata.version)
         val text = Normalizer.normalize("${metadata.title} ${metadata.versionContext}", Normalizer.Form.NFKC)
         markers.forEach { (version, regex) -> if (regex.containsMatchIn(text)) add(version) }
+        if (syntheticVoice.containsMatchIn(text)) add(RecordingVersion.COVER)
     }
 
-    fun hasVersionConflict(expected: RecordingMetadata, candidate: RecordingMetadata): Boolean =
-        versions(expected) != versions(candidate)
+    fun hasVersionConflict(expected: RecordingMetadata, candidate: RecordingMetadata): Boolean {
+        if (versions(expected) != versions(candidate)) return true
+        // Synthetic vocals also differ from an ordinary human cover; both can have COVER evidence.
+        if (hasSyntheticVoice(expected) != hasSyntheticVoice(candidate)) return true
+        // A word in the song's actual title must not mask an added explicit version label.
+        return taggedVersions(expected) != taggedVersions(candidate)
+    }
+
+    private fun hasSyntheticVoice(metadata: RecordingMetadata): Boolean = syntheticVoice.containsMatchIn(
+        Normalizer.normalize("${metadata.title} ${metadata.versionContext}", Normalizer.Form.NFKC))
+
+    private fun taggedVersions(metadata: RecordingMetadata): Set<RecordingVersion> {
+        val title = Normalizer.normalize(metadata.title, Normalizer.Form.NFKC)
+        val labels = brackets.findAll(title).joinToString(" ") { it.value } + " " +
+            (versionSuffix.find(title)?.value ?: "") + " " + metadata.versionContext
+        return versions(metadata.copy(title = labels, versionContext = ""))
+    }
 
     fun assess(expected: RecordingMetadata, candidate: RecordingMetadata, toleranceMs: Long = 4_000): RecordingMatch {
         require(toleranceMs >= 0)
@@ -59,7 +81,7 @@ object RecordingMatchPolicy {
             val inner = match.value.drop(1).dropLast(1).trim()
             if (decorations.matches(inner) || markers.values.any { it.containsMatchIn(inner) }) " " else match.value
         }
-        text = text.replace(Regex("(?:\\s*[-–—|:]\\s*|\\s+)(?:live|cover|instrumental|remix|remastered?|radio edit|sped up|slowed)\\s*$", RegexOption.IGNORE_CASE), "")
+        text = text.replace(versionSuffix, "")
         return canonicalText(text)
     }
 

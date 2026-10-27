@@ -1,0 +1,12 @@
+<?xml version='1.0' encoding='utf-8'?>
+<testsuite name="moe.ouom.neriplayer.core.player.policy.source.RecordingMatchPolicyTest" tests="6" skipped="0" failures="0" errors="0" timestamp="2026-10-27T23:01:53.658Z" hostname="local" time="0.2">
+  <properties />
+  <testcase name="versionWordsInsideTheActualTitleCannotHideAnAddedVersionLabel" classname="moe.ouom.neriplayer.core.player.policy.source.RecordingMatchPolicyTest" time="0.184" />
+  <testcase name="explicitSyntheticVocalsCannotPassAsTheOriginalOrAHumanCover" classname="moe.ouom.neriplayer.core.player.policy.source.RecordingMatchPolicyTest" time="0.003" />
+  <testcase name="titleArtistAndDurationAreIndependentRequirements" classname="moe.ouom.neriplayer.core.player.policy.source.RecordingMatchPolicyTest" time="0.0" />
+  <testcase name="aiNamedArtistsAndTitlesAreNotSyntheticWithoutAnExplicitVoiceSignal" classname="moe.ouom.neriplayer.core.player.policy.source.RecordingMatchPolicyTest" time="0.001" />
+  <testcase name="sameVersionAndCosmeticDifferencesCanMatch" classname="moe.ouom.neriplayer.core.player.policy.source.RecordingMatchPolicyTest" time="0.002" />
+  <testcase name="versionConflictsOverridePerfectTextAndDuration" classname="moe.ouom.neriplayer.core.player.policy.source.RecordingMatchPolicyTest" time="0.004" />
+  <system-out />
+  <system-err />
+</testsuite>
