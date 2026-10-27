@@ -1,0 +1,21 @@
+{
+  "phase": "2U",
+  "date": "2026-10-28",
+  "jvm": {
+    "tests": 10,
+    "failures": 0,
+    "errors": 0
+  },
+  "newTests": 2,
+  "build": "Debug passed; phase2u-ranking-evidence.log; 56s Gradle wall time, not app timing",
+  "apk": {
+    "path": "app/build/outputs/apk/debug/app-debug.apk",
+    "sha256": "16df82d246a42634f0be61f7022e0099c6146f2ac622e8ce266c6202c644d0d7",
+    "bytes": 62986195
+  },
+  "notRun": [
+    "new APK device installation/UI",
+    "live source latency",
+    "account/audio/original-vocal accuracy"
+  ]
+}

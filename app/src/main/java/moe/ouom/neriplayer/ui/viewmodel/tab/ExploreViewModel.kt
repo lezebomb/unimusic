@@ -624,8 +624,9 @@ class ExploreViewModel(application: Application) : AndroidViewModel(application)
         val ranker = checkNotNull(aggregateRanker)
         return viewModelScope.launch {
             engine.search(keyword, previous, sourceIds).collect { snapshot ->
-                val checks = _uiState.value.nativeSourceChecks
-                val items = withContext(Dispatchers.Default) { ranker.rank(snapshot.interleavedItems(), checks) }
+                val items = ranker.rankWithCurrentChecks(snapshot.interleavedItems(),
+                    checks = { _uiState.value.nativeSourceChecks },
+                    isCurrent = { isSearchRequestCurrent(requestVersion, SearchSource.ALL) }) ?: return@collect
                 updateSearchStateIfCurrent(requestVersion, SearchSource.ALL) { state ->
                     state.copy(
                         searching = previous == null && snapshot.loading,

@@ -63,6 +63,8 @@
 
 ## Phase 2：统一搜索与高精度匹配
 
+2U已解决元数据后台排序与可播探测交错的旧证据回填，预计算比较等级；2个新/共10项JVM、Debug通过，见[2U](PHASE_2U_CURRENT_SEARCH_EVIDENCE.md)。无新增线上性能/音频验收。
+
 2T已分离健康分页/失败重试，补无进展分页和内部timeout结束保护，8项相关JVM/最终APK/边界通过，见[2T](PHASE_2T_SELECTIVE_SEARCH_RETRY.md)。无真实设备/网络耗时或音频验收。
 
 2S已预计算发现排序证据并隔离搜索键字段，7项JVM/最终APK/边界通过，见[2S](PHASE_2S_DISCOVERY_RANKING_AND_KEYS.md)。规则优先级保持，无实测CPU/网络性能声明。

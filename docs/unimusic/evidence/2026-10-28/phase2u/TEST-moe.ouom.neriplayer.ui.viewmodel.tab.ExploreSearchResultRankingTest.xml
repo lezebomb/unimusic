@@ -1,0 +1,16 @@
+<?xml version='1.0' encoding='utf-8'?>
+<testsuite name="moe.ouom.neriplayer.ui.viewmodel.tab.ExploreSearchResultRankingTest" tests="10" skipped="0" failures="0" errors="0" timestamp="2026-10-27T23:44:39.532Z" hostname="local" time="0.428">
+  <properties />
+  <testcase name="stableSongKeysKeepSeparatorsAndMissingFieldsInTheirOwnComponents" classname="moe.ouom.neriplayer.ui.viewmodel.tab.ExploreSearchResultRankingTest" time="0.055" />
+  <testcase name="latin search ignores case in song metadata" classname="moe.ouom.neriplayer.ui.viewmodel.tab.ExploreSearchResultRankingTest" time="0.075" />
+  <testcase name="bare title prefers unmodified recording while explicit version stays discoverable" classname="moe.ouom.neriplayer.ui.viewmodel.tab.ExploreSearchResultRankingTest" time="0.012" />
+  <testcase name="version preference does not promote an artist match over the requested song title" classname="moe.ouom.neriplayer.ui.viewmodel.tab.ExploreSearchResultRankingTest" time="0.001" />
+  <testcase name="pinyin query promotes matching Chinese song title" classname="moe.ouom.neriplayer.ui.viewmodel.tab.ExploreSearchResultRankingTest" time="0.002" />
+  <testcase name="aReplacedQueryDoesNotPublishItsQueuedRanking" classname="moe.ouom.neriplayer.ui.viewmodel.tab.ExploreSearchResultRankingTest" time="0.253" />
+  <testcase name="equal metadata from different sources remains separate and stable" classname="moe.ouom.neriplayer.ui.viewmodel.tab.ExploreSearchResultRankingTest" time="0.002" />
+  <testcase name="title pinyin match ranks ahead of artist pinyin match" classname="moe.ouom.neriplayer.ui.viewmodel.tab.ExploreSearchResultRankingTest" time="0.002" />
+  <testcase name="verifiedNativeAddressRanksAboveEqualUnknownOrDeniedSourcesWithoutPromotingLive" classname="moe.ouom.neriplayer.ui.viewmodel.tab.ExploreSearchResultRankingTest" time="0.011" />
+  <testcase name="aProbeFinishingWhileMetadataIsRankedCannotBeOverwrittenByTheOldOrder" classname="moe.ouom.neriplayer.ui.viewmodel.tab.ExploreSearchResultRankingTest" time="0.013" />
+  <system-out />
+  <system-err />
+</testsuite>

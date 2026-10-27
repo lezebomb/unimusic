@@ -3,6 +3,15 @@ package moe.ouom.neriplayer.ui.viewmodel.tab
 import moe.ouom.neriplayer.data.model.SongItem
 import org.junit.Assert.assertEquals
 import org.junit.Test
+import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.async
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.runTest
+import moe.ouom.neriplayer.data.model.unified.CatalogTrack
+import moe.ouom.neriplayer.data.model.unified.SongSourceKey
+import moe.ouom.neriplayer.data.model.unified.SourceCheckResult
+import moe.ouom.neriplayer.data.model.unified.SourceCheckStatus
+import moe.ouom.neriplayer.data.model.unified.UnifiedSongMetadata
 
 class ExploreSearchResultRankingTest {
     @Test fun verifiedNativeAddressRanksAboveEqualUnknownOrDeniedSourcesWithoutPromotingLive() {
@@ -90,6 +99,32 @@ class ExploreSearchResultRankingTest {
         val absentAudio = first.copy(channelId = "local", audioId = null, subAudioId = null)
         org.junit.Assert.assertNotEquals(ExploreSearchResult.Song(absentChannel).stableKey, ExploreSearchResult.Song(absentAudio).stableKey)
         assertEquals(ExploreSearchResult.Song(first).stableKey, ExploreSearchResult.Song(first.copy(name = "Display edit")).stableKey)
+    }
+
+    @Test fun aProbeFinishingWhileMetadataIsRankedCannotBeOverwrittenByTheOldOrder() = runTest {
+        fun candidate(id: String) = ExploreSearchResult.Catalog(CatalogTrack(SongSourceKey("kuwo", id),
+            UnifiedSongMetadata("Dream", "Artist", "Album", 180_000), null))
+        val first = candidate("1")
+        val second = candidate("2")
+        var checks = mapOf(first.track.source to SourceCheckResult(SourceCheckStatus.ADDRESS_RESOLVED, System.currentTimeMillis()))
+        val result = async(start = CoroutineStart.UNDISPATCHED) {
+            ExploreSearchRankingSession("Dream").rankWithCurrentChecks(listOf(first, second), { checks }, { true },
+                StandardTestDispatcher(testScheduler))
+        }
+        // The metadata batch has captured the old map and is queued on its worker when the probe completes.
+        checks = mapOf(first.track.source to SourceCheckResult(SourceCheckStatus.NO_PERMISSION, System.currentTimeMillis()),
+            second.track.source to SourceCheckResult(SourceCheckStatus.ADDRESS_RESOLVED, System.currentTimeMillis()))
+        assertEquals(listOf(second, first), result.await())
+    }
+
+    @Test fun aReplacedQueryDoesNotPublishItsQueuedRanking() = runTest {
+        var current = true
+        val result = async(start = CoroutineStart.UNDISPATCHED) {
+            ExploreSearchRankingSession("Dream").rankWithCurrentChecks(listOf(ExploreSearchResult.Song(song(1, "Dream"))),
+                { emptyMap() }, { current }, StandardTestDispatcher(testScheduler))
+        }
+        current = false
+        org.junit.Assert.assertNull(result.await())
     }
 
     private fun song(id: Long, name: String, artist: String = "周杰伦"): SongItem {
