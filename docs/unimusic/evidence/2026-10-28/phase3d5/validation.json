@@ -1,0 +1,25 @@
+{
+  "phase": "3D.5",
+  "date": "2026-10-28",
+  "jvm": {
+    "uniqueTests": 7,
+    "newAliasTests": 2,
+    "finalGuardRecheck": 2,
+    "failures": 0,
+    "errors": 0
+  },
+  "build": "Initial and final Debug passed; phase3d5-local-alias-playback.log / phase3d5-final-alias-guard.log",
+  "moduleBoundaries": "Module boundaries: passed",
+  "apk": {
+    "path": "app/build/outputs/apk/debug/app-debug.apk",
+    "sha256": "6a56158c413f838d4816adfe143acc2f8a4e41872c01191628976ddbe9114598",
+    "bytes": 62916315
+  },
+  "notRun": [
+    "device install",
+    "actual Media3 foreign-UUID play",
+    "real concurrent URL resolution",
+    "cloud account/two-device",
+    "performance"
+  ]
+}

@@ -12,13 +12,33 @@ import moe.ouom.neriplayer.platform.youtube.api.transport.buildYouTubeMusicMedia
 import moe.ouom.neriplayer.platform.youtube.api.transport.stableYouTubeMusicId
 
 /** A UUID is the logical recording; the compatible SongItem remains the original queue identity. */
-data class UnifiedPlaybackTarget(val songId: String, val song: SongItem)
+data class UnifiedPlaybackTarget(val songId: String, val song: SongItem, val aliasRevision: Long? = null)
 
-class UnifiedPlaybackBackend(context: Context) {
-    private val app = context.applicationContext
-    private val store by lazy { UnifiedPlaybackRoomStore(NeriUserDataDatabase.getInstance(app)) }
+class UnifiedPlaybackBackend private constructor(
+    storeProvider: () -> UnifiedPlaybackRoomStore,
+    identityProvider: () -> UnifiedIdentitySyncBackend
+) {
+    private val store by lazy(storeProvider)
+    private val identities by lazy(identityProvider)
+    constructor(context: Context) : this(
+        { UnifiedPlaybackRoomStore(NeriUserDataDatabase.getInstance(context.applicationContext ?: context)) },
+        { UnifiedIdentitySyncBackend.getInstance(context.applicationContext ?: context) }
+    )
+    internal constructor(store: UnifiedPlaybackRoomStore, identities: UnifiedIdentitySyncBackend) : this({ store }, { identities })
     suspend fun identify(song: SongItem) = store.identify(song)
-    suspend fun load(songId: String) = store.load(songId)
+    fun isCurrent(target: UnifiedPlaybackTarget): Boolean = target.aliasRevision?.let(identities::isAliasRevisionCurrent) ?: true
+    suspend fun load(songId: String): UnifiedPlaybackTarget? {
+        store.load(songId)?.let { return it }
+        val lookup = identities.lookupLocal(songId)
+        if (lookup.status != LocalIdentityLookupStatus.READY) return null
+        for (localId in lookup.localSongIds) {
+            if (localId != songId) store.load(localId)?.let { target ->
+                val revision = lookup.decisionRevision ?: return null
+                return target.copy(aliasRevision = revision).takeIf(::isCurrent)
+            }
+        }
+        return null
+    }
 }
 
 /** Reads exact links only. Similar titles never select a different source or merge two UUIDs. */

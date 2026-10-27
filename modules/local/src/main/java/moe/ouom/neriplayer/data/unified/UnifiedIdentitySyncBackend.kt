@@ -23,6 +23,10 @@ data class RoomIdentityCaptureResult(
 )
 
 data class PortableIdentityExport(val bytes: ByteArray, val capture: RoomIdentityCaptureResult)
+enum class LocalIdentityLookupStatus { READY, INVALID_ID, UNKNOWN_ID, DELETED, CONFLICT, NOT_ON_DEVICE }
+data class LocalIdentityLookup(val status: LocalIdentityLookupStatus, val canonicalSongId: String? = null,
+    val localSongIds: List<String> = emptyList(), val decisionRevision: Long? = null)
+
 data class IdentityBackendSyncResult(val capture: RoomIdentityCaptureResult, val remote: UnifiedIdentitySyncOutcome)
 
 /** Explicit backend entry. Captures portable recording identities, not playlist membership or rights. */
@@ -32,6 +36,9 @@ class UnifiedIdentitySyncBackend private constructor(
 ) {
     private val captureMutex = Mutex()
     private val syncMutex = Mutex()
+    private data class AliasCache(val revision: Long, val state: UnifiedIdentityMergeResult,
+        val songs: Map<String, UnifiedIdentityState>, val originals: Map<String, List<String>>)
+    @Volatile private var aliasCache: AliasCache? = null
     private val database by lazy(databaseProvider)
     private val journal by lazy(journalProvider)
 
@@ -42,6 +49,32 @@ class UnifiedIdentitySyncBackend private constructor(
     )
 
     internal constructor(database: NeriUserDataDatabase, journal: UnifiedIdentityJournal) : this({ database }, { journal })
+
+    /** Resolve a foreign UUID without moving legacy keys, sources, memberships or user metadata. */
+    suspend fun lookupLocal(songId: String): LocalIdentityLookup = withContext(Dispatchers.IO) {
+        if (!canonicalUuid(songId)) return@withContext LocalIdentityLookup(LocalIdentityLookupStatus.INVALID_ID)
+        val revision = journal.revision.value
+        val cached = aliasCache?.takeIf { it.revision == revision } ?: journal.snapshot().let { state ->
+            AliasCache(revision, state, state.songs.associateBy { it.songId },
+                state.aliases.keys.sorted().groupBy { state.aliases.getValue(it) }).also { aliasCache = it }
+        }
+        val canonical = cached.state.aliases[songId]
+            ?: return@withContext LocalIdentityLookup(LocalIdentityLookupStatus.UNKNOWN_ID)
+        val state = cached.songs[canonical]
+            ?: return@withContext LocalIdentityLookup(LocalIdentityLookupStatus.UNKNOWN_ID, canonical)
+        if (state.deleted) return@withContext LocalIdentityLookup(LocalIdentityLookupStatus.DELETED, canonical)
+        if (state.hasConflict) return@withContext LocalIdentityLookup(LocalIdentityLookupStatus.CONFLICT, canonical)
+        val local = mutableListOf<String>()
+        for (page in cached.originals.getValue(canonical).chunked(200)) {
+            currentCoroutineContext().ensureActive()
+            local += database.unifiedLibraryDao().songsByIds(page).map { it.songId }.sorted()
+            if (local.size >= 32) break
+        }
+        LocalIdentityLookup(if (local.isEmpty()) LocalIdentityLookupStatus.NOT_ON_DEVICE else LocalIdentityLookupStatus.READY,
+            canonical, local.take(32), revision)
+    }
+
+    fun isAliasRevisionCurrent(revision: Long): Boolean = journal.revision.value == revision
 
     suspend fun snapshot() = withContext(Dispatchers.IO) { journal.snapshot() }
     suspend fun mergeRemote(bytes: ByteArray) = withContext(Dispatchers.IO) { journal.mergeRemote(bytes) }
@@ -98,5 +131,11 @@ class UnifiedIdentitySyncBackend private constructor(
         RoomIdentityCaptureResult(scanned, excludedDevice, excludedUnsupported, observations.size, journal.capture(observations))
     } }
 
-    private companion object { const val MAX_SCANNED_SOURCES = 200_000 }
+    companion object {
+        private const val MAX_SCANNED_SOURCES = 200_000
+        @Volatile private var shared: UnifiedIdentitySyncBackend? = null
+        fun getInstance(context: Context): UnifiedIdentitySyncBackend = shared ?: synchronized(this) {
+            shared ?: UnifiedIdentitySyncBackend(context.applicationContext ?: context).also { shared = it }
+        }
+    }
 }

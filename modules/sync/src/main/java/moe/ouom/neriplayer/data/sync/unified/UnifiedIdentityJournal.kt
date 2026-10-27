@@ -4,6 +4,9 @@ import java.io.File
 import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
@@ -33,7 +36,9 @@ class UnifiedIdentityJournal(
     private val file: File,
     private val write: (File, String) -> Unit = { target, text -> target.writeTextAtomically(text) }
 ) {
-    private val mutex = locks.computeIfAbsent(file.canonicalPath) { Mutex() }
+    private val coordination = locks.computeIfAbsent(file.canonicalPath) { JournalCoordination() }
+    private val mutex = coordination.mutex
+    val revision = coordination.revision.asStateFlow()
     private val json = Json { encodeDefaults = true; ignoreUnknownKeys = false; isLenient = false }
 
     suspend fun snapshot(): UnifiedIdentityMergeResult = transaction { state ->
@@ -143,7 +148,12 @@ class UnifiedIdentityJournal(
         require(text.toByteArray(Charsets.UTF_8).size <= UnifiedIdentityCodec.MAX_BYTES) { "Identity journal too large" }
         // Publish no in-memory counter: failed writes leave the prior actor/counter authoritative.
         write(file, text)
+        coordination.revision.update { it + 1L }
     }
 
-    private companion object { val locks = ConcurrentHashMap<String, Mutex>() }
+    private class JournalCoordination {
+        val mutex = Mutex()
+        val revision = MutableStateFlow(0L)
+    }
+    private companion object { val locks = ConcurrentHashMap<String, JournalCoordination>() }
 }

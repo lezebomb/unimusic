@@ -50,8 +50,9 @@ internal suspend fun PlayerManager.resolveUnifiedSongUrl(
     sideEffects: RefreshResolverSideEffects = RefreshResolverSideEffects()
 ): SongUrlResult {
     val started = SystemClock.elapsedRealtime()
+    val backend = UnifiedPlaybackBackend(application)
     val target = withTimeoutOrNull(8_000) {
-        try { UnifiedPlaybackBackend(application).load(unifiedSongId) }
+        try { backend.load(unifiedSongId) }
         catch (cancelled: CancellationException) { throw cancelled }
         catch (error: Exception) {
             NPLogger.w("NERI-PlayerManager", "Unified recording unavailable: type=${error.javaClass.simpleName}")
@@ -66,8 +67,10 @@ internal suspend fun PlayerManager.resolveUnifiedSongUrl(
     }
     val result = withSourceResolutionBudget(remaining) {
         resolveSongUrlFromLegacySource(target.song, forceRefresh = forceRefresh,
-            sideEffects = sideEffects, unifiedSongId = target.songId)
+            sideEffects = sideEffects, unifiedSongId = target.songId,
+            shouldApplyCacheMutation = { backend.isCurrent(target) })
     }
+    if (!backend.isCurrent(target)) return SongUrlResult.Failure
     if (result != null) return result
     emitSourceResolutionTimeout(sideEffects)
     return SongUrlResult.Failure
