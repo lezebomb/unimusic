@@ -25,6 +25,8 @@ internal fun AggregateSearchStatus(snapshot: FederatedSearchSnapshot<ExploreSear
         "qqmusic" to "QQ 音乐")
     val authRequired = stringResource(CoreCommonR.string.explore_source_login)
     val disabled = stringResource(CoreCommonR.string.explore_source_disabled)
+    val timedOut = stringResource(CoreCommonR.string.unimusic_search_source_timeout)
+    val network = stringResource(CoreCommonR.string.unimusic_search_source_network)
     val unavailable = stringResource(CoreCommonR.string.explore_source_unavailable)
     Column(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 6.dp)) {
         Text(snapshot.sources.entries.joinToString(" · ") { (id, state) ->
@@ -33,13 +35,15 @@ internal fun AggregateSearchStatus(snapshot: FederatedSearchSnapshot<ExploreSear
                 state.loading -> "…"
                 state.failure == SearchSourceFailure.AUTH_REQUIRED -> authRequired
                 state.failure == SearchSourceFailure.DISABLED -> disabled
+                state.failure == SearchSourceFailure.TIMEOUT -> timedOut
+                state.failure == SearchSourceFailure.NETWORK -> network
                 state.failure != null -> unavailable
                 else -> state.items.size.toString()
             }
             "$name $suffix"
         }, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         if (snapshot.loading) LinearProgressIndicator(Modifier.fillMaxWidth().padding(top = 4.dp))
-        if (!snapshot.loading && snapshot.sources.values.any { it.failure != null && it.nextCursor != null }) {
+        if (!snapshot.loading && snapshot.retryableSourceIds.isNotEmpty()) {
             androidx.compose.material3.TextButton(onClick = onRetry) { Text(stringResource(CoreCommonR.string.explore_aggregate_retry)) }
         }
     }

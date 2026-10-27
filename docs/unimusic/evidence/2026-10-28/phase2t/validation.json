@@ -1,0 +1,23 @@
+{
+  "phase": "2T",
+  "date": "2026-10-28",
+  "jvm": {
+    "tests": 8,
+    "newTests": 3,
+    "failures": 0,
+    "errors": 0,
+    "timing": "virtual time only"
+  },
+  "build": "Initial and final Debug passed; phase2t-source-specific-retry.log / phase2t-final-inner-timeout.log",
+  "moduleBoundaries": "Module boundaries: passed",
+  "apk": {
+    "path": "app/build/outputs/apk/debug/app-debug.apk",
+    "sha256": "33e3cd873b83b9bb233299b5b8fda37a18f70cdc5300136703108a434fc317b8",
+    "bytes": 62985043
+  },
+  "notRun": [
+    "device installation/UI",
+    "real server retry/timing",
+    "account/audio"
+  ]
+}

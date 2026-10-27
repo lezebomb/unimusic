@@ -3,6 +3,7 @@ package moe.ouom.neriplayer.common.search
 import java.io.IOException
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.withTimeout
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
@@ -78,6 +79,44 @@ class FederatedSearchEngineTest {
         assertEquals(2, attempts)
     }
 
+    @Test fun healthyPaginationDoesNotRetryFailedSourcesAndExplicitRetryKeepsHealthyCursors() = runTest {
+        var healthyCalls = 0
+        var failedCalls = 0
+        val engine = FederatedSearchEngine(listOf(
+            FederatedSearchProvider("healthy") { _: String, cursor: String? ->
+                healthyCalls++
+                if (cursor == null) SearchPage(listOf("a"), "page2") else SearchPage(listOf("b"))
+            },
+            FederatedSearchProvider("flaky") { _: String, _: String? ->
+                if (++failedCalls == 1) throw IOException("fixture")
+                SearchPage(listOf("recovered"))
+            }
+        ), identity = { it })
+        val initial = engine.search("song").toList().last()
+        assertEquals(setOf("healthy"), initial.paginationSourceIds)
+        assertEquals(setOf("flaky"), initial.retryableSourceIds)
+        val page = engine.search("song", initial, initial.paginationSourceIds).toList().last()
+        assertEquals(2, healthyCalls);assertEquals(1, failedCalls)
+        assertFalse(page.hasMoreResults);assertEquals(listOf("a", "b"), page.sources.getValue("healthy").items)
+        val retried = engine.search("song", page, page.retryableSourceIds).toList().last()
+        assertEquals(2, healthyCalls);assertEquals(2, failedCalls)
+        assertEquals(listOf("a", "b"), retried.sources.getValue("healthy").items)
+        assertTrue(retried.retryableSourceIds.isEmpty());assertFalse(retried.hasMoreResults)
+    }
+
+    @Test fun changingCursorWithNoNewIdentityStopsAutoPagingButRemainsExplicitlyRetryable() = runTest {
+        var calls = 0
+        val engine = FederatedSearchEngine(listOf(FederatedSearchProvider("repeating") { _: String, _: String? ->
+            calls++;SearchPage(listOf("same"), "cursor$calls")
+        }), identity = { it })
+        val first = engine.search("song").toList().last()
+        val stalled = engine.search("song", first, first.paginationSourceIds).toList().last()
+        assertEquals(2, calls)
+        assertFalse(stalled.hasMoreResults)
+        assertEquals(setOf("repeating"), stalled.retryableSourceIds)
+        assertEquals(listOf("same"), stalled.interleavedItems())
+    }
+
     @Test fun concurrencyIsBoundedAndQueueTimeCountsAgainstBudget() = runTest {
         var active = 0
         var maximum = 0
@@ -92,6 +131,18 @@ class FederatedSearchEngineTest {
         assertEquals(2, result.sources.values.count { it.failure == SearchSourceFailure.TIMEOUT })
         assertEquals(1500L, testScheduler.currentTime)
         assertEquals(0, active)
+    }
+
+    @Test fun anAdaptersOwnTimeoutFinishesItsStateWithoutCancellingHealthyResults() = runTest {
+        val engine = FederatedSearchEngine(listOf(
+            FederatedSearchProvider<String>("inner-timeout") { _, _ -> withTimeout(10) { delay(9000);SearchPage(emptyList()) } },
+            FederatedSearchProvider("fast") { _: String, _: String? -> SearchPage(listOf("ready")) }
+        ), identity = { it }, sourceBudgetMs = 100)
+        val result = engine.search("song").toList().last()
+        assertFalse(result.loading)
+        assertEquals(SearchSourceFailure.TIMEOUT, result.sources.getValue("inner-timeout").failure)
+        assertEquals(listOf("ready"), result.interleavedItems())
+        assertEquals(10L, testScheduler.currentTime)
     }
 
     @Test fun parentCancellationStopsWorkAndDisabledSourceCannotBePaged() = runTest {

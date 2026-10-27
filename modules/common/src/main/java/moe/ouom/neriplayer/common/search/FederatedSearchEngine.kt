@@ -3,6 +3,9 @@ package moe.ouom.neriplayer.common.search
 import java.io.IOException
 import java.text.Normalizer
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.TimeoutCancellationException
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.launch
@@ -35,6 +38,9 @@ data class SourceSearchState<T>(
 data class FederatedSearchSnapshot<T>(val query: String, val sources: Map<String, SourceSearchState<T>>) {
     val loading: Boolean get() = sources.values.any { it.loading }
     val hasMore: Boolean get() = sources.values.any { it.nextCursor != null }
+    val paginationSourceIds: Set<String> get() = sources.filterValues { !it.loading && it.failure == null && it.nextCursor != null }.keys
+    val retryableSourceIds: Set<String> get() = sources.filterValues { !it.loading && it.failure != null && it.nextCursor != null }.keys
+    val hasMoreResults: Boolean get() = paginationSourceIds.isNotEmpty()
 
     /** Stable provider order, independent of network completion order. No cross-source identity guess. */
     fun interleavedItems(): List<T> = buildList {
@@ -62,14 +68,18 @@ class FederatedSearchEngine<T>(
         require(providers.map { it.id }.containsAll(localProviders)) { "Unknown local search provider" }
     }
 
-    fun search(query: String, previous: FederatedSearchSnapshot<T>? = null): Flow<FederatedSearchSnapshot<T>> = channelFlow {
+    fun search(query: String, previous: FederatedSearchSnapshot<T>? = null,
+        sourceIds: Set<String>? = null): Flow<FederatedSearchSnapshot<T>> = channelFlow {
         val normalized = normalizeFederatedQuery(query)
         require(normalized.isNotBlank())
         require(previous == null || previous.query == normalized) { "Cannot reuse another query's cursors" }
+        val selected = sourceIds?.toSet()
+        require(selected == null || previous != null) { "Selective continuation requires a snapshot" }
+        require(selected == null || providers.map { it.id }.containsAll(selected)) { "Unknown search source" }
         val states = providers.associateTo(linkedMapOf()) { provider ->
             val prior = previous?.sources?.get(provider.id) ?: SourceSearchState()
-            provider.id to prior.copy(loading = prior.nextCursor != null,
-                failure = if (prior.nextCursor != null) null else prior.failure)
+            val requested = (selected == null || provider.id in selected) && prior.nextCursor != null
+            provider.id to prior.copy(loading = requested, failure = if (requested) null else prior.failure)
         }
         val mutex = Mutex()
         send(FederatedSearchSnapshot(normalized, states.toMap()))
@@ -87,10 +97,16 @@ class FederatedSearchEngine<T>(
                             val merged = (prior.items + page.items).distinctBy(identity)
                             // A provider repeating its cursor must not cause an infinite paging loop.
                             val cursor = page.nextCursor?.takeUnless { it == prior.nextCursor || it.isEmpty() }
-                            SourceSearchState(merged, cursor)
+                            if (cursor != null && merged.size == prior.items.size) {
+                                // A changing cursor without new identities must not drive an endless auto-page loop.
+                                prior.copy(loading = false, failure = SearchSourceFailure.UNAVAILABLE)
+                            } else SourceSearchState(merged, cursor)
                         } ?: prior.copy(loading = false, failure = SearchSourceFailure.TIMEOUT)
                     } catch (cancelled: CancellationException) {
-                        throw cancelled
+                        // An adapter's own timeout must finish this source; actual query cancellation still propagates.
+                        currentCoroutineContext().ensureActive()
+                        prior.copy(loading = false, failure = if (cancelled is TimeoutCancellationException)
+                            SearchSourceFailure.TIMEOUT else SearchSourceFailure.UNAVAILABLE)
                     } catch (error: SearchSourceException) {
                         prior.copy(loading = false, failure = error.reason,
                             nextCursor = if (error.reason in setOf(SearchSourceFailure.AUTH_REQUIRED, SearchSourceFailure.DISABLED)) null else prior.nextCursor)

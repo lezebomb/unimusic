@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="unimusic_search_source_timeout">Timed out</string>
+    <string name="unimusic_search_source_network">Network error</string>
+</resources>

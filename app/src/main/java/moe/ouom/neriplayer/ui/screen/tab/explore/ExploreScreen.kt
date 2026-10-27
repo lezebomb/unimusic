@@ -914,7 +914,7 @@ fun ExploreScreen(
                 }
 
             if (ui.selectedSearchSource == SearchSource.ALL && searchQuery.isNotBlank()) {
-                AggregateSearchStatus(ui.aggregateSnapshot, vm::loadMoreSearchResults)
+                AggregateSearchStatus(ui.aggregateSnapshot, vm::retryFailedAggregateSources)
             }
             HorizontalPager(
                 state = pagerState,

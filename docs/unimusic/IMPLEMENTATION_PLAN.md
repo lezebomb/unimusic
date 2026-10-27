@@ -63,6 +63,8 @@
 
 ## Phase 2：统一搜索与高精度匹配
 
+2T已分离健康分页/失败重试，补无进展分页和内部timeout结束保护，8项相关JVM/最终APK/边界通过，见[2T](PHASE_2T_SELECTIVE_SEARCH_RETRY.md)。无真实设备/网络耗时或音频验收。
+
 2S已预计算发现排序证据并隔离搜索键字段，7项JVM/最终APK/边界通过，见[2S](PHASE_2S_DISCOVERY_RANKING_AND_KEYS.md)。规则优先级保持，无实测CPU/网络性能声明。
 
 2R已补显式合成人声/版本词掩盖门槛与自动证据v3，8项相关JVM、最终APK/边界通过，见[2R](PHASE_2R_EXPLICIT_VERSION_AND_VOICE_GATES.md)。仍为保守元数据规则，无真实听辨/声纹或准确率结论；手动选择和Room数据保留。

@@ -1,0 +1,14 @@
+<?xml version='1.0' encoding='utf-8'?>
+<testsuite name="moe.ouom.neriplayer.common.search.FederatedSearchEngineTest" tests="8" skipped="0" failures="0" errors="0" timestamp="2026-10-27T23:21:16.383Z" hostname="local" time="0.494">
+  <properties />
+  <testcase name="parentCancellationStopsWorkAndDisabledSourceCannotBePaged" classname="moe.ouom.neriplayer.common.search.FederatedSearchEngineTest" time="0.427" />
+  <testcase name="concurrencyIsBoundedAndQueueTimeCountsAgainstBudget" classname="moe.ouom.neriplayer.common.search.FederatedSearchEngineTest" time="0.02" />
+  <testcase name="pagingRetriesOnlyPendingSourcesAndDeduplicatesWithinEachSource" classname="moe.ouom.neriplayer.common.search.FederatedSearchEngineTest" time="0.008" />
+  <testcase name="healthyPaginationDoesNotRetryFailedSourcesAndExplicitRetryKeepsHealthyCursors" classname="moe.ouom.neriplayer.common.search.FederatedSearchEngineTest" time="0.007" />
+  <testcase name="slowLocalIndexDoesNotOccupyAnOnlineSlotOrDelayTheFastProvider" classname="moe.ouom.neriplayer.common.search.FederatedSearchEngineTest" time="0.007" />
+  <testcase name="fastResultsSurviveOtherSourcesFailingOrTimingOut" classname="moe.ouom.neriplayer.common.search.FederatedSearchEngineTest" time="0.007" />
+  <testcase name="changingCursorWithNoNewIdentityStopsAutoPagingButRemainsExplicitlyRetryable" classname="moe.ouom.neriplayer.common.search.FederatedSearchEngineTest" time="0.004" />
+  <testcase name="anAdaptersOwnTimeoutFinishesItsStateWithoutCancellingHealthyResults" classname="moe.ouom.neriplayer.common.search.FederatedSearchEngineTest" time="0.006" />
+  <system-out />
+  <system-err />
+</testsuite>

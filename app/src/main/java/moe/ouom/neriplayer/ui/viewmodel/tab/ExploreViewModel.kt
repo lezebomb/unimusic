@@ -477,9 +477,7 @@ class ExploreViewModel(application: Application) : AndroidViewModel(application)
         val state = _uiState.value
         val source = state.selectedSearchSource
         if (source == SearchSource.ALL) {
-            if (!state.searching && !state.searchLoadingMore && state.searchHasMore && searchMoreJob?.isActive != true) {
-                searchMoreJob = launchAggregateSearch(state.searchKeyword, searchRequestVersion, state.aggregateSnapshot)
-            }
+            state.aggregateSnapshot?.let { continueAggregateSources(it, it.paginationSourceIds) }
             return
         }
         if (source == SearchSource.NETEASE && !isNeteaseSearchAllowed()) {
@@ -608,24 +606,35 @@ class ExploreViewModel(application: Application) : AndroidViewModel(application)
         searchJob = launchAggregateSearch(keyword, requestVersion, null)
     }
 
+    fun retryFailedAggregateSources() {
+        val state = _uiState.value
+        state.aggregateSnapshot?.let { continueAggregateSources(it, it.retryableSourceIds) }
+    }
+
+    private fun continueAggregateSources(snapshot: FederatedSearchSnapshot<ExploreSearchResult>, sourceIds: Set<String>) {
+        val state = _uiState.value
+        if (state.selectedSearchSource != SearchSource.ALL || state.searchKeyword.isBlank() || sourceIds.isEmpty() ||
+            state.searching || state.searchLoadingMore || searchJob?.isActive == true || searchMoreJob?.isActive == true) return
+        searchMoreJob = launchAggregateSearch(state.searchKeyword, searchRequestVersion, snapshot, sourceIds)
+    }
+
     private fun launchAggregateSearch(keyword: String, requestVersion: Long,
-        previous: FederatedSearchSnapshot<ExploreSearchResult>?): Job {
+        previous: FederatedSearchSnapshot<ExploreSearchResult>?, sourceIds: Set<String>? = null): Job {
         val engine = checkNotNull(aggregateEngine)
         val ranker = checkNotNull(aggregateRanker)
         return viewModelScope.launch {
-            engine.search(keyword, previous).collect { snapshot ->
+            engine.search(keyword, previous, sourceIds).collect { snapshot ->
                 val checks = _uiState.value.nativeSourceChecks
                 val items = withContext(Dispatchers.Default) { ranker.rank(snapshot.interleavedItems(), checks) }
                 updateSearchStateIfCurrent(requestVersion, SearchSource.ALL) { state ->
-                    val retryableFailure = snapshot.sources.values.any { it.failure != null && it.nextCursor != null }
                     state.copy(
                         searching = previous == null && snapshot.loading,
                         searchLoadingMore = previous != null && snapshot.loading,
                         searchError = null,
                         searchResults = searchSongItems(items),
                         searchItems = items,
-                        searchHasMore = snapshot.hasMore,
-                        searchLoadMoreError = if (!snapshot.loading && retryableFailure) app.getString(CoreCommonR.string.explore_aggregate_retry) else null,
+                        searchHasMore = snapshot.hasMoreResults,
+                        searchLoadMoreError = null, // Per-source failures remain actionable in AggregateSearchStatus.
                         aggregateSnapshot = snapshot,
                         searchPage = 1
                     )
