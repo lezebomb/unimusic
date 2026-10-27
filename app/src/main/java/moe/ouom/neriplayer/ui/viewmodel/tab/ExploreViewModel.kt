@@ -42,7 +42,6 @@ import moe.ouom.neriplayer.common.search.SearchSourceException
 import moe.ouom.neriplayer.common.search.SearchSourceFailure
 import moe.ouom.neriplayer.common.search.normalizeFederatedQuery
 import moe.ouom.neriplayer.data.local.playlist.LocalPlaylistRepository
-import moe.ouom.neriplayer.data.local.media.LocalSongSupport
 import moe.ouom.neriplayer.data.identity.stableKey
 import moe.ouom.neriplayer.common.R as CoreCommonR
 import moe.ouom.neriplayer.data.model.bilibili.collection.FavFolder
@@ -69,8 +68,6 @@ import moe.ouom.neriplayer.platform.youtube.config.YouTubeFeatureGate
 import moe.ouom.neriplayer.platform.youtube.api.transport.buildYouTubeMusicMediaUri
 import moe.ouom.neriplayer.platform.youtube.api.transport.stableYouTubeMusicId
 import moe.ouom.neriplayer.platform.youtube.api.transport.youtubeMusicThumbnailUrl
-import moe.ouom.neriplayer.common.search.SearchTextMatcher
-import moe.ouom.neriplayer.util.search.searchValues
 import org.json.JSONObject
 
 private const val TAG = "NERI-ExploreVM"
@@ -576,21 +573,15 @@ class ExploreViewModel(application: Application) : AndroidViewModel(application)
 
     /** Discover metadata independently; catalog entries never impersonate a playable provider. */
     private fun searchAggregate(keyword: String, requestVersion: Long) {
-        val localSongs = LocalPlaylistRepository.getInstance(app).playlists.value
-            .flatMap { it.songs }.filter { LocalSongSupport.isLocalSong(it) }.distinctBy { it.stableKey() }
-        var localIndex: SearchTextMatcher.Index<SongItem>? = null
+        val localSearch = moe.ouom.neriplayer.ui.viewmodel.tab.search.ExploreLocalSearchSession(loadPlaylists = {
+            val library = LocalPlaylistRepository.getInstance(app)
+            if (!library.awaitInitialized()) throw SearchSourceException(SearchSourceFailure.UNAVAILABLE)
+            library.playlists.value
+        })
         val accountContext = neteaseClient.searchSessionIdentity()
         aggregateRanker = ExploreSearchRankingSession(_uiState.value.searchDisplayQuery)
         aggregateEngine = FederatedSearchEngine<ExploreSearchResult>(listOf(
-            FederatedSearchProvider("local") { query, cursor ->
-                val offset = cursor?.toIntOrNull() ?: 0
-                val ranked = withContext(Dispatchers.Default) {
-                    val index = localIndex ?: SearchTextMatcher.index(localSongs) { it.searchValues() }.also { localIndex = it }
-                    index.filterAndRank(query)
-                }
-                SearchPage(ranked.drop(offset).take(30).map(ExploreSearchResult::Song),
-                    (offset + 30).takeIf { it < ranked.size }?.toString())
-            },
+            FederatedSearchProvider("local") { query, cursor -> localSearch.page(query, cursor) },
             FederatedSearchProvider("netease") { query, cursor ->
                 if (!isNeteaseSearchAllowed() || accountContext !== neteaseClient.searchSessionIdentity()) {
                     throw SearchSourceException(SearchSourceFailure.AUTH_REQUIRED)
@@ -620,7 +611,7 @@ class ExploreViewModel(application: Application) : AndroidViewModel(application)
                 val page = AppContainer.qqMusicAudioClient.search(query, cursor, limit = 20)
                 SearchPage(page.tracks.map(ExploreSearchResult::Catalog), page.nextCursor)
             }
-        ), identity = { it.stableKey }, parallelism = 4)
+        ), identity = { it.stableKey }, parallelism = 5, localProviderIds = setOf("local"))
         searchJob = launchAggregateSearch(keyword, requestVersion, null)
     }
 

@@ -1,0 +1,24 @@
+{
+  "phase": "2Q",
+  "date": "2026-10-28",
+  "jvm": {
+    "tests": 6,
+    "newTests": 2,
+    "failures": 0,
+    "errors": 0,
+    "latency": "virtual scheduler only; fast at 10ms while slow sources still pending; total synthetic budget 500ms"
+  },
+  "build": "Debug passed; phase2q-local-search-scheduling.log",
+  "moduleBoundaries": "Module boundaries: passed",
+  "apk": {
+    "path": "app/build/outputs/apk/debug/app-debug.apk",
+    "sha256": "48dd206541dd6607c671844321bce1b83ea45eca42eb90c27427934ace6159f5",
+    "bytes": 62981867
+  },
+  "notRun": [
+    "device install/UI",
+    "live source latency",
+    "large-library benchmarks",
+    "account/audio"
+  ]
+}

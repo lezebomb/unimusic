@@ -63,6 +63,8 @@
 
 ## Phase 2：统一搜索与高精度匹配
 
+2Q已交付聚合本地检索后台化、本地与5个在线槽分离、按查询缓存本地分页，6项相关JVM/最终APK/边界通过，见[2Q](PHASE_2Q_AGGREGATE_SEARCH_SCHEDULING.md)。无真实网络耗时/设备性能结论，未修改原唱/权限门槛。
+
 2A 已完成现有播放路径的元数据/版本门槛、分 P 歧义拒绝、可取消/有预算的临播解析和暂时失败冷却，详情见 [实现与边界](PHASE_2A_SOURCES.md)。这不是完整 Phase 2：来源权利能力注册、SongMatch/Override 持久化、统一搜索和 `SourceResolver(unifiedSongId)` 尚未实现。合成测试没有建立实际错误率或覆盖率结论。
 
 2B 已增加现有四来源聚合搜索与版本排序，复用原搜索的 300ms 输入去抖及 generation 取消，独立游标/预算/失败可见；点击播放才解析 URL。现阶段保留跨平台候选，不做无证据的录音合并。音源机制参考与实际范围见 [调研](MUSIC_SOURCE_RESEARCH.md) 和 [2B 报告](PHASE_2B_SEARCH.md)。后续仍需来源权利能力、持久匹配/拒绝和统一 UUID 临播入口。

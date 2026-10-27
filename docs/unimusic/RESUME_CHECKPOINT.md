@@ -6,6 +6,8 @@
 
 ## 最新可接续状态
 
+- 最新2Q已把发现聚合的本地等待/扫描/去重/索引/排序移后台，分离本地任务与5个在线槽，并缓存本地分页排名；新2项/共6项JVM、最终Debug与边界通过，见[2Q](PHASE_2Q_AGGREGATE_SEARCH_SCHEDULING.md)。虚拟时间不代表线上性能，无设备/账号/音频新验收。原唱/版本门槛未放宽，下一步保守匹配改进。4D已推送`f7202cba`，新CI状态另确认。
+
 - 3D.1～3D.8完成独立歌曲标识契约、精确来源UUID别名、因果删除/冲突、持久dot日志、只读Room批量捕获、本机基线、WebDAV/GitHub条件同步后台及显式入口、冲突选择、外来UUID临播适配与修订复核。最新见[3D.8](PHASE_3D8_GITHUB_IDENTITY_SYNC.md)，代码以git log/status为准。
 - 这是身份/元数据子集；歌单仍走原同步，不上传推荐反馈/凭据/设备路径或可播权限。不自动启用云同步，不重写Room原ID、歌单关系和本机显示字段。Room仍v23，无新迁移。
 - 3D.8新2项合成HTTP/Debug/最终边界通过；结构超限已归类解决，最终日志`phase3d8-final-package-build.log`。3D.7[CI 40594234079](https://github.com/lezebomb/unimusic/actions/runs/40594234079)已成功，包含此前新增身份关键集；更新后的CI需另核对。被后续提交替代取消的旧run不能算失败或成功。

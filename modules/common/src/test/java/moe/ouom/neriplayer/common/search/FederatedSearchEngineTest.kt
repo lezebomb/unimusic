@@ -31,6 +31,29 @@ class FederatedSearchEngineTest {
         assertEquals(1000L, testScheduler.currentTime)
     }
 
+    @Test fun slowLocalIndexDoesNotOccupyAnOnlineSlotOrDelayTheFastProvider() = runTest {
+        var active = 0
+        var maximum = 0
+        val engine = FederatedSearchEngine(listOf(
+            FederatedSearchProvider("local") { _: String, _: String? -> delay(9000);SearchPage(listOf("local")) },
+            FederatedSearchProvider("slow") { _: String, _: String? ->
+                active++;maximum = maxOf(maximum, active)
+                try { delay(9000);SearchPage(listOf("slow")) } finally { active-- }
+            },
+            FederatedSearchProvider("fast") { _: String, _: String? ->
+                active++;maximum = maxOf(maximum, active)
+                try { delay(10);SearchPage(listOf("fast")) } finally { active-- }
+            }
+        ), identity = { it }, sourceBudgetMs = 500, parallelism = 2, localProviderIds = setOf("local"))
+        val snapshots = mutableListOf<Pair<Long, FederatedSearchSnapshot<String>>>()
+        engine.search("song").collect { snapshots += testScheduler.currentTime to it }
+        val early = snapshots.first { "fast" in it.second.interleavedItems() }
+        assertEquals(10L, early.first);assertTrue(early.second.loading)
+        assertEquals(2, maximum);assertEquals(0, active)
+        assertEquals(500L, testScheduler.currentTime)
+        assertEquals(SearchSourceFailure.TIMEOUT, snapshots.last().second.sources.getValue("local").failure)
+    }
+
     @Test fun pagingRetriesOnlyPendingSourcesAndDeduplicatesWithinEachSource() = runTest {
         val cursors = mutableListOf<String?>()
         var attempts = 0

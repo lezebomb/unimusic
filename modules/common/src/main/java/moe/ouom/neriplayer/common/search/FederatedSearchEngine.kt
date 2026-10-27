@@ -50,13 +50,16 @@ class FederatedSearchEngine<T>(
     private val providers: List<FederatedSearchProvider<T>>,
     private val identity: (T) -> String,
     private val sourceBudgetMs: Long = 6_000,
-    parallelism: Int = 3
+    parallelism: Int = 3,
+    localProviderIds: Set<String> = emptySet()
 ) {
     private val permits = Semaphore(parallelism)
+    private val localProviders = localProviderIds.toSet()
 
     init {
         require(sourceBudgetMs > 0 && parallelism > 0)
         require(providers.map { it.id }.distinct().size == providers.size)
+        require(providers.map { it.id }.containsAll(localProviders)) { "Unknown local search provider" }
     }
 
     fun search(query: String, previous: FederatedSearchSnapshot<T>? = null): Flow<FederatedSearchSnapshot<T>> = channelFlow {
@@ -78,7 +81,8 @@ class FederatedSearchEngine<T>(
                     val result = try {
                         // Queueing time is included: a saturated/slow platform cannot extend the request forever.
                         withTimeoutOrNull(sourceBudgetMs) {
-                            permits.withPermit { provider.search(normalized, prior.nextCursor?.ifEmpty { null }) }
+                            if (provider.id in localProviders) provider.search(normalized, prior.nextCursor?.ifEmpty { null })
+                            else permits.withPermit { provider.search(normalized, prior.nextCursor?.ifEmpty { null }) }
                         }?.let { page ->
                             val merged = (prior.items + page.items).distinctBy(identity)
                             // A provider repeating its cursor must not cause an infinite paging loop.

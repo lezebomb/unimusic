@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<testsuite name="moe.ouom.neriplayer.ui.viewmodel.tab.search.ExploreLocalSearchSessionTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2026-10-27T22:51:01.452Z" hostname="local" time="0.34">
+  <properties />
+  <testcase name="localIndexRunsOffCallerAndPaginationReusesItsSnapshotAndRanking" classname="moe.ouom.neriplayer.ui.viewmodel.tab.search.ExploreLocalSearchSessionTest" time="0.338" />
+  <system-out />
+  <system-err />
+</testsuite>
