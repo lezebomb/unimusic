@@ -4,6 +4,8 @@
 
 **最新用户要求：暂停 YouTube 取流排查，先开发其他部分。Google/网易云登录与既有两份 5 首导入保留，不重复登录或重新导入。** 2P 已证实 Google 服务端账号成功，YouTube 音频仍失败；旧文“下一步排查取流”已被最新用户优先级覆盖。
 
+最新3D.2：持久actor/counter原子日志、重开与同进程多实例串行、严格导入/导出和显式恢复门槛已实现。新增3项/受影响4项共7项JVM、最终Debug APK与模块边界通过，见[3D.2](PHASE_3D2_DURABLE_IDENTITY_JOURNAL.md)。未接生产Room应用/上传、无设备安装、跨进程或断电验收。下一步只读Room批量快照和本地基线，避免重复覆盖远端编辑。3D.1已推送`cbcce273`，远端结果另核对。
+
 最新05:30阶段：3D.1已实现独立精确身份同步契约、UUID别名/因果删除合并与严格白名单编码，4个JVM、最终Debug APK和边界通过，见[3D.1报告](PHASE_3D1_PORTABLE_IDENTITY_CONTRACT.md)。尚未接生产网络/Room应用，仍不等于完整UUID同步。3C的[远端CI](https://github.com/lezebomb/unimusic/actions/runs/40564167581)已确认成功。下一步实现持久dot原子日志，然后接快照/别名投影；暂不重复安装手机或重做账号。
 
 Phase 4A 已完成“发现／我的”两标签、我的导入/历史/下载/统计入口、设置与调试入口及父子返回兼容。7 个定向 JVM 检查、Debug APK 和模块边界通过；Mate60 数据保留覆盖安装、搜索/设置返回、下载进出及导入弹层开关通过。没有重新验收账号、音频、平板或性能，详见 [4A报告](PHASE_4A_DISCOVER_AND_MY_LIBRARY.md)。APK/哈希、7项 XML 与设备检查保存在 `evidence/2026-10-28/phase4a/`。本阶段已推送；每个完成阶段 commit/push 后接着推进。

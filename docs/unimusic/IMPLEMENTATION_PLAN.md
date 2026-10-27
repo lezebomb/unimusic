@@ -105,7 +105,7 @@
 
 ## Phase 3：本地推荐与同步
 
-3D.1已实现独立身份/因果合并/严格编码契约，4项JVM与Debug构建通过，见[3D.1](PHASE_3D1_PORTABLE_IDENTITY_CONTRACT.md)。尚无持久dot分配、Room别名应用或生产上传，不标记完整同步交付。
+3D.1已实现独立身份/因果合并/严格编码契约，4项JVM与Debug构建通过，见[3D.1](PHASE_3D1_PORTABLE_IDENTITY_CONTRACT.md)。3D.2已补持久dot原子日志和显式恢复门槛，新增3项/相关共7项JVM与构建通过，见[3D.2](PHASE_3D2_DURABLE_IDENTITY_JOURNAL.md)。尚无Room别名应用或生产上传，不标记完整同步交付。
 
 3B已接精确身份的本机播放反馈、私有有界事件存储与推荐v3，见 [3B报告](PHASE_3B_PLAYBACK_RECOMMENDATION_SIGNALS.md)。这是实现与合成验证，实际Media3采样/异常持久性未验收；旧统计不回推事件，反馈未进入独立UUID dataset同步。
 

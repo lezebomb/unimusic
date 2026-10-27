@@ -22,17 +22,22 @@ object UnifiedIdentityCodec {
     }
 
     fun decode(bytes: ByteArray): UnifiedIdentityDataset {
+        val text = validateWire(bytes, setOf("schemaVersion", "capability"))
+        return json.decodeFromString<UnifiedIdentityDataset>(text).also(UnifiedIdentityValidation::validate)
+    }
+
+    internal fun validateWire(bytes: ByteArray, requiredRootFields: Set<String>): String {
         require(bytes.size <= MAX_BYTES) { "Unified identity document too large" }
         val text = Charsets.UTF_8.newDecoder().onMalformedInput(CodingErrorAction.REPORT)
             .onUnmappableCharacter(CodingErrorAction.REPORT).decode(ByteBuffer.wrap(bytes)).toString()
         JsonReader(StringReader(text)).use { reader ->
-            inspect(reader, 0)
+            inspect(reader, 0, requiredRootFields)
             require(reader.peek() == JsonToken.END_DOCUMENT) { "Trailing unified identity data" }
         }
-        return json.decodeFromString<UnifiedIdentityDataset>(text).also(UnifiedIdentityValidation::validate)
+        return text
     }
 
-    private fun inspect(reader: JsonReader, depth: Int) {
+    private fun inspect(reader: JsonReader, depth: Int, requiredRootFields: Set<String>) {
         require(depth <= 12) { "Unified identity document too deep" }
         when (reader.peek()) {
             JsonToken.BEGIN_OBJECT -> {
@@ -41,17 +46,17 @@ object UnifiedIdentityCodec {
                 while (reader.hasNext()) {
                     val name = reader.nextName()
                     require(name.length <= 128 && names.size < 64 && names.add(name)) { "Duplicate or oversized unified identity member" }
-                    inspect(reader, depth + 1)
+                    inspect(reader, depth + 1, requiredRootFields)
                 }
                 reader.endObject()
-                if (depth == 0) require(names.containsAll(setOf("schemaVersion", "capability"))) { "Missing unified identity protocol" }
+                if (depth == 0) require(names.containsAll(requiredRootFields)) { "Missing unified identity protocol" }
             }
             JsonToken.BEGIN_ARRAY -> {
                 reader.beginArray()
                 var count = 0
                 while (reader.hasNext()) {
                     require(++count <= UnifiedIdentityValidation.MAX_REVISIONS) { "Unified identity array too large" }
-                    inspect(reader, depth + 1)
+                    inspect(reader, depth + 1, requiredRootFields)
                 }
                 reader.endArray()
             }

@@ -1,0 +1,25 @@
+{
+  "phase": "3D.2",
+  "date": "2026-10-28",
+  "jvm": {
+    "tests": 7,
+    "newJournalTests": 3,
+    "failures": 0,
+    "errors": 0
+  },
+  "build": "Debug APK passed; phase3d2-durable-journal.log",
+  "moduleBoundaries": "Module boundaries: passed",
+  "apk": {
+    "path": "app/build/outputs/apk/debug/app-debug.apk",
+    "sha256": "5ec078708ec4c245d4be9e064ff6e19efdf5f603ea5cf0ae7b98bb378e7f7339",
+    "bytes": 62881459
+  },
+  "notRun": [
+    "device install",
+    "cross-process writer",
+    "power-loss filesystem test",
+    "production cloud/Room apply",
+    "two-device sync",
+    "account/audio/performance"
+  ]
+}
