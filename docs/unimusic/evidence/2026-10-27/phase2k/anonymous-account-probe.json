@@ -1,0 +1,10 @@
+{
+  "endpoint": "https://u.y.qq.com/cgi-bin/musicu.fcg",
+  "method": "GetLoginUserInfo",
+  "credentials_sent": false,
+  "http": 200,
+  "root_code": 0,
+  "account_code": 1000,
+  "data_fields": [],
+  "seconds": 0.23
+}

@@ -42,6 +42,7 @@ import moe.ouom.neriplayer.ui.screen.tab.settings.auth.loadBiliAccountProfile
 import moe.ouom.neriplayer.ui.screen.tab.settings.auth.loadNeteaseAccountProfile
 import moe.ouom.neriplayer.ui.screen.tab.settings.auth.loadYouTubeAccountProfile
 import moe.ouom.neriplayer.ui.screen.tab.settings.auth.rememberSettingsAccountProfile
+import moe.ouom.neriplayer.ui.screen.tab.settings.auth.rememberQQMusicAccountEntry
 import moe.ouom.neriplayer.ui.screen.tab.settings.component.InlineMessage
 import moe.ouom.neriplayer.ui.screen.tab.settings.state.formatSyncTime
 import moe.ouom.neriplayer.ui.viewmodel.auth.BiliAuthUiState
@@ -59,6 +60,7 @@ internal fun StartupPlatformAccounts(
     onLogin: (SettingsAccountPlatform) -> Unit,
     onManageSaved: (SettingsAccountPlatform) -> Unit
 ) {
+    val (qqAccount, qqActions) = rememberQQMusicAccountEntry()
     // 加密授权仓库首次访问留在 IO，避免平台步骤首次显示时阻塞绘制
     val biliAuthorizationFlow = remember {
         flow { emitAll(AppContainer.biliCookieRepo.cookieFlow) }
@@ -129,12 +131,12 @@ internal fun StartupPlatformAccounts(
                 profile = profiles.youtube.profile,
                 profileLoading = profiles.youtube.loading
             ),
-            SettingsAccountCardUiState(platform = SettingsAccountPlatform.QqMusic)
+            qqAccount
         ),
         inlineMessage = inlineMessage,
         onInlineMessageChange = onInlineMessageChange,
-        onLogin = onLogin,
-        onManageSaved = onManageSaved
+        onLogin = { if (it == SettingsAccountPlatform.QqMusic) qqActions.login() else onLogin(it) },
+        onManageSaved = { if (it == SettingsAccountPlatform.QqMusic) qqActions.manage() else onManageSaved(it) }
     )
 }
 

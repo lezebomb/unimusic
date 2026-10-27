@@ -1,0 +1,71 @@
+{
+  "date": "2026-10-27",
+  "phase": "2K",
+  "base_commit": "dc40b8a45f33d6384b56aca1f23741200fd9e026",
+  "room_version": 23,
+  "tests_passed": 4,
+  "new_test_methods": 4,
+  "test_suites": [
+    {
+      "name": "moe.ouom.neriplayer.platform.qqmusic.api.auth.QQMusicCredentialTest",
+      "tests": "2",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "0"
+    },
+    {
+      "name": "moe.ouom.neriplayer.platform.qqmusic.auth.QQMusicAuthRepositoryTest",
+      "tests": "2",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "0"
+    }
+  ],
+  "build": {
+    "result": "passed",
+    "log": "build/unimusic-toolchain/phase2k-final-build-io.log",
+    "seconds": 36,
+    "apk_path": "D:\\unimusic\\app\\build\\outputs\\apk\\debug\\app-debug.apk",
+    "apk_bytes": 62684678,
+    "apk_sha256": "34e322575cf383682025fa804e1cd8fdd8a2ce007629297899319bc112d00da4"
+  },
+  "boundaries": {
+    "module": "passed",
+    "platform_domains": "passed (0 violations)",
+    "logs": [
+      "phase2k-final-boundaries.log",
+      "phase2k-final-validation.log"
+    ]
+  },
+  "test_logs": [
+    "phase2k-validation.log",
+    "phase2k-final-validation.log"
+  ],
+  "anonymous_protocol_probe": "anonymous-account-probe.json",
+  "not_performed": [
+    "device/emulator installation or WebView UI",
+    "real QQ/WeChat account sign-in and positive server identity verification",
+    "QQ audio adapter integration or playback",
+    "Android Keystore hardware behavior (repository tests inject test SharedPreferences)",
+    "source failover/first sound or account-expiry endurance measurement"
+  ],
+  "auth_storage_scope": {
+    "default": "EncryptedSharedPreferences + shared secure opener",
+    "webview_process": ":qq_music_login",
+    "cookie_fields": [
+      "uin",
+      "wxuin",
+      "qqmusic_key",
+      "qm_keyst",
+      "login_type"
+    ],
+    "password_read_or_stored": false,
+    "library_sync_or_backup_payload_extended": false,
+    "logout_tombstone_persisted": true
+  },
+  "prior_ci": {
+    "commit": "dc40b8a45f33d6384b56aca1f23741200fd9e026",
+    "run": 40435919202,
+    "result": "success"
+  }
+}

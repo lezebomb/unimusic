@@ -2,7 +2,7 @@
 
 > 2026-10-27 的02:20和07:25两次单次续跑已执行，对应任务均已删除；没有新建重复计划。10月26日暂停交接仅为历史记录，按本文最新检查点接续。
 
-更新：2026-10-27（Asia/Shanghai）。2J新增GD网易云精确ID手动选择的在线播放路径，已通过实际Kotlin客户端联网取址和两个CDN HEAD；8个关键检查、最终Debug构建和相关边界通过，Room仍v23。GD不走磁盘音频缓存/下载/分享，不等于全曲库可播或真机播放完成。用户最新要求“把各种平台的登录接口也搞一下，我可以分别登录”：下一步检查既有网易云/B站/YouTube入口，并优先补QQ正常网页登录及安全凭证链。不要再重复只做音源缓存或只查目录。
+更新：2026-10-27（Asia/Shanghai）。2K已按用户“我可以分别登录”的要求补QQ官方网页登录、安全凭证仓库、严格身份校验、重新登录与退出，首次设置/设置账号页均接入；4个关键测试、最终APK和边界通过，Room仍v23。没有真实账号或设备验收，QQ完整音频Provider尚未接完。2J的GD精确ID在线播放已接，仍不走音频磁盘缓存/下载/分享；不要退回只查目录或只做缓存。下一步优先在正常账号链上接QQ取流，再核实酷我正常音频，不能把登录成功/地址HTTP200当全量可播。
 
 ## 已完成和推送
 
@@ -21,9 +21,12 @@
 - Phase 2G：`5976e9fb` 完成 MusicSourceRegistry、单来源显式校验和类型化结果、精确决策戳复核、校验菜单。见 [2G](PHASE_2G_SOURCE_AVAILABILITY.md)，此前[对应CI](https://github.com/lezebomb/unimusic/actions/runs/40421809825)已确认成功。
 - Phase 2H：`0c4df844` 完成共享解析预算、聚合4路并发、B站两个查询并发及更保守原唱匹配。见 [2H](PHASE_2H_LATENCY_AND_ORIGINAL_MATCHING.md)，[对应CI](https://github.com/lezebomb/unimusic/actions/runs/40428919546)已成功。
 - Phase 2I：`c9a08ba1` 完成自动成功来源持久映射和预算/失效/修订复核，见 [2I](PHASE_2I_PERSISTENT_SOURCE_FALLBACK.md) 和 `evidence/2026-10-27/phase2i/`。用户原始笔记保存在已忽略的 `.codex-remote-attachments/`，不要提交附件。
-- Phase 2J：本检查点所在提交接入GD公开音频线路，见 [2J](PHASE_2J_PUBLIC_AUDIO_SOURCE.md) 和 `evidence/2026-10-27/phase2j/`。2I已提交为`c9a08ba1`且[对应CI](https://github.com/lezebomb/unimusic/actions/runs/40433069959)成功。
+- Phase 2J：`dc40b8a4` 接入GD公开音频线路，见 [2J](PHASE_2J_PUBLIC_AUDIO_SOURCE.md) 和 `evidence/2026-10-27/phase2j/`，[对应CI](https://github.com/lezebomb/unimusic/actions/runs/40435919202)已成功。
+- Phase 2K：本检查点所在提交补QQ正常登录入口/安全存储/身份校验，见 [2K](PHASE_2K_PLATFORM_SIGN_IN.md) 和 `evidence/2026-10-27/phase2k/`，以git log/status确认commit/push及新CI。
 
 ## 实际验证
+
+- Phase 2K：4个新关键测试通过，持久退出修订补齐后只重跑受影响仓库2个；最终Debug APK及模块/QQ协议-存储依赖边界通过。匿名GetLoginUserInfo实测HTTP200/account.code1000，明确没有提供凭证、没有正向账号验证。无设备、官方网页交互、实际Keystore/账号/播放验收。
 
 - Phase 2J：8个检查通过，含手动启用的真实GdStudioClient联网取址1个；两个地址HEAD返回200/audio/mpeg，没有获取音频响应体。最终Debug APK/模块/平台/Listen Together边界通过；证据见phase2j。无设备/账号/实际解码播放验收。
 
@@ -68,6 +71,7 @@
 8. 每个完成子阶段自行 commit + push 到 https://github.com/lezebomb/unimusic；保留用户数据，准确区分本地验证与远端 Actions、模拟器与真机结果。
 9. 2I自动缓存复用song_match.algorithm_version=2和observed_at，普通发现/显式探测仍为1，不能当作已播放证据。按目标指纹、24小时TTL、NONE决策筛选最多8条，运行时跳过冷却后最多试2条；共享预算内自动缓存阶段最多1.2秒/每条1秒，失败后进入现有本地/B站发现。缓存命中仍检查最新元数据、歌手名称佐证、正常音频、会话、开关及人工revision。后续算法版本不可无区分接受所有旧证据；没有新表/迁移或新音频平台。GD官方文档当前列netease/joox/bilibili，不含kuwo，限制下载/传播/商用；只读取文档HTTP200，没有代取曲目URL/音频。不要把旧笔记里的固定pyncmd→kuwo顺序或HTTP200文档当作全量可播验证。
 10. 上一条的GD未接音频/仅查文档是2I历史范围。2J已实际请求地址并加入`gdstudio_netease` Registry/显式匹配/来源菜单，GD仅在用户选择后使用；其API客户端独立匿名，不接收平台Cookie；只接受预期HTTPS网易云CDN MP3，限50次/5分钟。模型内部fragment标记让数据源绕过CacheDataSource，两媒体预取入口和中央分享URL策略也排除它。实际联网smoke必须显式设置UNIMUSIC_LIVE_GD_NETEASE_ID，默认不联网；不因地址/HEAD通过宣称已播放、全长或原唱验证。下一阶段用户允许分别登录，复用官方网页登录，不能索取聊天中的密码/票据或自动导入其他应用账号。
+11. 2K已补`AppContainer.qqMusicAuthRepo`及`:qq_music_login`独立官方WebView，凭证白名单仅5类音乐会话字段，不读密码。主进程默认加密保存，退出修订墓碑持久化；旧网页/在途校验不能恢复退出。状态分SAVED_UNVERIFIED/VERIFIED/EXPIRED/UNAVAILABLE，不以Cookie存在认作已登录。QQ当前只有账号和既有歌词/元数据能力，没有MusicSourceRegistry QQ音频Adapter，不能误记已可播；正常GetLoginUserInfo接口匿名会返回1000。以后取流必须捕获账号会话并复核变更，不能把账号票据发给GD或未知演示服务器。QQ凭证不进同步/备份payload；硬件Keystore及真实账号仍待设备。
 
 ## 复用环境与日志
 
@@ -75,6 +79,6 @@
 - SDK：`D:/Collect/.tooling/android-sdk`，包均已安装，无需重复下载。
 - Gradle 参数：`-Dorg.gradle.java.installations.paths=D:/unimusic/.gradle-home/jdks/jdk-17.0.20.1+1`；通常 `--max-workers=2 --console=plain`。
 - 独立 AVD：`.gradle-home/avd/UniMusicMigrationAPI35.avd`，设置当前进程 ANDROID_AVD_HOME 后复用，WHPX 已验证；本轮结束正常关闭以节省资源。
-- 最新日志：`build/unimusic-toolchain/phase2j-final-build.log`、`phase2j-live-and-final.log`、`phase2j-validation.log`与`phase2j-*-boundaries.log`；8个检查XML和脱敏联网证据已归档。2I/2H等保留独立证据，避免重跑完整上游套件。
+- 最新日志：`build/unimusic-toolchain/phase2k-final-build-io.log`、`phase2k-final-validation.log`、`phase2k-validation.log`和`phase2k-final-boundaries.log`；4个关键检查XML及匿名协议实测已归档。2J/2I/2H等保留独立证据，避免重跑完整上游套件。
 - 运行 Python 检查时 Windows 使用 `python -X utf8`，避免默认 GBK 读取 UTF-8 源文件失败。
 - 本机普通沙箱执行器此前初始化失败，必要 shell 使用 require_escalated 入口。Git 单次加 `-c safe.directory=D:/unimusic`，网络再加 `-c http.sslBackend=openssl`，不改全局安全设置。

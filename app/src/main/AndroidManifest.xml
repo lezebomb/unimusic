@@ -139,6 +139,12 @@
             android:theme="@style/Theme.Material3.DayNight.NoActionBar"
             />
         <activity
+            android:name=".activity.auth.QQMusicWebLoginActivity"
+            android:exported="false"
+            android:process=":qq_music_login"
+            android:windowSoftInputMode="adjustResize"
+            android:theme="@style/Theme.Material3.DayNight.NoActionBar" />
+        <activity
             android:name=".activity.auth.YouTubeWebLoginActivity"
             android:exported="false"
             android:process=":youtube_web_login"

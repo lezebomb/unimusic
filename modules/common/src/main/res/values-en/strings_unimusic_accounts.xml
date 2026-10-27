@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="qq_music_web_login">QQ Music official sign-in</string>
+    <string name="qq_music_save_login">Finish and save</string>
+    <string name="qq_music_login_not_ready">Complete sign-in on the official page before saving your QQ Music session.</string>
+    <string name="qq_music_check_login">Check sign-in</string>
+    <string name="qq_music_auth_checking">Saving or checking the session…</string>
+    <string name="qq_music_relogin">Sign in again</string>
+    <string name="qq_music_logout">Sign out of QQ Music</string>
+    <string name="qq_music_auth_missing">No QQ Music session saved</string>
+    <string name="qq_music_auth_saved">Web session saved; server identity not yet verified</string>
+    <string name="qq_music_auth_verified">Identity verified by QQ Music during this check</string>
+    <string name="qq_music_auth_expired">The session expired or is restricted. Sign in again.</string>
+    <string name="qq_music_auth_unavailable">Unable to check right now. Your saved session was retained.</string>
+    <string name="qq_music_auth_scope">Sign in on the official QQ Music page. The session stays on this device and is excluded from library sync. Playback access and quality depend on the platform response.</string>
+    <string name="qq_music_auth_volatile">Secure storage is unavailable. This session will last only for the current process.</string>
+    <string name="qq_music_auth_changed">Another action changed the account. This older sign-in result was discarded.</string>
+    <string name="qq_music_auth_storage_error">Unable to update secure storage. Try again later.</string>
+</resources>

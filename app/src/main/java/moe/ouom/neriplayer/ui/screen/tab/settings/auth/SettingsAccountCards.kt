@@ -57,7 +57,9 @@ internal data class SettingsAccountCardUiState(
     val authorizationComplete: Boolean = false,
     val savedAtLabel: String? = null,
     val profile: SettingsAccountProfile? = null,
-    val profileLoading: Boolean = false
+    val profileLoading: Boolean = false,
+    val loginSupported: Boolean = platform != SettingsAccountPlatform.QqMusic,
+    val statusText: String? = null
 )
 
 @Composable
@@ -111,7 +113,7 @@ private fun SettingsAccountCard(
     suppressInactiveNavigationSurface: Boolean,
     fallbackColor: Color?
 ) {
-    val supported = account.platform != SettingsAccountPlatform.QqMusic
+    val supported = account.loginSupported
     val key = account.platform.key
     val cardShape = RoundedCornerShape(24.dp)
     val interactionModifier = if (supported) {
@@ -171,7 +173,7 @@ private fun SettingsAccountIdentity(
     modifier: Modifier = Modifier
 ) {
     val platformName = stringResource(account.platform.titleRes)
-    val supported = account.platform != SettingsAccountPlatform.QqMusic
+    val supported = account.loginSupported
     Row(
         modifier = modifier.fillMaxWidth().testTag("settingsAccountIdentity:${account.platform.key}"),
         verticalAlignment = Alignment.CenterVertically,
@@ -217,7 +219,7 @@ private fun SettingsAccountIdentity(
                 SettingsAccountAuthorization(account)
             } else {
                 Text(
-                    text = stringResource(CoreCommonR.string.common_coming_soon),
+                    text = account.statusText ?: stringResource(CoreCommonR.string.common_coming_soon),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -252,7 +254,7 @@ private fun SettingsAccountAuthorization(account: SettingsAccountCardUiState) {
         )
     }
     if (account.hasSavedAuthorization) {
-        val detail = if (!account.authorizationComplete) {
+        val detail = account.statusText ?: if (!account.authorizationComplete) {
             stringResource(CoreCommonR.string.settings_account_authorization_incomplete)
         } else account.savedAtLabel?.let {
             stringResource(CoreCommonR.string.settings_account_last_updated, it)

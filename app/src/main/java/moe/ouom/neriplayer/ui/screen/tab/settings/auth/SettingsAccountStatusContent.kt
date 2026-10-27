@@ -63,6 +63,7 @@ internal fun SettingsLoginExpandedContent(
     val bili by biliVm.uiState.collectAsStateWithLifecycleCompat()
     val youtube by youtubeVm.uiState.collectAsStateWithLifecycleCompat()
     val netease by neteaseVm.uiState.collectAsStateWithLifecycleCompat()
+    val (qqAccount, qqActions) = rememberQQMusicAccountEntry()
     val biliAuthorizationFlow = remember {
         AppContainer.biliCookieRepo.cookieFlow.map { cookies ->
             SettingsAccountAuthorizationSnapshot(cookies)
@@ -131,10 +132,10 @@ internal fun SettingsLoginExpandedContent(
                 profile = youtubeProfile.profile,
                 profileLoading = youtubeProfile.loading
             ),
-            SettingsAccountCardUiState(platform = SettingsAccountPlatform.QqMusic)
+            qqAccount
         ),
-        onLogin = controller.actions::openPlatformLogin,
-        onManageSaved = controller.actions::openPlatformSavedAuthorization,
+        onLogin = { if (it == SettingsAccountPlatform.QqMusic) qqActions.login() else controller.actions.openPlatformLogin(it) },
+        onManageSaved = { if (it == SettingsAccountPlatform.QqMusic) qqActions.manage() else controller.actions.openPlatformSavedAuthorization(it) },
         highlightTargetId = highlightTargetId,
         highlightPulse = highlightPulse,
         onHighlightFinished = onHighlightFinished

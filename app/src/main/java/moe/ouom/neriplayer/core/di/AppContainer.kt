@@ -255,6 +255,7 @@ object AppContainer {
     val sourceMatchBackend by lazy { moe.ouom.neriplayer.data.unified.SourceMatchBackend(application) }
     val biliCookieRepo by lazy { BiliCookieRepository(application) }
     val youtubeAuthRepo by lazy { YouTubeAuthRepository(application) }
+    val qqMusicAuthRepo by lazy { moe.ouom.neriplayer.platform.qqmusic.auth.QQMusicAuthRepository(application) }
     internal val youtubeAuthAutoRefreshManager by lazy {
         YouTubeAuthAutoRefreshManager(
             httpClientProvider = { sharedOkHttpClient },

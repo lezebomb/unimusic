@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="qq_music_web_login">QQ音乐官方网页登录</string>
+    <string name="qq_music_save_login">完成并保存</string>
+    <string name="qq_music_login_not_ready">尚未取得完整QQ音乐网页凭证。请先在官方页面完成登录，再点“完成并保存”。</string>
+    <string name="qq_music_check_login">校验登录</string>
+    <string name="qq_music_auth_checking">正在保存或校验，请稍候…</string>
+    <string name="qq_music_relogin">重新登录</string>
+    <string name="qq_music_logout">退出QQ音乐账号</string>
+    <string name="qq_music_auth_missing">尚未保存QQ音乐凭证</string>
+    <string name="qq_music_auth_saved">已保存网页凭证，尚未确认服务端登录状态</string>
+    <string name="qq_music_auth_verified">本次已通过QQ音乐服务端身份校验</string>
+    <string name="qq_music_auth_expired">QQ音乐登录已失效或受限，请重新登录</string>
+    <string name="qq_music_auth_unavailable">暂时无法校验，已保留本机凭证</string>
+    <string name="qq_music_auth_scope">请在QQ音乐官方网页自行登录。凭证仅保存在本机，不进入音乐库同步；账号权益与可播放音质以平台实际响应为准。</string>
+    <string name="qq_music_auth_volatile">安全存储暂不可用，本次凭证仅在当前进程中保留。</string>
+    <string name="qq_music_auth_changed">账号已在其他操作中变更，本次旧登录结果未保存。</string>
+    <string name="qq_music_auth_storage_error">无法更新安全存储，请稍后重试。</string>
+</resources>
