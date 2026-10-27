@@ -1,0 +1,22 @@
+{
+  "phase": "2S",
+  "date": "2026-10-28",
+  "jvm": {
+    "tests": 7,
+    "newTests": 1,
+    "failures": 0,
+    "errors": 0
+  },
+  "build": "Debug passed; phase2s-recording-rank-and-keys.log",
+  "moduleBoundaries": "Module boundaries: passed",
+  "apk": {
+    "path": "app/build/outputs/apk/debug/app-debug.apk",
+    "sha256": "f74c1d891a8d1f77fffcfa84b8773a92b657b0b5c12e7204e7a75b710508d706",
+    "bytes": 62983683
+  },
+  "notRun": [
+    "device install/UI",
+    "measured CPU or network performance",
+    "actual account/audio"
+  ]
+}

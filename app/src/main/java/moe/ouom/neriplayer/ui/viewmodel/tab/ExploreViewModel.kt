@@ -141,14 +141,7 @@ sealed class ExploreSearchResult {
     abstract val stableKey: String
 
     data class Song(val song: SongItem) : ExploreSearchResult() {
-        override val stableKey: String = listOfNotNull(
-            "song",
-            song.channelId,
-            song.audioId,
-            song.subAudioId,
-            song.mediaUri,
-            song.id.toString()
-        ).joinToString("|")
+        override val stableKey: String = songSearchResultKey(song)
     }
 
     /** Catalog entries cannot enter the SongItem queue/download path. */

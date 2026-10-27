@@ -63,3 +63,7 @@ internal class ExploreSearchRankingSession(query: String) {
 /** Display ranking only; never merges or certifies recording identities. */
 internal fun rankExploreSongSearchResults(query: String, songs: List<SongItem>): List<SongItem> =
     searchSongItems(ExploreSearchRankingSession(query).rank(songs.map(ExploreSearchResult::Song)))
+
+/** Preserve field boundaries even when provider data contains separators or missing components. */
+internal fun songSearchResultKey(song: SongItem): String = listOf("song", song.channelId.orEmpty(), song.audioId.orEmpty(),
+    song.subAudioId.orEmpty(), song.mediaUri.orEmpty(), song.id.toString()).joinToString("|") { "${it.length}:$it" }

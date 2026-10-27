@@ -21,16 +21,21 @@ object RecordingDiscoveryRanker {
         val expectedVersions = RecordingMatchPolicy.versions(expected)
         val title = RecordingMatchPolicy.canonicalTitle(expected.title)
         val artist = RecordingMatchPolicy.canonicalText(expected.artist)
-        return candidates.distinctBy { it.id }
-            .filter { (RecordingMatchPolicy.versions(it.metadata) - expectedVersions).isEmpty() }
-            .sortedWith(compareByDescending<RecordingDiscoveryCandidate<T>> {
-                RecordingMatchPolicy.assess(expected, it.metadata).accepted
-            }.thenByDescending { RecordingMatchPolicy.canonicalTitle(it.metadata.title) == title }
-                .thenByDescending { RecordingMatchPolicy.canonicalText(it.metadata.artist) == artist && artist.isNotEmpty() }
-                .thenBy {
-                    if (expected.durationMs > 0 && it.metadata.durationMs > 0) abs(expected.durationMs - it.metadata.durationMs)
-                    else Long.MAX_VALUE
-                }.thenByDescending { it.textRelevance })
-            .map { it.value }
+        return candidates.distinctBy { it.id }.mapNotNull { candidate ->
+            if ((RecordingMatchPolicy.versions(candidate.metadata) - expectedVersions).isNotEmpty()) return@mapNotNull null
+            Ranked(candidate, RecordingMatchPolicy.assess(expected, candidate.metadata).accepted,
+                RecordingMatchPolicy.canonicalTitle(candidate.metadata.title) == title,
+                artist.isNotEmpty() && RecordingMatchPolicy.canonicalText(candidate.metadata.artist) == artist,
+                if (expected.durationMs > 0 && candidate.metadata.durationMs > 0)
+                    abs(expected.durationMs - candidate.metadata.durationMs) else Long.MAX_VALUE)
+        }.sortedWith(compareByDescending<Ranked<T>> { it.accepted }
+            .thenByDescending { it.exactTitle }
+            .thenByDescending { it.exactArtist }
+            .thenBy { it.durationDifference }
+            .thenByDescending { it.candidate.textRelevance })
+            .map { it.candidate.value }
     }
+    private data class Ranked<T>(val candidate: RecordingDiscoveryCandidate<T>, val accepted: Boolean,
+        val exactTitle: Boolean, val exactArtist: Boolean, val durationDifference: Long)
+
 }

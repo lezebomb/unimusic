@@ -1,0 +1,9 @@
+<?xml version='1.0' encoding='utf-8'?>
+<testsuite name="moe.ouom.neriplayer.ui.viewmodel.tab.ExploreSearchResultRankingTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-10-27T23:11:07.918Z" hostname="local" time="0.136">
+  <properties />
+  <testcase name="stableSongKeysKeepSeparatorsAndMissingFieldsInTheirOwnComponents" classname="moe.ouom.neriplayer.ui.viewmodel.tab.ExploreSearchResultRankingTest" time="0.057" />
+  <testcase name="equal metadata from different sources remains separate and stable" classname="moe.ouom.neriplayer.ui.viewmodel.tab.ExploreSearchResultRankingTest" time="0.067" />
+  <testcase name="verifiedNativeAddressRanksAboveEqualUnknownOrDeniedSourcesWithoutPromotingLive" classname="moe.ouom.neriplayer.ui.viewmodel.tab.ExploreSearchResultRankingTest" time="0.01" />
+  <system-out />
+  <system-err />
+</testsuite>

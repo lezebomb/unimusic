@@ -82,6 +82,16 @@ class ExploreSearchResultRankingTest {
         assertEquals(requested, rankExploreSongSearchResults("晴天", listOf(unrelated, requested)).first())
     }
 
+    @Test fun stableSongKeysKeepSeparatorsAndMissingFieldsInTheirOwnComponents() {
+        val first = song(1, "Original").copy(channelId = "bilibili", audioId = "one|two", subAudioId = "three")
+        val second = first.copy(audioId = "one", subAudioId = "two|three")
+        org.junit.Assert.assertNotEquals(ExploreSearchResult.Song(first).stableKey, ExploreSearchResult.Song(second).stableKey)
+        val absentChannel = first.copy(channelId = null, audioId = "local", subAudioId = null)
+        val absentAudio = first.copy(channelId = "local", audioId = null, subAudioId = null)
+        org.junit.Assert.assertNotEquals(ExploreSearchResult.Song(absentChannel).stableKey, ExploreSearchResult.Song(absentAudio).stableKey)
+        assertEquals(ExploreSearchResult.Song(first).stableKey, ExploreSearchResult.Song(first.copy(name = "Display edit")).stableKey)
+    }
+
     private fun song(id: Long, name: String, artist: String = "周杰伦"): SongItem {
         return SongItem(
             id = id,
