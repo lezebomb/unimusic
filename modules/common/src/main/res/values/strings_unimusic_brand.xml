@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="unimusic_about_source">UniMusic 源码</string>
+    <string name="unimusic_about_upstream">上游 NeriPlayer</string>
+</resources>

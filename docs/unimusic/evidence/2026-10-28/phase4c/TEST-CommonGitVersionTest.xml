@@ -1,0 +1,9 @@
+<?xml version='1.0' encoding='utf8'?>
+<testsuite name="CommonGitVersionTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-10-27T17:38:53.768Z" hostname="local" time="1.802">
+  <properties />
+  <testcase name="reads the selected checkout with spaces and marks tracked changes" classname="CommonGitVersionTest" time="0.778" />
+  <testcase name="untracked source files also mark a dirty build" classname="CommonGitVersionTest" time="0.646" />
+  <testcase name="source archives cannot inherit a parent checkout revision" classname="CommonGitVersionTest" time="0.376" />
+  <system-out />
+  <system-err />
+</testsuite>

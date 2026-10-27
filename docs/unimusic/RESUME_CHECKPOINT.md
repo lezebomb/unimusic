@@ -10,7 +10,9 @@ Phase 3A 也已完成：精确歌曲30天暂不推荐、撤销和恢复全部隐
 
 Phase 1D已完成已关联歌单的可选每日刷新，默认关闭。3个直接相关JVM、主/测试APK、模块边界、Mate60一个调度测试及入口检查通过；仅健康完成的关联歌单自动刷新，不重启取消/失败/暂停，也不关联一次性导入。设备开关最终关闭，没有进行真实远端刷新或等待24小时；见 [1D报告](PHASE_1D_OPTIONAL_LINKED_REFRESH.md) 与 `evidence/2026-10-28/phase1d/`。1D已推送 `35ed256a`，其[CI](https://github.com/lezebomb/unimusic/actions/runs/40547749753)已确认成功，保留全部账号和库数据。
 
-Phase 4B已把本地歌单匹配与艺人构建/筛选/排序移后台，120ms去抖、取消过期查询、每快照复用单个艺人索引，无关键词歌单立即恢复；7个定向JVM、Debug构建、模块边界及Mate60搜索/清空/分类检查通过。没有大库性能数字或新的音频验收，见 [4B报告](PHASE_4B_BACKGROUND_LIBRARY_SEARCH.md)。下一步补UniMusic显示名称、自己的源码入口和清晰上游署名。
+Phase 4B已把本地歌单匹配与艺人构建/筛选/排序移后台，120ms去抖、取消过期查询、每快照复用单个艺人索引，无关键词歌单立即恢复；7个定向JVM、Debug构建、模块边界及Mate60搜索/清空/分类检查通过。没有大库性能数字或新的音频验收，见 [4B报告](PHASE_4B_BACKGROUND_LIBRARY_SEARCH.md)。4B已提交推送 `1ad712db`，以实际CI状态为准。
+
+Phase 4C已完成UniMusic名称与Debug覆盖、原创U音符启动图标、自己的源码与独立上游入口/GPL署名，并修复版本no_commit问题。3个构建Git检查、最终APK/边界和Mate60关于页/目视图标/返回检查通过，见 [4C报告](PHASE_4C_PROJECT_IDENTITY.md) 及 [包名签名说明](PACKAGE_AND_SIGNING.md)。APK为实际基础Git修订+dirty的工作树构建；无Release/新包名迁移或Android13真机图标结论。下一步完善推荐所需的真实SKIP/COMPLETE/REPEAT反馈，先核对现有PlaybackStatsTracker与用户操作入口，避免把取流失败或拖动进度误记为不喜欢。
 
 ## 历史阶段（以最新用户优先级和上述状态为准）
 

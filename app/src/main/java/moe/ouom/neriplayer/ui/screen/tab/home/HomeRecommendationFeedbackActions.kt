@@ -39,7 +39,7 @@ internal fun rememberRecommendationFeedbackActions(vm: HomeViewModel, host: Snac
                     if (failure is CancellationException) throw failure
                     host.showNeriSnackbar(error)
                 }
-            }; Unit },
+            } },
             reset = { scope.launch {
                 try {
                     vm.resetLocalRecommendationFeedback()
@@ -49,7 +49,7 @@ internal fun rememberRecommendationFeedbackActions(vm: HomeViewModel, host: Snac
                     if (failure is CancellationException) throw failure
                     host.showNeriSnackbar(error)
                 }
-            }; Unit }
+            } }
         )
     }
 }

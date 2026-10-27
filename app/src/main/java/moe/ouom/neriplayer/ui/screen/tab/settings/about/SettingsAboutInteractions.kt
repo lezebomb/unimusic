@@ -63,8 +63,11 @@ private class SettingsAboutPageActions(
         onShowMessage(copiedMessage)
     }
 
-    fun onOpenGitHubRepo() {
-        if (!context.tryStartActivity(Intent(Intent.ACTION_VIEW, "https://github.com/cwuom/NeriPlayer".toUri()))) {
+    fun onOpenGitHubRepo() = openSource(UNIMUSIC_SOURCE_URL)
+    fun onOpenUpstreamRepo() = openSource(NERIPLAYER_SOURCE_URL)
+
+    private fun openSource(url: String) {
+        if (!context.tryStartActivity(Intent(Intent.ACTION_VIEW, url.toUri()))) {
             onShowMessage(resources.getString(CoreCommonR.string.error_no_app_for_action))
         }
     }
@@ -93,6 +96,7 @@ internal fun SettingsAboutPageContent(
         devModeEnabled = devModeEnabled,
         onVersionClick = actions::onVersionClick,
         onCopyValue = actions::onCopyValue,
-        onOpenGitHubRepo = actions::onOpenGitHubRepo
+        onOpenGitHubRepo = actions::onOpenGitHubRepo,
+        onOpenUpstreamRepo = actions::onOpenUpstreamRepo
     )
 }

@@ -1,0 +1,40 @@
+{
+  "phase": "4C",
+  "date": "2026-10-28",
+  "jvm": {
+    "tests": 3,
+    "failures": 0,
+    "class": "CommonGitVersionTest"
+  },
+  "build": {
+    "success": true,
+    "logs": [
+      "build/unimusic-toolchain/phase4c-project-identity-build.log",
+      "build/unimusic-toolchain/phase4c-identity-and-version-validation.log",
+      "build/unimusic-toolchain/phase4c-final-git-version-tests.log"
+    ],
+    "apk": "app/build/outputs/apk/debug/app-debug.apk",
+    "bytes": 62805723,
+    "sha256": "a1e12558b66220c1c8e5f15bdce0062d3a77bdb538fc4347e9cb32b1f1a4ab25",
+    "versionName": "1ad712db94fb.dirty.10280136",
+    "debug_labels": [
+      "UniMusic DEBUG"
+    ],
+    "package": "moe.ouom.neriplayer.debug",
+    "working_tree": "pre-commit dirty build, accurately marked"
+  },
+  "module_boundaries": "passed",
+  "device": {
+    "model": "Huawei Mate60 API31",
+    "final_install": "adb install -r: Success",
+    "intermediate_install": "agent cancelled after detecting old Debug label; not an auto-review rejection",
+    "checks": "device-identity.json",
+    "visual": "About logo visually inspected; screenshot stayed in ignored build folder"
+  },
+  "not_run": [
+    "release signing or release APK",
+    "Android13 themed icon on a physical device",
+    "all launcher masks",
+    "new account or audio verification"
+  ]
+}

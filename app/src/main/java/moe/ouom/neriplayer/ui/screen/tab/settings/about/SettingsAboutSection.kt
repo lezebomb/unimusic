@@ -24,13 +24,15 @@ package moe.ouom.neriplayer.ui.screen.tab.settings.about
  */
 
 import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.foundation.layout.size
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.compose.material.icons.Icons
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Timer
 import androidx.compose.material.icons.outlined.Update
 import androidx.compose.material.icons.outlined.Verified
@@ -48,14 +50,16 @@ internal fun LazyListScope.settingsAboutSection(
     devModeEnabled: Boolean,
     onVersionClick: () -> Unit,
     onCopyValue: (String) -> Unit = {},
-    onOpenGitHubRepo: () -> Unit
+    onOpenGitHubRepo: () -> Unit,
+    onOpenUpstreamRepo: () -> Unit
 ) {
     item {
         SettingsAboutContent(
             devModeEnabled = devModeEnabled,
             onVersionClick = onVersionClick,
             onCopyValue = onCopyValue,
-            onOpenGitHubRepo = onOpenGitHubRepo
+            onOpenGitHubRepo = onOpenGitHubRepo,
+            onOpenUpstreamRepo = onOpenUpstreamRepo
         )
     }
 }
@@ -65,7 +69,8 @@ internal fun SettingsAboutContent(
     devModeEnabled: Boolean,
     onVersionClick: () -> Unit,
     onCopyValue: (String) -> Unit,
-    onOpenGitHubRepo: () -> Unit
+    onOpenGitHubRepo: () -> Unit,
+    onOpenUpstreamRepo: () -> Unit
 ) {
     SettingsAboutIntroItem()
     SettingsBuildUuidItem(onCopyValue)
@@ -75,7 +80,8 @@ internal fun SettingsAboutContent(
         onCopyValue = onCopyValue
     )
     SettingsBuildTimeItem(onCopyValue)
-    SettingsGitHubItem(onOpenGitHubRepo = onOpenGitHubRepo)
+    SettingsGitHubItem(stringResource(CoreCommonR.string.unimusic_about_source), UNIMUSIC_SOURCE_URL, onOpenGitHubRepo)
+    SettingsGitHubItem(stringResource(CoreCommonR.string.unimusic_about_upstream), NERIPLAYER_SOURCE_URL, onOpenUpstreamRepo)
 }
 
 @Composable
@@ -83,14 +89,15 @@ private fun SettingsAboutIntroItem() {
     ListItem(
         leadingContent = {
             Icon(
-                imageVector = Icons.Outlined.Info,
-                contentDescription = stringResource(CoreCommonR.string.settings_about),
-                tint = MaterialTheme.colorScheme.onSurface
+                painter = painterResource(R.drawable.ic_unimusic_logo),
+                contentDescription = null,
+                tint = Color.Unspecified,
+                modifier = Modifier.size(44.dp)
             )
         },
         headlineContent = {
             Text(
-                text = stringResource(CoreCommonR.string.settings_about),
+                text = stringResource(CoreCommonR.string.app_name),
                 style = MaterialTheme.typography.titleMedium
             )
         },
@@ -188,17 +195,17 @@ private fun SettingsBuildTimeItem(onCopyValue: (String) -> Unit) {
 }
 
 @Composable
-private fun SettingsGitHubItem(onOpenGitHubRepo: () -> Unit) {
+private fun SettingsGitHubItem(title: String, url: String, onOpenGitHubRepo: () -> Unit) {
     ListItem(
         leadingContent = {
             Icon(
                 painter = painterResource(id = R.drawable.ic_github),
-                contentDescription = stringResource(CoreCommonR.string.common_github),
+                contentDescription = null,
                 tint = MaterialTheme.colorScheme.onSurface
             )
         },
-        headlineContent = { Text(stringResource(CoreCommonR.string.common_github)) },
-        supportingContent = { Text(stringResource(CoreCommonR.string.settings_github_repo_url)) },
+        headlineContent = { Text(title) },
+        supportingContent = { Text(url.removePrefix("https://")) },
         modifier = androidx.compose.ui.Modifier.settingsItemClickable(onClick = onOpenGitHubRepo),
         colors = ListItemDefaults.colors(containerColor = Color.Transparent)
     )

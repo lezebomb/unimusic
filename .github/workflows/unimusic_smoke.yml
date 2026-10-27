@@ -70,6 +70,7 @@ jobs:
           chmod +x gradlew
           python3 -X utf8 tools_pub/quality/module_boundaries.py
           ./gradlew -Dorg.gradle.java.installations.paths="$JAVA_HOME_17_X64" \
+            :build-logic:convention:test --tests '*CommonGitVersionTest' \
             :database:testDebugUnitTest --tests '*RegisteredMigrationChainTest' --tests '*NeriUserDataDatabaseVersionTest' --tests '*PlaylistImportMigrationTest' --tests '*SourceMatchMigrationTest' \
             :local:testDebugUnitTest --tests '*UnifiedLibraryRoomStoreTest' --tests '*PlaylistImportCoordinatorTest' --tests '*PlaylistImportAutoRefreshPolicyTest' --tests '*LocalPlaylistSyncMutationDecoderTest' --tests '*SourceMatchRoomStoreTest' --tests '*LocalRecommendationRankerTest' --tests '*DailyRecommendationStoreTest' --tests '*LocalRecommendationFeedbackStoreTest' --tests '*LocalArtistSummaryTest.artist build cancellation*' --tests '*UnifiedPlaybackRoomStoreTest' \
             :common:testDebugUnitTest --tests '*FederatedSearchEngineTest' \
@@ -102,6 +103,7 @@ jobs:
         with:
           name: unimusic-focused-reports
           path: |
+            build-logic/convention/build/test-results/**/*.xml
             modules/database/build/test-results/**/*.xml
             modules/local/build/test-results/**/*.xml
             modules/platform/build/test-results/**/*.xml
