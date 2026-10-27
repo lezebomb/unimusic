@@ -44,6 +44,7 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.coroutines.withContext
 import moe.ouom.neriplayer.platform.youtube.api.bootstrap.YouTubePlaybackBootstrapCoordinator
 import moe.ouom.neriplayer.platform.youtube.api.bootstrap.YouTubePlaybackBootstrapOwner
@@ -78,14 +79,10 @@ import moe.ouom.neriplayer.platform.youtube.api.protocol.isYouTubeGoogleVideoStr
 import moe.ouom.neriplayer.platform.youtube.api.protocol.playerClientProfiles
 import moe.ouom.neriplayer.platform.youtube.api.protocol.requiresGvsPoToken
 import moe.ouom.neriplayer.platform.youtube.api.transport.NewPipeOkHttpDownloader
-import moe.ouom.neriplayer.platform.youtube.api.transport.YOUTUBE_ERROR_RESPONSE_MAX_BYTES
-import moe.ouom.neriplayer.platform.youtube.api.transport.YOUTUBE_TEXT_RESPONSE_MAX_BYTES
 import moe.ouom.neriplayer.platform.youtube.api.transport.YouTubeHttpStatusException
 import moe.ouom.neriplayer.platform.youtube.api.transport.buildBootstrapAuthFingerprint
-import moe.ouom.neriplayer.platform.youtube.api.transport.parseRetryAfterMs
 import moe.ouom.neriplayer.platform.youtube.api.transport.rateLimitBackoffMs
-import moe.ouom.neriplayer.platform.youtube.api.transport.readErrorPreviewWithLimit
-import moe.ouom.neriplayer.platform.youtube.api.transport.readTextWithLimit
+import moe.ouom.neriplayer.platform.youtube.api.transport.executeYouTubePlaybackText
 import moe.ouom.neriplayer.common.logging.NPLogger
 import moe.ouom.neriplayer.network.weblogin.ForegroundWebLoginGuard
 import moe.ouom.neriplayer.platform.youtube.auth.YouTubeAuthAutoRefreshManager
@@ -754,8 +751,23 @@ class YouTubeMusicPlaybackRepository(
                     )
                     try {
                         // 按需解析不受闸门约束, 避免被排队中的预取堵住
-                        val resolved = if (isPrefetch) {
-                            prefetchResolveGate.withPrefetchSlot(onDemandSignal) {
+                        val resolved = withTimeoutOrNull(8_000) {
+                            if (isPrefetch) {
+                                prefetchResolveGate.withPrefetchSlot(onDemandSignal) {
+                                    resolvePlayableAudio(
+                                        videoId = videoId,
+                                        preferredQualityKey = preferredQualityKey,
+                                        sourcePreference = sourcePreference,
+                                        requireDirect = requireDirect,
+                                        logFailure = logFailure,
+                                        preferM4a = preferM4a,
+                                        cacheKey = cacheKey,
+                                        forceRefresh = forceRefresh,
+                                        avoidDirect = avoidDirect,
+                                        allowUnverifiedDirectFallback = allowUnverifiedDirectFallback
+                                    )
+                                }
+                            } else {
                                 resolvePlayableAudio(
                                     videoId = videoId,
                                     preferredQualityKey = preferredQualityKey,
@@ -769,19 +781,6 @@ class YouTubeMusicPlaybackRepository(
                                     allowUnverifiedDirectFallback = allowUnverifiedDirectFallback
                                 )
                             }
-                        } else {
-                            resolvePlayableAudio(
-                                videoId = videoId,
-                                preferredQualityKey = preferredQualityKey,
-                                sourcePreference = sourcePreference,
-                                requireDirect = requireDirect,
-                                logFailure = logFailure,
-                                preferM4a = preferM4a,
-                                cacheKey = cacheKey,
-                                forceRefresh = forceRefresh,
-                                avoidDirect = avoidDirect,
-                                allowUnverifiedDirectFallback = allowUnverifiedDirectFallback
-                            )
                         }
                         NPLogger.d(
                             "YouTubeMusicPlayback",
@@ -1437,7 +1436,7 @@ class YouTubeMusicPlaybackRepository(
         forceRefresh, prefetchedPoToken, allowBlockingAcquisition
     )
 
-    private fun postPlayerRequest(
+    private suspend fun postPlayerRequest(
         videoId: String,
         auth: YouTubeAuthBundle,
         bootstrap: YouTubePlaybackBootstrap,
@@ -1500,26 +1499,12 @@ class YouTubeMusicPlaybackRepository(
         forceRefresh: Boolean = false
     ): YouTubePlaybackBootstrap = bootstrapOwner.bootstrap(auth, forceRefresh)
 
-    private fun executeJson(request: Request): JSONObject {
+    private suspend fun executeJson(request: Request): JSONObject {
         return JSONObject(executeText(request))
     }
 
-    private fun executeText(request: Request): String {
-        okHttpClient.newCall(request).execute().use { response ->
-            if (!response.isSuccessful) {
-                val preview = response.body
-                    .readErrorPreviewWithLimit(YOUTUBE_ERROR_RESPONSE_MAX_BYTES)
-                // 保留 "request failed: <code>" 消息格式以兼容 extractYouTubeRequestFailureCode 正则
-                // 额外携带状态码与 Retry-After, 供 429/503 退避使用 (#Y5)
-                throw YouTubeHttpStatusException(
-                    statusCode = response.code,
-                    retryAfterMs = parseRetryAfterMs(response.header("Retry-After")),
-                    message = "YouTube Music request failed: ${response.code} $preview"
-                )
-            }
-            return response.body.readTextWithLimit(YOUTUBE_TEXT_RESPONSE_MAX_BYTES)
-        }
-    }
+    private suspend fun executeText(request: Request): String =
+        okHttpClient.executeYouTubePlaybackText(request)
 
     private fun resolvePlayableAudioViaNewPipe(
         videoId: String,

@@ -1203,6 +1203,7 @@
     "name": "platform-youtube-client",
     "package": "moe.ouom.neriplayer.platform.youtube.api.",
     "allowed_classes": [
+      "java.net.SocketTimeoutException",
       "android.content.Context",
       "android.content.res.AssetManager",
       "android.net.Uri",

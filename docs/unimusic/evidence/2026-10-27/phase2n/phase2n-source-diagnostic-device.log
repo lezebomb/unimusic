@@ -1,0 +1,65 @@
+
+moe.ouom.neriplayer.sources.OtherSourceDeviceTest:INSTRUMENTATION_STATUS: failure_type=TimeoutCancellationException
+INSTRUMENTATION_STATUS: outcome=FAILED
+INSTRUMENTATION_STATUS: source=youtube_music
+INSTRUMENTATION_STATUS_CODE: 2
+INSTRUMENTATION_STATUS: diagnostic_source=youtube_music
+INSTRUMENTATION_STATUS: first_address_observed_ms=-1
+INSTRUMENTATION_STATUS: observed_http_stages=YOUTUBE_BOOTSTRAP,YOUTUBE_PLAYER_API_OR_JS
+INSTRUMENTATION_STATUS: pending_media_load=false
+INSTRUMENTATION_STATUS: player_error_kind=TIMEOUT
+INSTRUMENTATION_STATUS_CODE: 2
+
+Error in youtubeMusicSampleDecodes(moe.ouom.neriplayer.sources.OtherSourceDeviceTest):
+java.lang.AssertionError: youtube_music playback failed (TimeoutCancellationException)
+	at moe.ouom.neriplayer.sources.OtherSourceDeviceTest$play$2.invokeSuspend(OtherSourceDeviceTest.kt:137)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:34)
+	at kotlinx.coroutines.internal.ScopeCoroutine.afterResume(Scopes.kt:35)
+	at kotlinx.coroutines.AbstractCoroutine.resumeWith(AbstractCoroutine.kt:101)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:47)
+	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:98)
+	at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:256)
+	at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:54)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlockingImpl(Builders.kt:30)
+	at kotlinx.coroutines.BuildersKt.runBlockingImpl(Unknown Source:1)
+	at kotlinx.coroutines.BuildersKt__Builders_concurrentKt.runBlockingK(Builders.concurrent.kt:172)
+	at kotlinx.coroutines.BuildersKt.runBlockingK(Unknown Source:1)
+	at kotlinx.coroutines.BuildersKt__Builders_concurrentKt.runBlockingK$default(Builders.concurrent.kt:157)
+	at kotlinx.coroutines.BuildersKt.runBlockingK$default(Unknown Source:1)
+	at moe.ouom.neriplayer.sources.OtherSourceDeviceTest.youtubeMusicSampleDecodes(OtherSourceDeviceTest.kt:50)
+INSTRUMENTATION_STATUS: discovery_ms=4167
+INSTRUMENTATION_STATUS: observed_position_ms=2073
+INSTRUMENTATION_STATUS: outcome=PLAYED
+INSTRUMENTATION_STATUS: play_request_to_observed_position_ms=2689
+INSTRUMENTATION_STATUS: source=bilibili
+INSTRUMENTATION_STATUS_CODE: 2
+INSTRUMENTATION_STATUS: diagnostic_source=bilibili
+INSTRUMENTATION_STATUS: first_address_observed_ms=162
+INSTRUMENTATION_STATUS: observed_http_stages=BILI_METADATA_OR_SESSION
+INSTRUMENTATION_STATUS: pending_media_load=false
+INSTRUMENTATION_STATUS: player_error_kind=NONE
+INSTRUMENTATION_STATUS_CODE: 2
+.
+
+Time: 30.933
+There was 1 failure:
+1) youtubeMusicSampleDecodes(moe.ouom.neriplayer.sources.OtherSourceDeviceTest)
+java.lang.AssertionError: youtube_music playback failed (TimeoutCancellationException)
+	at moe.ouom.neriplayer.sources.OtherSourceDeviceTest$play$2.invokeSuspend(OtherSourceDeviceTest.kt:137)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:34)
+	at kotlinx.coroutines.internal.ScopeCoroutine.afterResume(Scopes.kt:35)
+	at kotlinx.coroutines.AbstractCoroutine.resumeWith(AbstractCoroutine.kt:101)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:47)
+	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:98)
+	at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:256)
+	at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:54)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlockingImpl(Builders.kt:30)
+	at kotlinx.coroutines.BuildersKt.runBlockingImpl(Unknown Source:1)
+	at kotlinx.coroutines.BuildersKt__Builders_concurrentKt.runBlockingK(Builders.concurrent.kt:172)
+	at kotlinx.coroutines.BuildersKt.runBlockingK(Unknown Source:1)
+	at kotlinx.coroutines.BuildersKt__Builders_concurrentKt.runBlockingK$default(Builders.concurrent.kt:157)
+	at kotlinx.coroutines.BuildersKt.runBlockingK$default(Unknown Source:1)
+	at moe.ouom.neriplayer.sources.OtherSourceDeviceTest.youtubeMusicSampleDecodes(OtherSourceDeviceTest.kt:50)
+
+FAILURES!!!
+Tests run: 2,  Failures: 1

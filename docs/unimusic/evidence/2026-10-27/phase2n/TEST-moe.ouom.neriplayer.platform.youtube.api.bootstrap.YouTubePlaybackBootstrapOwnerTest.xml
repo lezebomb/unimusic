@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="moe.ouom.neriplayer.platform.youtube.api.bootstrap.YouTubePlaybackBootstrapOwnerTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-10-27T07:24:47.369Z" hostname="local" time="1.747">
+  <properties/>
+  <testcase name="auth generation prevents late snapshot from replacing current cache" classname="moe.ouom.neriplayer.platform.youtube.api.bootstrap.YouTubePlaybackBootstrapOwnerTest" time="0.321"/>
+  <testcase name="player script timestamp accepts signatureTimestamp and sts fields" classname="moe.ouom.neriplayer.platform.youtube.api.bootstrap.YouTubePlaybackBootstrapOwnerTest" time="0.005"/>
+  <testcase name="stale bootstrap serves immediately while one refresh is in flight" classname="moe.ouom.neriplayer.platform.youtube.api.bootstrap.YouTubePlaybackBootstrapOwnerTest" time="0.1"/>
+  <testcase name="restores same identity snapshot with fresh cookie header" classname="moe.ouom.neriplayer.platform.youtube.api.bootstrap.YouTubePlaybackBootstrapOwnerTest" time="1.318"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

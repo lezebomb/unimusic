@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="moe.ouom.neriplayer.platform.youtube.api.transport.YouTubePlaybackHttpCancellationTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-10-27T07:24:49.346Z" hostname="local" time="0.239">
+  <properties/>
+  <testcase name="responseStatusKeepsRecoveryFieldsWithoutEchoingBody" classname="moe.ouom.neriplayer.platform.youtube.api.transport.YouTubePlaybackHttpCancellationTest" time="0.01"/>
+  <testcase name="callerCancellationRemainsCancellation" classname="moe.ouom.neriplayer.platform.youtube.api.transport.YouTubePlaybackHttpCancellationTest" time="0.012"/>
+  <testcase name="stageDeadlineCancelsTheUnderlyingCall" classname="moe.ouom.neriplayer.platform.youtube.api.transport.YouTubePlaybackHttpCancellationTest" time="0.217"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

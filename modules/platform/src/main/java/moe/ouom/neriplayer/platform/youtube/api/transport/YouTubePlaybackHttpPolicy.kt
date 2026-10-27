@@ -1,6 +1,11 @@
 package moe.ouom.neriplayer.platform.youtube.api.transport
 
 import java.io.IOException
+import java.net.SocketTimeoutException
+import kotlinx.coroutines.withTimeoutOrNull
+import moe.ouom.neriplayer.network.http.awaitResponse
+import okhttp3.OkHttpClient
+import okhttp3.Request
 
 // 脏 IP 下 429/503 退避基数与上限, 避免密集重试进一步拉高限流等级 (#Y5)
 private const val RATE_LIMIT_BACKOFF_BASE_MS = 500L
@@ -33,4 +38,22 @@ fun rateLimitBackoffMs(error: Throwable?, priorHits: Int): Long? {
     status.retryAfterMs?.let { return it.coerceIn(0L, RATE_LIMIT_BACKOFF_MAX_MS) }
     return (RATE_LIMIT_BACKOFF_BASE_MS shl priorHits.coerceIn(0, 3))
         .coerceAtMost(RATE_LIMIT_BACKOFF_MAX_MS)
+}
+
+/** Cancel the underlying call, including response-body reads, when this stage or its caller expires. */
+internal suspend fun OkHttpClient.executeYouTubePlaybackText(
+    request: Request,
+    timeoutMs: Long = 3_000
+): String {
+    require(timeoutMs > 0)
+    return withTimeoutOrNull(timeoutMs) {
+        newCall(request).awaitResponse { response ->
+            if (!response.isSuccessful) {
+                // Keep status-based recovery; response bodies can contain account or request details.
+                throw YouTubeHttpStatusException(response.code, parseRetryAfterMs(response.header("Retry-After")),
+                    "YouTube Music request failed: ${response.code}")
+            }
+            response.body.readTextWithLimit(YOUTUBE_TEXT_RESPONSE_MAX_BYTES)
+        }
+    } ?: throw SocketTimeoutException("YouTube playback request timed out")
 }

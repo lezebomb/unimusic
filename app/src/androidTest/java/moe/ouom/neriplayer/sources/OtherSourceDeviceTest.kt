@@ -7,12 +7,17 @@ import android.os.Bundle
 import android.os.SystemClock
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeout
 import moe.ouom.neriplayer.core.di.AppContainer
 import moe.ouom.neriplayer.core.player.PlayerManager
 import moe.ouom.neriplayer.data.model.SongItem
+import moe.ouom.neriplayer.data.model.playback.PlayerEvent
 import moe.ouom.neriplayer.data.model.playback.streamOnlyPlaybackUrl
 import moe.ouom.neriplayer.data.model.youtube.music.YouTubeMusicSearchFilter
 import moe.ouom.neriplayer.platform.gdstudio.api.GdStudioClient
@@ -69,11 +74,32 @@ class OtherSourceDeviceTest {
         play("gdstudio_netease", song, SystemClock.elapsedRealtime() - start)
     }
 
-    private suspend fun play(provider: String, song: SongItem, discoveryMs: Long) {
+    private suspend fun play(provider: String, song: SongItem, discoveryMs: Long) = coroutineScope {
         val context = instrumentation.targetContext
         val audio = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
         val volume = audio.getStreamVolume(AudioManager.STREAM_MUSIC)
         val started = SystemClock.elapsedRealtime()
+        val previousUrl = PlayerManager.currentMediaUrlFlow.value
+        var firstAddressMs = -1L
+        var errorKind = "NONE"
+        var firstErrorMs = -1L
+        val phases = linkedSetOf<String>()
+        val events = launch(start = CoroutineStart.UNDISPATCHED) {
+            PlayerManager.playerEventFlow.collect { event ->
+                if (event !is PlayerEvent.ShowNotice && firstErrorMs < 0) firstErrorMs = SystemClock.elapsedRealtime() - started
+                errorKind = when (event) {
+                    is PlayerEvent.ShowLoginPrompt -> "LOGIN_REQUIRED"
+                    is PlayerEvent.ShowError -> when {
+                        event.message.contains("403") -> "HTTP_403"
+                        event.message.contains("429") -> "HTTP_429"
+                        event.message.contains("disabled", ignoreCase = true) -> "DISABLED"
+                        event.message.contains("超时") || event.message.contains("timed out", true) -> "TIMEOUT"
+                        else -> "PLAYBACK_ERROR"
+                    }
+                    is PlayerEvent.ShowNotice -> errorKind
+                }
+            }
+        }
         try {
             audio.setStreamVolume(AudioManager.STREAM_MUSIC, minOf(volume, 3), 0)
             instrumentation.runOnMainSync {
@@ -83,7 +109,22 @@ class OtherSourceDeviceTest {
             }
             withTimeout(20_000) {
                 while (PlayerManager.currentSongFlow.value?.audioId != song.audioId ||
-                    !PlayerManager.isPlayingFlow.value || PlayerManager.playbackPositionFlow.value < 1_500) delay(100)
+                    !PlayerManager.isPlayingFlow.value || PlayerManager.playbackPositionFlow.value < 1_500) {
+                    if (firstAddressMs < 0 && PlayerManager.currentMediaUrlFlow.value?.let { it != previousUrl } == true) {
+                        firstAddressMs = SystemClock.elapsedRealtime() - started
+                    }
+                    AppContainer.sharedOkHttpClient.dispatcher.runningCalls().forEach { call ->
+                        val url = call.request().url
+                        when {
+                            url.host.endsWith("youtube.com") && url.encodedPath.startsWith("/youtubei/") -> phases += "YOUTUBE_PLAYER_API"
+                            url.host.endsWith("youtube.com") && url.encodedPath.contains("/s/player/") -> phases += "YOUTUBE_PLAYER_JS"
+                            url.host.endsWith("youtube.com") -> phases += "YOUTUBE_BOOTSTRAP"
+                            url.host.endsWith("bilibili.com") && url.encodedPath.contains("playurl") -> phases += "BILI_PLAYURL"
+                            url.host.endsWith("bilibili.com") -> phases += "BILI_METADATA_OR_SESSION"
+                        }
+                    }
+                    delay(100)
+                }
             }
             instrumentation.sendStatus(2, Bundle().apply {
                 putString("source", provider); putString("outcome", "PLAYED")
@@ -98,6 +139,18 @@ class OtherSourceDeviceTest {
             })
             throw AssertionError("$provider playback failed (${failure.javaClass.simpleName})")
         } finally {
+            instrumentation.sendStatus(2, Bundle().apply {
+                putString("diagnostic_source", provider)
+                putString("observed_http_stages", phases.joinToString(","))
+                putString("player_error_kind", errorKind)
+                putLong("first_address_observed_ms", firstAddressMs)
+                putLong("first_player_error_ms", firstErrorMs)
+                putInt("remaining_youtube_http_calls", AppContainer.sharedOkHttpClient.dispatcher.runningCalls().count {
+                    it.request().url.host.endsWith("youtube.com")
+                })
+                putBoolean("pending_media_load", PlayerManager.pendingMediaLoadFlow.value)
+            })
+            events.cancel()
             instrumentation.runOnMainSync { PlayerManager.pause() }
             audio.setStreamVolume(AudioManager.STREAM_MUSIC, volume, 0)
         }

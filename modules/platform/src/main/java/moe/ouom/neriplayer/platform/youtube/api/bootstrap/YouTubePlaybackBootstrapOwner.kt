@@ -5,6 +5,7 @@ import moe.ouom.neriplayer.platform.youtube.api.auth.normalized
 
 import android.content.Context
 import java.io.IOException
+import java.net.SocketTimeoutException
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.CancellationException
@@ -15,6 +16,7 @@ import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import moe.ouom.neriplayer.platform.youtube.api.auth.YouTubeAuthRefresher
@@ -26,18 +28,13 @@ import moe.ouom.neriplayer.data.model.youtube.auth.YOUTUBE_MUSIC_ORIGIN
 import moe.ouom.neriplayer.data.model.youtube.auth.YouTubeAuthBundle
 import moe.ouom.neriplayer.data.model.youtube.playback.YouTubePlaybackBootstrap
 import moe.ouom.neriplayer.platform.youtube.api.protocol.YouTubeMusicLocaleResolver
-import moe.ouom.neriplayer.platform.youtube.api.transport.YOUTUBE_ERROR_RESPONSE_MAX_BYTES
-import moe.ouom.neriplayer.platform.youtube.api.transport.YOUTUBE_TEXT_RESPONSE_MAX_BYTES
 import moe.ouom.neriplayer.platform.youtube.api.transport.YOUTUBE_WEB_ORIGIN
-import moe.ouom.neriplayer.platform.youtube.api.transport.YouTubeHttpStatusException
 import moe.ouom.neriplayer.platform.youtube.api.transport.appendYouTubeConsentCookie
 import moe.ouom.neriplayer.platform.youtube.api.transport.buildBootstrapAuthFingerprint
 import moe.ouom.neriplayer.platform.youtube.api.transport.buildYouTubePageRequestHeaders
 import moe.ouom.neriplayer.platform.youtube.api.transport.effectiveCookieHeader
-import moe.ouom.neriplayer.platform.youtube.api.transport.parseRetryAfterMs
 import moe.ouom.neriplayer.platform.youtube.api.transport.rateLimitBackoffMs
-import moe.ouom.neriplayer.platform.youtube.api.transport.readErrorPreviewWithLimit
-import moe.ouom.neriplayer.platform.youtube.api.transport.readTextWithLimit
+import moe.ouom.neriplayer.platform.youtube.api.transport.executeYouTubePlaybackText
 import moe.ouom.neriplayer.platform.youtube.api.transport.resolveBootstrapUserAgent
 import moe.ouom.neriplayer.platform.youtube.api.transport.resolveXGoogAuthUser
 import moe.ouom.neriplayer.common.logging.NPLogger
@@ -307,7 +304,9 @@ class YouTubePlaybackBootstrapOwner(
         lateinit var created: Deferred<YouTubePlaybackBootstrap>
         created = scope.async(start = CoroutineStart.LAZY) {
             try {
-                loadBootstrap(auth = auth, forceRefresh = forceRefresh)
+                withTimeoutOrNull(8_000) {
+                    loadBootstrap(auth = auth, forceRefresh = forceRefresh)
+                } ?: throw SocketTimeoutException("YouTube bootstrap timed out")
             } finally {
                 synchronized(bootstrapRequestLock) {
                     if (inFlightBootstrapRequests[key] === created) inFlightBootstrapRequests.remove(key)
@@ -533,7 +532,7 @@ class YouTubePlaybackBootstrapOwner(
         )
     }
 
-    private fun parseBootstrap(
+    private suspend fun parseBootstrap(
         fetched: FetchedBootstrapHtml,
         cached: YouTubePlaybackBootstrap?,
         forceRefresh: Boolean
@@ -603,7 +602,7 @@ class YouTubePlaybackBootstrapOwner(
     private fun optionalOrDerived(source: YouTubeBootstrapHtmlSource, name: String, derived: String): String =
         source.optionalString(name).ifBlank { derived }
 
-    private fun resolveSignatureTimestamp(
+    private suspend fun resolveSignatureTimestamp(
         source: YouTubeBootstrapHtmlSource,
         playerJsUrl: String,
         userAgent: String,
@@ -746,21 +745,10 @@ class YouTubePlaybackBootstrapOwner(
         throw lastError ?: IOException("YouTube Music bootstrap request failed")
     }
 
-    private fun executeText(request: Request): String {
-        okHttpClient.newCall(request).execute().use { response ->
-            if (!response.isSuccessful) {
-                val preview = response.body.readErrorPreviewWithLimit(YOUTUBE_ERROR_RESPONSE_MAX_BYTES)
-                throw YouTubeHttpStatusException(
-                    statusCode = response.code,
-                    retryAfterMs = parseRetryAfterMs(response.header("Retry-After")),
-                    message = "YouTube Music request failed: ${response.code} $preview"
-                )
-            }
-            return response.body.readTextWithLimit(YOUTUBE_TEXT_RESPONSE_MAX_BYTES)
-        }
-    }
+    private suspend fun executeText(request: Request): String =
+        okHttpClient.executeYouTubePlaybackText(request)
 
-    private fun fetchPlayerSignatureTimestamp(
+    private suspend fun fetchPlayerSignatureTimestamp(
         playerJsUrl: String,
         userAgent: String
     ): Int? {
@@ -771,7 +759,7 @@ class YouTubePlaybackBootstrapOwner(
         return fetchUncachedSignatureTimestamp(playerJsUrl, userAgent)
     }
 
-    private fun fetchUncachedSignatureTimestamp(playerJsUrl: String, userAgent: String): Int? {
+    private suspend fun fetchUncachedSignatureTimestamp(playerJsUrl: String, userAgent: String): Int? {
         val request = Request.Builder()
             .url(playerJsUrl)
             .header("User-Agent", userAgent)
@@ -779,6 +767,7 @@ class YouTubePlaybackBootstrapOwner(
         return runCatching {
             parsePlayerSignatureTimestamp(executeText(request))
         }.onFailure { error ->
+            if (error is CancellationException) throw error
             NPLogger.w(
                 "YouTubeMusicPlayback",
                 "Failed to fetch player signature timestamp",
@@ -818,7 +807,7 @@ class YouTubePlaybackBootstrapOwner(
         }
     }
 
-    private fun loadWarmSignatureTimestamp(playerJsUrl: String, userAgent: String): Int? {
+    private suspend fun loadWarmSignatureTimestamp(playerJsUrl: String, userAgent: String): Int? {
         val startedAtMs = System.currentTimeMillis()
         val timestamp = fetchPlayerSignatureTimestamp(playerJsUrl, userAgent)
         NPLogger.d(

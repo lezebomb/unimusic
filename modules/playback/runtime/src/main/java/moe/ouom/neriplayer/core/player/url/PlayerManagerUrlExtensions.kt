@@ -367,9 +367,9 @@ internal suspend fun PlayerManager.resolveSongUrlFromLegacySource(
     } else {
         sideEffects
     }
-    // Netease already tries qualities and independent sources under bounded budgets. Do not
-    // restart that entire pipeline five more times for a permanent denial or a rejected match.
-    val retryCount = if (!isYouTubeTrack && !isBiliTrack(song)) 0 else SONG_URL_RESOLUTION_RETRY_COUNT
+    // NetEase owns quality/source retries; YouTube owns player client/locale retries. Restarting
+    // either full pipeline after a terminal failure only repeats work until the shared deadline.
+    val retryCount = if (isBiliTrack(song)) SONG_URL_RESOLUTION_RETRY_COUNT else 0
     val result = retrySongUrlResolution(retryCount = retryCount) { retryAttempt ->
         val isFinalAttempt = retryAttempt == retryCount
         if (retryAttempt > 0) {
@@ -1739,7 +1739,7 @@ private suspend fun PlayerManager.getBiliAudioUrl(
         )
 
         if (audioStream?.url != null) {
-            NPLogger.d("NERI-PlayerManager-BiliAudioUrl", audioStream.url)
+            NPLogger.d("NERI-PlayerManager-BiliAudioUrl", "Resolved audio; candidates=${audioStream.candidateUrls.size}")
             SongUrlResult.Success(
                 url = audioStream.url,
                 candidateUrls = audioStream.candidateUrls,

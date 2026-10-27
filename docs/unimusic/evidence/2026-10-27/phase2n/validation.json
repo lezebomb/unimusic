@@ -1,0 +1,127 @@
+{
+  "date": "2026-10-27",
+  "phase": "2N",
+  "base_commit": "ba5bb77dbabb3c0e72a90699858165a8d8745fe4",
+  "room_version": 23,
+  "previous_ci": {
+    "url": "https://github.com/lezebomb/unimusic/actions/runs/40462851633",
+    "conclusion": "success"
+  },
+  "implementation": {
+    "youtube_text_request_budget_ms": 3000,
+    "shared_bootstrap_budget_ms": 8000,
+    "shared_resolution_budget_ms": 8000,
+    "network": "Bootstrap HTML, player API and timestamp requests now use cancellable awaitResponse, including body reads; scoped timeout cancels the call",
+    "retry": "Runtime no longer repeats the complete YouTube client/locale pipeline; internal platform retries retained; Bili retry behavior unchanged",
+    "privacy": "HTTP failures retain status and Retry-After without response bodies; remove signed Bili stream URL log"
+  },
+  "jvm": {
+    "passed": 9,
+    "suites": [
+      {
+        "name": "moe.ouom.neriplayer.platform.youtube.api.bootstrap.YouTubePlaybackBootstrapOwnerTest",
+        "tests": "4",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0"
+      },
+      {
+        "name": "moe.ouom.neriplayer.platform.youtube.api.transport.YouTubePlaybackHttpCancellationTest",
+        "tests": "3",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0"
+      },
+      {
+        "name": "moe.ouom.neriplayer.platform.youtube.repository.YouTubeMusicPlaybackRepositoryTest",
+        "tests": "2",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0"
+      }
+    ],
+    "new_checks": 3,
+    "log": "build/unimusic-toolchain/phase2n-final-validation.log"
+  },
+  "device": {
+    "model": "Huawei Mate60 / BRA-AL00",
+    "api": 31,
+    "install": "both final APKs installed with -r; no data clearing or account logout",
+    "charging_stay_on": 7,
+    "baseline": {
+      "tests": 2,
+      "passed": 1,
+      "failed": 1,
+      "seconds": 30.933,
+      "log": "phase2n-source-diagnostic-device.log",
+      "youtube": "no address; TIMEOUT event; not played",
+      "bilibili": {
+        "outcome": "PLAYED",
+        "discovery_ms": 4167,
+        "play_request_to_observed_position_ms": 2689,
+        "observed_position_ms": 2073,
+        "first_address_observed_ms": 162,
+        "cache": "Existing sample/cache retained; not a cold-start or causal improvement measurement"
+      }
+    },
+    "intermediate_youtube": {
+      "tests": 1,
+      "failed": 1,
+      "seconds": 24.461,
+      "log": "build/unimusic-toolchain/phase2n-final-youtube-device.log"
+    },
+    "final_youtube": {
+      "tests": 1,
+      "failed": 1,
+      "seconds": 24.093,
+      "log": "phase2n-terminal-youtube-device.log",
+      "first_address_observed_ms": -1,
+      "first_player_error_ms": 8684,
+      "http_stages": [
+        "YOUTUBE_BOOTSTRAP",
+        "YOUTUBE_PLAYER_JS",
+        "YOUTUBE_PLAYER_API"
+      ],
+      "pending_media_load_at_end": false,
+      "remaining_youtube_calls_on_shared_client_at_20s_observation_end": 0,
+      "outcome": "FAILED; no audio address or playback"
+    },
+    "normal_ui": {
+      "aggregate_public_query": "sources returned results; first Kuwo result marked address checked",
+      "youtube_public_sample": "UI eventually showed no playback address; no positive playback",
+      "pause": "media pause issued; error dismissed"
+    },
+    "unique_test_methods": 2,
+    "test_executions": 4,
+    "passed_executions": 1,
+    "failed_executions": 3
+  },
+  "validation": {
+    "final_build": "passed",
+    "seconds": 40,
+    "log": "build/unimusic-toolchain/phase2n-final-apk.log",
+    "platform_dependencies": "passed",
+    "module_boundaries": "passed",
+    "module_log": "build/unimusic-toolchain/phase2n-final-boundaries.log"
+  },
+  "app": {
+    "path": "app/build/outputs/apk/debug/app-debug.apk",
+    "bytes": 62736578,
+    "sha256": "e7324cbd40f21fb981be429789474697879506aa63953153e2ca30e2d6bf88b3"
+  },
+  "android_test": {
+    "path": "app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk",
+    "bytes": 8075703,
+    "sha256": "6ca4a7434f134362a76f711bc340dc6924d126af0ca4c915861384bad009b023"
+  },
+  "initial_failure": "Precise SocketTimeoutException domain dependency was missing; registered that one class and reran successfully",
+  "limits": [
+    "YouTube successful audio playback not established",
+    "No exact cause for final address failure beyond observed bootstrap/player stages",
+    "Synchronous third-party NewPipe/extractor/JS execution not proven to honor a hard 8-second background deadline",
+    "No cold Bili sample comparison or latency percentiles",
+    "QQ account positive audio remains unverified",
+    "No new full-song, multi-network or original-recording corpus evaluation"
+  ],
+  "privacy": "No contacts, OTPs, lock PIN, cookies, account IDs, playlist names or signed URLs saved to this evidence."
+}
