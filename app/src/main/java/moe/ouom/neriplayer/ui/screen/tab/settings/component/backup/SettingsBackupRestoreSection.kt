@@ -964,6 +964,10 @@ internal fun SettingsBackupRestoreSection(
                 }
             }
 
+            HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
+            androidx.compose.runtime.key(showWebDavConfigDialog, webDavState.isConfigured) {
+                SettingsIdentitySyncSection(configured = webDavState.isConfigured, onConfigure = onOpenWebDavConfig)
+            }
             }
 
             if (hasSyncMessage && shouldShowCard(4)) {

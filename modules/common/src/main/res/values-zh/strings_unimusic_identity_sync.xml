@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="unimusic_identity_sync_title">同步歌曲标识</string>
+    <string name="unimusic_identity_sync_description">通过公开平台歌曲ID和元数据，让其他设备识别同一首歌。账号和本地文件信息留在本机；歌单仍用上方的同步入口。</string>
+    <string name="unimusic_identity_sync_action">同步标识</string>
+    <string name="unimusic_identity_sync_configure">配置WebDAV</string>
+    <string name="unimusic_identity_sync_changed">服务器配置已变化，请按当前配置重新同步。</string>
+    <string name="unimusic_identity_sync_racing">远端数据持续变化，请稍后重试。</string>
+    <string name="unimusic_identity_sync_failed">标识同步未完成，请检查连接及服务器是否支持安全更新；本地音乐库已保留。</string>
+    <string name="unimusic_identity_sync_result">当前%1$d首记录、%2$d个删除标记、%3$d个待处理冲突。</string>
+    <string name="unimusic_identity_sync_excluded">%1$d个本地或不支持的来源保留在本机。</string>
+    <string name="unimusic_identity_sync_local_conflict">本地和远端元数据有差异，自动捕获已保留现有版本。</string>
+    <string name="unimusic_identity_sync_pending">有新的本地变更待发送，可再次同步。</string>
+</resources>

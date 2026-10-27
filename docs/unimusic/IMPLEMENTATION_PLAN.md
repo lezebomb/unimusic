@@ -105,7 +105,7 @@
 
 ## Phase 3：本地推荐与同步
 
-3D.1已实现独立身份/因果合并/严格编码契约，4项JVM与Debug构建通过，见[3D.1](PHASE_3D1_PORTABLE_IDENTITY_CONTRACT.md)。3D.2已补持久dot原子日志和显式恢复门槛，新增3项/相关共7项JVM与构建通过，见[3D.2](PHASE_3D2_DURABLE_IDENTITY_JOURNAL.md)。3D.3已补只读Room批量身份捕获、私有本地基线与冲突/删除保护，10项定向JVM、构建通过，见[3D.3](PHASE_3D3_ROOM_IDENTITY_CAPTURE.md)。3D.4已补独立条件同步/WebDAV后台，4项合成JVM和构建通过，见[3D.4](PHASE_3D4_CONDITIONAL_IDENTITY_WEBDAV.md)。3D.5已补只读远端UUID到本地播放适配与过期修订保护，7项唯一JVM/最终构建通过，见[3D.5](PHASE_3D5_FOREIGN_UUID_PLAYBACK_ADAPTER.md)。尚无UI、完整Room远端应用、GitHub身份传输或真实云上传，不标记完整同步交付。
+3D.1已实现独立身份/因果合并/严格编码契约，4项JVM与Debug构建通过，见[3D.1](PHASE_3D1_PORTABLE_IDENTITY_CONTRACT.md)。3D.2已补持久dot原子日志和显式恢复门槛，新增3项/相关共7项JVM与构建通过，见[3D.2](PHASE_3D2_DURABLE_IDENTITY_JOURNAL.md)。3D.3已补只读Room批量身份捕获、私有本地基线与冲突/删除保护，10项定向JVM、构建通过，见[3D.3](PHASE_3D3_ROOM_IDENTITY_CAPTURE.md)。3D.4已补独立条件同步/WebDAV后台，4项合成JVM和构建通过，见[3D.4](PHASE_3D4_CONDITIONAL_IDENTITY_WEBDAV.md)。3D.5已补只读远端UUID到本地播放适配与过期修订保护，7项唯一JVM/最终构建通过，见[3D.5](PHASE_3D5_FOREIGN_UUID_PLAYBACK_ADAPTER.md)。3D.6已加WebDAV显式标识同步入口/配置代次保护，2项JVM与构建通过，见[3D.6](PHASE_3D6_MANUAL_IDENTITY_SYNC_ENTRY.md)。完整Room远端应用、冲突选择、GitHub身份传输和真实云上传仍未交付，不标记完整同步验收。
 
 3B已接精确身份的本机播放反馈、私有有界事件存储与推荐v3，见 [3B报告](PHASE_3B_PLAYBACK_RECOMMENDATION_SIGNALS.md)。这是实现与合成验证，实际Media3采样/异常持久性未验收；旧统计不回推事件，反馈未进入独立UUID dataset同步。
 

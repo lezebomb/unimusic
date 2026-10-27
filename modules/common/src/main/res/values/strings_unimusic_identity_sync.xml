@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="unimusic_identity_sync_title">Sync song identities</string>
+    <string name="unimusic_identity_sync_description">Let other devices recognize the same recordings using public platform IDs and song metadata. Accounts and local file information stay on this device. Playlists still use the sync action above.</string>
+    <string name="unimusic_identity_sync_action">Sync identities</string>
+    <string name="unimusic_identity_sync_configure">Configure WebDAV</string>
+    <string name="unimusic_identity_sync_changed">The server configuration changed. Start again with the current configuration.</string>
+    <string name="unimusic_identity_sync_racing">The remote document keeps changing. Please try again later.</string>
+    <string name="unimusic_identity_sync_failed">Identity sync failed. Check the connection and server support for safe updates. Your local library is kept.</string>
+    <string name="unimusic_identity_sync_result">%1$d recordings, %2$d deletion markers, %3$d unresolved conflicts.</string>
+    <string name="unimusic_identity_sync_excluded">%1$d local or unsupported sources were kept on this device.</string>
+    <string name="unimusic_identity_sync_local_conflict">Local and remote metadata differ; automatic capture kept the existing versions.</string>
+    <string name="unimusic_identity_sync_pending">New local changes are pending. Sync again to send them.</string>
+</resources>
