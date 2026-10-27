@@ -11,6 +11,12 @@ import moe.ouom.neriplayer.data.model.bilibili.playback.PlayInfo
 
 internal data class BiliPageSelection(val page: VideoPage?, val rejection: SourceFailure?)
 
+/** A name match is corroborating text, never proof that the account is verified or owns a recording. */
+internal fun hasBiliUploaderArtistEvidence(artist: String, uploader: String): Boolean {
+    val expected = RecordingMatchPolicy.canonicalText(artist)
+    return expected.isNotEmpty() && expected == RecordingMatchPolicy.canonicalText(uploader)
+}
+
 internal fun biliAutoSourceAccessFailure(info: PlayInfo, expectedDurationMs: Long): SourceFailure? {
     val data = info.raw.optJSONObject("data") ?: info.raw
     if (data.optBoolean("is_preview", false) || data.optInt("is_preview", 0) == 1) return SourceFailure.PREVIEW_ONLY

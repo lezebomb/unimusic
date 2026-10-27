@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="moe.ouom.neriplayer.core.player.policy.source.SourceResolutionBudgetTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-10-27T00:42:14.819Z" hostname="XUSHAOYANG" time="0.196">
+  <properties/>
+  <testcase name="nestedRecoveryCannotResetTheDeadlineAndStandaloneChecksKeepTheirBudget" classname="moe.ouom.neriplayer.core.player.policy.source.SourceResolutionBudgetTest" time="0.191"/>
+  <testcase name="primaryAndFallbackShareOneDeadlineAndDoNotAddIndependentWaits" classname="moe.ouom.neriplayer.core.player.policy.source.SourceResolutionBudgetTest" time="0.005"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

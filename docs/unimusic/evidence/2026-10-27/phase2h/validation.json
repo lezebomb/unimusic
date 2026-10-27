@@ -1,0 +1,143 @@
+{
+  "date": "2026-10-27",
+  "timezone": "Asia/Shanghai",
+  "phase": "2H",
+  "baseCommit": "5976e9fbc622039bac01477c11d45ae1bc07c826",
+  "totalTests": 18,
+  "newTestMethods": 4,
+  "suites": [
+    {
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "name": "SourceResolutionBudgetTest",
+      "timestamp": "2026-10-27T00:42:14.819Z",
+      "methods": [
+        "nestedRecoveryCannotResetTheDeadlineAndStandaloneChecksKeepTheirBudget",
+        "primaryAndFallbackShareOneDeadlineAndDoNotAddIndependentWaits"
+      ]
+    },
+    {
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "name": "RecordingMatchPolicyTest",
+      "timestamp": "2026-10-27T00:42:14.805Z",
+      "methods": [
+        "titleArtistAndDurationAreIndependentRequirements",
+        "sameVersionAndCosmeticDifferencesCanMatch",
+        "versionConflictsOverridePerfectTextAndDuration"
+      ]
+    },
+    {
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "name": "RecordingDiscoveryRankerTest",
+      "timestamp": "2026-10-27T00:42:14.623Z",
+      "methods": [
+        "sameLengthAloneNeverOutranksCompleteRecordingMetadata",
+        "discoveryRetainsUnknownContextForDetailChecksWithoutApprovingIt",
+        "multipleQualifiedUploadsNeedManualChoiceRegardlessOfTextScore",
+        "conflictingVersionsCannotFillTheDiscoveryWindowAheadOfTheOriginal"
+      ]
+    },
+    {
+      "tests": 7,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "name": "BiliRecordingMatchTest",
+      "timestamp": "2026-10-27T00:42:44.510Z",
+      "methods": [
+        "confirmedCidDisambiguatesOnlyTheSelectedCompatiblePage",
+        "onlyActualAutoSourceFailuresTriggerCooldown",
+        "previewDrmAndIncompleteStreamsAreNotFullSongSources",
+        "titleMentionsCannotEstablishUploaderArtistEvidence",
+        "genericSinglePartCanUseVideoTitleButArtistSubstringCannotMatch",
+        "headerCannotRescueWrongVersionOrAmbiguousPages",
+        "oneMatchingPageUsesItsOwnCidAndFullMetadata"
+      ]
+    },
+    {
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "name": "FederatedSearchEngineTest",
+      "timestamp": "2026-10-27T00:42:17.301Z",
+      "methods": [
+        "concurrencyIsBoundedAndQueueTimeCountsAgainstBudget",
+        "fastResultsSurviveOtherSourcesFailingOrTimingOut"
+      ]
+    }
+  ],
+  "roomVersion": 23,
+  "schemaUnchanged": true,
+  "configuredBudgetsMs": {
+    "overallResolution": 8000,
+    "rememberedTotal": 2000,
+    "rememberedCandidate": 1500,
+    "neteasePrimary": 2500,
+    "neteaseRequest": 1500,
+    "biliAlternateTotal": 5000,
+    "biliCandidate": 1800,
+    "biliMetadataQuery": 1500,
+    "federatedSourceIncludingQueue": 6000
+  },
+  "aggregateParallelism": 4,
+  "checks": {
+    "moduleBoundaries": "passed",
+    "debugApk": "built",
+    "performanceMeasurements": "not performed; time assertions use a virtual coroutine clock",
+    "realAccountPlayback": "not run",
+    "deviceInteraction": "not run",
+    "originalRecordingLabeledDataset": "not evaluated",
+    "audioFingerprinting": "not implemented",
+    "remoteCIForNewCommit": "pending",
+    "previousCI": {
+      "runId": 40421809825,
+      "head": "5976e9fbc622039bac01477c11d45ae1bc07c826",
+      "conclusion": "success"
+    }
+  },
+  "artifacts": [
+    {
+      "path": "app/build/outputs/apk/debug/app-debug.apk",
+      "size": 62622238,
+      "sha256": "d020df6b36a1fdfe7527da569cee77b603c2bf0ae437daf4a8e1edee1150c179"
+    },
+    {
+      "path": "modules/database/schemas/moe.ouom.neriplayer.data.local.database.NeriUserDataDatabase/23.json",
+      "size": 159181,
+      "sha256": "6945804ef89cb399c531ccc3e5f3a123b2eb2b5feefc5b133ce1f22be7d392de"
+    }
+  ],
+  "logs": [
+    {
+      "path": "build/unimusic-toolchain/phase2h-validation.log",
+      "size": 30310,
+      "sha256": "3ca56d3360789376f17e386a4349170a9a439df36474d4e19ad232b30b16fea1"
+    },
+    {
+      "path": "build/unimusic-toolchain/phase2h-boundaries.log",
+      "size": 27,
+      "sha256": "f10fd66c214b917ee89a1cfc270e44fb332b76cf9000c053f0514056d7a97e2d"
+    }
+  ],
+  "commands": [
+    "gradlew <JDK17 path> :playback:logic:testDebugUnitTest --tests '*SourceResolutionBudgetTest' --tests '*RecordingMatchPolicyTest' --tests '*RecordingDiscoveryRankerTest' :playback:runtime:testDebugUnitTest --tests '*BiliRecordingMatchTest' :common:testDebugUnitTest --tests '*FederatedSearchEngineTest.fastResultsSurvive*' --tests '*FederatedSearchEngineTest.concurrencyIsBounded*' :app:assembleDebug --continue --max-workers=2 --console=plain",
+    "python -X utf8 tools_pub/quality/module_boundaries.py"
+  ],
+  "jdk17Argument": "-Dorg.gradle.java.installations.paths=D:/unimusic/.gradle-home/jdks/jdk-17.0.20.1+1",
+  "limits": [
+    "Address resolution coroutine budgets do not guarantee first-audio time or immediate cancellation of blocking third-party extractors.",
+    "Player startup and runtime stall watchdog timing is separate and unchanged.",
+    "Uploader display-name equality is not verification of artist identity.",
+    "Text/metadata matching does not prove an unlabelled recording is original.",
+    "Stricter automatic matching reduces coverage; exact manual CID selection remains available."
+  ]
+}

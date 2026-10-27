@@ -69,4 +69,5 @@
     <string name="unimusic_sources_check_network">The source request failed. Check the network or platform status.</string>
     <string name="unimusic_sources_check_unavailable">The source did not return suitable audio. Try again later.</string>
     <string name="unimusic_sources_check_context">The account, setting or decision changed during the check. The old result was discarded.</string>
+    <string name="unimusic_sources_resolution_timeout">Audio source resolution timed out. Retry or choose a source manually from the source menu.</string>
 </resources>

@@ -10,6 +10,7 @@ import moe.ouom.neriplayer.common.logging.NPLogger
 import moe.ouom.neriplayer.core.player.PlayerManager
 import moe.ouom.neriplayer.core.player.network.isPlaybackNetworkUsable
 import moe.ouom.neriplayer.core.player.quality.effectiveNeteaseQuality
+import moe.ouom.neriplayer.core.player.policy.source.sourceStageBudgetMs
 import moe.ouom.neriplayer.core.player.resolver.netease.tryResolveNeteaseAutoBiliSource
 import moe.ouom.neriplayer.core.player.resolver.netease.tryResolveNeteaseMatchedLocalSource
 import moe.ouom.neriplayer.core.player.runtime.refresh.RefreshResolverSideEffects
@@ -32,12 +33,14 @@ internal suspend fun PlayerManager.getNeteaseSongUrl(
         var previewFallback: SongUrlResult.Success? = null
         var lastFailureReason: NeteasePlaybackResponseParser.FailureReason? = null
         var requiresLogin = false
-        val deadline = SystemClock.elapsedRealtime() + 8_000L
+        val primaryBudget = sourceStageBudgetMs(2_500, 8_000)
+        if (primaryBudget <= 0) return@withContext SongUrlResult.Failure
+        val deadline = SystemClock.elapsedRealtime() + primaryBudget
 
         for ((index, quality) in qualityCandidates.withIndex()) {
             val remainingMs = deadline - SystemClock.elapsedRealtime()
             if (remainingMs <= 0L) break
-            val resp = withTimeoutOrNull(minOf(3_000L, remainingMs)) {
+            val resp = withTimeoutOrNull(minOf(sourceStageBudgetMs(1_500, 3_000), remainingMs)) {
                 neteaseClient.getSongDownloadUrlCancellable(song.id, level = quality)
             } ?: break
             NPLogger.d("NERI-PlayerManager", "Netease URL response: id=${song.id}, requestedQuality=$quality")

@@ -22,7 +22,7 @@ object RecordingMatchPolicy {
         RecordingVersion.COVER to Regex("翻唱|翻弹|翻奏|\\bcover(?:ed)?\\b", RegexOption.IGNORE_CASE),
         RecordingVersion.INSTRUMENTAL to Regex("伴奏|纯音乐|无人声|\\b(?:instrumental|karaoke|backing track)\\b", RegexOption.IGNORE_CASE),
         RecordingVersion.REMIX to Regex("混音|\\bremix(?:ed)?\\b", RegexOption.IGNORE_CASE),
-        RecordingVersion.EDIT to Regex("剪辑|片段|串烧|混剪|\\b(?:edit|snippet|medley|mashup|short ver(?:sion)?)\\b", RegexOption.IGNORE_CASE),
+        RecordingVersion.EDIT to Regex("剪辑|片段|串烧|混剪|教学|教程|讲解|乐理分析|\\b(?:edit|snippet|medley|mashup|short ver(?:sion)?|tutorial|lesson|reaction|how to play)\\b", RegexOption.IGNORE_CASE),
         RecordingVersion.SPEED_ALTERED to Regex("加速|减速|变速|升调|降调|倍速|\\b(?:sped up|speed up|slowed|nightcore|pitch(?:ed)?)\\b", RegexOption.IGNORE_CASE),
         RecordingVersion.REMASTER to Regex("重制|修复版|\\bremaster(?:ed)?\\b", RegexOption.IGNORE_CASE),
         RecordingVersion.RERECORDING to Regex("重录|再录|\\b(?:re-record(?:ed|ing)?|rerecord(?:ed|ing)?|taylor['’]s version)\\b", RegexOption.IGNORE_CASE)

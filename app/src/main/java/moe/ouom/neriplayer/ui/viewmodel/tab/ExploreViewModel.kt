@@ -604,7 +604,7 @@ class ExploreViewModel(application: Application) : AndroidViewModel(application)
                 val page = AppContainer.kuwoCatalogProvider.search(query, cursor, limit = 20)
                 SearchPage(page.tracks.map(ExploreSearchResult::Catalog), page.nextCursor)
             }
-        ), identity = { it.stableKey })
+        ), identity = { it.stableKey }, parallelism = 4)
         searchJob = launchAggregateSearch(keyword, requestVersion, null)
     }
 

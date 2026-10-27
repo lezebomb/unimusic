@@ -65,8 +65,10 @@ internal suspend fun PlayerManager.tryResolveRememberedSource(unifiedSongId: Str
                 })
             }
         }
+        val budget = sourceStageBudgetMs(2_000, 8_000)
+        if (budget <= 0) return null
         return PlaybackSourceResolver(RememberedSourceState.cooldown).resolve(song.stableKey(), candidates,
-            totalBudgetMs = 8_000, candidateBudgetMs = 4_000).value
+            totalBudgetMs = budget, candidateBudgetMs = sourceStageBudgetMs(1_500, 4_000).coerceAtLeast(1)).value
     } catch (cancelled: CancellationException) {
         throw cancelled
     } catch (error: Exception) {

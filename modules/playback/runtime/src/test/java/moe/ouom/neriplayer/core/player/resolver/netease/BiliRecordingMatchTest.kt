@@ -11,6 +11,14 @@ import org.junit.Assert.*
 import org.junit.Test
 
 class BiliRecordingMatchTest {
+    @Test fun titleMentionsCannotEstablishUploaderArtistEvidence() {
+        assertTrue(hasBiliUploaderArtistEvidence("周杰伦", "周杰伦"))
+        assertFalse(hasBiliUploaderArtistEvidence("周杰伦", "原唱周杰伦的歌迷"))
+        assertFalse(hasBiliUploaderArtistEvidence("周杰伦", "随机搬运UP主"))
+        assertFalse(hasBiliUploaderArtistEvidence("Sia", "Asia"))
+        assertFalse(hasBiliUploaderArtistEvidence("", ""))
+    }
+
     private val song = SongItem(1, "晴天", "周杰伦", "叶惠美", 1, 269_000, null)
     private fun page(cid: Long, title: String) = VideoPage(cid, cid.toInt(), title, 269, 0, 0)
     private fun video(vararg pages: VideoPage) = VideoBasicInfo(1, "BVfixture", "周杰伦 - 晴天【Hi-Res】", "", "", 269,

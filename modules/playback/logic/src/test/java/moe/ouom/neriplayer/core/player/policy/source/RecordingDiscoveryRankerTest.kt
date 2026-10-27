@@ -9,6 +9,15 @@ class RecordingDiscoveryRankerTest {
     private fun candidate(id: String, metadata: RecordingMetadata, relevance: Int = 0) =
         RecordingDiscoveryCandidate(id, metadata, id, relevance)
 
+    @Test fun multipleQualifiedUploadsNeedManualChoiceRegardlessOfTextScore() {
+        val one = candidate("one", expected, 1)
+        val two = candidate("two", expected.copy(durationMs = 270_000), 999)
+        assertTrue(RecordingDiscoveryRanker.unambiguous(expected, listOf(one, two)).isEmpty())
+        assertEquals(listOf("one"), RecordingDiscoveryRanker.unambiguous(expected,
+            listOf(one, one, candidate("cover", expected.copy(title = "晴天 (Cover)"), 999))))
+        assertTrue(RecordingDiscoveryRanker.unambiguous(expected, listOf(candidate("unknown", expected.copy(durationMs = 0)))).isEmpty())
+    }
+
     @Test fun conflictingVersionsCannotFillTheDiscoveryWindowAheadOfTheOriginal() {
         val covers = (1..10).map { candidate("cover-$it", expected.copy(title = "晴天 (翻唱)"), 999) }
         val ranked = RecordingDiscoveryRanker.rank(expected, covers + candidate("original", expected, 1))

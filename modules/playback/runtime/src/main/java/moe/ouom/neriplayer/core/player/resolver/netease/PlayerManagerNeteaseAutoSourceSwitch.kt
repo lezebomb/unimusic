@@ -1,6 +1,10 @@
 package moe.ouom.neriplayer.core.player.resolver.netease
 
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.supervisorScope
+import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.coroutines.flow.flow
 import moe.ouom.neriplayer.core.player.PlayerManager
 import moe.ouom.neriplayer.core.player.policy.source.*
@@ -24,7 +28,6 @@ import moe.ouom.neriplayer.data.model.unified.SongSourceKey
 import moe.ouom.neriplayer.data.model.unified.SourceMatchDecision
 import moe.ouom.neriplayer.data.model.unified.UnifiedSongMetadata
 
-private const val NETEASE_AUTO_SOURCE_SEARCH_LIMIT = 6
 private val autoSourceCacheKeyUnsafeRegex = Regex("[^A-Za-z0-9_.-]+")
 private val autoSourceNonTextRegex = Regex("[^\\p{L}\\p{N}]+")
 private val autoSourceWhitespaceRegex = Regex("\\s+")
@@ -51,20 +54,23 @@ internal suspend fun PlayerManager.tryResolveNeteaseAutoBiliSource(
             ))
         }
         NeteaseAutoSourceState.previous(song)?.let { offer(it) }
-        for (query in queries) {
-            val expected = song.recordingMetadata()
-            val found = fetchBiliAutoSourceCandidates(song, query)
-            RecordingDiscoveryRanker.rank(expected, found.map { candidate ->
+        val expected = song.recordingMetadata()
+        val found = supervisorScope {
+            queries.map { query -> async { fetchBiliAutoSourceCandidates(song, query) } }.awaitAll().flatten()
+        }.distinctBy { NeteaseAutoSourceState.candidateId(it) }
+            .filter { hasBiliUploaderArtistEvidence(expected.artist, it.author) }
+        RecordingDiscoveryRanker.unambiguous(expected, found.map { candidate ->
                 RecordingDiscoveryCandidate(NeteaseAutoSourceState.candidateId(candidate),
                     biliRecordingMetadata(expected, candidate.titlePlain, candidate.titlePlain,
                         candidate.author, candidate.durationSec * 1000L),
                     candidate, scoreNeteaseAutoBiliCandidate(song, candidate))
-            })
-                .take(NETEASE_AUTO_SOURCE_SEARCH_LIMIT).forEach { offer(it) }
-        }
+        }).forEach { offer(it) }
     }
+    val budget = sourceStageBudgetMs(5_000, 10_000)
+    if (budget <= 0) return null
     val result = PlaybackSourceResolver(NeteaseAutoSourceState.cooldown)
-        .resolve(NeteaseAutoSourceState.key(song), candidates)
+        .resolve(NeteaseAutoSourceState.key(song), candidates, totalBudgetMs = budget,
+            candidateBudgetMs = sourceStageBudgetMs(1_800, 3_000).coerceAtLeast(1))
     NPLogger.d("NERI-PlayerManager", "Bili alternate resolution: selected=${result.candidateId != null}, failures=${result.failures.distinct()}")
     return result.value
 }
@@ -79,9 +85,11 @@ private fun buildNeteaseAutoSourceQueries(song: SongItem): List<String> {
 private suspend fun PlayerManager.fetchBiliAutoSourceCandidates(song: SongItem, query: String): List<SearchVideoItem> {
     val durationFilter = durationFilterForBiliSearch(song.durationMs)
     return try {
-        val first = biliClient.searchVideos(keyword = query, page = 1, duration = durationFilter).items
-        if (first.isNotEmpty() || durationFilter == 0) first
-        else biliClient.searchVideos(keyword = query, page = 1, duration = 0).items
+        withTimeoutOrNull(sourceStageBudgetMs(1_500, 3_000)) {
+            val first = biliClient.searchVideos(keyword = query, page = 1, duration = durationFilter).items
+            if (first.isNotEmpty() || durationFilter == 0) first
+            else biliClient.searchVideos(keyword = query, page = 1, duration = 0).items
+        } ?: emptyList()
     } catch (cancelled: CancellationException) {
         throw cancelled
     } catch (_: Exception) {
@@ -98,6 +106,11 @@ internal suspend fun PlayerManager.resolveStrictBiliSource(
             else biliClient.getVideoBasicInfoByAvid(candidate.aid)
         if ((candidate.aid > 0 && info.aid != candidate.aid) ||
             (candidate.bvid.isNotBlank() && info.bvid != candidate.bvid)) return SourceAttempt.Rejected(SourceFailure.NO_MATCH)
+        // First-time automatic switching cannot infer the singer merely from a title mention.
+        // Explicit CID selection comes only from remembered/user-requested source choices.
+        if (selectedCid == null && !hasBiliUploaderArtistEvidence(song.originalArtist ?: song.artist, info.ownerName)) {
+            return SourceAttempt.Rejected(SourceFailure.NO_MATCH)
+        }
         val selection = selectStrictBiliPage(song, info, candidate.titlePlain, selectedCid)
         val page = selection.page ?: return SourceAttempt.Rejected(selection.rejection ?: SourceFailure.NO_MATCH)
         val matchBackend = SourceMatchBackend(application)

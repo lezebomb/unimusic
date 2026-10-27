@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="moe.ouom.neriplayer.core.player.resolver.netease.BiliRecordingMatchTest" tests="7" skipped="0" failures="0" errors="0" timestamp="2026-10-27T00:42:44.510Z" hostname="XUSHAOYANG" time="0.104">
+  <properties/>
+  <testcase name="confirmedCidDisambiguatesOnlyTheSelectedCompatiblePage" classname="moe.ouom.neriplayer.core.player.resolver.netease.BiliRecordingMatchTest" time="0.084"/>
+  <testcase name="onlyActualAutoSourceFailuresTriggerCooldown" classname="moe.ouom.neriplayer.core.player.resolver.netease.BiliRecordingMatchTest" time="0.0"/>
+  <testcase name="previewDrmAndIncompleteStreamsAreNotFullSongSources" classname="moe.ouom.neriplayer.core.player.resolver.netease.BiliRecordingMatchTest" time="0.006"/>
+  <testcase name="titleMentionsCannotEstablishUploaderArtistEvidence" classname="moe.ouom.neriplayer.core.player.resolver.netease.BiliRecordingMatchTest" time="0.0"/>
+  <testcase name="genericSinglePartCanUseVideoTitleButArtistSubstringCannotMatch" classname="moe.ouom.neriplayer.core.player.resolver.netease.BiliRecordingMatchTest" time="0.005"/>
+  <testcase name="headerCannotRescueWrongVersionOrAmbiguousPages" classname="moe.ouom.neriplayer.core.player.resolver.netease.BiliRecordingMatchTest" time="0.002"/>
+  <testcase name="oneMatchingPageUsesItsOwnCidAndFullMetadata" classname="moe.ouom.neriplayer.core.player.resolver.netease.BiliRecordingMatchTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

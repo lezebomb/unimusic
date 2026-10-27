@@ -11,6 +11,12 @@ data class RecordingDiscoveryCandidate<T>(
 
 /** Orders metadata discovery only. Actual page/stream access checks must still run before playback. */
 object RecordingDiscoveryRanker {
+    /** Equal recording evidence cannot identify which upload is genuine. Keep it for manual choice. */
+    fun <T> unambiguous(expected: RecordingMetadata, candidates: List<RecordingDiscoveryCandidate<T>>): List<T> {
+        val qualified = candidates.distinctBy { it.id }.filter { RecordingMatchPolicy.assess(expected, it.metadata).accepted }
+        return if (qualified.size == 1) listOf(qualified.single().value) else emptyList()
+    }
+
     fun <T> rank(expected: RecordingMetadata, candidates: List<RecordingDiscoveryCandidate<T>>): List<T> {
         val expectedVersions = RecordingMatchPolicy.versions(expected)
         val title = RecordingMatchPolicy.canonicalTitle(expected.title)
