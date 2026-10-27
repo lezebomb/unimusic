@@ -12,6 +12,8 @@ import androidx.test.platform.app.InstrumentationRegistry
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.first
+import moe.ouom.neriplayer.platform.youtube.api.auth.hasLoginCookies
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
@@ -51,6 +53,7 @@ class OtherSourceDeviceTest {
 
     @Test fun youtubeMusicSampleDecodes() = runBlocking {
         enabled()
+        awaitSavedYouTubeAccountIfRequested()
         val start = SystemClock.elapsedRealtime()
         val track = withTimeout(8_000) { AppContainer.youtubeMusicClient.search("Canon", limit = 3,
             filter = YouTubeMusicSearchFilter.Song).first { it.videoId.isNotBlank() } }
@@ -79,6 +82,7 @@ class OtherSourceDeviceTest {
     /** Mirrors the upstream warm-bootstrap -> shared resolver path; emits no request payloads. */
     @Test fun youtubeUpstreamWarmupDiagnostics() = runBlocking {
         enabled()
+        awaitSavedYouTubeAccountIfRequested()
         val traces = Collections.synchronizedList(mutableListOf<String>())
         val client = AppContainer.sharedOkHttpClient.newBuilder().addInterceptor { chain ->
             val request = chain.request()
@@ -113,7 +117,7 @@ class OtherSourceDeviceTest {
             val track = withTimeout(8_000) { AppContainer.youtubeMusicClient.search("Canon", limit = 3,
                 filter = YouTubeMusicSearchFilter.Song).first { it.videoId.isNotBlank() } }
             withTimeout(12_000) { repository.warmBootstrap() }
-            ready = withTimeout(12_000) { repository.getBestPlayableAudio(track.videoId) } != null
+            ready = withTimeout(25_000) { repository.getBestPlayableAudio(track.videoId) } != null
         } finally {
             instrumentation.sendStatus(2, Bundle().apply {
                 putString("diagnostic", "UPSTREAM_WARMUP_PATH")
@@ -123,6 +127,12 @@ class OtherSourceDeviceTest {
             })
         }
         assertTrue("Warmup path did not return an audio address; inspect redacted stage metrics", ready)
+    }
+
+    private suspend fun awaitSavedYouTubeAccountIfRequested() {
+        if (InstrumentationRegistry.getArguments().getString("unimusicRequireYoutubeAccount") != "true") return
+        withTimeout(10_000) { AppContainer.youtubeAuthRepo.authFlow.first { it.hasLoginCookies() } }
+        instrumentation.sendStatus(2, Bundle().apply { putBoolean("saved_youtube_login_cookies_loaded", true) })
     }
 
     private suspend fun play(provider: String, song: SongItem, discoveryMs: Long) = coroutineScope {
@@ -158,7 +168,7 @@ class OtherSourceDeviceTest {
                 PlayerManager.pause()
                 PlayerManager.playPlaylist(listOf(song), 0)
             }
-            withTimeout(20_000) {
+            withTimeout(if (provider == "youtube_music") 35_000 else 20_000) {
                 while (PlayerManager.currentSongFlow.value?.audioId != song.audioId ||
                     !PlayerManager.isPlayingFlow.value || PlayerManager.playbackPositionFlow.value < 1_500) {
                     if (firstAddressMs < 0 && PlayerManager.currentMediaUrlFlow.value?.let { it != previousUrl } == true) {

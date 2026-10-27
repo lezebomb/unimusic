@@ -2,6 +2,8 @@
 
 > 2026-10-27 的02:20和07:25两次单次续跑已执行，对应任务均已删除；没有新建重复计划。10月26日暂停交接仅为历史记录，按本文最新检查点接续。
 
+> 当前 2P 登录进行中：用户已授权 Google 登录并在场操作；已通过 App 设置打开 Mate60 上的官方 Google 网页，等待用户本人完成密码/二次验证并确认结果。没有读取或记录密码/验证码，没有取得 Google 登录成功证据。此时勿重装 App、启动 instrumentation、清会话或重复打开登录页，以免打断操作。后续测试包已编译但未安装/执行；账号正向检查需传 `unimusicRequireYoutubeAccount=true`，先等待本机保存的 YouTube 登录 Cookie，避免把匿名测试冒充账号测试。构建日志：`build/unimusic-toolchain/phase2p-account-test-build.log`，成功 2m43s。
+
 更新：2026-10-27（Asia/Shanghai）。最新 2O 对照原版 b9b6caf3 和已 fetch 的最新上游 0d9ce69f，保留预热/缓存/客户端回退。修复 8 秒共享任务短于原版 12 秒签名窗口的预算冲突：明确 YouTube 主播放 20 秒、共享后台 30 秒，其他主源/自动切源仍 8 秒且不能被嵌套延长。真实匿名响应是 UNPLAYABLE/LOGIN_REQUIRED、无音频格式；新增一轮后明确拒绝与来源 AUTH_REQUIRED、YouTube 专属登录提示，避免重复刷新和泛化超时。9 个关键 JVM 检查、最终 APK/测试包及边界通过，已覆盖安装到 Mate60。YouTube 仍未播通：最终播放器本次 5818ms 提示 LOGIN_REQUIRED，预热诊断一轮 6 次请求后明确拒绝，普通 UI 提示已核对。见 [2O报告](PHASE_2O_UPSTREAM_PLAYBACK_AND_ACCESS_FEEDBACK.md)。2N CI 已成功；网易云登录及 5 首导入保留，不重发验证码。未做 Google 登录，QQ 正向仍待验收。
 
 此前阶段：2026-10-27（Asia/Shanghai）。最新 2N 已把 YouTube bootstrap/player/STS 文本请求改为可取消且单请求 3 秒，后台共享 bootstrap/取流各显式 8 秒，去掉运行时重复重启完整 YouTube 流程；保留内部重试与原唱门槛，B站重试未变。9 个定向 JVM 检查、最终 APK/测试包和边界通过，已保留数据覆盖安装。YouTube 真机仍无地址/无法播放，首次超时事件 8684ms，20 秒观察末共享客户端相关 HTTP Call 为 0；不能标记接通。B站本次缓存样本 2.7 秒观察到进度，不能与旧冷启动比较。见 [2N报告](PHASE_2N_PLAYBACK_CANCELLATION_AND_DIAGNOSTICS.md)。2M 的 CI 已成功；网易云既有登录及两份 5 首导入保留，不重复登录或全选导入。QQ 正向账号取流仍未验收。
