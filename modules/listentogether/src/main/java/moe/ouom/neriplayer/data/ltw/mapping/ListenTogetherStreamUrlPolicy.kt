@@ -2,6 +2,7 @@ package moe.ouom.neriplayer.data.ltw.mapping
 
 import moe.ouom.neriplayer.common.logging.NPLogger
 import moe.ouom.neriplayer.data.model.ltw.track.ListenTogetherChannels
+import moe.ouom.neriplayer.data.model.playback.isStreamOnlyPlaybackUrl
 import okhttp3.HttpUrl
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 
@@ -21,6 +22,7 @@ fun trustedListenTogetherStreamUrl(
     streamUrl: String?
 ): String? {
     val candidate = streamUrl?.trim().orEmpty()
+    if (isStreamOnlyPlaybackUrl(candidate)) return null
     val url = parsedStreamUrlOrNull(candidate) ?: return null
     val host = url.host.lowercase()
     if (!isTrustedStreamHost(channelId, host)) {

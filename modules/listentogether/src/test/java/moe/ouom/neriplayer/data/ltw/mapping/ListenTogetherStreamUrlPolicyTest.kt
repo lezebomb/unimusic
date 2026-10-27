@@ -26,6 +26,10 @@ class ListenTogetherStreamUrlPolicyTest {
         }
         assertNull(trustedListenTogetherStreamUrl("unknown", "https://music.126.net/song"))
         assertNull(trustedListenTogetherStreamUrl(ListenTogetherChannels.NETEASE, "https://googlevideo.com/song"))
+        assertNull(trustedListenTogetherStreamUrl(ListenTogetherChannels.NETEASE,
+            "https://m801.music.126.net/song.mp3#unimusic-stream-only"))
+        assertNull(trustedListenTogetherStreamUrl(ListenTogetherChannels.NETEASE,
+            "https://m801.music.126.net/song.mp3#unimusic-stream-only&neriplayer-ltw-quality=netease:high"))
     }
 
     @Test

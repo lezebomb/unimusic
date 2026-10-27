@@ -2,7 +2,7 @@
 
 > 2026-10-27 的02:20和07:25两次单次续跑已执行，对应任务均已删除；没有新建重复计划。10月26日暂停交接仅为历史记录，按本文最新检查点接续。
 
-更新：2026-10-27（Asia/Shanghai）。2I参考用户2024音源笔记，补齐自动成功来源持久映射、24小时TTL、失败后重新发现和专用SQL/精确键复核；原站优先，缓存命中不降低匹配门槛，人工决策优先。15个关键测试和最终Debug构建通过。GD当前官方文档已读取，未新增GD/酷我音频适配器。Room仍v23。2H的8秒是地址解析协程预算，不是首声/所有故障切换保证；未做音频指纹或标注集验证。
+更新：2026-10-27（Asia/Shanghai）。2J新增GD网易云精确ID手动选择的在线播放路径，已通过实际Kotlin客户端联网取址和两个CDN HEAD；8个关键检查、最终Debug构建和相关边界通过，Room仍v23。GD不走磁盘音频缓存/下载/分享，不等于全曲库可播或真机播放完成。用户最新要求“把各种平台的登录接口也搞一下，我可以分别登录”：下一步检查既有网易云/B站/YouTube入口，并优先补QQ正常网页登录及安全凭证链。不要再重复只做音源缓存或只查目录。
 
 ## 已完成和推送
 
@@ -20,9 +20,12 @@
 - Phase 2F：`b5e73b3f` 完成 UUID反查/临播适配、四源元数据菜单、最新版本/会话复核、预取交接保护、北京时间每日快照。见 [2F](PHASE_2F_UUID_RESOLUTION_AND_DAILY_CACHE.md) 和 `evidence/2026-10-27/phase2f/`，[对应CI](https://github.com/lezebomb/unimusic/actions/runs/40379408254) 已成功。
 - Phase 2G：`5976e9fb` 完成 MusicSourceRegistry、单来源显式校验和类型化结果、精确决策戳复核、校验菜单。见 [2G](PHASE_2G_SOURCE_AVAILABILITY.md)，此前[对应CI](https://github.com/lezebomb/unimusic/actions/runs/40421809825)已确认成功。
 - Phase 2H：`0c4df844` 完成共享解析预算、聚合4路并发、B站两个查询并发及更保守原唱匹配。见 [2H](PHASE_2H_LATENCY_AND_ORIGINAL_MATCHING.md)，[对应CI](https://github.com/lezebomb/unimusic/actions/runs/40428919546)已成功。
-- Phase 2I：本检查点所在提交完成自动成功来源持久映射和预算/失效/修订复核，见 [2I](PHASE_2I_PERSISTENT_SOURCE_FALLBACK.md) 和 `evidence/2026-10-27/phase2i/`。以git log/status及新CI确认推送；用户原始笔记保存在已忽略的 `.codex-remote-attachments/`，不要提交附件。
+- Phase 2I：`c9a08ba1` 完成自动成功来源持久映射和预算/失效/修订复核，见 [2I](PHASE_2I_PERSISTENT_SOURCE_FALLBACK.md) 和 `evidence/2026-10-27/phase2i/`。用户原始笔记保存在已忽略的 `.codex-remote-attachments/`，不要提交附件。
+- Phase 2J：本检查点所在提交接入GD公开音频线路，见 [2J](PHASE_2J_PUBLIC_AUDIO_SOURCE.md) 和 `evidence/2026-10-27/phase2j/`。2I已提交为`c9a08ba1`且[对应CI](https://github.com/lezebomb/unimusic/actions/runs/40433069959)成功。
 
 ## 实际验证
+
+- Phase 2J：8个检查通过，含手动启用的真实GdStudioClient联网取址1个；两个地址HEAD返回200/audio/mpeg，没有获取音频响应体。最终Debug APK/模块/平台/Listen Together边界通过；证据见phase2j。无设备/账号/实际解码播放验收。
 
 - Phase 2I：15个定向JVM测试通过（新增2个方法并补冷却断言），模块边界和最终Debug APK通过。首次磁盘测试SQLite开库失败，缩短方法名后通过；最后专用查询改动另做同集合/构建确认，实际日志分别保留。没有新迁移、设备/真实账号/播放性能验收，没有验证GD或酷我完整音频可用。
 
@@ -64,6 +67,7 @@
 7. 2G已补实现能力登记和显式校验状态；这不是播放权利授予或真实账号/设备验收。下一步优先实际网络下的首声/卡顿恢复测量及原唱标注样本；2H未验证所有阻塞式提取器及时取消，也未把播放器启动/运行看门狗等待合并到地址预算。继续细化平台明确返回的失败类型，避免仅凭地址或元数据宣称可播。反馈事件与独立unified dataset同步、双标签UI继续按计划推进，不能缺真机验收时宣称全功能完善。
 8. 每个完成子阶段自行 commit + push 到 https://github.com/lezebomb/unimusic；保留用户数据，准确区分本地验证与远端 Actions、模拟器与真机结果。
 9. 2I自动缓存复用song_match.algorithm_version=2和observed_at，普通发现/显式探测仍为1，不能当作已播放证据。按目标指纹、24小时TTL、NONE决策筛选最多8条，运行时跳过冷却后最多试2条；共享预算内自动缓存阶段最多1.2秒/每条1秒，失败后进入现有本地/B站发现。缓存命中仍检查最新元数据、歌手名称佐证、正常音频、会话、开关及人工revision。后续算法版本不可无区分接受所有旧证据；没有新表/迁移或新音频平台。GD官方文档当前列netease/joox/bilibili，不含kuwo，限制下载/传播/商用；只读取文档HTTP200，没有代取曲目URL/音频。不要把旧笔记里的固定pyncmd→kuwo顺序或HTTP200文档当作全量可播验证。
+10. 上一条的GD未接音频/仅查文档是2I历史范围。2J已实际请求地址并加入`gdstudio_netease` Registry/显式匹配/来源菜单，GD仅在用户选择后使用；其API客户端独立匿名，不接收平台Cookie；只接受预期HTTPS网易云CDN MP3，限50次/5分钟。模型内部fragment标记让数据源绕过CacheDataSource，两媒体预取入口和中央分享URL策略也排除它。实际联网smoke必须显式设置UNIMUSIC_LIVE_GD_NETEASE_ID，默认不联网；不因地址/HEAD通过宣称已播放、全长或原唱验证。下一阶段用户允许分别登录，复用官方网页登录，不能索取聊天中的密码/票据或自动导入其他应用账号。
 
 ## 复用环境与日志
 
@@ -71,6 +75,6 @@
 - SDK：`D:/Collect/.tooling/android-sdk`，包均已安装，无需重复下载。
 - Gradle 参数：`-Dorg.gradle.java.installations.paths=D:/unimusic/.gradle-home/jdks/jdk-17.0.20.1+1`；通常 `--max-workers=2 --console=plain`。
 - 独立 AVD：`.gradle-home/avd/UniMusicMigrationAPI35.avd`，设置当前进程 ANDROID_AVD_HOME 后复用，WHPX 已验证；本轮结束正常关闭以节省资源。
-- 本轮日志：`build/unimusic-toolchain/phase2i-final.log`、`phase2i-boundaries.log`；15个关键测试XML已归档，首次失败及修正后日志为`phase2i-validation.log`/`phase2i-validation-retry.log`。2H/2F/2G保留独立证据，避免重跑完整上游套件。
+- 最新日志：`build/unimusic-toolchain/phase2j-final-build.log`、`phase2j-live-and-final.log`、`phase2j-validation.log`与`phase2j-*-boundaries.log`；8个检查XML和脱敏联网证据已归档。2I/2H等保留独立证据，避免重跑完整上游套件。
 - 运行 Python 检查时 Windows 使用 `python -X utf8`，避免默认 GBK 读取 UTF-8 源文件失败。
 - 本机普通沙箱执行器此前初始化失败，必要 shell 使用 require_escalated 入口。Git 单次加 `-c safe.directory=D:/unimusic`，网络再加 `-c http.sslBackend=openssl`，不改全局安全设置。

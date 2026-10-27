@@ -2,7 +2,7 @@
 <resources>
     <string name="unimusic_sources_title">Choose audio source</string>
     <string name="unimusic_sources_description">Remember a preferred source for the next playback resolution. Current playback continues. Sources may require login or membership or have regional restrictions; confirming grants no additional playback rights.</string>
-    <string name="unimusic_sources_discovery_scope">Find candidates in local files, Bilibili, signed-in NetEase Music, and normal YouTube Music song search when enabled. Video parts are listed separately. Conflicting version, artist, or duration evidence prevents confirmation.</string>
+    <string name="unimusic_sources_discovery_scope">Find candidates in local files, Bilibili, signed-in NetEase Music, and enabled YouTube Music. GD Studio can also be selected manually by exact NetEase ID. Video parts are separate; conflicting version, artist or duration evidence prevents confirmation.</string>
     <string name="unimusic_sources_youtube_disabled">YouTube Music is disabled, so no search requests are sent to it. Existing choices can be cleared or rejected.</string>
     <string name="unimusic_sources_provider_local">Local files</string>
     <string name="unimusic_sources_provider_bilibili">Bilibili</string>
@@ -70,4 +70,7 @@
     <string name="unimusic_sources_check_unavailable">The source did not return suitable audio. Try again later.</string>
     <string name="unimusic_sources_check_context">The account, setting or decision changed during the check. The old result was discarded.</string>
     <string name="unimusic_sources_resolution_timeout">Audio source resolution timed out. Retry or choose a source manually from the source menu.</string>
+    <string name="unimusic_sources_gd_key">GD Studio · NetEase ID %1$s</string>
+    <string name="unimusic_sources_gd_description">Source: GD Studio (music.gdstudio.xyz). Personal study and online streaming only; no offline saving or audio link sharing. Uses the exact NetEase ID. Availability depends on the service.</string>
+    <string name="unimusic_sources_gd_notice">Source: GD Studio · Online streaming only</string>
 </resources>

@@ -116,6 +116,7 @@ private suspend fun PlayerManager.prefetchGenericTrackMedia(
     cacheKey: String,
     song: SongItem
 ) {
+    if (moe.ouom.neriplayer.data.model.playback.isStreamOnlyPlaybackUrl(result.url)) return
     val mediaCacheKey = resolveGenericMediaPrefetchCacheKey(cacheKey, result)
     if (result.audioInfo == null) return
     if (playbackDemandArbiter.shouldYieldPrefetch(mediaCacheKey)) return

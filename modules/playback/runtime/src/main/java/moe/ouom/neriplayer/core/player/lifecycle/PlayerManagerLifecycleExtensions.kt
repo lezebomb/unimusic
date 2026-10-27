@@ -1116,7 +1116,8 @@ private fun PlayerManager.createCachedPlaybackDataSourceFactory(
                 }
             }
         })
-    return androidx.media3.datasource.DefaultDataSource.Factory(app, cacheDsFactory)
+    return androidx.media3.datasource.DefaultDataSource.Factory(app,
+        moe.ouom.neriplayer.core.player.engine.datasource.StreamPolicyDataSourceFactory(cacheDsFactory, upstream))
 }
 
 private fun PlayerManager.observePlaybackSettings() {

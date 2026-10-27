@@ -1,0 +1,85 @@
+{
+  "date": "2026-10-27",
+  "phase": "2J",
+  "base_commit": "c9a08ba194f660e3f088025f5710e00ca61c5d3e",
+  "room_version": 23,
+  "test_suites": [
+    {
+      "name": "moe.ouom.neriplayer.core.player.engine.datasource.StreamPolicyDataSourceFactoryTest",
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "name": "moe.ouom.neriplayer.core.player.url.RememberedSourceMetadataTest",
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "name": "moe.ouom.neriplayer.data.ltw.mapping.ListenTogetherStreamUrlPolicyTest",
+      "tests": "2",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "name": "moe.ouom.neriplayer.platform.gdstudio.api.GdStudioClientTest",
+      "tests": "3",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "name": "moe.ouom.neriplayer.platform.gdstudio.api.GdStudioNetworkSmokeTest",
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    }
+  ],
+  "tests_passed": 8,
+  "new_test_methods": 5,
+  "build": {
+    "result": "passed",
+    "log": "build/unimusic-toolchain/phase2j-final-build.log",
+    "seconds": 28,
+    "apk_path": "D:\\unimusic\\app\\build\\outputs\\apk\\debug\\app-debug.apk",
+    "apk_bytes": 62643846,
+    "apk_sha256": "310044f25f6fc570809dd5b05734ad06cffacffda8011426d172cef972a5ee99"
+  },
+  "checks": {
+    "module_boundaries": "passed",
+    "platform_domain_dependencies": "passed",
+    "listen_together_domain_dependencies": "passed"
+  },
+  "logs": [
+    "phase2j-validation.log",
+    "phase2j-live-and-final.log",
+    "phase2j-final-build.log",
+    "phase2j-boundaries.log",
+    "phase2j-platform-boundaries.log",
+    "phase2j-ltw-boundaries.log"
+  ],
+  "network_probe": "network-probes.json",
+  "live_test": {
+    "environment": "UNIMUSIC_LIVE_GD_NETEASE_ID=28815250",
+    "audio_body_requested": false,
+    "note": "Actual Kotlin client resolved a public address; no audio playback or download."
+  },
+  "prior_ci": {
+    "run": 40433069959,
+    "result": "success",
+    "commit": "c9a08ba194f660e3f088025f5710e00ca61c5d3e"
+  },
+  "not_performed": [
+    "phone/emulator install",
+    "actual audio playback or media completeness validation",
+    "real-account or WebView login",
+    "source choice Compose interaction",
+    "QQ music playback/account integration",
+    "first-sound/source failover performance or original-singer accuracy"
+  ]
+}

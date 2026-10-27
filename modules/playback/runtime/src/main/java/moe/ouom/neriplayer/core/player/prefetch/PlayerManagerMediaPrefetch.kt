@@ -19,6 +19,7 @@ internal suspend fun PlayerManager.prefetchIntoPlayerCache(
     cacheKey: String,
     targetBytes: Long
 ): Long = withContext(Dispatchers.IO) {
+    if (moe.ouom.neriplayer.data.model.playback.isStreamOnlyPlaybackUrl(url)) return@withContext 0L
     val mediaCache = cache ?: return@withContext 0L
     val upstreamFactory = conditionalHttpFactory ?: return@withContext 0L
     val requestedBytes = targetBytes.coerceAtLeast(MEDIA_PREFETCH_MIN_BYTES)

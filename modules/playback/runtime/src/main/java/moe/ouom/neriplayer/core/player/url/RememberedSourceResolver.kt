@@ -36,6 +36,8 @@ internal object RememberedSourceState {
     }
 }
 
+private val gdStudioAudioClient by lazy { moe.ouom.neriplayer.platform.gdstudio.api.GdStudioClient() }
+
 internal suspend fun PlayerManager.tryResolveRememberedSource(unifiedSongId: String, song: SongItem,
     sideEffects: RefreshResolverSideEffects): SongUrlResult.Success? =
     tryResolveStoredSource(song, sideEffects, unifiedSongId)
@@ -108,10 +110,13 @@ private suspend fun PlayerManager.tryResolveStoredSource(song: SongItem, sideEff
                 })
             }
         }
-        val budget = if (automatic) sourceStageBudgetMs(1_200, 2_500) else sourceStageBudgetMs(2_000, 8_000)
+        val hasPublicSource = matches.any { it.candidate.key.provider == "gdstudio_netease" }
+        val budget = if (automatic) sourceStageBudgetMs(1_200, 2_500)
+            else if (hasPublicSource) sourceStageBudgetMs(5_000, 8_000) else sourceStageBudgetMs(2_000, 8_000)
         if (budget <= 0) return null
         val result = PlaybackSourceResolver(RememberedSourceState.cooldown).resolve(song.stableKey(), candidates,
             totalBudgetMs = budget, candidateBudgetMs = (if (automatic) sourceStageBudgetMs(1_000, 2_000)
+                else if (hasPublicSource) sourceStageBudgetMs(4_500, 4_500)
                 else sourceStageBudgetMs(1_500, 4_000)).coerceAtLeast(1))
         if (automatic && result.value == null && SourceFailure.TIMEOUT in result.failures) {
             matches.forEach { RememberedSourceState.cooldown.reject(song.stableKey(), it.id) }
@@ -131,6 +136,27 @@ internal suspend fun PlayerManager.resolveSourceCandidate(subject: SongItem, can
     val source = candidate.key
     val meta = candidate.metadata
     val result: SongUrlResult.Success = when (source.provider) {
+        "gdstudio_netease" -> {
+            val raw = neteaseClient.getSongDetailCancellable(listOf(source.resourceId.toLong()))
+            neteaseDetailsAccessFailure(raw)?.let { return SourceAttempt.Rejected(it) }
+            val fresh = refreshedNeteaseSource(raw, source.resourceId)
+                ?: return SourceAttempt.Rejected(SourceFailure.NO_MATCH)
+            if (!RecordingMatchPolicy.assess(subject.recordingMetadata(), fresh.second).accepted) {
+                return SourceAttempt.Rejected(SourceFailure.NO_MATCH)
+            }
+            val audio = gdStudioAudioClient.resolveNetease(source.resourceId)
+                ?: return SourceAttempt.Rejected(SourceFailure.UNAVAILABLE)
+            SongUrlResult.Success(
+                url = moe.ouom.neriplayer.data.model.playback.streamOnlyPlaybackUrl(audio.url),
+                durationMs = fresh.first.durationMs, mimeType = audio.mimeType,
+                noticeMessage = getLocalizedString(moe.ouom.neriplayer.common.R.string.unimusic_sources_gd_notice),
+                audioInfo = moe.ouom.neriplayer.data.model.playback.PlaybackAudioInfo(
+                    source = moe.ouom.neriplayer.data.model.playback.PlaybackAudioSource.NETEASE,
+                    qualityLabel = "GD Studio · ${audio.bitrateKbps} kbps", bitrateKbps = audio.bitrateKbps,
+                    mimeType = audio.mimeType, codecLabel = "MP3"),
+                cacheKeyOverride = "gdstream-netease-${source.resourceId}-${audio.bitrateKbps}"
+            )
+        }
         "bilibili" -> {
             val item = SearchVideoItem(source.resourceId.toLong(), "", "", "", "", 0, "", 0, null, null)
             return resolveStrictBiliSource(subject, item, sideEffects, source.subResourceId.toLong(), automatic)

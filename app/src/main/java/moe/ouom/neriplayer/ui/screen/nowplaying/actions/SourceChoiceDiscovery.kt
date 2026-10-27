@@ -67,10 +67,14 @@ internal suspend fun discoverSourceChoices(
         }
         val results = listOf(local, bili, netease, youtube).awaitAll()
         val originalKey = sourceCandidateForSong(song)?.key
+        // Only offer exact NetEase identities. Opening the sheet never calls the GD URL API.
+        val gdChoices = ((sourceCandidateForSong(song)?.let(::listOf) ?: emptyList()) +
+            results.flatMap { it.candidates }).filter { it.key.provider == "netease" }
+            .map { it.copy(key = it.key.copy(provider = "gdstudio_netease")) }
         SourceChoiceDiscoveryResult(
-            candidates = results.flatMap { result -> result.candidates.filter { it.key != originalKey }
+            candidates = (gdChoices + results.flatMap { result -> result.candidates.filter { it.key != originalKey }
                 .sortedByDescending { assessSourceChoice(song, it).accepted }.take(8) }
-                .distinctBy { it.key }.sortedByDescending { assessSourceChoice(song, it).accepted },
+                ).distinctBy { it.key }.sortedByDescending { assessSourceChoice(song, it).accepted },
             incomplete = results.any { it.incomplete },
             offline = offline,
             failures = results.flatMap { it.failures.entries }.associate { it.toPair() }

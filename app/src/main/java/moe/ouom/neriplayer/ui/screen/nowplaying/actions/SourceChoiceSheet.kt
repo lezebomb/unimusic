@@ -157,6 +157,9 @@ private fun SourceChoiceCard(
     Card(Modifier.fillMaxWidth().padding(horizontal = 16.dp)) {
         Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
             Text(sourceLabel(candidate), style = MaterialTheme.typography.labelLarge)
+            if (candidate.key.provider == "gdstudio_netease") {
+                Text(stringResource(CoreCommonR.string.unimusic_sources_gd_description), style = MaterialTheme.typography.bodySmall)
+            }
             Text(metadata.title, style = MaterialTheme.typography.titleMedium)
             Text(stringResource(CoreCommonR.string.unimusic_sources_artist_duration,
                 metadata.artist.ifBlank { stringResource(CoreCommonR.string.unimusic_sources_unknown_artist) },
@@ -208,6 +211,7 @@ private fun sourceLabel(candidate: RecordingSourceCandidate): String = when (can
         candidate.key.resourceId, candidate.key.subResourceId)
     "local" -> stringResource(CoreCommonR.string.unimusic_sources_local_key, candidate.key.resourceId.takeLast(8))
     "netease" -> stringResource(CoreCommonR.string.unimusic_sources_netease_key, candidate.key.resourceId)
+    "gdstudio_netease" -> stringResource(CoreCommonR.string.unimusic_sources_gd_key, candidate.key.resourceId)
     "youtube_music" -> stringResource(CoreCommonR.string.unimusic_sources_youtube_key, candidate.key.resourceId)
     else -> candidate.key.provider
 }

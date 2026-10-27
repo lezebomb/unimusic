@@ -11,6 +11,7 @@ object MusicSourceRegistry {
     private val providers = mapOf(
         "local" to MusicSourceCapabilities(true, SourceAudioSupport.LOCAL_FILE),
         "netease" to MusicSourceCapabilities(true, SourceAudioSupport.PLATFORM_API),
+        "gdstudio_netease" to MusicSourceCapabilities(false, SourceAudioSupport.PLATFORM_API),
         "bilibili" to MusicSourceCapabilities(true, SourceAudioSupport.PLATFORM_API),
         "youtube_music" to MusicSourceCapabilities(true, SourceAudioSupport.PLATFORM_API),
         "kuwo" to MusicSourceCapabilities(true, SourceAudioSupport.METADATA_ONLY)
@@ -20,7 +21,7 @@ object MusicSourceRegistry {
     fun capabilities(provider: String) = providers[provider] ?: unknown
 
     fun validKey(key: SongSourceKey): Boolean = key.recordingContext.isEmpty() && when (key.provider) {
-        "netease", "kuwo" -> positiveId(key.resourceId) && key.subResourceId.isEmpty()
+        "netease", "kuwo", "gdstudio_netease" -> positiveId(key.resourceId) && key.subResourceId.isEmpty()
         "bilibili" -> positiveId(key.resourceId) && positiveId(key.subResourceId)
         "youtube_music" -> key.resourceId.matches(Regex("[A-Za-z0-9_-]{11}")) && key.subResourceId.isEmpty()
         "local" -> runCatching { UUID.fromString(key.resourceId).toString() == key.resourceId }.getOrDefault(false) && key.subResourceId.isEmpty()

@@ -2,7 +2,7 @@
 <resources>
     <string name="unimusic_sources_title">选择音源</string>
     <string name="unimusic_sources_description">记住优先来源，下次解析时使用；当前播放不会中断。来源仍可能需要登录、会员或受地区限制，确认选择不会获得额外播放权限。</string>
-    <string name="unimusic_sources_discovery_scope">候选发现：本地文件、Bilibili、已登录的网易云音乐，以及启用后的 YouTube Music 正常歌曲搜索。每个分 P 单独展示；版本、歌手或时长证据不一致时无法确认。</string>
+    <string name="unimusic_sources_discovery_scope">候选发现：本地文件、Bilibili、已登录的网易云音乐，以及启用后的 YouTube Music。另可按精确网易云 ID 手动选择 GD音乐台。每个分 P 单独展示；版本、歌手或时长证据不一致时无法确认。</string>
     <string name="unimusic_sources_youtube_disabled">YouTube Music 已关闭，不发起该来源的搜索；已有记录可清除或拒绝。</string>
     <string name="unimusic_sources_provider_local">本地文件</string>
     <string name="unimusic_sources_provider_bilibili">Bilibili</string>
@@ -70,4 +70,7 @@
     <string name="unimusic_sources_check_unavailable">来源暂未返回符合要求的音频，请稍后重试。</string>
     <string name="unimusic_sources_check_context">校验期间账号、开关或选择已变化，旧结果已作废。</string>
     <string name="unimusic_sources_resolution_timeout">音源解析已超时。可重试或在来源菜单中手动选择。</string>
+    <string name="unimusic_sources_gd_key">GD音乐台 · 网易云 ID %1$s</string>
+    <string name="unimusic_sources_gd_description">来源：GD音乐台（music.gdstudio.xyz）。仅供个人学习在线播放，不能离线保存或分享音频链接。按网易云原始 ID 取流，可用性由服务方决定。</string>
+    <string name="unimusic_sources_gd_notice">当前来源：GD音乐台 · 仅在线播放</string>
 </resources>

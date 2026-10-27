@@ -11,6 +11,7 @@ import moe.ouom.neriplayer.data.model.playback.PlaybackAudioInfo
 import moe.ouom.neriplayer.data.model.playback.PlaybackAudioSource
 import moe.ouom.neriplayer.data.model.playback.PlaybackQualityOption
 import moe.ouom.neriplayer.data.model.playback.PlaybackUrlCandidate
+import moe.ouom.neriplayer.data.model.playback.isStreamOnlyPlaybackUrl
 import moe.ouom.neriplayer.core.player.quality.effectiveBiliQuality
 import moe.ouom.neriplayer.core.player.quality.effectiveNeteaseQuality
 import moe.ouom.neriplayer.core.player.quality.effectiveYouTubeQuality
@@ -50,7 +51,7 @@ internal fun PlayerManager.currentListenTogetherShareableStreamUrls(): List<Stri
         activePlaybackCandidates = shareableCandidates,
         allowUntrackedCurrentStream = currentSong != null &&
             (isYouTubeMusicTrack(currentSong) || isBiliTrack(currentSong))
-    ).map { streamUrl ->
+    ).filterNot(::isStreamOnlyPlaybackUrl).map { streamUrl ->
         val matchingCandidate = sequenceOf(currentCandidate)
             .filterNotNull()
             .plus(shareableCandidates.asSequence())

@@ -1,0 +1,59 @@
+{
+  "date": "2026-10-27",
+  "gd_api": "https://music-api.gdstudio.xyz/api.php",
+  "requests": [
+    {
+      "id": "186016",
+      "requested_bitrate": 128,
+      "http": 200,
+      "address_returned": false,
+      "seconds": 1.99
+    },
+    {
+      "id": "28815250",
+      "requested_bitrate": 320,
+      "http": 200,
+      "address_returned": true,
+      "seconds": 1.67
+    },
+    {
+      "id": "436514312",
+      "requested_bitrate": 320,
+      "http": 200,
+      "address_returned": true,
+      "seconds": 2.33
+    }
+  ],
+  "head_checks": [
+    {
+      "name": "gd-netease-28815250",
+      "host": "m801.music.126.net",
+      "scheme": "https",
+      "path_extension": "mp3",
+      "method": "HEAD",
+      "http": 200,
+      "type": "audio/mpeg",
+      "bytes": "12087507",
+      "final_host": "m801.music.126.net",
+      "seconds": 0.14
+    },
+    {
+      "name": "gd-netease-436514312",
+      "host": "m801.music.126.net",
+      "scheme": "https",
+      "path_extension": "mp3",
+      "method": "HEAD",
+      "http": 200,
+      "type": "audio/mpeg",
+      "bytes": "13137546",
+      "final_host": "m801.music.126.net",
+      "seconds": 0.08
+    }
+  ],
+  "actual_kotlin_client_probe": {
+    "id": "28815250",
+    "result": "passed",
+    "audio_body_requested": false
+  },
+  "audio_playback_performed": false
+}

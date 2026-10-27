@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="moe.ouom.neriplayer.platform.gdstudio.api.GdStudioNetworkSmokeTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2026-10-27T01:52:43.582Z" hostname="XUSHAOYANG" time="3.431">
+  <properties/>
+  <testcase name="resolvesExactIdWhenExplicitlyEnabled" classname="moe.ouom.neriplayer.platform.gdstudio.api.GdStudioNetworkSmokeTest" time="3.427"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
