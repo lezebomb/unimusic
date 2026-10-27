@@ -1,0 +1,24 @@
+{
+  "phase": "3D.1",
+  "date": "2026-10-28",
+  "tests": {
+    "jvm": 4,
+    "failures": 0,
+    "errors": 0
+  },
+  "build": "Debug APK passed; phase3d1-portable-identity.log",
+  "moduleBoundaries": "Module boundaries: passed",
+  "apk": {
+    "path": "app/build/outputs/apk/debug/app-debug.apk",
+    "bytes": 62870403,
+    "sha256": "3d4db1985dce8aac5d3160bc8e35f0d77aedb0291189356ef73d40212d29c918"
+  },
+  "notRun": [
+    "device install/UI",
+    "actual cloud upload",
+    "two-device sync",
+    "backup restore",
+    "performance",
+    "account/audio"
+  ]
+}

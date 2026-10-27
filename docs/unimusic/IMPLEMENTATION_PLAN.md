@@ -105,6 +105,8 @@
 
 ## Phase 3：本地推荐与同步
 
+3D.1已实现独立身份/因果合并/严格编码契约，4项JVM与Debug构建通过，见[3D.1](PHASE_3D1_PORTABLE_IDENTITY_CONTRACT.md)。尚无持久dot分配、Room别名应用或生产上传，不标记完整同步交付。
+
 3B已接精确身份的本机播放反馈、私有有界事件存储与推荐v3，见 [3B报告](PHASE_3B_PLAYBACK_RECOMMENDATION_SIGNALS.md)。这是实现与合成验证，实际Media3采样/异常持久性未验收；旧统计不回推事件，反馈未进入独立UUID dataset同步。
 
 3A 已交付精确歌曲的本机暂不推荐、撤销与恢复，见 [3A报告](PHASE_3A_LOCAL_RECOMMENDATION_FEEDBACK.md)。没有 SKIP/COMPLETE/REPEAT 事件或独立 dataset 同步；持久偏好与每日缓存分开保存，不删除音乐库内容。
