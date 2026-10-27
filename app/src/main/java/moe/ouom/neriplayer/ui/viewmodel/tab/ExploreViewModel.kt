@@ -752,15 +752,17 @@ class ExploreViewModel(application: Application) : AndroidViewModel(application)
         val searchPage = withContext(Dispatchers.IO) {
             biliClient.searchVideos(keyword = keyword, page = page)
         }
-        val songs = rankExploreSongSearchResults(
-            query = matchQuery,
-            songs = searchPage.items.map { it.toSongItem() }
-        )
-        return ExploreSearchFetchResult(
-            items = songs.map { ExploreSearchResult.Song(it) },
-            page = searchPage.page,
-            hasMore = searchPage.page < searchPage.numPages && searchPage.items.isNotEmpty()
-        )
+        return withContext(Dispatchers.Default) {
+            val songs = rankExploreSongSearchResults(
+                query = matchQuery,
+                songs = searchPage.items.map { it.toSongItem() }
+            )
+            ExploreSearchFetchResult(
+                items = songs.map { ExploreSearchResult.Song(it) },
+                page = searchPage.page,
+                hasMore = searchPage.page < searchPage.numPages && searchPage.items.isNotEmpty()
+            )
+        }
     }
 
     private fun beginSearchRequest(keyword: String, displayQuery: String): Long {
@@ -1329,27 +1331,30 @@ class ExploreViewModel(application: Application) : AndroidViewModel(application)
                 usePersistedCookies = true
             )
         }
-        val code = JSONObject(raw).optInt("code", -1)
-        if (code != 200) throw SearchSourceException(
-            if (code == 301) SearchSourceFailure.AUTH_REQUIRED else SearchSourceFailure.UNAVAILABLE)
-        val parsed = parseNeteaseSearchResults(raw, type)
-        val items = if (type == NeteaseExploreSearchType.SONG) {
-            rankExploreSongSearchResults(matchQuery, parsed.items.mapNotNull {
-                (it as? ExploreSearchResult.Song)?.song
-            }).map { ExploreSearchResult.Song(it) }
-        } else {
-            parsed.items
-        }
-        return ExploreSearchFetchResult(
-            items = items,
-            page = page,
-            hasMore = hasMoreExploreSearchResults(
-                totalCount = parsed.totalCount,
-                loadedCount = offset + parsed.items.size,
-                pageItemCount = parsed.items.size,
-                pageSize = NETEASE_SEARCH_PAGE_SIZE
+        return withContext(Dispatchers.Default) {
+            val root = JSONObject(raw)
+            val code = root.optInt("code", -1)
+            if (code != 200) throw SearchSourceException(
+                if (code == 301) SearchSourceFailure.AUTH_REQUIRED else SearchSourceFailure.UNAVAILABLE)
+            val parsed = parseNeteaseSearchResults(root, type)
+            val items = if (type == NeteaseExploreSearchType.SONG) {
+                rankExploreSongSearchResults(matchQuery, parsed.items.mapNotNull {
+                    (it as? ExploreSearchResult.Song)?.song
+                }).map { ExploreSearchResult.Song(it) }
+            } else {
+                parsed.items
+            }
+            ExploreSearchFetchResult(
+                items = items,
+                page = page,
+                hasMore = hasMoreExploreSearchResults(
+                    totalCount = parsed.totalCount,
+                    loadedCount = offset + parsed.items.size,
+                    pageItemCount = parsed.items.size,
+                    pageSize = NETEASE_SEARCH_PAGE_SIZE
+                )
             )
-        )
+        }
     }
 
     suspend fun getVideoInfoByAvid(avid: Long): VideoBasicInfo {
@@ -1383,7 +1388,7 @@ class ExploreViewModel(application: Application) : AndroidViewModel(application)
                                 limit = YOUTUBE_MUSIC_SEARCH_LIMIT,
                                 filter = requireNotNull(searchType.filter)
                             ).map { it.toSongItem(app) }
-                        }.let { rankExploreSongSearchResults(matchQuery, it) }
+                        }.let { fetched -> withContext(Dispatchers.Default) { rankExploreSongSearchResults(matchQuery, fetched) } }
                         songs.map(ExploreSearchResult::Song)
                     }
                     YouTubeExploreSearchType.CREATOR -> {

@@ -14,8 +14,9 @@ internal data class ParsedNeteaseSearchResult(
 internal fun parseNeteaseSearchResults(
     raw: String,
     type: NeteaseExploreSearchType
-): ParsedNeteaseSearchResult {
-    val root = JSONObject(raw)
+): ParsedNeteaseSearchResult = parseNeteaseSearchResults(JSONObject(raw), type)
+
+internal fun parseNeteaseSearchResults(root: JSONObject, type: NeteaseExploreSearchType): ParsedNeteaseSearchResult {
     if (root.optInt("code", -1) != 200) {
         return ParsedNeteaseSearchResult(items = emptyList(), totalCount = null)
     }
@@ -25,7 +26,7 @@ internal fun parseNeteaseSearchResults(
 
     return when (type) {
         NeteaseExploreSearchType.SONG -> ParsedNeteaseSearchResult(
-            items = parseNeteaseSearchSongs(raw).map { ExploreSearchResult.Song(it) },
+            items = parseNeteaseSearchSongs(root).map { ExploreSearchResult.Song(it) },
             totalCount = result.optIntOrNull("songCount")
         )
         NeteaseExploreSearchType.PLAYLIST -> ParsedNeteaseSearchResult(

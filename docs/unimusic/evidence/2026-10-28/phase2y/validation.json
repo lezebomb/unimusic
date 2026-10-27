@@ -1,0 +1,36 @@
+{
+  "phase": "2Y",
+  "date": "2026-10-28",
+  "jvm": [
+    {
+      "suite": "moe.ouom.neriplayer.ui.viewmodel.tab.NeteaseSearchSongParserTest",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0
+    },
+    {
+      "suite": "moe.ouom.neriplayer.ui.viewmodel.tab.ExploreSearchPaginationTest",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0
+    },
+    {
+      "suite": "moe.ouom.neriplayer.platform.netease.mapping.NeteaseSongMappingTest",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0
+    }
+  ],
+  "newTests": 1,
+  "build": "Debug passed; phase2y-background-online-pages.log",
+  "apk": {
+    "path": "app/build/outputs/apk/debug/app-debug.apk",
+    "sha256": "e2819e489d079995865d08df4d02958fe2b5b0434fa967b58ba7f8987f772437",
+    "bytes": 62993831
+  },
+  "notRun": [
+    "thread/frame profiling",
+    "device installation",
+    "real source latency/audio/account"
+  ]
+}

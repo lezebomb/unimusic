@@ -5,8 +5,10 @@ import moe.ouom.neriplayer.common.json.mapObjectsNotNull
 import org.json.JSONArray
 import org.json.JSONObject
 
-fun parseNeteaseSearchSongs(raw: String): List<SongItem> {
-    val root = JSONObject(raw)
+fun parseNeteaseSearchSongs(raw: String): List<SongItem> = parseNeteaseSearchSongs(JSONObject(raw))
+
+/** Read-only root overload avoids reparsing a response already inspected by the caller. */
+fun parseNeteaseSearchSongs(root: JSONObject): List<SongItem> {
     if (root.optInt("code", -1) != 200) return emptyList()
 
     val songs = root.optJSONObject("result")?.optJSONArray("songs") ?: return emptyList()

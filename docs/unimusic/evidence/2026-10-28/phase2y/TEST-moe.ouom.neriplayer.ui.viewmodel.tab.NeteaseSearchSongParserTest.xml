@@ -1,0 +1,10 @@
+<?xml version='1.0' encoding='utf-8'?>
+<testsuite name="moe.ouom.neriplayer.ui.viewmodel.tab.NeteaseSearchSongParserTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-10-27T23:57:03.207Z" hostname="local" time="0.089">
+  <properties />
+  <testcase name="sharedSongRootKeepsSourceMetadataCountsAndValidOrderWithoutMutation" classname="moe.ouom.neriplayer.ui.viewmodel.tab.NeteaseSearchSongParserTest" time="0.082" />
+  <testcase name="non success response returns no search results" classname="moe.ouom.neriplayer.ui.viewmodel.tab.NeteaseSearchSongParserTest" time="0.001" />
+  <testcase name="artist search parser returns artist metadata and total count" classname="moe.ouom.neriplayer.ui.viewmodel.tab.NeteaseSearchSongParserTest" time="0.003" />
+  <testcase name="playlist search parser returns summaries and total count" classname="moe.ouom.neriplayer.ui.viewmodel.tab.NeteaseSearchSongParserTest" time="0.003" />
+  <system-out />
+  <system-err />
+</testsuite>

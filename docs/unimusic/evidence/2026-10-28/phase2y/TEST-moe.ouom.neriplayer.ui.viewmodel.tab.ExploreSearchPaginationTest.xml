@@ -1,0 +1,8 @@
+<?xml version='1.0' encoding='utf-8'?>
+<testsuite name="moe.ouom.neriplayer.ui.viewmodel.tab.ExploreSearchPaginationTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-10-27T23:57:03.145Z" hostname="local" time="0.016">
+  <properties />
+  <testcase name="known total count controls whether another page exists" classname="moe.ouom.neriplayer.ui.viewmodel.tab.ExploreSearchPaginationTest" time="0.012" />
+  <testcase name="page size fallback handles APIs without a total count" classname="moe.ouom.neriplayer.ui.viewmodel.tab.ExploreSearchPaginationTest" time="0.0" />
+  <system-out />
+  <system-err />
+</testsuite>

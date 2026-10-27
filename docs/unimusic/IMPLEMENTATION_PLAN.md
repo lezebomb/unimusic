@@ -63,6 +63,8 @@
 
 ## Phase 2：统一搜索与高精度匹配
 
+2Y将在线页解析/排名移后台并复用网易云JSON根对象，新1/共8项JVM、Debug通过，见[2Y](PHASE_2Y_BACKGROUND_ONLINE_PAGES.md)。无实际帧率/网络性能结论。
+
 2X隔离播放候选内部超时/取消/解析错误并继续备用，原生并行源即使自行取消也报告完成；父取消与严格门槛保持。新4/共11项JVM、Debug通过，见[2X](PHASE_2X_SOURCE_FAILURE_ISOLATION.md)。真实故障切源/音频未验收。
 
 2W新增可展开的每源本批次搜索耗时与明确超时分类，7项JVM、Debug通过，见[2W](PHASE_2W_SEARCH_TIMINGS.md)。虚拟时序不是线上速度，实际UI/计时待真机验收。

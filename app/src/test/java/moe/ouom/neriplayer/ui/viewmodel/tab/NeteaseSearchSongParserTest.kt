@@ -6,6 +6,22 @@ import org.junit.Test
 
 class NeteaseSearchSongParserTest {
 
+    @Test fun sharedSongRootKeepsSourceMetadataCountsAndValidOrderWithoutMutation() {
+        val root = org.json.JSONObject("""{"code":200,"result":{"songCount":32,"songs":[
+            {"id":7,"name":"Dream","dt":180000,"ar":[{"id":8,"name":"Artist"}],"al":{"id":9,"name":"Album"}},
+            {"id":0,"name":"invalid"},{"id":6,"name":"Other"}]}}""")
+        val before = root.toString()
+        val parsed = parseNeteaseSearchResults(root, NeteaseExploreSearchType.SONG)
+        val songs = parsed.items.map { (it as ExploreSearchResult.Song).song }
+        assertEquals(listOf(7L, 6L), songs.map { it.id })
+        assertEquals(32, parsed.totalCount)
+        assertEquals("netease", songs.first().channelId)
+        assertEquals("7", songs.first().audioId)
+        assertEquals("Artist", songs.first().artist)
+        assertEquals(180000L, songs.first().durationMs)
+        assertEquals(before, root.toString())
+    }
+
     @Test
     fun `playlist search parser returns summaries and total count`() {
         val raw = """
