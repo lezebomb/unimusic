@@ -1,6 +1,6 @@
 # UniMusic 分阶段实施与验收
 
-状态日期：2026-10-28。4A 已完成发现/我的两标签与我的快捷入口、设置和返回兼容；7项定向 JVM、Debug 构建、边界和 Mate60 基本导航通过，详见 [4A](PHASE_4A_DISCOVER_AND_MY_LIBRARY.md)。用户最新要求暂缓 YouTube 取流排查、先开发其他功能；现有 Google/网易云授权与音乐库保留。2P 的 Google 服务端账号成功、音频仍失败不变，不重新登录。3A已补30天暂不推荐/撤销/恢复、私有摘要持久化，3个JVM及Mate60流程通过；接下来推进可选导入定期刷新及其他计划事项，设备/账号/音频/性能验收仍按实际阶段单列。
+状态日期：2026-10-28。4A 已完成发现/我的两标签与我的快捷入口、设置和返回兼容；7项定向 JVM、Debug 构建、边界和 Mate60 基本导航通过，详见 [4A](PHASE_4A_DISCOVER_AND_MY_LIBRARY.md)。用户最新要求暂缓 YouTube 取流排查、先开发其他功能；现有 Google/网易云授权与音乐库保留。2P 的 Google 服务端账号成功、音频仍失败不变，不重新登录。3A已补30天暂不推荐/撤销/恢复、私有摘要持久化，3个JVM及Mate60流程通过；1D已交付默认关闭的已关联歌单每日刷新，3个JVM、一个Mate60调度测试和最终构建通过；继续优化我的搜索及其他事项，设备/账号/音频/性能验收仍按实际阶段单列。
 
 ## 执行约定
 
@@ -38,13 +38,17 @@
 
 ### 1B：入站 Provider 与导入任务
 
-1B.1 与 1B.2 的后台实现已完成，见 [Provider](PHASE_1B_PROVIDER.md) 和 [后台报告](PHASE_1B_BACKEND.md)。失败明细保存在快照条目中；导入凭证跨快照保留用户移除记录。WorkManager 导入器与旧库回填 Worker 分开，1C 已加入导入 UI；尚无定期自动刷新或真实账号验收。
+1B.1 与 1B.2 的后台实现已完成，见 [Provider](PHASE_1B_PROVIDER.md) 和 [后台报告](PHASE_1B_BACKEND.md)。失败明细保存在快照条目中；导入凭证跨快照保留用户移除记录。WorkManager 导入器与旧库回填 Worker 分开，1C 已加入导入 UI；1D已补默认关闭的本机可选每日刷新；真实账号导入范围以2M报告为准。
 
 - model 定义 PlaylistImportProvider contract；platform 新增 Netease adapter，复用安全 session、分页歌单与可取消详情调用。
 - local 新增导入 coordinator/WorkManager Worker，页级事务 checkpoint、账号检查、失败项重试、取消/恢复、一次性与持续关联。
 - 复用 repository 写入路径并扩展事务入口，不把现有“向网易云上传收藏”误用为“从网易云导入”。
 - FakeMusicProvider 放共享 testFixtures，控制分页、失败、空结果、授权过期、慢响应及 snapshot 变化。
 - 验证：两次导入单一歌单、保留顺序/封面/元数据、空远端不删除、取消后恢复、失败明细重试、解除来源保留本地修改；只选覆盖这些行为的紧凑测试。
+
+### 1D：可选定期刷新（已交付）
+
+见 [1D报告](PHASE_1D_OPTIONAL_LINKED_REFRESH.md)：默认关闭，约24小时联网/电量约束，健康完成关联歌单才刷新，已有排队仅补建Work；取消/失败/暂停和一次性导入不自动重启。没有真实24小时或OEM后台耐久验收。
 
 ### 1C：现有库接入与操作入口
 

@@ -47,6 +47,9 @@ internal data class PlaylistImportUiState(
     val jobs: List<PlaylistImportProgress> = emptyList(),
     val loadingJobs: Boolean = true,
     val jobsFailed: Boolean = false,
+    val autoRefreshEnabled: Boolean = false,
+    val autoRefreshLoaded: Boolean = false,
+    val autoRefreshBusy: Boolean = false,
     val busyJobs: Set<String> = emptySet(),
     val queuedBatch: Int = 0,
     val message: PlaylistImportMessage? = null,
@@ -63,6 +66,7 @@ internal class PlaylistImportViewModel(
     private val savedState: SavedStateHandle
 ) : AndroidViewModel(application) {
     private val backend by lazy { AppContainer.playlistImportBackend }
+    private val automaticRefresh = moe.ouom.neriplayer.data.unified.PlaylistImportAutoRefresh(application)
     private val _uiState = MutableStateFlow(
         PlaylistImportUiState(
             accountInput = savedState["playlist_import_account"] ?: "",
@@ -78,6 +82,11 @@ internal class PlaylistImportViewModel(
 
     init {
         observeJobs()
+        viewModelScope.launch {
+            automaticRefresh.enabled.collect { enabled ->
+                _uiState.update { it.copy(autoRefreshEnabled = enabled, autoRefreshLoaded = true) }
+            }
+        }
         viewModelScope.launch {
             var previousSession: String? = null
             AppContainer.neteaseCookieRepo.cookieFlow.collect { cookies ->
@@ -225,6 +234,23 @@ internal class PlaylistImportViewModel(
                 }
             } finally {
                 _uiState.update { it.copy(enqueueing = false) }
+            }
+        }
+    }
+
+    fun setAutomaticRefresh(enabled: Boolean) {
+        if (_uiState.value.autoRefreshBusy || !_uiState.value.autoRefreshLoaded) return
+        if (enabled && !_uiState.value.signedIn) return
+        _uiState.update { it.copy(autoRefreshBusy = true, message = null) }
+        viewModelScope.launch {
+            try {
+                automaticRefresh.setEnabled(enabled)
+            } catch (failure: CancellationException) {
+                throw failure
+            } catch (_: Exception) {
+                message(R.string.unimusic_import_auto_failed, error = true)
+            } finally {
+                _uiState.update { it.copy(autoRefreshBusy = false) }
             }
         }
     }

@@ -17,6 +17,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -26,6 +27,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import java.text.DateFormat
 import java.util.Date
@@ -57,6 +60,23 @@ internal fun PlaylistImportJobs(
         item {
             Text(stringResource(R.string.unimusic_import_jobs_hint), style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant)
+        }
+        item {
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    Text(stringResource(R.string.unimusic_import_auto_title), style = MaterialTheme.typography.titleSmall)
+                    Text(stringResource(R.string.unimusic_import_auto_hint), style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+                val automaticRefreshLabel = stringResource(R.string.unimusic_import_auto_title)
+                Switch(
+                    modifier = Modifier.semantics { contentDescription = automaticRefreshLabel },
+                    checked = state.autoRefreshEnabled,
+                    onCheckedChange = vm::setAutomaticRefresh,
+                    enabled = state.autoRefreshLoaded && !state.autoRefreshBusy &&
+                        (state.autoRefreshEnabled || (state.signedIn && !offlineMode))
+                )
+            }
         }
         if (offlineMode || !state.signedIn) {
             item {

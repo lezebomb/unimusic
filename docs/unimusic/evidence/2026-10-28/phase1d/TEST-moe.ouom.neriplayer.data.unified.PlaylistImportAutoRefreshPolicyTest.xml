@@ -1,0 +1,8 @@
+<?xml version='1.0' encoding='utf8'?>
+<testsuite name="moe.ouom.neriplayer.data.unified.PlaylistImportAutoRefreshPolicyTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-10-27T17:00:51.880Z" hostname="local" time="0.051">
+  <properties />
+  <testcase name="refresh only completed linked imports and resume existing queued work" classname="moe.ouom.neriplayer.data.unified.PlaylistImportAutoRefreshPolicyTest" time="0.048" />
+  <testcase name="one shot unlinked and other providers never become automatic work" classname="moe.ouom.neriplayer.data.unified.PlaylistImportAutoRefreshPolicyTest" time="0.0" />
+  <system-out />
+  <system-err />
+</testsuite>

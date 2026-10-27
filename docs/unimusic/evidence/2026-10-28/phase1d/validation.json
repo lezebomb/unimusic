@@ -1,0 +1,45 @@
+{
+  "phase": "1D",
+  "date": "2026-10-28",
+  "jvm": {
+    "tests": 3,
+    "failures": 0,
+    "classes": [
+      "PlaylistImportAutoRefreshPolicyTest (2)",
+      "PlaylistImportCoordinatorTest.automaticRefreshKeepsEditsAndHonorsCancellation (1)"
+    ]
+  },
+  "build": {
+    "success": true,
+    "offline": true,
+    "log": "build/unimusic-toolchain/phase1d-linked-auto-refresh-validation.log",
+    "artifacts": [
+      {
+        "path": "app/build/outputs/apk/debug/app-debug.apk",
+        "bytes": 62789702,
+        "sha256": "4096f755df35d2e660d901a3ac0ce486cf4b0aafa33b89639e94dcc3764e746d"
+      },
+      {
+        "path": "app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk",
+        "bytes": 8081871,
+        "sha256": "033a46db3517a2dc70c15407fa576d5595cdbdd09a7da147ea2d9559e4a4df80"
+      }
+    ]
+  },
+  "module_boundaries": "passed",
+  "device": {
+    "model": "Huawei Mate60",
+    "install": "main and AndroidTest APK: adb install -r, Success",
+    "instrumentation_tests": 1,
+    "instrumentation_result": "OK (1 test)",
+    "initial_and_final_automatic_refresh": "disabled",
+    "ui": "device-ui.json"
+  },
+  "not_run": [
+    "real 24h deferred execution",
+    "OEM background/Doze/reboot delivery",
+    "real remote linked-playlist refresh",
+    "new account or audio validation",
+    "performance benchmark"
+  ]
+}

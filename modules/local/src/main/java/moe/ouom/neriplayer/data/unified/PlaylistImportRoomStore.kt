@@ -101,8 +101,9 @@ class PlaylistImportRoomStore(
         cancel(id)
     }
 
-    suspend fun refreshLinked(id: String): Boolean = database.withTransaction {
+    suspend fun refreshLinked(id: String, onlyCompleted: Boolean = false): Boolean = database.withTransaction {
         val job = dao.job(id) ?: return@withTransaction false
+        if (onlyCompleted && job.state != "COMPLETED") return@withTransaction false
         val origin = library.origin(job.provider, job.accountKey, job.remotePlaylistId)
         if (origin?.linked != true || origin.importMode != "LINKED") return@withTransaction false
         enqueue(job.accountKey, job.remotePlaylistId, PlaylistImportMode.LINKED)

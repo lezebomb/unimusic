@@ -18,9 +18,9 @@
     <string name="unimusic_import_once">Import once</string>
     <string name="unimusic_import_once_hint">Save locally and keep a source record, without following future changes.</string>
     <string name="unimusic_import_linked">Keep source linked</string>
-    <string name="unimusic_import_linked_hint">Manually refresh from Import tasks to add new songs. Automatic periodic refresh is not enabled.</string>
-    <string name="unimusic_import_linked_status">Linked · Manual refresh available</string>
-    <string name="unimusic_import_link_pending">Link after import · Manual refresh only</string>
+    <string name="unimusic_import_linked_hint">Refresh manually in import tasks, or enable daily refresh to add new songs.</string>
+    <string name="unimusic_import_linked_status">Linked · Refresh available</string>
+    <string name="unimusic_import_link_pending">Keep the source linked after import</string>
     <string name="unimusic_import_unlinked_status">Source unlinked</string>
     <string name="unimusic_import_loading">Reading, please wait…</string>
     <string name="unimusic_import_selection_count">%1$d of %2$d playlists selected</string>

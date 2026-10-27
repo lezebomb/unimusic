@@ -57,6 +57,27 @@ class PlaylistImportCoordinatorTest {
     private suspend fun enqueue() = store.enqueue("7", "10", PlaylistImportMode.LINKED)
     private suspend fun run(id: String, pages: Int = 20) = PlaylistImportCoordinator(store, fake, 1).run(id, pages)
 
+    @Test fun automaticRefreshKeepsEditsAndHonorsCancellation() = runTest {
+        val id = enqueue()
+        assertFalse(store.refreshLinked(id, onlyCompleted = true))
+        run(id)
+        val playlist = repo.playlists.value.single()
+        repo.renamePlaylist(playlist.id, "My title")
+        repo.removeSongFromPlaylist(playlist.id, 1L)
+        snapshot("automatic", listOf("2", "1", "4"))
+        assertTrue(store.refreshLinked(id, onlyCompleted = true))
+        assertFalse(store.refreshLinked(id, onlyCompleted = true)) // Already queued: do not replace ownership.
+        run(id)
+        assertEquals("My title", repo.playlists.value.single().name)
+        assertEquals(listOf(3L, 2L, 4L), repo.playlists.value.single().songs.map { it.id })
+        store.cancel(id)
+        assertFalse(store.refreshLinked(id, onlyCompleted = true))
+        store.unlink(id)
+        assertFalse(store.refreshLinked(id, onlyCompleted = true))
+        assertFalse(store.refreshLinked(id))
+        assertEquals(3, repo.playlists.value.single().songs.size)
+    }
+
     @Test fun durableResumeAndDedup() = runTest {
         snapshot("first", listOf("3", "1", "3", "2"))
         val id = enqueue()

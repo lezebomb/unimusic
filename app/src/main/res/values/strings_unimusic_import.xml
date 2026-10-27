@@ -18,9 +18,9 @@
     <string name="unimusic_import_once">一次性导入</string>
     <string name="unimusic_import_once_hint">保存到本地，保留来源记录，不跟随远端更新。</string>
     <string name="unimusic_import_linked">保留来源关联</string>
-    <string name="unimusic_import_linked_hint">可在导入任务中手动刷新，补充远端新增歌曲。目前不会定期自动刷新。</string>
-    <string name="unimusic_import_linked_status">已关联 · 可手动刷新</string>
-    <string name="unimusic_import_link_pending">导入后保留关联 · 仅手动刷新</string>
+    <string name="unimusic_import_linked_hint">可在导入任务中手动刷新，或开启每日刷新，补充远端新增歌曲。</string>
+    <string name="unimusic_import_linked_status">已关联 · 可刷新</string>
+    <string name="unimusic_import_link_pending">导入后保留来源关联</string>
     <string name="unimusic_import_unlinked_status">已解除关联</string>
     <string name="unimusic_import_loading">正在读取，请稍候…</string>
     <string name="unimusic_import_selection_count">已选 %1$d / %2$d 个歌单</string>

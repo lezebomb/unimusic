@@ -6,7 +6,9 @@
 
 Phase 4A 已完成“发现／我的”两标签、我的导入/历史/下载/统计入口、设置与调试入口及父子返回兼容。7 个定向 JVM 检查、Debug APK 和模块边界通过；Mate60 数据保留覆盖安装、搜索/设置返回、下载进出及导入弹层开关通过。没有重新验收账号、音频、平板或性能，详见 [4A报告](PHASE_4A_DISCOVER_AND_MY_LIBRARY.md)。APK/哈希、7项 XML 与设备检查保存在 `evidence/2026-10-28/phase4a/`。本阶段已推送；每个完成阶段 commit/push 后接着推进。
 
-Phase 3A 也已完成：精确歌曲30天暂不推荐、撤销和恢复全部隐藏，摘要/期限本机原子保存、过期与旧撤销保护；3个关键JVM、最终Debug构建、边界及Mate60隐藏/撤销/进程重开/恢复通过，播放器保持暂停，测试偏好最终清空。实际范围见 [3A报告](PHASE_3A_LOCAL_RECOMMENDATION_FEEDBACK.md)，不是SKIP/COMPLETE/REPEAT或跨设备同步。4A已推送 `9bb6fe89`，其CI本轮最后查询仍在运行，不能写成成功。下一步补网易云导入的可选定期刷新，默认关闭、不自动关联一次性导入。
+Phase 3A 也已完成：精确歌曲30天暂不推荐、撤销和恢复全部隐藏，摘要/期限本机原子保存、过期与旧撤销保护；3个关键JVM、最终Debug构建、边界及Mate60隐藏/撤销/进程重开/恢复通过，播放器保持暂停，测试偏好最终清空。实际范围见 [3A报告](PHASE_3A_LOCAL_RECOMMENDATION_FEEDBACK.md)，不是SKIP/COMPLETE/REPEAT或跨设备同步。4A已推送 `9bb6fe89`，其[CI](https://github.com/lezebomb/unimusic/actions/runs/40543256303)已确认成功。3A已推送 `be36116e`，其CI上次查询仍在运行。
+
+Phase 1D已完成已关联歌单的可选每日刷新，默认关闭。3个直接相关JVM、主/测试APK、模块边界、Mate60一个调度测试及入口检查通过；仅健康完成的关联歌单自动刷新，不重启取消/失败/暂停，也不关联一次性导入。设备开关最终关闭，没有进行真实远端刷新或等待24小时；见 [1D报告](PHASE_1D_OPTIONAL_LINKED_REFRESH.md) 与 `evidence/2026-10-28/phase1d/`。下一步优化“我的”本地搜索的主线程扫描，保留全部账号和库数据。
 
 ## 历史阶段（以最新用户优先级和上述状态为准）
 
@@ -93,7 +95,7 @@ Phase 3A 也已完成：精确歌曲30天暂不推荐、撤销和恢复全部隐
 2. 当前数据库为 v23，20→21、21→22 与 22→23 均不可重写；新结构使用后续独立迁移，不可 destructive migration。
 3. 提供 APK 的静态审计已完成，见 APK_SOURCE_AUDIT.md。最新 REA 6.8 CLI 已实际复核；旧 MCP 连接仍自报 6.5，未混淆版本。样本为 com.hihonor.cloudmusic 1.5.30 + LSPatch/附加模块/Node 来源层，不凭文件名认作官方网易云 9.1。原始样本已忽略，保留本机，不执行/分发；自动审批拒绝完整破解 Hook 方法体，未间接绕过或移植会员/DRM逻辑。
    酷我 `AppContainer.kuwoCatalogProvider` 只提供目录，现以独立 Catalog 结果接入聚合 UI 和官方查看入口，仍未接音频播放/下载/收藏/队列。不要把酷我ID交给网易云播放器；正常音频能力需另外核实，不以 PAY/COPYRIGHT 字段推断授权。
-4. 当前 LINKED 支持显式刷新，尚无定期自动刷新；ONE_SHOT 不关联，普通 refresh 不会重新关联已解除来源。重新 enqueue 是明确重新导入/关联动作。
+4. 当前 LINKED 支持显式刷新，1D另提供默认关闭的本机可选每日刷新；ONE_SHOT 不关联，普通 refresh 不会重新关联已解除来源。重新 enqueue 是明确重新导入/关联动作。
 5. FakeMusicProvider 与 PlaylistImportCoordinatorTest 已覆盖磁盘重开续跑、批次回滚、取消换号、部分失败、用户修改和同步恢复。后续只跑改动相关的小集合。
 6. UI/队列/同步仍使用旧兼容路径，新导入后台会原子写入旧表。2F已提供 resolveUnifiedSongUrl(UUID) 和原播放入口UUID适配，精确反查当前durable SongItem；不是整库/同步完全切换UUID，也没有独立权利注册表。1C 操作界面已复用 AppContainer.playlistImportBackend；不要再写独立导入器。
    聚合快照现在为 `FederatedSearchSnapshot<ExploreSearchResult>`，Song/Catalog 混合展示，searchSongItems 只提取 Song。ExploreSearchRankingSession 每查询最多缓存 2048 个分数，数据变化失效；在 Default 排名后回 Main 校验 generation。2E 已补本地持久匹配/用户确认与拒绝，2F已提供UUID临播入口；新决策暂不跨设备同步。

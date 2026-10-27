@@ -53,17 +53,26 @@ class PlaylistImportBackend(context: Context) {
         return id
     }
 
-    suspend fun refresh(jobId: String): Boolean {
-        if (!store.refreshLinked(jobId)) return false
-        scheduleQueued(jobId)
+    suspend fun refresh(jobId: String, automatic: Boolean = false): Boolean {
+        if (!store.refreshLinked(jobId, onlyCompleted = automatic)) return false
+        scheduleQueued(jobId, awaitPersistence = automatic)
         return true
     }
 
-    private suspend fun scheduleQueued(id: String) {
+    internal suspend fun resumeAutomatic(id: String) {
+        val current = store.progress(id) ?: return
+        if (automaticImportAction(current) != AutomaticImportAction.RESUME) return
+        // KEEP preserves a manual worker and its backoff; only orphaned queued jobs are recreated.
+        awaitImportScheduling(schedule(id, ExistingWorkPolicy.KEEP,
+            (current.retryAt - System.currentTimeMillis()).coerceAtLeast(0L)))
+    }
+
+    private suspend fun scheduleQueued(id: String, awaitPersistence: Boolean = false) {
         // A queued replacement must not be discarded while an expired/cancelled worker exits.
         val policy = if (store.progress(id)?.state == PlaylistImportState.RUNNING)
             ExistingWorkPolicy.KEEP else ExistingWorkPolicy.REPLACE
-        schedule(id, policy)
+        val operation = schedule(id, policy)
+        if (awaitPersistence) awaitImportScheduling(operation)
     }
 
     suspend fun cancel(jobId: String) {
@@ -82,13 +91,13 @@ class PlaylistImportBackend(context: Context) {
         WorkManager.getInstance(app).cancelUniqueWork(workName(jobId))
     }
 
-    private fun schedule(id: String, policy: ExistingWorkPolicy) {
+    private fun schedule(id: String, policy: ExistingWorkPolicy, delayMillis: Long = 0L): androidx.work.Operation =
         WorkManager.getInstance(app).enqueueUniqueWork(workName(id), policy,
             OneTimeWorkRequestBuilder<PlaylistImportWorker>()
                 .setInputData(workDataOf("job_id" to id))
+                .setInitialDelay(delayMillis, TimeUnit.MILLISECONDS)
                 .setConstraints(Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build())
                 .setBackoffCriteria(BackoffPolicy.EXPONENTIAL, 30, TimeUnit.SECONDS).build())
-    }
 
     private fun workName(id: String) = "unimusic-playlist-import-$id"
 

@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf8'?>
+<testsuite name="moe.ouom.neriplayer.data.unified.PlaylistImportCoordinatorTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2026-10-27T17:00:51.939Z" hostname="local" time="6.248">
+  <properties />
+  <testcase name="automaticRefreshKeepsEditsAndHonorsCancellation" classname="moe.ouom.neriplayer.data.unified.PlaylistImportCoordinatorTest" time="5.491" />
+  <system-out />
+  <system-err />
+</testsuite>

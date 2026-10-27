@@ -172,6 +172,13 @@ class NeriPlayerApplication : Application(), WorkConfiguration.Provider {
                 AppStartupWorkGate.awaitInteractiveContentOrTimeout()
                 FavoritePlaylistRepository.getInstance(this@NeriPlayerApplication)
                 UnifiedLibraryBackfillWorker.schedule(this@NeriPlayerApplication)
+                try {
+                    moe.ouom.neriplayer.data.unified.PlaylistImportAutoRefresh(this@NeriPlayerApplication).reconcile()
+                } catch (failure: kotlinx.coroutines.CancellationException) {
+                    throw failure
+                } catch (_: Exception) {
+                    NPLogger.w("PlaylistImport", "后台刷新计划暂不可用，将在下次启动重试")
+                }
             }
             AppContainer.launchBackgroundIo {
                 AppStartupWorkGate.awaitInteractiveContentOrTimeout()
