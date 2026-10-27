@@ -19,6 +19,7 @@ import moe.ouom.neriplayer.util.search.searchValues
 /** One query/context only. Cache bounds do not impose a search-result limit. */
 internal class ExploreSearchRankingSession(query: String) {
     private val normalized = normalizeFederatedQuery(query)
+    private val textQuery = SearchTextMatcher.query(normalized)
     private val requestedVersions = RecordingMatchPolicy.versions(RecordingMetadata(normalized, "", 0))
     private data class Score(val text: Int?, val versionPenalty: Int)
     private data class Cached(val item: ExploreSearchResult, val score: Score)
@@ -78,7 +79,7 @@ internal class ExploreSearchRankingSession(query: String) {
             else -> return Score(null, 0)
         }
         val versions = RecordingMatchPolicy.versions(RecordingMetadata(title, "", 0))
-        return Score(SearchTextMatcher.score(normalized, values),
+        return Score(textQuery.score(values),
             (versions - requestedVersions).size + (requestedVersions - versions).size)
     }
 }

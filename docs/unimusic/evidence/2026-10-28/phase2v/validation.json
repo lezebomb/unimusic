@@ -1,0 +1,30 @@
+{
+  "phase": "2V",
+  "date": "2026-10-28",
+  "jvm": [
+    {
+      "suite": "moe.ouom.neriplayer.common.search.SearchTextMatcherTest",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0
+    },
+    {
+      "suite": "moe.ouom.neriplayer.ui.viewmodel.tab.ExploreSearchResultRankingTest",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0
+    }
+  ],
+  "newTests": 2,
+  "build": "Debug passed; phase2v-prepared-text-query.log",
+  "apk": {
+    "path": "app/build/outputs/apk/debug/app-debug.apk",
+    "sha256": "f34db5bfbd145b217a59808e9176e4d0ab3634b9f4d893900d302b7ef2648d9a",
+    "bytes": 62986587
+  },
+  "notRun": [
+    "new APK device installation",
+    "CPU/memory benchmark",
+    "live network/search/audio/account acceptance"
+  ]
+}

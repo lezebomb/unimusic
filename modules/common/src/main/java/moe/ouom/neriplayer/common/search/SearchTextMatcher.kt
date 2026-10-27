@@ -20,11 +20,15 @@ object SearchTextMatcher {
         return score(query, values) != null
     }
 
-    fun score(query: String, values: Iterable<Any?>): Int? {
-        val queryTokens = query.searchQueryTokens()
-        if (queryTokens.isEmpty()) return 0
-        return scoreCandidates(queryTokens, collapseCandidates(values))
+    /** Immutable query tokens can be reused across candidates and worker threads. */
+    class Query internal constructor(private val tokens: List<String>) {
+        fun score(values: Iterable<Any?>): Int? =
+            if (tokens.isEmpty()) 0 else scoreCandidates(tokens, collapseCandidates(values))
     }
+
+    fun query(value: String): Query = Query(value.searchQueryTokens())
+
+    fun score(query: String, values: Iterable<Any?>): Int? = query(query).score(values)
 
     fun tokensOf(value: String): List<String> {
         return value.searchCandidates().map { it.text }.distinct()
@@ -100,11 +104,12 @@ object SearchTextMatcher {
 
         var totalScore = 0
         for (queryToken in queryTokens) {
-            val bestScore = candidates
-                .mapNotNull { candidate -> matchScore(queryToken, candidate) }
-                .minOrNull()
-                ?: return null
-            totalScore += bestScore
+            var bestScore: Int? = null
+            for (candidate in candidates) {
+                val score = matchScore(queryToken, candidate) ?: continue
+                if (bestScore == null || score < bestScore) bestScore = score
+            }
+            totalScore += bestScore ?: return null
         }
         return totalScore
     }

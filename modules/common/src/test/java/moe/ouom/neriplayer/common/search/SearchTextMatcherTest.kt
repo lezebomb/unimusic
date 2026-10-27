@@ -11,6 +11,23 @@ class SearchTextMatcherTest {
         val artist: String
     )
 
+    @Test fun preparedQueryKeepsWeightedPinyinAccentAndAllTokenMatching() {
+        val query = SearchTextMatcher.query("ＱＴ café")
+        val title = listOf(SearchTextMatcher.value("晴天 Café", bias = 0))
+        val artist = listOf(SearchTextMatcher.value("晴天 Café", bias = 24))
+        assertTrue(query.score(title)!! < query.score(artist)!!)
+        org.junit.Assert.assertNull(query.score(listOf("晴天")))
+        assertEquals(0, SearchTextMatcher.query("  ").score(emptyList()))
+    }
+
+    @Test fun preparedQueryDoesNotReuseThePreviousCandidatesOrMisses() {
+        val query = SearchTextMatcher.query("Dream")
+        assertEquals(0, query.score(listOf("Dream")))
+        org.junit.Assert.assertNull(query.score(listOf("Other")))
+        assertEquals(24, query.score(listOf(SearchTextMatcher.value("Dream", bias = 24))))
+        assertEquals(0, query.score(listOf("Dream")))
+    }
+
     @Test
     fun `matches ignores latin case`() {
         assertTrue(SearchTextMatcher.matches("LoFi", "lofi playlist"))
