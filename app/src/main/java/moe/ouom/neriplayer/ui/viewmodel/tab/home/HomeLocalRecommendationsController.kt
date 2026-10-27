@@ -17,6 +17,9 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.stateIn
 import moe.ouom.neriplayer.data.local.playlist.LocalPlaylistRepository
 import moe.ouom.neriplayer.data.recommendation.LocalRecommendationRepository
+import moe.ouom.neriplayer.data.recommendation.LocalRecommendation
+import moe.ouom.neriplayer.data.recommendation.LocalRecommendationFeedbackStore
+import moe.ouom.neriplayer.data.recommendation.RecommendationDismissal
 import moe.ouom.neriplayer.data.recommendation.LocalRecommendations
 import moe.ouom.neriplayer.data.recommendation.BeijingRecommendationDay
 import moe.ouom.neriplayer.data.stats.PlaybackStatsRepository
@@ -30,6 +33,8 @@ data class HomeLocalRecommendationsState(
 
 /** Kept separate from remote Home state so account changes cannot replace the local section. */
 internal class HomeLocalRecommendationsController(application: Application, scope: CoroutineScope) {
+    private val feedback = LocalRecommendationFeedbackStore.getInstance(application)
+    private var handledFeedbackRevision = feedback.revision.value
     private val refreshVersion = MutableStateFlow(0L)
     private var handledRefreshVersion = 0L
     val state = channelFlow {
@@ -47,17 +52,21 @@ internal class HomeLocalRecommendationsController(application: Application, scop
                         if (failure is CancellationException) throw failure
                         emit(-1L)
                     },
-                    recommendationDays()
-                ) { playlists, _, _ -> playlists.map { it.copy(songs = it.songs.toMutableList()) } }
+                    recommendationDays(),
+                    feedback.revision
+                ) { playlists, _, _, feedbackRevision ->
+                    playlists.map { it.copy(songs = it.songs.toMutableList()) } to feedbackRevision
+                }
                     .conflate()
-                    .collectLatest { playlists ->
+                    .collectLatest { (playlists, feedbackRevision) ->
                         send(HomeLocalRecommendationsState(latest, loading = true))
                         try {
                             latest = recommendations.recommend(
                                 playlists,
-                                forceRefresh = requestedRefreshVersion > handledRefreshVersion
+                                forceRefresh = requestedRefreshVersion > handledRefreshVersion || feedbackRevision != handledFeedbackRevision
                             )
                             handledRefreshVersion = requestedRefreshVersion
+                            handledFeedbackRevision = feedbackRevision
                             send(HomeLocalRecommendationsState(latest, loading = false))
                         } catch (failure: Exception) {
                             if (failure is CancellationException) throw failure
@@ -76,6 +85,10 @@ internal class HomeLocalRecommendationsController(application: Application, scop
         SharingStarted.WhileSubscribed(stopTimeoutMillis = 5_000),
         HomeLocalRecommendationsState()
     )
+
+    suspend fun dismiss(item: LocalRecommendation): RecommendationDismissal = feedback.dismiss(item.identityKey)
+    suspend fun undo(token: RecommendationDismissal) = feedback.undo(token)
+    suspend fun resetFeedback() = feedback.reset()
 
     fun refresh() {
         refreshVersion.value += 1L

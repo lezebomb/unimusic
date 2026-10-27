@@ -17,14 +17,17 @@ import java.util.Locale
 data class LocalRecommendations(
     val items: List<LocalRecommendation> = emptyList(),
     val localFileItems: List<LocalRecommendation> = emptyList(),
-    val statisticsAvailable: Boolean = true
+    val statisticsAvailable: Boolean = true,
+    val feedbackAvailable: Boolean = true,
+    val hasDismissedCandidates: Boolean = false
 )
 
-/** No network calls or new feedback events; only a disposable private recommendation cache is written. */
+/** Local rules, daily snapshots and explicit device-only recommendation preferences. */
 class LocalRecommendationRepository(
     private val context: Context,
     private val playbackStats: PlaybackStatsRepository,
-    private val dailySnapshots: DailyRecommendationStore = DailyRecommendationStore.getInstance(context)
+    private val dailySnapshots: DailyRecommendationStore = DailyRecommendationStore.getInstance(context),
+    private val feedback: LocalRecommendationFeedbackStore = LocalRecommendationFeedbackStore.getInstance(context)
 ) {
     suspend fun recommend(
         playlists: List<LocalPlaylist>,
@@ -48,7 +51,17 @@ class LocalRecommendationRepository(
                 }
             }
         }
-        return dailySnapshots.getOrCreate(candidates, nowMillis, forceRefresh) { rankFresh(candidates, nowMillis) }
+        var feedbackAvailable = true
+        val dismissed = try { feedback.activeDigests(nowMillis) } catch (failure: Exception) {
+            if (failure is CancellationException) throw failure
+            feedbackAvailable = false
+            emptySet()
+        }
+        val eligible = if (dismissed.isEmpty()) candidates else withContext(Dispatchers.Default) {
+            candidates.filterNot { recommendationIdentityDigest(it.identityKey) in dismissed }
+        }
+        return dailySnapshots.getOrCreate(eligible, nowMillis, forceRefresh) { rankFresh(eligible, nowMillis) }
+            .copy(feedbackAvailable = feedbackAvailable, hasDismissedCandidates = eligible.size < candidates.size)
     }
 
     private suspend fun rankFresh(candidates: List<LocalRecommendationCandidate>, nowMillis: Long): LocalRecommendations {

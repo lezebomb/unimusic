@@ -1,0 +1,10 @@
+{
+  "dismiss_hides_recording": true,
+  "undo_available": true,
+  "undo_restores_recommendation_set": true,
+  "preferences_written": true,
+  "restore_available_after_process_restart": true,
+  "reset_restores_recommendation_set": true,
+  "playback_remained_paused": true,
+  "private_titles_or_keys_saved": false
+}

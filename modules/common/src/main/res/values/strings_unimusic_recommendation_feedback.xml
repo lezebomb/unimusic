@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="unimusic_recommendations_dismiss">30天内不推荐这首歌</string>
+    <string name="unimusic_recommendations_dismissed">30天内不再推荐这首歌</string>
+    <string name="unimusic_recommendations_undo">撤销</string>
+    <string name="unimusic_recommendations_restore">恢复已隐藏</string>
+    <string name="unimusic_recommendations_restored">已恢复本地推荐中的隐藏歌曲</string>
+    <string name="unimusic_recommendations_feedback_error">推荐偏好暂不可用，请稍后重试。音乐库和收藏不受影响。</string>
+    <string name="unimusic_recommendations_all_hidden">这些歌曲已暂不推荐，可恢复已隐藏歌曲或加入其他歌曲。</string>
+</resources>

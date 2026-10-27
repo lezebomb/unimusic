@@ -1,0 +1,9 @@
+<?xml version='1.0' encoding='utf8'?>
+<testsuite name="moe.ouom.neriplayer.data.recommendation.LocalRecommendationFeedbackStoreTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-10-27T16:44:34.191Z" hostname="local" time="0.292">
+  <properties />
+  <testcase name="concurrent decisions survive and stale undo cannot remove a newer dismissal" classname="moe.ouom.neriplayer.data.recommendation.LocalRecommendationFeedbackStoreTest" time="0.223" />
+  <testcase name="preferences survive reopening expire and contain no raw identity" classname="moe.ouom.neriplayer.data.recommendation.LocalRecommendationFeedbackStoreTest" time="0.034" />
+  <testcase name="failed writes and unknown files preserve previous preferences" classname="moe.ouom.neriplayer.data.recommendation.LocalRecommendationFeedbackStoreTest" time="0.031" />
+  <system-out />
+  <system-err />
+</testsuite>

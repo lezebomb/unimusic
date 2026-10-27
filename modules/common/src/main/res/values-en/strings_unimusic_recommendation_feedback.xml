@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="unimusic_recommendations_dismiss">Hide this song for 30 days</string>
+    <string name="unimusic_recommendations_dismissed">Hidden from recommendations for 30 days</string>
+    <string name="unimusic_recommendations_undo">Undo</string>
+    <string name="unimusic_recommendations_restore">Restore hidden</string>
+    <string name="unimusic_recommendations_restored">Hidden recommendation songs restored</string>
+    <string name="unimusic_recommendations_feedback_error">Recommendation preferences are unavailable. Your library and favorites are unaffected.</string>
+    <string name="unimusic_recommendations_all_hidden">These songs are hidden. Restore them or add other songs to your library.</string>
+</resources>

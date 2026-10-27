@@ -213,6 +213,11 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     val localRecommendations = localRecommendationController.state
 
     fun refreshLocalRecommendations() = localRecommendationController.refresh()
+    suspend fun dismissLocalRecommendation(item: moe.ouom.neriplayer.data.recommendation.LocalRecommendation) =
+        localRecommendationController.dismiss(item)
+    suspend fun undoLocalRecommendationDismissal(token: moe.ouom.neriplayer.data.recommendation.RecommendationDismissal) =
+        localRecommendationController.undo(token)
+    suspend fun resetLocalRecommendationFeedback() = localRecommendationController.resetFeedback()
 
     private val repo = AppContainer.neteaseCookieRepo
     private val client = AppContainer.neteaseClient

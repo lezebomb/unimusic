@@ -1,0 +1,32 @@
+{
+  "phase": "3A",
+  "date": "2026-10-28",
+  "jvm": {
+    "class": "LocalRecommendationFeedbackStoreTest",
+    "tests": 3,
+    "failures": 0
+  },
+  "build": {
+    "success": true,
+    "test_log": "build/unimusic-toolchain/phase3a-recommendation-feedback-validation.log",
+    "final_build_log": "build/unimusic-toolchain/phase3a-final-feedback-build.log",
+    "apk": "app/build/outputs/apk/debug/app-debug.apk",
+    "bytes": 62771654,
+    "sha256": "a66f7d3823b76d8dd9eeb4ba9550bdbe59e6292d88b3cc24c1aaff94c962c48b"
+  },
+  "boundaries": "passed",
+  "device": {
+    "model": "Huawei Mate60",
+    "install": "adb install -r: Success",
+    "checks": "device-feedback.json",
+    "feedback_after_validation": "all test dismissals undone or restored",
+    "playback": "remained paused"
+  },
+  "not_run": [
+    "SKIP/COMPLETE/REPEAT tracking",
+    "cross-device feedback sync",
+    "account or audio revalidation",
+    "performance benchmark",
+    "full upstream suite"
+  ]
+}

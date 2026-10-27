@@ -12,6 +12,8 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.outlined.VisibilityOff
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -44,6 +46,8 @@ internal fun HomeLocalRecommendationsSection(
     state: HomeLocalRecommendationsState,
     offlineMode: Boolean,
     onRefresh: () -> Unit,
+    onDismiss: (LocalRecommendation) -> Unit = {},
+    onResetFeedback: () -> Unit = {},
     onSongClick: (List<SongItem>, Int) -> Unit
 ) {
     val items = if (offlineMode) state.recommendations.localFileItems else state.recommendations.items
@@ -56,6 +60,11 @@ internal fun HomeLocalRecommendationsSection(
                 fontWeight = FontWeight.SemiBold,
                 modifier = Modifier.weight(1f)
             )
+            if (state.recommendations.hasDismissedCandidates) {
+                TextButton(onClick = onResetFeedback, enabled = !state.loading) {
+                    Text(stringResource(CoreCommonR.string.unimusic_recommendations_restore))
+                }
+            }
             if (state.loading) CircularProgressIndicator(modifier = Modifier.size(20.dp), strokeWidth = 2.dp)
             IconButton(onClick = onRefresh, enabled = !state.loading) {
                 Icon(Icons.Default.Refresh, stringResource(CoreCommonR.string.unimusic_recommendations_refresh))
@@ -70,14 +79,19 @@ internal fun HomeLocalRecommendationsSection(
             state.failed -> LocalRecommendationNotice(CoreCommonR.string.unimusic_recommendations_error)
             items.isNotEmpty() -> LazyRow(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 itemsIndexed(items, key = { _, item -> item.identityKey }) { index, item ->
-                    LocalRecommendationCard(item, onClick = { onSongClick(songs, index) })
+                    LocalRecommendationCard(item, onClick = { onSongClick(songs, index) }, onDismiss = { onDismiss(item) })
                 }
             }
             !state.loading -> LocalRecommendationNotice(
-                if (offlineMode && state.recommendations.items.isNotEmpty()) {
+                if (state.recommendations.hasDismissedCandidates) {
+                    CoreCommonR.string.unimusic_recommendations_all_hidden
+                } else if (offlineMode && state.recommendations.items.isNotEmpty()) {
                     CoreCommonR.string.unimusic_recommendations_offline_empty
                 } else CoreCommonR.string.unimusic_recommendations_empty
             )
+        }
+        if (!state.failed && !state.recommendations.feedbackAvailable) {
+            LocalRecommendationNotice(CoreCommonR.string.unimusic_recommendations_feedback_error)
         }
         if (!state.failed && !state.recommendations.statisticsAvailable) {
             LocalRecommendationNotice(CoreCommonR.string.unimusic_recommendations_statistics_unavailable)
@@ -95,7 +109,7 @@ private fun LocalRecommendationNotice(textResource: Int) {
 }
 
 @Composable
-private fun LocalRecommendationCard(item: LocalRecommendation, onClick: () -> Unit) {
+private fun LocalRecommendationCard(item: LocalRecommendation, onClick: () -> Unit, onDismiss: () -> Unit) {
     val song = item.song
     Surface(shape = NeriDesign.tokens.cardShape, color = MaterialTheme.colorScheme.surfaceContainer) {
         Column(
@@ -128,17 +142,23 @@ private fun LocalRecommendationCard(item: LocalRecommendation, onClick: () -> Un
                 style = MaterialTheme.typography.bodySmall,
                 modifier = Modifier.fillMaxWidth()
             )
-            Text(
-                stringResource(when (item.source) {
-                    LocalRecommendationSource.LOCAL_FILE -> CoreCommonR.string.unimusic_recommendations_source_file
-                    LocalRecommendationSource.NETEASE -> CoreCommonR.string.unimusic_recommendations_source_netease
-                    LocalRecommendationSource.BILIBILI -> CoreCommonR.string.unimusic_recommendations_source_bilibili
-                    LocalRecommendationSource.YOUTUBE_MUSIC -> CoreCommonR.string.unimusic_recommendations_source_youtube
-                    LocalRecommendationSource.LIBRARY -> CoreCommonR.string.unimusic_recommendations_source_library
-                }),
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.primary
-            )
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    stringResource(when (item.source) {
+                        LocalRecommendationSource.LOCAL_FILE -> CoreCommonR.string.unimusic_recommendations_source_file
+                        LocalRecommendationSource.NETEASE -> CoreCommonR.string.unimusic_recommendations_source_netease
+                        LocalRecommendationSource.BILIBILI -> CoreCommonR.string.unimusic_recommendations_source_bilibili
+                        LocalRecommendationSource.YOUTUBE_MUSIC -> CoreCommonR.string.unimusic_recommendations_source_youtube
+                        LocalRecommendationSource.LIBRARY -> CoreCommonR.string.unimusic_recommendations_source_library
+                    }),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.weight(1f)
+                )
+                IconButton(onClick = onDismiss) {
+                    Icon(Icons.Outlined.VisibilityOff, stringResource(CoreCommonR.string.unimusic_recommendations_dismiss))
+                }
+            }
         }
     }
 }

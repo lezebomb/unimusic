@@ -369,6 +369,7 @@ fun HomeScreen(
     )
 
     val snackbarHostState = remember { SnackbarHostState() }
+    val recommendationFeedback = rememberRecommendationFeedbackActions(vm, snackbarHostState)
     val guessYouLikeTitle = stringResource(CoreCommonR.string.home_ytmusic_guess_you_like)
     val dailyDiscoverTitle = stringResource(CoreCommonR.string.home_ytmusic_daily_discover)
     val moreRecommendationsTitle = stringResource(CoreCommonR.string.home_ytmusic_more_recommendations)
@@ -599,6 +600,8 @@ fun HomeScreen(
                                 state = localRecommendations,
                                 offlineMode = offlineMode,
                                 onRefresh = vm::refreshLocalRecommendations,
+                                onDismiss = recommendationFeedback.dismiss,
+                                onResetFeedback = recommendationFeedback.reset,
                                 onSongClick = onSongClick
                             )
                         }
