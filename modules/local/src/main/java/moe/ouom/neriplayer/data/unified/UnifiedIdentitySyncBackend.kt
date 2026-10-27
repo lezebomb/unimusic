@@ -23,6 +23,7 @@ data class RoomIdentityCaptureResult(
 )
 
 data class PortableIdentityExport(val bytes: ByteArray, val capture: RoomIdentityCaptureResult)
+data class IdentityBackendSyncResult(val capture: RoomIdentityCaptureResult, val remote: UnifiedIdentitySyncOutcome)
 
 /** Explicit backend entry. Captures portable recording identities, not playlist membership or rights. */
 class UnifiedIdentitySyncBackend private constructor(
@@ -30,6 +31,7 @@ class UnifiedIdentitySyncBackend private constructor(
     journalProvider: () -> UnifiedIdentityJournal
 ) {
     private val captureMutex = Mutex()
+    private val syncMutex = Mutex()
     private val database by lazy(databaseProvider)
     private val journal by lazy(journalProvider)
 
@@ -43,6 +45,12 @@ class UnifiedIdentitySyncBackend private constructor(
 
     suspend fun snapshot() = withContext(Dispatchers.IO) { journal.snapshot() }
     suspend fun mergeRemote(bytes: ByteArray) = withContext(Dispatchers.IO) { journal.mergeRemote(bytes) }
+
+    /** Explicit opt-in invocation only; no existing scheduler or cloud setting is changed. */
+    suspend fun <V> synchronize(remote: UnifiedIdentityRemoteTransport<V>): IdentityBackendSyncResult = syncMutex.withLock {
+        val capture = captureRoom()
+        IdentityBackendSyncResult(capture, UnifiedIdentitySyncCoordinator(journal, remote).synchronize())
+    }
 
     suspend fun exportCurrent(): PortableIdentityExport {
         val capture = captureRoom()

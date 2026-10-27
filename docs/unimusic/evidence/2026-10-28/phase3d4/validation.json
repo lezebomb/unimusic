@@ -1,0 +1,25 @@
+{
+  "phase": "3D.4",
+  "date": "2026-10-28",
+  "jvm": {
+    "tests": 4,
+    "failures": 0,
+    "errors": 0,
+    "http": "synthetic interceptor responses; not live WebDAV"
+  },
+  "build": "Debug APK passed; phase3d4-conditional-webdav.log",
+  "moduleBoundaries": "Module boundaries: passed",
+  "apk": {
+    "path": "app/build/outputs/apk/debug/app-debug.apk",
+    "sha256": "543a40c8457d3f62abc7be6342fab1af7d93122e79eded25a019618c06b80094",
+    "bytes": 62908747
+  },
+  "notRun": [
+    "real WebDAV authentication/server upload",
+    "device install/UI",
+    "GitHub identity transport",
+    "two-device sync",
+    "Room remote application",
+    "account/audio/performance"
+  ]
+}

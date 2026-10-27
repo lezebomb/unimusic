@@ -1,0 +1,8 @@
+<?xml version='1.0' encoding='utf-8'?>
+<testsuite name="moe.ouom.neriplayer.api.sync.webdav.UnifiedIdentityWebDavTransportTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-10-27T21:56:17.232Z" hostname="local" time="0.707">
+  <properties />
+  <testcase name="missing file creates conditionally and existing file preserves the strong validator" classname="moe.ouom.neriplayer.api.sync.webdav.UnifiedIdentityWebDavTransportTest" time="0.691" />
+  <testcase name="weak validators unsafe endpoint fields and server error bodies never cause an unconditional fallback" classname="moe.ouom.neriplayer.api.sync.webdav.UnifiedIdentityWebDavTransportTest" time="0.01" />
+  <system-out />
+  <system-err />
+</testsuite>
