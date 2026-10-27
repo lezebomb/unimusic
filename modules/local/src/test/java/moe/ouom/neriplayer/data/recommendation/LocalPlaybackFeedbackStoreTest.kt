@@ -43,6 +43,37 @@ class LocalPlaybackFeedbackStoreTest {
         assertTrue(reopened.signals(now, 0).byDigest.isEmpty())
     }
 
+    @Test fun `disabled recording persists and clear fences reject queued old evidence`() = runTest {
+        val file = File(temporary.root, "controls.json")
+        val store = LocalPlaybackFeedbackStore(file, now = { now })
+        store.record("a", event())
+        now += 1000
+        store.setEnabled(false)
+        assertFalse(store.signals(now, 0).enabled)
+        now += 1000
+        store.record("b", event())
+        val reopened = LocalPlaybackFeedbackStore(file, now = { now })
+        assertFalse(reopened.signals(now, 0).enabled)
+        assertTrue(reopened.signals(now, 0).byDigest.isEmpty())
+        val beforeEnabled = event()
+        now += 1000
+        reopened.setEnabled(true)
+        reopened.record("b", beforeEnabled)
+        assertTrue(reopened.signals(now, 0).byDigest.isEmpty())
+        now += 1000
+        val beforeClear = event()
+        reopened.record("a", beforeClear)
+        assertEquals(1, reopened.signals(now, 0).byDigest.size)
+        now += 1000
+        reopened.clearSignals()
+        reopened.record("a", beforeClear)
+        assertTrue(reopened.signals(now, 0).enabled)
+        assertTrue(reopened.signals(now, 0).byDigest.isEmpty())
+        now += 1000
+        reopened.record("b", event())
+        assertEquals(1, reopened.signals(now, 0).byDigest.size)
+    }
+
     @Test fun `queued writes flush without changing unrelated evidence and failed writes preserve disk`() = runTest {
         val file = File(temporary.root, "queued.json")
         val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)

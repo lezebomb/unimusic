@@ -602,6 +602,8 @@ fun HomeScreen(
                                 onRefresh = vm::refreshLocalRecommendations,
                                 onDismiss = recommendationFeedback.dismiss,
                                 onResetFeedback = recommendationFeedback.reset,
+                                onSetPlaybackFeedbackEnabled = recommendationFeedback.setPlaybackEnabled,
+                                onClearPlaybackFeedback = recommendationFeedback.clearPlayback,
                                 onSongClick = onSongClick
                             )
                         }

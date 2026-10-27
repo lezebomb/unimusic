@@ -1,0 +1,24 @@
+{
+  "date": "2026-10-28",
+  "phase": "3C",
+  "build": "Debug APK passed; phase3c-feedback-controls.log",
+  "tests": {
+    "jvm": 3,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "moduleBoundaries": "passed",
+  "apk": {
+    "path": "app/build/outputs/apk/debug/app-debug.apk",
+    "sha256": "a7a025dca24b4593575c21eed7c188c0ebb6780ef13fb85b1bc10e0fc1d96199",
+    "bytes": 62846331
+  },
+  "device": "3 replacement-install attempts returned INSTALL_FAILED_ABORTED: User rejected permissions; final APK not installed, UI not validated. Prior app still opens; no clear/uninstall.",
+  "notRun": [
+    "real Media3 signal capture",
+    "account or new audio validation",
+    "performance benchmarks",
+    "release build"
+  ]
+}

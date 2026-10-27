@@ -12,6 +12,11 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Tune
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.material.icons.outlined.VisibilityOff
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.CircularProgressIndicator
@@ -48,8 +53,13 @@ internal fun HomeLocalRecommendationsSection(
     onRefresh: () -> Unit,
     onDismiss: (LocalRecommendation) -> Unit = {},
     onResetFeedback: () -> Unit = {},
+    onSetPlaybackFeedbackEnabled: (Boolean) -> Unit = {},
+    onClearPlaybackFeedback: () -> Unit = {},
     onSongClick: (List<SongItem>, Int) -> Unit
 ) {
+    var showPreferences by remember { mutableStateOf(false) }
+    if (showPreferences) LocalRecommendationPreferencesDialog(state, { showPreferences = false },
+        onSetPlaybackFeedbackEnabled, onClearPlaybackFeedback)
     val items = if (offlineMode) state.recommendations.localFileItems else state.recommendations.items
     val songs = items.map { it.song }
     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -64,6 +74,9 @@ internal fun HomeLocalRecommendationsSection(
                 TextButton(onClick = onResetFeedback, enabled = !state.loading) {
                     Text(stringResource(CoreCommonR.string.unimusic_recommendations_restore))
                 }
+            }
+            IconButton(onClick = { showPreferences = true }) {
+                Icon(Icons.Default.Tune, stringResource(CoreCommonR.string.unimusic_feedback_preferences))
             }
             if (state.loading) CircularProgressIndicator(modifier = Modifier.size(20.dp), strokeWidth = 2.dp)
             IconButton(onClick = onRefresh, enabled = !state.loading) {

@@ -15,6 +15,9 @@ internal fun PlayerManager.initializePlaybackStatistics(app: Context) {
         ioScope, AppPlaybackStatsWritePort,
         PlaybackStatsTracker(AppQueueSongIdentity::stableKey, readClearedAt = AppPlaybackStatsWritePort::clearedAt),
         AppPlaybackStatsPendingWrites.queue,
-        feedback = PlaybackFeedbackTracker(AppQueueSongIdentity::stableKey, readClearedAt = AppPlaybackStatsWritePort::clearedAt)
+        feedback = PlaybackFeedbackTracker(AppQueueSongIdentity::stableKey, readClearedAt = {
+            maxOf(AppPlaybackStatsWritePort.clearedAt(),
+                moe.ouom.neriplayer.data.recommendation.LocalPlaybackFeedbackStore.captureResetEpoch())
+        })
     )
 }

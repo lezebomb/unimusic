@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="unimusic_feedback_preferences">推荐偏好</string>
+    <string name="unimusic_feedback_enabled">根据播放反馈调整推荐</string>
+    <string name="unimusic_feedback_privacy">跳过、听完和重播记录仅保存在本机，用于调整推荐。关闭会清除这些信号，保留播放历史、歌单及手动隐藏的歌曲。</string>
+    <string name="unimusic_feedback_clear">清除播放反馈</string>
+    <string name="unimusic_feedback_cleared">已清除播放反馈</string>
+    <string name="unimusic_feedback_done">完成</string>
+</resources>

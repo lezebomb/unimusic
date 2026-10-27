@@ -91,6 +91,9 @@ internal class HomeLocalRecommendationsController(application: Application, scop
     suspend fun undo(token: RecommendationDismissal) = feedback.undo(token)
     suspend fun resetFeedback() = feedback.reset()
 
+    suspend fun setPlaybackFeedbackEnabled(enabled: Boolean) = playbackFeedback.setEnabled(enabled)
+    suspend fun clearPlaybackFeedback() = playbackFeedback.clearSignals()
+
     fun refresh() {
         refreshVersion.value += 1L
     }

@@ -18,6 +18,10 @@ Phase 3B已完成本机播放反馈实现、精确摘要有界存储与推荐规
 
 下一步先看3B远端结果，继续完善推荐反馈的用户控制/后续价值事项；实际媒体采样、极端时序、性能和独立UUID dataset同步仍未验收。4C已推送 `c8211f95`。
 
+Phase 3B已提交推送`38707973`；远端[CI](https://github.com/lezebomb/unimusic/actions/runs/40562535680)截至本次记录仍运行，两个需要JDK21的旧runtime测试不能标成本地通过。
+
+Phase 3C已实现发现页推荐偏好、关闭学习与独立清除播放信号、持久开关/旧排队水位和采样周期复位，3个JVM、最终Debug构建与模块边界通过，见[3C报告](PHASE_3C_RECOMMENDATION_PRIVACY_CONTROLS.md)。本阶段Mate60覆盖安装被系统中止3次，新APK/界面未验收，原版本仍可打开且未清理数据；不要重复尝试安装或重做账号。下一轮若需要设备验证先核对系统安装条件。先继续不依赖设备的功能；按用户要求保存检查点、阶段commit/push。
+
 ## 历史阶段（以最新用户优先级和上述状态为准）
 
 此前阶段：2026-10-27（Asia/Shanghai）。最新 2O 对照原版 b9b6caf3 和已 fetch 的最新上游 0d9ce69f，保留预热/缓存/客户端回退。修复 8 秒共享任务短于原版 12 秒签名窗口的预算冲突：明确 YouTube 主播放 20 秒、共享后台 30 秒，其他主源/自动切源仍 8 秒且不能被嵌套延长。真实匿名响应是 UNPLAYABLE/LOGIN_REQUIRED、无音频格式；新增一轮后明确拒绝与来源 AUTH_REQUIRED、YouTube 专属登录提示，避免重复刷新和泛化超时。9 个关键 JVM 检查、最终 APK/测试包及边界通过，已覆盖安装到 Mate60。YouTube 仍未播通：最终播放器本次 5818ms 提示 LOGIN_REQUIRED，预热诊断一轮 6 次请求后明确拒绝，普通 UI 提示已核对。见 [2O报告](PHASE_2O_UPSTREAM_PLAYBACK_AND_ACCESS_FEEDBACK.md)。2N CI 已成功；网易云登录及 5 首导入保留，不重发验证码。未做 Google 登录，QQ 正向仍待验收。

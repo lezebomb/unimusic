@@ -29,7 +29,7 @@ import moe.ouom.neriplayer.data.model.stats.PlaybackFeedbackKind
 
 /** Decayed counts for exact device-local identities. Missing evidence stays unknown. */
 data class LocalPlaybackSignal(val skips: Double = 0.0, val completions: Double = 0.0, val repeats: Double = 0.0)
-data class LocalPlaybackSignals(val byDigest: Map<String, LocalPlaybackSignal>, val available: Boolean)
+data class LocalPlaybackSignals(val byDigest: Map<String, LocalPlaybackSignal>, val available: Boolean, val enabled: Boolean = true)
 
 /** Bounded, device-only evidence. Best-effort enqueue never blocks playback or authoritative statistics. */
 class LocalPlaybackFeedbackStore internal constructor(
@@ -39,13 +39,14 @@ class LocalPlaybackFeedbackStore internal constructor(
     private val writerScope: CoroutineScope? = null
 ) {
     private data class Row(val digest: String, val event: PlaybackFeedbackEvent)
-    private data class State(val clearedAt: Long = 0L, val rows: List<Row> = emptyList())
+    private data class State(val clearedAt: Long = 0L, val rows: List<Row> = emptyList(), val enabled: Boolean = true)
     private sealed interface Message {
         data class Record(val digest: String, val event: PlaybackFeedbackEvent, val clearedAt: Long) : Message
         data class Flush(val done: CompletableDeferred<Unit>) : Message
     }
     private val mutex = Mutex()
     private var memory: State? = null
+    @Volatile private var captureEpoch = 0L
     @Volatile private var failed = false
     private val pending = AtomicInteger()
     private val queuedDigests = ConcurrentHashMap<String, AtomicInteger>()
@@ -105,6 +106,7 @@ class LocalPlaybackFeedbackStore internal constructor(
         validate(event)
         mutex.withLock {
             val old = load()
+            if (!old.enabled) return@withLock
             val epoch = maxOf(old.clearedAt, observedClearedAt.coerceAtLeast(0L))
             forgottenAt.keys.retainAll(queuedDigests.keys)
             val cutoff = maxOf(epoch, now() - RETENTION_MS)
@@ -112,7 +114,7 @@ class LocalPlaybackFeedbackStore internal constructor(
             val retained = old.rows.filter { it.event.occurredAt > cutoff }
             val next = if (event.occurredAt <= eventCutoff || retained.any { it.event.eventId == event.eventId }) retained
                 else (retained + Row(digest, event)).sortedByDescending { it.event.occurredAt }.take(MAX_ROWS)
-            publish(State(epoch, next))
+            publish(State(epoch, next, old.enabled))
         }
     }
 
@@ -121,9 +123,9 @@ class LocalPlaybackFeedbackStore internal constructor(
             val old = load()
             val epoch = maxOf(old.clearedAt, clearedAt.coerceAtLeast(0L))
             val rows = old.rows.filter { it.event.occurredAt > maxOf(epoch, nowMillis - RETENTION_MS) }
-            publish(State(epoch, rows))
+            publish(State(epoch, rows, old.enabled))
             val result = mutableMapOf<String, LocalPlaybackSignal>()
-            rows.forEach { row ->
+            rows.filter { old.enabled }.forEach { row ->
                 val age = (nowMillis - row.event.occurredAt).coerceAtLeast(0L) / 86_400_000.0
                 if (age > 14.0) return@forEach
                 val weight = 1.0 / (1.0 + age / 3.0)
@@ -134,7 +136,7 @@ class LocalPlaybackFeedbackStore internal constructor(
                     PlaybackFeedbackKind.REPEAT -> current.copy(repeats = current.repeats + weight)
                 }
             }
-            LocalPlaybackSignals(result, !failed)
+            LocalPlaybackSignals(result, !failed, old.enabled)
         }
     }
 
@@ -142,7 +144,27 @@ class LocalPlaybackFeedbackStore internal constructor(
         mutex.withLock {
             val old = load()
             val cutoff = maxOf(old.clearedAt, epoch)
-            publish(State(cutoff, old.rows.filter { it.event.occurredAt > cutoff }))
+            publish(State(cutoff, old.rows.filter { it.event.occurredAt > cutoff }, old.enabled))
+        }
+    }
+
+    /** Only recommendation evidence is affected; history and explicit dismissals are separate. */
+    suspend fun setEnabled(enabled: Boolean) = withContext(Dispatchers.IO) {
+        mutex.withLock {
+            val old = load()
+            if (old.enabled == enabled) return@withLock
+            val epoch = maxOf(old.clearedAt, now())
+            publish(State(epoch, emptyList(), enabled))
+            captureEpoch = epoch
+        }
+    }
+
+    suspend fun clearSignals() = withContext(Dispatchers.IO) {
+        mutex.withLock {
+            val old = load()
+            val epoch = maxOf(old.clearedAt, now())
+            publish(State(epoch, emptyList(), old.enabled))
+            captureEpoch = epoch
         }
     }
 
@@ -166,6 +188,7 @@ class LocalPlaybackFeedbackStore internal constructor(
         val text = JsonObject().apply {
             addProperty("schemaVersion", 1)
             addProperty("clearedAt", next.clearedAt)
+            addProperty("enabled", next.enabled)
             add("events", JsonArray().apply {
                 next.rows.forEach { row -> add(JsonObject().apply {
                     addProperty("digest", row.digest)
@@ -220,7 +243,8 @@ class LocalPlaybackFeedbackStore internal constructor(
                 Row(digest, event)
             }
             require(parsed.map { it.event.eventId }.distinct().size == parsed.size)
-            return State(epoch, parsed).also { memory = it }
+            val enabled = root.get("enabled")?.let { require(it.asString in setOf("true", "false")); it.asBoolean } ?: true
+            return State(epoch, parsed, enabled).also { memory = it }
         } catch (failure: Exception) {
             throw IOException("Local playback feedback unavailable", failure)
         }
@@ -237,6 +261,7 @@ class LocalPlaybackFeedbackStore internal constructor(
         private const val RETENTION_MS = 30L * 86_400_000L
         private const val MAX_INTERVAL_MS = 7L * 86_400_000L
         @Volatile private var instance: LocalPlaybackFeedbackStore? = null
+        fun captureResetEpoch(): Long = instance?.captureEpoch ?: 0L
         fun getInstance(context: Context): LocalPlaybackFeedbackStore = instance ?: synchronized(this) {
             instance ?: (context.applicationContext ?: context).let { app ->
                 LocalPlaybackFeedbackStore(File(requireNotNull(app.filesDir),

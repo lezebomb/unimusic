@@ -218,6 +218,8 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     suspend fun undoLocalRecommendationDismissal(token: moe.ouom.neriplayer.data.recommendation.RecommendationDismissal) =
         localRecommendationController.undo(token)
     suspend fun resetLocalRecommendationFeedback() = localRecommendationController.resetFeedback()
+    suspend fun setPlaybackFeedbackEnabled(enabled: Boolean) = localRecommendationController.setPlaybackFeedbackEnabled(enabled)
+    suspend fun clearPlaybackFeedback() = localRecommendationController.clearPlaybackFeedback()
 
     private val repo = AppContainer.neteaseCookieRepo
     private val client = AppContainer.neteaseClient

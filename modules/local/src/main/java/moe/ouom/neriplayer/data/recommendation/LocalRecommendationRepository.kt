@@ -19,7 +19,8 @@ data class LocalRecommendations(
     val localFileItems: List<LocalRecommendation> = emptyList(),
     val statisticsAvailable: Boolean = true,
     val feedbackAvailable: Boolean = true,
-    val hasDismissedCandidates: Boolean = false
+    val hasDismissedCandidates: Boolean = false,
+    val playbackFeedbackEnabled: Boolean = true
 )
 
 /** Local rules, daily snapshots and explicit device-only recommendation preferences. */
@@ -68,7 +69,8 @@ class LocalRecommendationRepository(
         }
         return dailySnapshots.getOrCreate(eligible, nowMillis, forceRefresh) { rankFresh(eligible, nowMillis, evidence.byDigest) }
             .copy(feedbackAvailable = feedbackAvailable && evidence.available,
-                hasDismissedCandidates = eligible.size < candidates.size)
+                hasDismissedCandidates = eligible.size < candidates.size,
+                playbackFeedbackEnabled = evidence.enabled)
     }
 
     private suspend fun rankFresh(candidates: List<LocalRecommendationCandidate>, nowMillis: Long, signals: Map<String, LocalPlaybackSignal>): LocalRecommendations {

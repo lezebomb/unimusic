@@ -16,7 +16,9 @@ import moe.ouom.neriplayer.ui.viewmodel.tab.HomeViewModel
 
 internal data class HomeRecommendationFeedbackActions(
     val dismiss: (LocalRecommendation) -> Unit,
-    val reset: () -> Unit
+    val reset: () -> Unit,
+    val setPlaybackEnabled: (Boolean) -> Unit,
+    val clearPlayback: () -> Unit
 )
 
 @Composable
@@ -25,8 +27,9 @@ internal fun rememberRecommendationFeedbackActions(vm: HomeViewModel, host: Snac
     val hidden = stringResource(CoreCommonR.string.unimusic_recommendations_dismissed)
     val undo = stringResource(CoreCommonR.string.unimusic_recommendations_undo)
     val restored = stringResource(CoreCommonR.string.unimusic_recommendations_restored)
+    val cleared = stringResource(CoreCommonR.string.unimusic_feedback_cleared)
     val error = stringResource(CoreCommonR.string.unimusic_recommendations_feedback_error)
-    return remember(vm, host, scope, hidden, undo, restored, error) {
+    return remember(vm, host, scope, hidden, undo, restored, cleared, error) {
         HomeRecommendationFeedbackActions(
             dismiss = { item -> scope.launch {
                 try {
@@ -36,6 +39,20 @@ internal fun rememberRecommendationFeedbackActions(vm: HomeViewModel, host: Snac
                         vm.undoLocalRecommendationDismissal(token)
                     }
                 } catch (failure: Exception) {
+                    if (failure is CancellationException) throw failure
+                    host.showNeriSnackbar(error)
+                }
+            } },
+            setPlaybackEnabled = { enabled -> scope.launch {
+                try { vm.setPlaybackFeedbackEnabled(enabled) }
+                catch (failure: Exception) {
+                    if (failure is CancellationException) throw failure
+                    host.showNeriSnackbar(error)
+                }
+            } },
+            clearPlayback = { scope.launch {
+                try { vm.clearPlaybackFeedback(); host.showNeriSnackbar(cleared) }
+                catch (failure: Exception) {
                     if (failure is CancellationException) throw failure
                     host.showNeriSnackbar(error)
                 }
