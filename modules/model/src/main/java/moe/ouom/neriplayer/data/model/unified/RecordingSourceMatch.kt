@@ -14,5 +14,7 @@ data class RecordingSourceMatch(
     val decision: SourceMatchDecision,
     val revision: Long,
     val updatedAt: Long,
-    val current: Boolean
+    val current: Boolean,
+    /** An automatic resolver obtained an eligible address, not proof of completed playback. */
+    val automaticResolvedAt: Long? = null
 )

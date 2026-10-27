@@ -167,6 +167,11 @@ internal suspend fun PlayerManager.getNeteaseSongUrl(
 private suspend fun PlayerManager.resolveNeteaseAlternates(
     song: SongItem, sideEffects: RefreshResolverSideEffects, local: Boolean, online: Boolean
 ): SongUrlResult? {
+    if (local || online) {
+        try { tryResolveAutomaticSource(song, sideEffects, local, online)?.let { return it } }
+        catch (cancelled: CancellationException) { throw cancelled }
+        catch (_: Exception) { NPLogger.w("NERI-PlayerManager", "Automatic source mapping unavailable") }
+    }
     if (local) {
         try { tryResolveNeteaseMatchedLocalSource(song)?.let { return it } }
         catch (cancelled: CancellationException) { throw cancelled }

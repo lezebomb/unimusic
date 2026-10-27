@@ -99,3 +99,9 @@ Phase 1 先保留现有 2.0 数据同步，不让新字段意外混入旧序列�
 2G的MusicSourceRegistry只描述已实现的适配器及合法结构的来源键，不给SongSource增加AUTHORIZED_AUDIO或新的权利。SourceCheckResult为短期内存状态，只含枚举和检查时间，不进入Room、备份或同步，没有音频URL。
 
 人工决策戳通过目标UUID/精确候选键直接读取决策和revision，不经200项展示列表；新观察NONE/0不使校验失效，人工确认/拒绝/清除增加revision使旧校验失效。没有新表、字段或迁移，schema23保持不变。
+
+## 8. 自动解析成功映射（2I，不变更v23）
+
+复用 song_match 的 algorithm_version/observed_at：1为普通候选或显式探测，2为当前严格自动规则通过且已获得地址。仅local/bilibili自动链写v2，不保存URL、凭据或文件路径，不修改Source默认权限，不表示播放完成。24小时后或目标指纹不符不参与自动解析；自动缓存查询最多8条，按精确键复核修订，不扫描200条展示列表。
+
+自动写入原子比较NONE决策与revision；人工拒绝/清除/确认优先。清除将自动证据降回v1，旧失效请求只在观察时间及revision仍相符时降级；普通未变观察不延长v2时间。没有表结构/迁移变更、删除用户记录或destructive migration。详见 [2I](PHASE_2I_PERSISTENT_SOURCE_FALLBACK.md)。

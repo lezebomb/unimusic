@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="moe.ouom.neriplayer.core.player.resolver.netease.PlayerManagerNeteaseAutoSourceSwitchTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-10-27T01:28:37.211Z" hostname="XUSHAOYANG" time="0.016">
+  <properties/>
+  <testcase name="buildNeteaseAutoBiliCacheKey_isStableForSameStream" classname="moe.ouom.neriplayer.core.player.resolver.netease.PlayerManagerNeteaseAutoSourceSwitchTest" time="0.015"/>
+  <testcase name="buildNeteaseAutoBiliCacheKey_separatesDifferentStreams" classname="moe.ouom.neriplayer.core.player.resolver.netease.PlayerManagerNeteaseAutoSourceSwitchTest" time="0.001"/>
+  <testcase name="buildNeteaseAutoBiliCacheKey_usesBiliAutoNamespace" classname="moe.ouom.neriplayer.core.player.resolver.netease.PlayerManagerNeteaseAutoSourceSwitchTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

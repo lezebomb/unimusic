@@ -67,6 +67,9 @@ class BiliRecordingMatchTest {
     @Test fun onlyActualAutoSourceFailuresTriggerCooldown() {
         assertTrue(shouldCoolDownAutoSource("bili-auto-bv-1", "playback_error_ERROR_CODE_IO"))
         assertTrue(shouldCoolDownAutoSource("bili-auto-bv-1", "startup_stall_BUFFERING"))
+        assertTrue(shouldCoolDownAutoSource("match-uuid-bili-auto-bv-1", "playback_error_ERROR_CODE_IO"))
+        assertFalse(shouldCoolDownAutoSource("match-uuid-bili-auto-bv-1", "startup_stall_offline_cache"))
+        assertFalse(shouldCoolDownAutoSource("match-uuid-local", "startup_stall_BUFFERING"))
         assertFalse(shouldCoolDownAutoSource("bili-auto-bv-1", "stale_resume"))
         assertFalse(shouldCoolDownAutoSource("bili-auto-bv-1", "startup_stall_offline_cache"))
         assertFalse(shouldCoolDownAutoSource("netease-1", "playback_error_ERROR_CODE_IO"))

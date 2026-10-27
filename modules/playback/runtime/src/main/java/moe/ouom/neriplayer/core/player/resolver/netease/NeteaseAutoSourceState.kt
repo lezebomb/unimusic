@@ -11,7 +11,7 @@ internal object NeteaseAutoSourceState {
     private val winners = LinkedHashMap<String, Winner>()
     fun key(song: SongItem): String = listOf(song.id, song.originalName ?: song.name,
         song.originalArtist ?: song.artist, song.album, song.durationMs).joinToString("\u0000")
-    fun candidateId(candidate: SearchVideoItem): String = candidate.bvid.ifBlank { "av${candidate.aid}" }
+    fun candidateId(candidate: SearchVideoItem): String = if (candidate.aid > 0) "av${candidate.aid}" else candidate.bvid
     private fun now() = System.nanoTime() / 1_000_000
 
     @Synchronized fun previous(song: SongItem): SearchVideoItem? {
@@ -31,5 +31,6 @@ internal object NeteaseAutoSourceState {
 }
 
 internal fun shouldCoolDownAutoSource(cacheKey: String?, reason: String): Boolean =
-    cacheKey?.startsWith("bili-auto-") == true && !reason.endsWith("offline_cache") &&
+    (cacheKey?.startsWith("bili-auto-") == true ||
+        (cacheKey?.startsWith("match-") == true && cacheKey.contains("-bili-auto-"))) && !reason.endsWith("offline_cache") &&
         (reason.startsWith("playback_error_") || reason.startsWith("startup_stall_") || reason.startsWith("runtime_stall_"))

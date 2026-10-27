@@ -83,4 +83,61 @@ class SourceMatchRoomStoreTest {
             assertEquals(2, store.matches(subject).size)
         } finally { db.close() }
     }
+
+    @Test fun automaticCacheReopensAndExpires() = runTest {
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        val file = "auto-match-test.db"
+        context.deleteDatabase(file)
+        var time = 1_000L
+        var db = Room.databaseBuilder(context, NeriUserDataDatabase::class.java, file).allowMainThreadQueries().build()
+        try {
+            val first = SourceMatchRoomStore(db) { time }
+            first.observe(subject, candidate)
+            assertTrue(first.automaticMatches(subject).isEmpty()) // A discovery/probe is not a successful auto resolution.
+            val resolved = first.rememberAutomatic(subject, candidate, first.decisionStamp(subject, candidate.key))!!
+            val resolvedAt = requireNotNull(resolved.automaticResolvedAt)
+            db.close()
+            db = Room.databaseBuilder(context, NeriUserDataDatabase::class.java, file).allowMainThreadQueries().build()
+            val reopened = SourceMatchRoomStore(db) { time }
+            assertEquals(resolved.id, reopened.automaticMatches(subject).single().id)
+            assertEquals(resolved.id, reopened.match(subject, candidate.key)?.id)
+            time += 5_000
+            reopened.observe(subject, candidate)
+            assertEquals(resolved.automaticResolvedAt, reopened.automaticMatches(subject).single().automaticResolvedAt)
+            assertTrue(reopened.automaticMatches(subject.copy(name = "另一首歌")).isEmpty())
+            time = resolvedAt - 1 // Wall-clock rollback cannot extend trust.
+            assertTrue(reopened.automaticMatches(subject).isEmpty())
+            time = resolvedAt + 24 * 60 * 60_000L
+            assertTrue(reopened.automaticMatches(subject).isEmpty())
+            assertEquals(1, reopened.matches(subject).size) // Expiry preserves the observation and all user data.
+        } finally { db.close(); context.deleteDatabase(file) }
+    }
+
+    @Test fun staleAutomaticWorkCannotUndoResetRejectionOrNewerSuccess() = runTest {
+        val db = Room.inMemoryDatabaseBuilder(ApplicationProvider.getApplicationContext<Context>(),
+            NeriUserDataDatabase::class.java).allowMainThreadQueries().build()
+        var time = 1_000L
+        try {
+            val store = SourceMatchRoomStore(db) { time }
+            val stamp = store.decisionStamp(subject, candidate.key)
+            val old = store.rememberAutomatic(subject, candidate, stamp)!!
+            time++
+            val fresh = store.rememberAutomatic(subject, candidate, stamp)!!
+            store.invalidateAutomatic(subject, old)
+            assertEquals(fresh.automaticResolvedAt, store.automaticMatches(subject).single().automaticResolvedAt)
+            store.clear(subject, candidate.key)
+            assertTrue(store.automaticMatches(subject).isEmpty())
+            assertNull(store.rememberAutomatic(subject, candidate, stamp))
+            val resetStamp = store.decisionStamp(subject, candidate.key)
+            store.decide(subject, candidate, SourceMatchDecision.REJECTED)
+            assertNull(store.rememberAutomatic(subject, candidate, resetStamp))
+            store.invalidateAutomatic(subject, fresh)
+            assertTrue(store.isRejected(subject, candidate.key))
+            assertTrue(store.automaticMatches(subject).isEmpty())
+            assertNull(store.rememberAutomatic(subject, candidate.copy(key = candidate.key.copy(subResourceId = "12"),
+                metadata = candidate.metadata.copy(title = "晴天 Live")),
+                SourceDecisionStamp()))
+            assertNull(store.rememberAutomatic(subject, candidate.copy(key = SongSourceKey("kuwo", "9")), SourceDecisionStamp()))
+        } finally { db.close() }
+    }
 }

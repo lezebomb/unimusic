@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="moe.ouom.neriplayer.data.unified.SourceMatchRoomStoreTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-10-27T01:28:26.827Z" hostname="XUSHAOYANG" time="5.516">
+  <properties/>
+  <testcase name="confirmationCannotGrantCatalogRightsOrOverrideVersionConflicts" classname="moe.ouom.neriplayer.data.unified.SourceMatchRoomStoreTest" time="4.484"/>
+  <testcase name="changedMetadataRequiresExplicitReconfirmationAndPartsRemainDistinct" classname="moe.ouom.neriplayer.data.unified.SourceMatchRoomStoreTest" time="0.101"/>
+  <testcase name="staleAutomaticWorkCannotUndoResetRejectionOrNewerSuccess" classname="moe.ouom.neriplayer.data.unified.SourceMatchRoomStoreTest" time="0.088"/>
+  <testcase name="decisionSurvivesReopenAndOldObservation" classname="moe.ouom.neriplayer.data.unified.SourceMatchRoomStoreTest" time="0.092"/>
+  <testcase name="automaticCacheReopensAndExpires" classname="moe.ouom.neriplayer.data.unified.SourceMatchRoomStoreTest" time="0.109"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

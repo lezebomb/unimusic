@@ -1,0 +1,79 @@
+{
+  "date": "2026-10-27",
+  "phase": "2I",
+  "base_commit": "0c4df84428de4cf73eb2d79097feecbe74dc652a",
+  "room_version": 23,
+  "test_suites": [
+    {
+      "name": "moe.ouom.neriplayer.data.unified.SourceMatchRoomStoreTest",
+      "tests": "5",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "name": "moe.ouom.neriplayer.core.player.resolver.netease.BiliRecordingMatchTest",
+      "tests": "7",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "name": "moe.ouom.neriplayer.core.player.resolver.netease.PlayerManagerNeteaseAutoSourceSwitchTest",
+      "tests": "3",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    }
+  ],
+  "tests_passed": 15,
+  "new_test_methods": 2,
+  "build": {
+    "result": "passed",
+    "log": "build/unimusic-toolchain/phase2i-final.log",
+    "elapsed_seconds": 70,
+    "apk_path": "D:\\unimusic\\app\\build\\outputs\\apk\\debug\\app-debug.apk",
+    "apk_size_bytes": 62634890,
+    "apk_sha256": "6bb2d79408e605afe41c14db56fd399fe92050956493524638cd25341aaeedec"
+  },
+  "initial_attempt": {
+    "log": "build/unimusic-toolchain/phase2i-validation.log",
+    "result": "failed",
+    "reason": "Robolectric SQLiteCantOpenDatabaseException in new disk reopen test; shortening the test method name fixed it, consistent with the known Windows temporary-path limit. Production DB settings unchanged."
+  },
+  "boundaries": {
+    "result": "passed",
+    "log": "build/unimusic-toolchain/phase2i-boundaries.log"
+  },
+  "external_verification": {
+    "api_docs": "https://music-api.gdstudio.xyz/api.php",
+    "docs_http_status": 200,
+    "docs_update_date": "2026-09-16",
+    "advertised_available_sources": [
+      "netease",
+      "joox",
+      "bilibili"
+    ],
+    "audio_url_request_performed": false,
+    "audio_download_or_playback_performed": false,
+    "upstream_releases": "https://github.com/UnblockNeteaseMusic/server/releases",
+    "docs_sha256": "0aab374f63ba91ec745119fc3d6432ff85ae22dba292e62edf7b80d6ac538864"
+  },
+  "not_performed": [
+    "phone/emulator install or playback",
+    "real account verification",
+    "live source failover latency or first sound measurement",
+    "audio fingerprint or manually annotated original-singer accuracy",
+    "GD Studio or Kuwo audio adapter integration"
+  ],
+  "prior_ci": {
+    "run": 40428919546,
+    "result": "success",
+    "commit": "0c4df84428de4cf73eb2d79097feecbe74dc652a"
+  },
+  "intermediate_validation": {
+    "result": "passed",
+    "log": "build/unimusic-toolchain/phase2i-validation-retry.log",
+    "note": "15 tests and APK passed after shortening the disk test name; exact cache SQL and key refresh subsequently changed and revalidated in final log."
+  }
+}

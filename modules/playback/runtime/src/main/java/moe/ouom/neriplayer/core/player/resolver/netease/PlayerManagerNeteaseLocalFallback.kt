@@ -22,12 +22,13 @@ import moe.ouom.neriplayer.core.player.policy.source.RecordingMetadata
 import moe.ouom.neriplayer.data.unified.SourceMatchBackend
 import moe.ouom.neriplayer.data.unified.sourceCandidateForSong
 import moe.ouom.neriplayer.data.model.unified.SourceMatchDecision
+import moe.ouom.neriplayer.core.player.url.RememberedSourceState
 
 internal const val NETEASE_LOCAL_FALLBACK_DURATION_TOLERANCE_MS = 8_000L
 
 internal suspend fun PlayerManager.tryResolveNeteaseMatchedLocalSource(song: SongItem,
-    explicitCandidate: SongItem? = null): SongUrlResult? {
-    if (explicitCandidate == null && !neteaseLocalSourceFallbackEnabled) return null
+    explicitCandidate: SongItem? = null, automatic: Boolean = explicitCandidate == null): SongUrlResult? {
+    if (automatic && !neteaseLocalSourceFallbackEnabled) return null
 
     val localSongs = localRepo.playlists.value.flatMap { it.songs }
     val candidates = selectNeteaseLocalFallbackCandidates(song, explicitCandidate?.let(::listOf) ?: localSongs)
@@ -36,14 +37,20 @@ internal suspend fun PlayerManager.tryResolveNeteaseMatchedLocalSource(song: Son
     for (candidate in candidates) {
         val descriptor = sourceCandidateForSong(candidate) ?: continue
         val matchBackend = SourceMatchBackend(application)
-        if (matchBackend.isRejected(song, descriptor.key)) continue
+        val stamp = matchBackend.decisionStamp(song, descriptor.key)
+        if (stamp.decision == SourceMatchDecision.REJECTED) continue
         val localMediaUri = PlayerDependencies.downloads.resolvePermittedLocalPlaybackUri(
             context = application,
             song = candidate,
             rawLocalReference = localMediaSource(candidate)
         ) ?: continue
         if (!isReadableLocalMediaUri(localMediaUri)) continue
-        if (matchBackend.observe(song, descriptor).decision == SourceMatchDecision.REJECTED) continue
+        if (automatic && !neteaseLocalSourceFallbackEnabled) return null
+        if (stamp != matchBackend.decisionStamp(song, descriptor.key)) continue
+        val observed = if (automatic) matchBackend.rememberAutomatic(song, descriptor, stamp) ?: continue
+            else matchBackend.observe(song, descriptor)
+        if (observed.decision == SourceMatchDecision.REJECTED ||
+            (automatic && RememberedSourceState.cooldown.cooling(song.stableKey(), observed.id))) continue
         val playableUrl = toPlayableLocalUrl(localMediaUri) ?: localMediaUri
         NPLogger.w(
             "NERI-PlayerManager",
@@ -54,8 +61,11 @@ internal suspend fun PlayerManager.tryResolveNeteaseMatchedLocalSource(song: Son
         val playableAudioInfo = runCatching { playableUrl.toUri() }.getOrNull()
             ?.let { buildLocalPlaybackAudioInfo(it, application) }
             ?: PlaybackAudioInfo(source = PlaybackAudioSource.LOCAL)
+        if (automatic && !neteaseLocalSourceFallbackEnabled) return null
+        if (stamp != matchBackend.decisionStamp(song, descriptor.key)) continue
         return SongUrlResult.Success(
             url = playableUrl,
+            cacheKeyOverride = if (automatic) "match-${observed.id}-local" else null,
             audioInfo = playableAudioInfo.copy(isNeteaseLocalFallback = true),
             isNeteaseLocalFallback = true
         )

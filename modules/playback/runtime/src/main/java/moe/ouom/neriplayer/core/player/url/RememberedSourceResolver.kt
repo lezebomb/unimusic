@@ -10,6 +10,7 @@ import moe.ouom.neriplayer.core.player.resolver.netease.resolveStrictBiliSource
 import moe.ouom.neriplayer.core.player.resolver.netease.recordingMetadata
 import moe.ouom.neriplayer.core.player.resolver.netease.biliRecordingMetadata
 import moe.ouom.neriplayer.core.player.resolver.netease.tryResolveNeteaseMatchedLocalSource
+import moe.ouom.neriplayer.core.player.resolver.netease.NeteaseAutoSourceState
 import moe.ouom.neriplayer.core.player.runtime.refresh.RefreshResolverSideEffects
 import moe.ouom.neriplayer.data.identity.stableKey
 import moe.ouom.neriplayer.data.model.SongItem
@@ -17,6 +18,7 @@ import moe.ouom.neriplayer.data.model.bilibili.search.SearchVideoItem
 import moe.ouom.neriplayer.data.model.playback.SongUrlResult
 import moe.ouom.neriplayer.data.model.unified.RecordingSourceCandidate
 import moe.ouom.neriplayer.data.model.unified.SourceMatchDecision
+import moe.ouom.neriplayer.data.model.unified.RecordingSourceMatch
 import moe.ouom.neriplayer.data.unified.SourceMatchBackend
 import moe.ouom.neriplayer.data.unified.sourceCandidateForSong
 import moe.ouom.neriplayer.platform.youtube.api.transport.buildYouTubeMusicMediaUri
@@ -35,40 +37,87 @@ internal object RememberedSourceState {
 }
 
 internal suspend fun PlayerManager.tryResolveRememberedSource(unifiedSongId: String, song: SongItem,
-    sideEffects: RefreshResolverSideEffects): SongUrlResult.Success? {
+    sideEffects: RefreshResolverSideEffects): SongUrlResult.Success? =
+    tryResolveStoredSource(song, sideEffects, unifiedSongId)
+
+/** Runs only after the original source failed; never promotes a search result or explicit probe. */
+internal suspend fun PlayerManager.tryResolveAutomaticSource(song: SongItem,
+    sideEffects: RefreshResolverSideEffects, local: Boolean, online: Boolean): SongUrlResult.Success? =
+    tryResolveStoredSource(song, sideEffects, null, buildSet {
+        if (local) add("local")
+        if (online) add("bilibili")
+    })
+
+private fun PlayerManager.automaticSourceEnabled(provider: String): Boolean = when (provider) {
+    "local" -> neteaseLocalSourceFallbackEnabled
+    "bilibili" -> neteaseAutoSourceSwitchEnabled && isPlaybackNetworkUsable(application)
+    else -> false
+}
+
+private fun coolAutomaticBili(song: SongItem, match: RecordingSourceMatch) {
+    if (match.candidate.key.provider == "bilibili" && RememberedSourceState.cooldown.cooling(song.stableKey(), match.id)) {
+        // Do not spend another network request on the same failed physical source during discovery.
+        NeteaseAutoSourceState.cooldown.reject(NeteaseAutoSourceState.key(song), "av${match.candidate.key.resourceId}")
+    }
+}
+
+private suspend fun PlayerManager.tryResolveStoredSource(song: SongItem, sideEffects: RefreshResolverSideEffects,
+    unifiedSongId: String?, allowedAutomaticProviders: Set<String> = emptySet()): SongUrlResult.Success? {
     try {
         val backend = SourceMatchBackend(application)
-        val confirmed = backend.matches(unifiedSongId, song).filter { it.current && it.decision == SourceMatchDecision.CONFIRMED }
-        if (confirmed.isEmpty()) return null
+        val automatic = unifiedSongId == null
+        val stored = if (automatic) backend.automaticMatches(song).filter {
+            it.candidate.key.provider in allowedAutomaticProviders && automaticSourceEnabled(it.candidate.key.provider) }
+            else backend.matches(requireNotNull(unifiedSongId), song).filter { it.current && it.decision == SourceMatchDecision.CONFIRMED }
+        if (automatic) stored.forEach { coolAutomaticBili(song, it) }
+        val matches = if (automatic) stored.filterNot { RememberedSourceState.cooldown.cooling(song.stableKey(), it.id) }.take(2)
+            else stored
+        if (matches.isEmpty()) return null
         val candidates = flow {
-            confirmed.forEach { match ->
+            matches.forEach { match ->
                 val provider = match.candidate.key.provider
                 val allowed = (provider == "local" || isPlaybackNetworkUsable(application)) &&
                     (provider != "youtube_music" || YouTubeFeatureGate.isEnabled())
                 emit(PlaybackSourceCandidate(match.id, allowed) {
                     val session = sourceResolutionSession(provider)
-                    val attempt = try { resolveSourceCandidate(song, match.candidate, sideEffects) }
+                    val attempt = try { resolveSourceCandidate(song, match.candidate, sideEffects, automatic) }
                     catch (cancelled: CancellationException) { throw cancelled }
                     catch (network: java.io.IOException) { throw network }
                     catch (_: Exception) { SourceAttempt.Rejected(SourceFailure.UNAVAILABLE) }
                     // A rejection/reset while the network was in flight must win over the old result.
-                    val current = backend.matches(unifiedSongId, song).any { it.id == match.id && it.revision == match.revision &&
-                        it.current && it.decision == SourceMatchDecision.CONFIRMED }
+                    val refreshed = backend.match(song, match.candidate.key)
+                    val current = refreshed != null && refreshed.id == match.id && refreshed.songId == match.songId &&
+                        refreshed.revision == match.revision && refreshed.current &&
+                        refreshed.decision == (if (automatic) SourceMatchDecision.NONE else SourceMatchDecision.CONFIRMED)
+                    if (automatic && attempt is SourceAttempt.Rejected) {
+                        if (attempt.reason in setOf(SourceFailure.NO_MATCH, SourceFailure.NO_PERMISSION,
+                                SourceFailure.PREVIEW_ONLY, SourceFailure.UNAVAILABLE)) backend.invalidateAutomatic(song, match)
+                        RememberedSourceState.cooldown.reject(song.stableKey(), match.id)
+                        coolAutomaticBili(song, match)
+                    }
                     if (session != sourceResolutionSession(provider)) SourceAttempt.Rejected(SourceFailure.AUTH_REQUIRED)
+                    else if (automatic && !automaticSourceEnabled(provider)) SourceAttempt.Rejected(SourceFailure.NO_PERMISSION)
                     else if (provider != "local" && !isPlaybackNetworkUsable(application)) SourceAttempt.Rejected(SourceFailure.NETWORK)
                     else if (!current) SourceAttempt.Rejected(SourceFailure.NO_MATCH)
                     else when (attempt) {
                         is SourceAttempt.Ready -> SourceAttempt.Ready(attempt.value.copy(
-                            cacheKeyOverride = "match-${match.id}-${attempt.value.cacheKeyOverride ?: provider}"))
+                            cacheKeyOverride = attempt.value.cacheKeyOverride?.takeIf { it.startsWith("match-${match.id}-") }
+                                ?: "match-${match.id}-${attempt.value.cacheKeyOverride ?: provider}"))
                         is SourceAttempt.Rejected -> attempt
                     }
                 })
             }
         }
-        val budget = sourceStageBudgetMs(2_000, 8_000)
+        val budget = if (automatic) sourceStageBudgetMs(1_200, 2_500) else sourceStageBudgetMs(2_000, 8_000)
         if (budget <= 0) return null
-        return PlaybackSourceResolver(RememberedSourceState.cooldown).resolve(song.stableKey(), candidates,
-            totalBudgetMs = budget, candidateBudgetMs = sourceStageBudgetMs(1_500, 4_000).coerceAtLeast(1)).value
+        val result = PlaybackSourceResolver(RememberedSourceState.cooldown).resolve(song.stableKey(), candidates,
+            totalBudgetMs = budget, candidateBudgetMs = (if (automatic) sourceStageBudgetMs(1_000, 2_000)
+                else sourceStageBudgetMs(1_500, 4_000)).coerceAtLeast(1))
+        if (automatic && result.value == null && SourceFailure.TIMEOUT in result.failures) {
+            matches.forEach { RememberedSourceState.cooldown.reject(song.stableKey(), it.id) }
+        }
+        if (automatic) matches.forEach { coolAutomaticBili(song, it) }
+        return result.value
     } catch (cancelled: CancellationException) {
         throw cancelled
     } catch (error: Exception) {
@@ -78,19 +127,19 @@ internal suspend fun PlayerManager.tryResolveRememberedSource(unifiedSongId: Str
 }
 
 internal suspend fun PlayerManager.resolveSourceCandidate(subject: SongItem, candidate: RecordingSourceCandidate,
-    sideEffects: RefreshResolverSideEffects): SourceAttempt<SongUrlResult.Success> {
+    sideEffects: RefreshResolverSideEffects, automatic: Boolean = false): SourceAttempt<SongUrlResult.Success> {
     val source = candidate.key
     val meta = candidate.metadata
     val result: SongUrlResult.Success = when (source.provider) {
         "bilibili" -> {
             val item = SearchVideoItem(source.resourceId.toLong(), "", "", "", "", 0, "", 0, null, null)
-            return resolveStrictBiliSource(subject, item, sideEffects, source.subResourceId.toLong())
+            return resolveStrictBiliSource(subject, item, sideEffects, source.subResourceId.toLong(), automatic)
         }
         "local" -> {
             if (!localRepo.awaitInitialized()) return SourceAttempt.Rejected(SourceFailure.UNAVAILABLE)
             val local = localRepo.playlists.value.asSequence().flatMap { it.songs.asSequence() }
                 .firstOrNull { sourceCandidateForSong(it)?.key == source } ?: return SourceAttempt.Rejected(SourceFailure.UNAVAILABLE)
-            (tryResolveNeteaseMatchedLocalSource(subject, local) as? SongUrlResult.Success)
+            (tryResolveNeteaseMatchedLocalSource(subject, local, automatic) as? SongUrlResult.Success)
                 ?: return SourceAttempt.Rejected(SourceFailure.NO_PERMISSION)
         }
         "netease" -> {

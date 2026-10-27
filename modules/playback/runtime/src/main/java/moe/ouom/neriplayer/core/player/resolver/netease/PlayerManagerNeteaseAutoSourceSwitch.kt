@@ -13,6 +13,8 @@ import moe.ouom.neriplayer.core.player.url.buildBiliPlaybackAudioInfo
 import moe.ouom.neriplayer.core.player.url.buildBiliRepresentationIdentity
 import moe.ouom.neriplayer.core.player.url.inferBiliQualityKey
 import moe.ouom.neriplayer.core.player.url.sourceResolutionSession
+import moe.ouom.neriplayer.core.player.url.RememberedSourceState
+import moe.ouom.neriplayer.data.identity.stableKey
 import moe.ouom.neriplayer.data.model.SongItem
 import moe.ouom.neriplayer.data.model.bilibili.search.SearchVideoItem
 import moe.ouom.neriplayer.data.model.bilibili.playback.BiliAudioStreamInfo
@@ -98,7 +100,8 @@ private suspend fun PlayerManager.fetchBiliAutoSourceCandidates(song: SongItem, 
 }
 
 internal suspend fun PlayerManager.resolveStrictBiliSource(
-    song: SongItem, candidate: SearchVideoItem, sideEffects: RefreshResolverSideEffects, selectedCid: Long? = null
+    song: SongItem, candidate: SearchVideoItem, sideEffects: RefreshResolverSideEffects, selectedCid: Long? = null,
+    automatic: Boolean = selectedCid == null
 ): SourceAttempt<SongUrlResult.Success> {
     try {
         val session = sourceResolutionSession("bilibili")
@@ -106,16 +109,18 @@ internal suspend fun PlayerManager.resolveStrictBiliSource(
             else biliClient.getVideoBasicInfoByAvid(candidate.aid)
         if ((candidate.aid > 0 && info.aid != candidate.aid) ||
             (candidate.bvid.isNotBlank() && info.bvid != candidate.bvid)) return SourceAttempt.Rejected(SourceFailure.NO_MATCH)
-        // First-time automatic switching cannot infer the singer merely from a title mention.
-        // Explicit CID selection comes only from remembered/user-requested source choices.
-        if (selectedCid == null && !hasBiliUploaderArtistEvidence(song.originalArtist ?: song.artist, info.ownerName)) {
+        // Cached automatic mappings must satisfy the same artist evidence as first discovery.
+        // A remembered CID is not equivalent to explicit user confirmation.
+        if (automatic && (!neteaseAutoSourceSwitchEnabled ||
+                !hasBiliUploaderArtistEvidence(song.originalArtist ?: song.artist, info.ownerName))) {
             return SourceAttempt.Rejected(SourceFailure.NO_MATCH)
         }
         val selection = selectStrictBiliPage(song, info, candidate.titlePlain, selectedCid)
         val page = selection.page ?: return SourceAttempt.Rejected(selection.rejection ?: SourceFailure.NO_MATCH)
         val matchBackend = SourceMatchBackend(application)
         val sourceKey = SongSourceKey("bilibili", info.aid.toString(), page.cid.toString())
-        if (matchBackend.isRejected(song, sourceKey)) return SourceAttempt.Rejected(SourceFailure.NO_MATCH)
+        val stamp = matchBackend.decisionStamp(song, sourceKey)
+        if (stamp.decision == SourceMatchDecision.REJECTED) return SourceAttempt.Rejected(SourceFailure.NO_MATCH)
         val playInfo = biliClient.getPlayInfoByBvid(info.bvid, page.cid, PlayOptions(tryLook = 0))
         biliAutoSourceAccessFailure(playInfo, song.durationMs)?.let { return SourceAttempt.Rejected(it) }
         val available = with(biliClient) { playInfo.toAudioStreamInfos() }
@@ -126,17 +131,30 @@ internal suspend fun PlayerManager.resolveStrictBiliSource(
         val expected = song.recordingMetadata()
         val title = if (info.pages.size == 1 && page.part.matches(Regex("(?i)(?:p?1|正片|视频|音频|默认|video|audio)"))) info.title else page.part
         val metadata = biliRecordingMetadata(expected, title, "${info.title} ${page.part}", info.ownerName, duration)
-        val observed = matchBackend.observe(song, RecordingSourceCandidate(sourceKey,
-            UnifiedSongMetadata(metadata.title, metadata.artist, metadata.versionContext, metadata.durationMs)))
-        if (observed.decision == SourceMatchDecision.REJECTED) return SourceAttempt.Rejected(SourceFailure.NO_MATCH)
         if (session != sourceResolutionSession("bilibili")) return SourceAttempt.Rejected(SourceFailure.AUTH_REQUIRED)
+        if (automatic && !neteaseAutoSourceSwitchEnabled) return SourceAttempt.Rejected(SourceFailure.NO_PERMISSION)
+        if (stamp != matchBackend.decisionStamp(song, sourceKey)) return SourceAttempt.Rejected(SourceFailure.NO_MATCH)
+        val descriptor = RecordingSourceCandidate(sourceKey,
+            UnifiedSongMetadata(metadata.title, metadata.artist, metadata.versionContext, metadata.durationMs))
+        val observed = if (automatic) matchBackend.rememberAutomatic(song, descriptor, stamp)
+            ?: return SourceAttempt.Rejected(SourceFailure.NO_MATCH)
+            else matchBackend.observe(song, descriptor)
+        if (observed.decision == SourceMatchDecision.REJECTED) return SourceAttempt.Rejected(SourceFailure.NO_MATCH)
+        if (automatic && RememberedSourceState.cooldown.cooling(song.stableKey(), observed.id)) {
+            return SourceAttempt.Rejected(SourceFailure.UNAVAILABLE)
+        }
+        if (session != sourceResolutionSession("bilibili")) return SourceAttempt.Rejected(SourceFailure.AUTH_REQUIRED)
+        if (automatic && !neteaseAutoSourceSwitchEnabled) return SourceAttempt.Rejected(SourceFailure.NO_PERMISSION)
+        if (stamp != matchBackend.decisionStamp(song, sourceKey)) return SourceAttempt.Rejected(SourceFailure.NO_MATCH)
         sideEffects.updateDuration { maybeUpdateSongDuration(song, duration) }
         return SourceAttempt.Ready(SongUrlResult.Success(
             url = stream.url, candidateUrls = stream.candidateUrls, durationMs = duration,
             mimeType = stream.mimeType,
             audioInfo = buildBiliPlaybackAudioInfo(stream, available) { getLocalizedString(it) },
             representationIdentity = buildBiliRepresentationIdentity(stream),
-            cacheKeyOverride = buildNeteaseAutoBiliCacheKey(info.bvid, page.cid, stream)
+            cacheKeyOverride = buildNeteaseAutoBiliCacheKey(info.bvid, page.cid, stream).let {
+                if (automatic) "match-${observed.id}-$it" else it
+            }
         ))
     } catch (cancelled: CancellationException) {
         throw cancelled
