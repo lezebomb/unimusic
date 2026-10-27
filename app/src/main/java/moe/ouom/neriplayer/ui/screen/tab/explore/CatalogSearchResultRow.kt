@@ -35,7 +35,9 @@ import moe.ouom.neriplayer.util.format.formatDuration
 import moe.ouom.neriplayer.util.platform.tryStartActivity
 
 @Composable
-internal fun CatalogSearchResultRow(track: CatalogTrack) {
+internal fun CatalogSearchResultRow(track: CatalogTrack,
+    check: moe.ouom.neriplayer.data.model.unified.SourceCheckResult? = null,
+    onPlay: (CatalogTrack) -> Unit = {}) {
     val context = LocalContext.current
     val metadata = track.metadata
     val pageUrl = catalogExternalPageUrl(track)
@@ -90,12 +92,23 @@ internal fun CatalogSearchResultRow(track: CatalogTrack) {
         }
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
-                text = "${stringResource(CoreCommonR.string.explore_catalog_kuwo)} · " +
-                    stringResource(CoreCommonR.string.explore_catalog_metadata_only),
+                text = (if (track.source.provider == "qqmusic") "QQ 音乐" else stringResource(CoreCommonR.string.explore_catalog_kuwo)) +
+                    " · " + when (check?.takeIf { System.currentTimeMillis() - it.checkedAtMillis in 0..120_000 }?.status) {
+                        moe.ouom.neriplayer.data.model.unified.SourceCheckStatus.ADDRESS_RESOLVED -> "音频地址已校验"
+                        moe.ouom.neriplayer.data.model.unified.SourceCheckStatus.AUTH_REQUIRED -> "需要登录"
+                        moe.ouom.neriplayer.data.model.unified.SourceCheckStatus.NO_PERMISSION -> "当前无完整播放权限"
+                        moe.ouom.neriplayer.data.model.unified.SourceCheckStatus.TIMED_OUT -> "校验超时，可重试"
+                        null -> "播放时检查完整音频权限"
+                        else -> "暂不可用，可重试"
+                    },
                 modifier = Modifier.weight(1f),
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
+            HapticTextButton(onClick = { onPlay(track) }, enabled =
+                moe.ouom.neriplayer.data.model.unified.MusicSourceRegistry.canResolveAudio(track.source)) {
+                Text("播放")
+            }
             HapticTextButton(
                 enabled = pageUrl != null,
                 onClick = {
@@ -111,7 +124,7 @@ internal fun CatalogSearchResultRow(track: CatalogTrack) {
                     }
                 }
             ) {
-                Text(stringResource(CoreCommonR.string.explore_catalog_view_on_kuwo))
+                Text(if (track.source.provider == "qqmusic") "QQ 音乐官网" else stringResource(CoreCommonR.string.explore_catalog_view_on_kuwo))
             }
         }
     }

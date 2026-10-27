@@ -8,6 +8,7 @@ import moe.ouom.neriplayer.platform.youtube.config.YouTubeFeatureGate
 internal fun sourceResolutionSession(provider: String): Any {
     val repositories = PlayerDependencies.repositories
     return when (provider) {
+        "qqmusic" -> repositories.qqMusicAuthRepo.generation()
         "netease", "gdstudio_netease" -> repositories.neteaseClient.searchSessionIdentity()
         "bilibili" -> repositories.biliCookieRepo.cookieFlow.value.let { cookies ->
             listOf(cookies["DedeUserID"], cookies["SESSDATA"], cookies["bili_jct"])

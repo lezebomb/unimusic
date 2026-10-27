@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="moe.ouom.neriplayer.core.player.policy.source.AutomaticCatalogChoiceTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-10-27T04:58:41.157Z" hostname="XUSHAOYANG" time="0.163">
+  <properties/>
+  <testcase name="readyFirstButNeverAheadOfRecordingGatesOrUserRejection" classname="moe.ouom.neriplayer.core.player.policy.source.AutomaticCatalogChoiceTest" time="0.157"/>
+  <testcase name="wrongRecordingNeverWinsAndDuplicateEvidenceNeedsDisambiguation" classname="moe.ouom.neriplayer.core.player.policy.source.AutomaticCatalogChoiceTest" time="0.003"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

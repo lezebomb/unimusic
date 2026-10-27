@@ -961,7 +961,10 @@ fun ExploreScreen(
                                     key = { _, item -> item.stableKey }
                                 ) { index, item ->
                                     when (item) {
-                                        is ExploreSearchResult.Catalog -> CatalogSearchResultRow(item.track)
+                                        is ExploreSearchResult.Catalog -> CatalogSearchResultRow(item.track,
+                                            check = ui.nativeSourceChecks[item.track.source]) { track ->
+                                            moe.ouom.neriplayer.data.unified.catalogPlaybackSong(track)?.let { onSongClick(listOf(it), 0) }
+                                        }
                                         is ExploreSearchResult.Song -> {
                                             val song = item.song
                                             val songListIndex = ui.searchResults.indexOfFirst {

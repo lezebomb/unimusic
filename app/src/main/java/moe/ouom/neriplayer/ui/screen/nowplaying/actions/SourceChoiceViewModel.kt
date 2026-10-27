@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import moe.ouom.neriplayer.core.di.AppContainer
+import moe.ouom.neriplayer.core.player.resolver.netease.recordingMetadata
 import moe.ouom.neriplayer.core.player.PlayerManager
 import moe.ouom.neriplayer.core.player.url.checkSourceAvailability
 import moe.ouom.neriplayer.data.model.SongItem
@@ -54,9 +55,10 @@ internal class SourceChoiceViewModel(application: Application) : AndroidViewMode
                 AppContainer.biliCookieRepo.cookieFlow,
                 AppContainer.neteaseCookieRepo.cookieFlow,
                 AppContainer.youtubeAuthRepo.authFlow,
-                AppContainer.settingsRepo.youtubeEnabledFlow
-            ) { bili, netease, youtube, enabled ->
-                sourceChoiceSession(bili, netease, youtube, enabled)
+                AppContainer.settingsRepo.youtubeEnabledFlow,
+                AppContainer.qqMusicAuthRepo.state
+            ) { bili, netease, youtube, enabled, _ ->
+                sourceChoiceSession(bili, netease, youtube, enabled).copy(qqRevision = AppContainer.qqMusicAuthRepo.generation())
             }.distinctUntilChanged().collect { current ->
                 youtubeEnabled = current.youtubeEnabled
                 if (account != current) {
@@ -106,6 +108,18 @@ internal class SourceChoiceViewModel(application: Application) : AndroidViewMode
                         result.offline -> SourceChoiceNotice.OFFLINE
                         else -> null
                     })
+                // Probe at most one unambiguous native candidate per provider, never the whole list.
+                for (provider in listOf("qqmusic", "kuwo")) {
+                    val candidate = moe.ouom.neriplayer.core.player.policy.source.automaticCatalogChoice(
+                        song.recordingMetadata(), result.candidates.filter { it.key.provider == provider }.map {
+                            moe.ouom.neriplayer.data.model.unified.CatalogTrack(it.key, it.metadata, null) }, null) ?: continue
+                    if (!isCurrent(token, session)) return@launch
+                    val checked = kotlinx.coroutines.withTimeoutOrNull(2_600) {
+                        PlayerManager.checkSourceAvailability(song, candidate)
+                    } ?: SourceCheckResult(SourceCheckStatus.TIMED_OUT, System.currentTimeMillis())
+                    if (!isCurrent(token, session)) return@launch
+                    _state.value = _state.value.copy(checks = _state.value.checks + (candidate.key to checked))
+                }
             } catch (cancelled: CancellationException) {
                 throw cancelled
             } catch (_: Exception) {
@@ -177,5 +191,5 @@ internal class SourceChoiceViewModel(application: Application) : AndroidViewMode
         AppContainer.neteaseCookieRepo.cookieFlow.value,
         AppContainer.youtubeAuthRepo.authFlow.value,
         youtubeEnabled
-    )
+    ).copy(qqRevision = AppContainer.qqMusicAuthRepo.generation())
 }

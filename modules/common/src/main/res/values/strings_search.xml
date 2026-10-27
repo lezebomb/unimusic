@@ -5,7 +5,7 @@
     <string name="explore_source_login">待登录</string>
     <string name="explore_source_disabled">未开启</string>
     <string name="explore_source_unavailable">暂不可用</string>
-    <string name="explore_aggregate_hint">一次搜索本地、网易云、B 站、已开启的 YouTube 和酷我歌曲目录。酷我仅提供歌曲信息，可前往酷我查看。</string>
+    <string name="explore_aggregate_hint">聚合搜索本地、网易云、QQ音乐、酷我、B站及已开启的 YouTube。结果先显示，再限量校验音频；同等相关和版本下，地址校验成功的结果优先，仍以当前账号权限为准。</string>
     <string name="explore_aggregate_retry">部分来源暂不可用，点击重试</string>
     <string name="explore_catalog_kuwo">酷我</string>
     <string name="explore_catalog_metadata_only">仅歌曲信息</string>

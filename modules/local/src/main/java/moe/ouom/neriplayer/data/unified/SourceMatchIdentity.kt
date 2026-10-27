@@ -11,6 +11,10 @@ import moe.ouom.neriplayer.data.sync.identity.normalizedSubAudioId
 import moe.ouom.neriplayer.platform.youtube.api.transport.extractYouTubeMusicVideoId
 
 fun sourceCandidateForSong(song: SongItem): RecordingSourceCandidate? {
+    if (song.channelId in setOf("qqmusic", "kuwo") && song.streamUrl.isNullOrBlank()) {
+        val key = SongSourceKey(requireNotNull(song.channelId), song.audioId.orEmpty())
+        return key.takeIf(MusicSourceRegistry::validKey)?.let { RecordingSourceCandidate(it, sourceMatchMetadata(song)) }
+    }
     val key = if (LocalSongSupport.isLocalSong(song)) {
         val reference = LocalSongSupport.identityMediaReference(song) ?: return null
         SongSourceKey("local", UUID.nameUUIDFromBytes("${song.stableKey()}\u0000$reference".toByteArray()).toString())

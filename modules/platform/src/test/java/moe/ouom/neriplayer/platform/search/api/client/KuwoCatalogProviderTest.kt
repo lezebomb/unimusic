@@ -40,6 +40,7 @@ class KuwoCatalogProviderTest {
         assertEquals(listOf("1", "2"), page.tracks.map { it.source.resourceId })
         assertEquals("晴天 Live", page.tracks.first().metadata.title)
         assertEquals("A&B", page.tracks.first().metadata.artist)
+        assertEquals("Dan Gibson's Solitudes", decodeCatalogMetadataText("Dan Gibson&apos;s Solitudes"))
         assertEquals(269_000L, page.tracks.first().metadata.durationMs)
         assertEquals(0L, page.tracks.last().metadata.durationMs)
         assertEquals("C&D", page.tracks.last().metadata.artist)

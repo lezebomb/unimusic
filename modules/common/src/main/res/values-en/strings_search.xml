@@ -5,7 +5,7 @@
     <string name="explore_source_login">Sign in required</string>
     <string name="explore_source_disabled">Disabled</string>
     <string name="explore_source_unavailable">Unavailable</string>
-    <string name="explore_aggregate_hint">Search local files, NetEase, Bilibili, enabled YouTube and the Kuwo song catalog together. Kuwo provides song information only; open its page to view more.</string>
+    <string name="explore_aggregate_hint">Search local files, NetEase, QQ Music, Kuwo, Bilibili and enabled YouTube together. Results appear immediately with limited background audio checks. Verified addresses rank first among similarly relevant versions; account permissions still apply.</string>
     <string name="explore_aggregate_retry">Some sources are unavailable. Tap to retry</string>
     <string name="explore_catalog_kuwo">Kuwo</string>
     <string name="explore_catalog_metadata_only">Song information only</string>

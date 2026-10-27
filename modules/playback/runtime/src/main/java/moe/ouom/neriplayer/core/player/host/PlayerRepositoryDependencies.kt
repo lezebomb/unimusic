@@ -24,6 +24,10 @@ import moe.ouom.neriplayer.platform.youtube.repository.YouTubeMusicPlaybackRepos
 import okhttp3.OkHttpClient
 
 interface PlayerRepositoryDependencies {
+    val qqMusicAuthRepo: moe.ouom.neriplayer.platform.qqmusic.auth.QQMusicAuthRepository
+    val qqMusicAudioClient: moe.ouom.neriplayer.platform.qqmusic.api.QQMusicAudioClient
+    val kuwoAudioClient: moe.ouom.neriplayer.platform.kuwo.api.KuwoAudioClient
+    val kuwoCatalogProvider: moe.ouom.neriplayer.platform.search.api.client.KuwoCatalogProvider
     val settingsRepo: SettingsRepository
     val biliCookieRepo: BiliCookieRepository
     val neteaseCookieRepo: NeteaseCookieRepository

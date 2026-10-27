@@ -1,0 +1,197 @@
+{
+  "date": "2026-10-27",
+  "phase": "2L",
+  "base_commit": "cdb15b90c06e9cd0c52a54cf98e161497df435c9",
+  "room_version": 23,
+  "jvm_checks_passed": 26,
+  "jvm_suites": [
+    {
+      "name": "moe.ouom.neriplayer.core.player.policy.source.AutomaticCatalogChoiceTest",
+      "tests": "2",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "name": "moe.ouom.neriplayer.core.player.policy.source.SourceAvailabilityCheckerTest",
+      "tests": "3",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "name": "moe.ouom.neriplayer.data.unified.SourceMatchRoomStoreTest",
+      "tests": "5",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "name": "moe.ouom.neriplayer.platform.kuwo.api.KuwoAudioClientTest",
+      "tests": "2",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "name": "moe.ouom.neriplayer.platform.kuwo.api.NativeCatalogNetworkSmokeTest",
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "name": "moe.ouom.neriplayer.platform.qqmusic.api.QQMusicAudioClientTest",
+      "tests": "2",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "name": "moe.ouom.neriplayer.platform.qqmusic.auth.QQMusicAuthRepositoryTest",
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "name": "moe.ouom.neriplayer.platform.search.api.client.KuwoCatalogProviderTest",
+      "tests": "3",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "name": "moe.ouom.neriplayer.ui.viewmodel.tab.ExploreSearchResultRankingTest",
+      "tests": "7",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    }
+  ],
+  "device_tests": {
+    "device": "Huawei Mate60 / BRA-AL00",
+    "api": 31,
+    "physical_device": true,
+    "runner": "moe.ouom.neriplayer.testing.NeriPlayerInstrumentationTestRunner",
+    "class": "moe.ouom.neriplayer.sources.NativeCatalogDeviceTest",
+    "opt_in_argument": "unimusicLiveSources=true",
+    "tests_passed": 2,
+    "seconds": 8.52,
+    "kuwo_api_address_ms": 700,
+    "play_request_to_observed_1500ms_position_ms": 4105,
+    "observed_position_ms": 2178,
+    "audio_path": "production PlayerManager -> normal Kuwo client -> Android playback engine; observed progressing playback, then paused",
+    "qq_anonymous_sample": "AUTH_REQUIRED, no URL",
+    "device_screen_setting": {
+      "stay_on_while_plugged_in_before": 2,
+      "after": 7
+    },
+    "media_volume": "temporarily limited during test and restored in finally",
+    "tested_apk_sha256": "aedf0eb4a2578df957197f9cbc8bfa6380c62885fbb41779c835f29a46fa7881"
+  },
+  "desktop_live_probe": {
+    "client": "real Kotlin KuwoAudioClient / QQMusicAudioClient",
+    "kuwo_resource_id": "328578424",
+    "kuwo_address_status": "ADDRESS_RESOLVED",
+    "kuwo_api_ms": 969,
+    "qq_resource_id": "003OUlho2HcRHC",
+    "qq_status": "AUTH_REQUIRED",
+    "media_body_downloaded_by_desktop_probe": false
+  },
+  "build": {
+    "result": "passed",
+    "log": "build/unimusic-toolchain/phase2l-search-polish.log",
+    "seconds": 46,
+    "apk_path": "app\\build\\outputs\\apk\\debug\\app-debug.apk",
+    "apk_bytes": 62727818,
+    "apk_sha256": "aedf0eb4a2578df957197f9cbc8bfa6380c62885fbb41779c835f29a46fa7881",
+    "android_test_apk_bytes": 6313438,
+    "android_test_apk_sha256": "fbd32e7e20d408aaa2975f997431d884c357fca5e4c5bbf5b1f21952190064eb"
+  },
+  "boundaries": {
+    "module": "passed",
+    "platform": "passed (0 violations)"
+  },
+  "logs": [
+    "phase2l-validation.log",
+    "phase2l-final-validation.log",
+    "phase2l-release-check.log",
+    "phase2l-auth-race.log",
+    "phase2l-apk.log",
+    "phase2l-mate60-tests.log",
+    "phase2l-search-polish.log",
+    "phase2l-final-module-boundaries.log",
+    "phase2l-mate60-final-tests.log",
+    "phase2l-build-helper.log"
+  ],
+  "build_attempts": {
+    "initial": "JAVA_HOME / SDK had been removed by external cleanup",
+    "restoration": "official platform 37.0, Build Tools 36/37, NDK 27 and CMake 3.31.6 restored with upstream archive SHA-1 verification; project-local ignored SDK",
+    "cmake_repair": "correct SDK archive layout, then explicitly pin native module CMake 3.31.6 / NDK 27",
+    "boundary_repair": "two exact QQ repository dependencies added; final 0 violations"
+  },
+  "privacy": {
+    "phone_password_saved_to_file": false,
+    "phone_password_printed": false,
+    "phone_password_committed": false,
+    "system_verification": "local USB/ADB input only; no website or third-party credential service",
+    "music_account_credentials_used": false
+  },
+  "not_performed": [
+    "positive QQ account login/audio entitlement",
+    "full-song listening/end-of-track verification",
+    "human-labeled original recording accuracy / calibrated error rate",
+    "first-sound percentiles or multi-network failover endurance",
+    "membership or DRM bypass",
+    "QQ positive catalog search/account playback on the device; anonymous Canon source reported unavailable"
+  ],
+  "previous_ci": {
+    "commit": "cdb15b90c06e9cd0c52a54cf98e161497df435c9",
+    "run": 40439910040,
+    "conclusion": "success"
+  },
+  "initial_device_tested_apk_sha256": "964b8497204f3d6770b4ca08d73dd3879b2feca979c5b97cf42d1f4fba749f8d",
+  "search_probe_limits": {
+    "parallel_providers": 2,
+    "candidates_per_provider": 3,
+    "per_provider_budget_ms": 4500,
+    "per_candidate_budget_ms": 1800,
+    "stop_on_first_resolved": true
+  },
+  "initial_device_tests": {
+    "device": "Huawei Mate60 / BRA-AL00",
+    "api": 31,
+    "physical_device": true,
+    "runner": "moe.ouom.neriplayer.testing.NeriPlayerInstrumentationTestRunner",
+    "class": "moe.ouom.neriplayer.sources.NativeCatalogDeviceTest",
+    "opt_in_argument": "unimusicLiveSources=true",
+    "tests_passed": 2,
+    "seconds": 8.77,
+    "kuwo_api_address_ms": 785,
+    "play_request_to_observed_1500ms_position_ms": 4332,
+    "observed_position_ms": 2247,
+    "audio_path": "production PlayerManager -> normal Kuwo client -> Android playback engine; observed progressing playback, then paused",
+    "qq_anonymous_sample": "AUTH_REQUIRED, no URL",
+    "device_screen_setting": {
+      "stay_on_while_plugged_in_before": 2,
+      "after": 7
+    },
+    "media_volume": "temporarily limited during test and restored in finally"
+  },
+  "device_ui_search": {
+    "query": "Canon",
+    "real_app": true,
+    "displayed_providers": [
+      "local",
+      "netease",
+      "bilibili",
+      "youtube",
+      "kuwo",
+      "qqmusic"
+    ],
+    "observed": "Kuwo Canon / Dan Gibson's Solitudes displayed first with ADDRESS_RESOLVED label; HTML apostrophe decoded correctly",
+    "qq_search": "temporarily unavailable for this anonymous device query; did not block Kuwo/Bilibili/YouTube results",
+    "not_claimed": "This ambiguous query does not establish the original artist/recording."
+  }
+}

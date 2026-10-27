@@ -82,8 +82,4 @@ internal fun parseKuwoCatalogSearch(body: String, page: Int, limit: Int): Catalo
     return CatalogSearchPage(tracks, next, total)
 }
 
-private fun decodeKuwoCatalogText(value: String): String = value
-    .replace(Regex("\\\\+u0026", RegexOption.IGNORE_CASE), "&")
-    .replace("&nbsp;", " ", ignoreCase = true).replace("&amp;", "&", ignoreCase = true)
-    .replace("&quot;", "\"", ignoreCase = true).replace("&#39;", "'")
-    .trim().replace(Regex("\\s+"), " ")
+private fun decodeKuwoCatalogText(value: String): String = decodeCatalogMetadataText(value)

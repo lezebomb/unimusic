@@ -380,6 +380,8 @@ internal suspend fun AudioDownloadManager.resolveDownloadSourceForAttempt(
     isBili: Boolean,
     state: DownloadExecutionAttemptState
 ): ResolvedDownloadSource? {
+    // These native providers currently implement streaming only. Never reinterpret their IDs as NetEase IDs.
+    if (song.channelId in setOf("qqmusic", "kuwo")) return null
     return sourceResolveSemaphore.withPermit {
         when {
             isYouTubeMusic -> resolveYouTubeMusic(

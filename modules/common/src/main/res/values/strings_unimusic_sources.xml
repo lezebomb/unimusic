@@ -2,7 +2,7 @@
 <resources>
     <string name="unimusic_sources_title">选择音源</string>
     <string name="unimusic_sources_description">记住优先来源，下次解析时使用；当前播放不会中断。来源仍可能需要登录、会员或受地区限制，确认选择不会获得额外播放权限。</string>
-    <string name="unimusic_sources_discovery_scope">候选发现：本地文件、Bilibili、已登录的网易云音乐，以及启用后的 YouTube Music。另可按精确网易云 ID 手动选择 GD音乐台。每个分 P 单独展示；版本、歌手或时长证据不一致时无法确认。</string>
+    <string name="unimusic_sources_discovery_scope">候选发现：本地、QQ音乐、酷我、Bilibili、已登录的网易云，以及启用后的 YouTube Music。相同录音中，音频地址校验成功的候选优先；版本、歌手或时长冲突时不会自动选择。GD音乐台仍需手动选择。</string>
     <string name="unimusic_sources_youtube_disabled">YouTube Music 已关闭，不发起该来源的搜索；已有记录可清除或拒绝。</string>
     <string name="unimusic_sources_provider_local">本地文件</string>
     <string name="unimusic_sources_provider_bilibili">Bilibili</string>

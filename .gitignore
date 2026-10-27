@@ -57,3 +57,5 @@ AGENTS.md
 
 # User-provided reference material stays on this machine.
 /.codex-remote-attachments/
+# Project-local Android toolchain (restored independently of other projects).
+.android-sdk/

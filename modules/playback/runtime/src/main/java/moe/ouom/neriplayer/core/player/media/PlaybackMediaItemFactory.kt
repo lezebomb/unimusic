@@ -31,6 +31,7 @@ internal object PlaybackMediaItemFactory {
         biliQuality: () -> String,
         neteaseQuality: () -> String
     ): String {
+        if (song.channelId in setOf("qqmusic", "kuwo")) return "catalogstream-${song.channelId}-${song.audioId}"
         if (LocalSongSupport.isLocalSong(song, context)) return "local-${song.stableKey().hashCode()}"
         if (isYouTubeSource(song)) {
             return youtubeSongCacheKey(song, youtubeQualityOverride, youtubePreferM4a, youtubeQuality)

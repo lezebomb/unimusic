@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import moe.ouom.neriplayer.common.R as CoreCommonR
+import moe.ouom.neriplayer.core.player.resolver.netease.recordingMetadata
 import moe.ouom.neriplayer.data.model.SongItem
 import moe.ouom.neriplayer.data.model.unified.RecordingMismatch
 import moe.ouom.neriplayer.data.model.unified.RecordingSourceCandidate
@@ -75,7 +76,10 @@ private fun SourceChoiceSheet(song: SongItem, onDismiss: () -> Unit) {
 private fun SourceChoiceContent(song: SongItem, state: SourceChoiceState, owner: SourceChoiceViewModel) {
     val records = if (state.song == song) state.matches.associateBy { it.candidate.key } else emptyMap()
     val candidates = if (state.song == song) {
-        (state.matches.map { it.candidate } + state.candidates).associateBy { it.key }.values.toList()
+        moe.ouom.neriplayer.data.model.unified.orderRecordingSources(
+            song.recordingMetadata(),
+            (state.matches.map { it.candidate } + state.candidates).associateBy { it.key }.values.toList(),
+            records.mapValues { it.value.decision }, state.checks)
     } else emptyList()
     val originalSource = remember(song) { sourceCandidateForSong(song) }
     LazyColumn(
@@ -213,6 +217,8 @@ private fun sourceLabel(candidate: RecordingSourceCandidate): String = when (can
     "netease" -> stringResource(CoreCommonR.string.unimusic_sources_netease_key, candidate.key.resourceId)
     "gdstudio_netease" -> stringResource(CoreCommonR.string.unimusic_sources_gd_key, candidate.key.resourceId)
     "youtube_music" -> stringResource(CoreCommonR.string.unimusic_sources_youtube_key, candidate.key.resourceId)
+    "qqmusic" -> "QQ 音乐 · ${candidate.key.resourceId}"
+    "kuwo" -> "酷我音乐 · ${candidate.key.resourceId}"
     else -> candidate.key.provider
 }
 

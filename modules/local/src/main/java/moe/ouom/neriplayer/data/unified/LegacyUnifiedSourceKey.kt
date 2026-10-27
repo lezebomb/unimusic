@@ -9,7 +9,7 @@ import moe.ouom.neriplayer.data.model.unified.SongSourceKey
 internal fun legacyUnifiedSourceKey(track: TrackEntity): SongSourceKey {
     val provider = when (val channel = track.channelId?.trim()?.lowercase(Locale.ROOT)) {
         "youtube", "ytmusic", "youtubemusic", "youtube_music" -> "youtube_music"
-        "netease", "bilibili" -> channel
+        "netease", "bilibili", "qqmusic", "kuwo" -> channel
         else -> "legacy"
     }
     val resource = track.audioId?.takeIf { it.isNotBlank() }

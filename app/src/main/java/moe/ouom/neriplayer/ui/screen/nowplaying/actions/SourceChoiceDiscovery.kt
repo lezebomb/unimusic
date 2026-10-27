@@ -65,7 +65,13 @@ internal suspend fun discoverSourceChoices(
             if (offline || !youtubeEnabled) SourceChoiceDiscoveryResult(emptyList())
             else boundedCandidates("youtube_music") { discoverYouTubeChoices(song) }
         }
-        val results = listOf(local, bili, netease, youtube).awaitAll()
+        val qq = async { if (offline) SourceChoiceDiscoveryResult(emptyList()) else boundedCandidates("qqmusic") {
+            val page = AppContainer.qqMusicAudioClient.search(song.recordingMetadata().title, null, 12)
+            SourceChoiceDiscoveryResult(page.tracks.map { RecordingSourceCandidate(it.source, it.metadata) }) } }
+        val kuwo = async { if (offline) SourceChoiceDiscoveryResult(emptyList()) else boundedCandidates("kuwo") {
+            val page = AppContainer.kuwoCatalogProvider.search(song.recordingMetadata().title, null, 12)
+            SourceChoiceDiscoveryResult(page.tracks.map { RecordingSourceCandidate(it.source, it.metadata) }) } }
+        val results = listOf(local, bili, netease, youtube, qq, kuwo).awaitAll()
         val originalKey = sourceCandidateForSong(song)?.key
         // Only offer exact NetEase identities. Opening the sheet never calls the GD URL API.
         val gdChoices = ((sourceCandidateForSong(song)?.let(::listOf) ?: emptyList()) +

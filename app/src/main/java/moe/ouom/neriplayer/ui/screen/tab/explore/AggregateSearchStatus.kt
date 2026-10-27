@@ -21,7 +21,8 @@ internal fun AggregateSearchStatus(snapshot: FederatedSearchSnapshot<ExploreSear
     val names = mapOf("local" to stringResource(CoreCommonR.string.local_files),
         "netease" to stringResource(CoreCommonR.string.platform_netease_short),
         "bilibili" to stringResource(CoreCommonR.string.platform_bilibili), "youtube" to "YouTube",
-        "kuwo" to stringResource(CoreCommonR.string.explore_catalog_kuwo))
+        "kuwo" to stringResource(CoreCommonR.string.explore_catalog_kuwo),
+        "qqmusic" to "QQ 音乐")
     val authRequired = stringResource(CoreCommonR.string.explore_source_login)
     val disabled = stringResource(CoreCommonR.string.explore_source_disabled)
     val unavailable = stringResource(CoreCommonR.string.explore_source_unavailable)

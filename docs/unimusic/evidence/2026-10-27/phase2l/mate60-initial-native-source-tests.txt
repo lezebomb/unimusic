@@ -1,0 +1,10 @@
+moe.ouom.neriplayer.sources.NativeCatalogDeviceTest:INSTRUMENTATION_STATUS: address_ms=785
+INSTRUMENTATION_STATUS: observed_position_ms=2247
+INSTRUMENTATION_STATUS: play_request_to_observed_1500ms_position_ms=4332
+INSTRUMENTATION_STATUS: unimusic_source=kuwo
+INSTRUMENTATION_STATUS_CODE: 2
+..
+
+Time: 8.77
+
+OK (2 tests)

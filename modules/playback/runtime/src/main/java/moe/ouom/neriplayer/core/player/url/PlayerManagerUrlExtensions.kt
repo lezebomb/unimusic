@@ -241,6 +241,12 @@ internal suspend fun PlayerManager.resolveSongUrlFromLegacySource(
         return SongUrlResult.Failure
     }
 
+    // Native catalog identities must never fall through to the NetEase ID/cache/quality path.
+    if (song.channelId in setOf("qqmusic", "kuwo")) {
+        val candidate = moe.ouom.neriplayer.data.unified.sourceCandidateForSong(song) ?: return SongUrlResult.Failure
+        return resolveNativeCatalogPlayback(song, candidate, resolverSideEffects = sideEffects)
+    }
+
     val localResult = checkLocalCache(song, sideEffects)
     if (localResult != null) {
         prepareBiliPlaybackSkipsForResolvedPlayback(song, playbackRequestTokenOverride)

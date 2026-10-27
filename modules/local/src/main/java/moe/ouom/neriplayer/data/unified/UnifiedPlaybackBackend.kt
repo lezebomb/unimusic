@@ -46,6 +46,9 @@ class UnifiedPlaybackRoomStore(private val db: NeriUserDataDatabase) {
             ?: return@withTransaction null
         val id = source.resourceId
         val song = when (source.provider) {
+            "qqmusic", "kuwo" -> catalogPlaybackSong(moe.ouom.neriplayer.data.model.unified.CatalogTrack(
+                source.key(), moe.ouom.neriplayer.data.model.unified.UnifiedSongMetadata(recording.title,
+                    recording.artist, recording.album, recording.durationMs), null)) ?: return@withTransaction null
             "netease" -> SongItem(id.toLong(), recording.title, recording.artist, recording.album, 0,
                 recording.durationMs, null, channelId = "netease", audioId = id)
             "bilibili" -> SongItem(id.toLong(), recording.title, recording.artist, recording.album, 0,

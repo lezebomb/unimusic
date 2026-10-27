@@ -17,7 +17,8 @@ internal class ExploreSearchRankingSession(query: String) {
     private val scores = LinkedHashMap<String, Cached>(64, 0.75f, true)
 
     @Synchronized
-    fun rank(items: List<ExploreSearchResult>): List<ExploreSearchResult> {
+    fun rank(items: List<ExploreSearchResult>, checks: Map<moe.ouom.neriplayer.data.model.unified.SongSourceKey,
+        moe.ouom.neriplayer.data.model.unified.SourceCheckResult> = emptyMap()): List<ExploreSearchResult> {
         if (normalized.isBlank() || items.size <= 1) return items
         data class Ranked(val item: ExploreSearchResult, val index: Int, val score: Score)
         return items.mapIndexed { index, item ->
@@ -29,6 +30,17 @@ internal class ExploreSearchRankingSession(query: String) {
             Ranked(item, index, score)
         }.sortedWith(compareBy<Ranked> { it.score.text == null }
             // A bounded version preference must not outweigh a much better title/artist match.
+            .thenBy { ((it.score.text?.toLong() ?: Int.MAX_VALUE.toLong()) + minOf(2, it.score.versionPenalty) * 8) / 16 }
+            .thenBy { it.score.versionPenalty }
+            .thenBy { entry ->
+                val item = entry.item as? ExploreSearchResult.Catalog
+                val check = item?.let { checks[it.track.source] }?.takeIf { System.currentTimeMillis() - it.checkedAtMillis in 0..120_000 }
+                when (check?.status) {
+                    moe.ouom.neriplayer.data.model.unified.SourceCheckStatus.ADDRESS_RESOLVED -> 0
+                    null -> 1
+                    else -> 2
+                }
+            }
             .thenBy { (it.score.text?.toLong() ?: Int.MAX_VALUE.toLong()) + minOf(2, it.score.versionPenalty) * 8 }
             .thenBy { it.score.text ?: Int.MAX_VALUE }
             .thenBy { it.item is ExploreSearchResult.Catalog }

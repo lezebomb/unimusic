@@ -38,6 +38,7 @@ internal fun PlayerManager.prefetchNextGenericTrackUrl() {
     }
     val nextSong = currentPlaylist.getOrNull(nextIndex)
     if (nextSong == null ||
+        nextSong.channelId in setOf("qqmusic", "kuwo") ||
         isLocalSong(nextSong) ||
         isYouTubeMusicTrack(nextSong) ||
         isDirectStreamUrl(nextSong.streamUrl)

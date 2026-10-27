@@ -47,12 +47,12 @@ internal suspend fun PlayerManager.tryResolveAutomaticSource(song: SongItem,
     sideEffects: RefreshResolverSideEffects, local: Boolean, online: Boolean): SongUrlResult.Success? =
     tryResolveStoredSource(song, sideEffects, null, buildSet {
         if (local) add("local")
-        if (online) add("bilibili")
+        if (online) addAll(setOf("bilibili", "qqmusic", "kuwo"))
     })
 
 private fun PlayerManager.automaticSourceEnabled(provider: String): Boolean = when (provider) {
     "local" -> neteaseLocalSourceFallbackEnabled
-    "bilibili" -> neteaseAutoSourceSwitchEnabled && isPlaybackNetworkUsable(application)
+    "bilibili", "qqmusic", "kuwo" -> neteaseAutoSourceSwitchEnabled && isPlaybackNetworkUsable(application)
     else -> false
 }
 
@@ -110,7 +110,7 @@ private suspend fun PlayerManager.tryResolveStoredSource(song: SongItem, sideEff
                 })
             }
         }
-        val hasPublicSource = matches.any { it.candidate.key.provider == "gdstudio_netease" }
+        val hasPublicSource = matches.any { it.candidate.key.provider in setOf("gdstudio_netease", "qqmusic", "kuwo") }
         val budget = if (automatic) sourceStageBudgetMs(1_200, 2_500)
             else if (hasPublicSource) sourceStageBudgetMs(5_000, 8_000) else sourceStageBudgetMs(2_000, 8_000)
         if (budget <= 0) return null
@@ -136,6 +136,7 @@ internal suspend fun PlayerManager.resolveSourceCandidate(subject: SongItem, can
     val source = candidate.key
     val meta = candidate.metadata
     val result: SongUrlResult.Success = when (source.provider) {
+        "qqmusic", "kuwo" -> return resolveNativeCatalogSource(subject, candidate)
         "gdstudio_netease" -> {
             val raw = neteaseClient.getSongDetailCancellable(listOf(source.resourceId.toLong()))
             neteaseDetailsAccessFailure(raw)?.let { return SourceAttempt.Rejected(it) }

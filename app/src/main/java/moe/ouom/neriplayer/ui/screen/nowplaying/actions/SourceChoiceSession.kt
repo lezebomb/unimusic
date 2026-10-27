@@ -9,7 +9,8 @@ internal data class SourceChoiceSession(
     val bilibili: String,
     val netease: String,
     val youtube: String,
-    val youtubeEnabled: Boolean
+    val youtubeEnabled: Boolean,
+    val qqRevision: Long = 0
 )
 
 internal fun sourceChoiceSession(

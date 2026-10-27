@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="moe.ouom.neriplayer.platform.kuwo.api.KuwoAudioClientTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-10-27T05:24:39.568Z" hostname="XUSHAOYANG" time="0.316">
+  <properties/>
+  <testcase name="webHeaderMatchesOfficialJavascriptAndRotatingSession" classname="moe.ouom.neriplayer.platform.kuwo.api.KuwoAudioClientTest" time="0.305"/>
+  <testcase name="feeOrMissingPermissionNeverRequestsAudio" classname="moe.ouom.neriplayer.platform.kuwo.api.KuwoAudioClientTest" time="0.006"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

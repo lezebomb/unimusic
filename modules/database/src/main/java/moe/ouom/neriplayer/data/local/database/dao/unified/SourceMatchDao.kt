@@ -15,7 +15,7 @@ interface SourceMatchDao {
 
     @Query("SELECT m.* FROM song_match m LEFT JOIN user_match_override o ON o.match_id = m.match_id " +
         "WHERE m.song_id = :songId AND m.subject_fingerprint = :fingerprint AND m.algorithm_version = :version " +
-        "AND m.observed_at > :after AND m.observed_at <= :until AND m.provider IN ('local', 'bilibili') " +
+        "AND m.observed_at > :after AND m.observed_at <= :until AND m.provider IN ('local', 'bilibili', 'qqmusic', 'kuwo') " +
         "AND (o.decision IS NULL OR o.decision = 'NONE') " +
         "ORDER BY CASE WHEN m.provider = 'local' THEN 0 ELSE 1 END, m.observed_at DESC, m.match_id LIMIT 8")
     suspend fun automaticMatches(songId: String, fingerprint: String, after: Long, until: Long, version: Int): List<SongMatchEntity>

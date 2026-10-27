@@ -235,6 +235,7 @@ private fun DownloadOrDetailsAction(
     isLocalSong: Boolean,
     onShowSongDetails: () -> Unit
 ) {
+    if (song.channelId in setOf("qqmusic", "kuwo")) return
     if (isLocalSong) {
         MoreOptionsItem(
             title = stringResource(CoreCommonR.string.local_song_open_details),

@@ -29,6 +29,18 @@ class QQMusicAuthRepository(context: Context, private val client: QQMusicAccount
     val state = _state.asStateFlow()
     fun generation(): Long = synchronized(lock) { revision }
 
+    /** Keep credentials inside the account/protocol layer. A late result cannot survive logout. */
+    suspend fun resolveAudio(mid: String, audio: moe.ouom.neriplayer.platform.qqmusic.api.QQMusicAudioClient):
+        moe.ouom.neriplayer.platform.search.api.client.CatalogAudioResolution {
+        val captured = synchronized(lock) { credential to revision }
+        val result = audio.resolve(mid, captured.first)
+        return synchronized(lock) {
+            if (revision == captured.second && credential === captured.first) result
+            else moe.ouom.neriplayer.platform.search.api.client.CatalogAudioResolution(
+                moe.ouom.neriplayer.data.model.unified.SourceCheckStatus.CONTEXT_CHANGED)
+        }
+    }
+
     private fun snapshot() = QQMusicAccountState(credential?.accountId,
         if (credential == null) QQMusicLoginStatus.MISSING else QQMusicLoginStatus.SAVED_UNVERIFIED,
         savedAt = runCatching { preferences.getLong("saved_at", 0) }.getOrDefault(0),

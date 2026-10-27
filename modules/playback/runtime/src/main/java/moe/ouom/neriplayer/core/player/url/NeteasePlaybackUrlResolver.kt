@@ -178,6 +178,7 @@ private suspend fun PlayerManager.resolveNeteaseAlternates(
         catch (_: Exception) { NPLogger.w("NERI-PlayerManager", "Local alternate is temporarily unreadable") }
     }
     if (online && isPlaybackNetworkUsable(application)) {
+        tryResolveNativeCatalogAlternate(song, sideEffects)?.let { return it }
         return tryResolveNeteaseAutoBiliSource(song, sideEffects)
     }
     return null

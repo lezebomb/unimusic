@@ -5,6 +5,25 @@ import org.junit.Assert.assertEquals
 import org.junit.Test
 
 class ExploreSearchResultRankingTest {
+    @Test fun verifiedNativeAddressRanksAboveEqualUnknownOrDeniedSourcesWithoutPromotingLive() {
+        fun catalog(id: String, title: String = "Dream") = ExploreSearchResult.Catalog(
+            moe.ouom.neriplayer.data.model.unified.CatalogTrack(
+                moe.ouom.neriplayer.data.model.unified.SongSourceKey("kuwo", id),
+                moe.ouom.neriplayer.data.model.unified.UnifiedSongMetadata(title, "Artist", "Album", 180_000), null))
+        val unknown = catalog("1")
+        val denied = catalog("2")
+        val ready = catalog("3")
+        val live = catalog("4", "Dream (Live)")
+        val time = System.currentTimeMillis()
+        val checks = mapOf(denied.track.source to moe.ouom.neriplayer.data.model.unified.SourceCheckResult(
+            moe.ouom.neriplayer.data.model.unified.SourceCheckStatus.NO_PERMISSION, time),
+            ready.track.source to moe.ouom.neriplayer.data.model.unified.SourceCheckResult(
+                moe.ouom.neriplayer.data.model.unified.SourceCheckStatus.ADDRESS_RESOLVED, time),
+            live.track.source to moe.ouom.neriplayer.data.model.unified.SourceCheckResult(
+                moe.ouom.neriplayer.data.model.unified.SourceCheckStatus.ADDRESS_RESOLVED, time))
+        assertEquals(listOf(ready, unknown, denied, live), ExploreSearchRankingSession("Dream").rank(
+            listOf(denied, live, unknown, ready), checks))
+    }
     @Test
     fun `pinyin query promotes matching Chinese song title`() {
         val songs = listOf(

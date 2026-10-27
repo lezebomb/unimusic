@@ -56,6 +56,7 @@ import moe.ouom.neriplayer.data.model.youtube.music.YouTubeMusicSearchFilter
 import moe.ouom.neriplayer.data.model.youtube.music.YouTubeMusicSearchResult
 import moe.ouom.neriplayer.data.model.youtube.music.YouTubeMusicSearchResultType
 import moe.ouom.neriplayer.core.di.AppContainer
+import moe.ouom.neriplayer.core.player.url.checkSourceAvailability
 import moe.ouom.neriplayer.common.logging.NPLogger
 import moe.ouom.neriplayer.core.player.PlayerManager.biliClient
 import moe.ouom.neriplayer.core.player.PlayerManager.neteaseClient
@@ -203,6 +204,8 @@ data class ExploreUiState(
     val searchKeyword: String = "",
     val searchDisplayQuery: String = "",
     val aggregateSnapshot: FederatedSearchSnapshot<ExploreSearchResult>? = null,
+    val nativeSourceChecks: Map<moe.ouom.neriplayer.data.model.unified.SongSourceKey,
+        moe.ouom.neriplayer.data.model.unified.SourceCheckResult> = emptyMap(),
     val selectedSearchSource: SearchSource = SearchSource.ALL,
     val selectedNeteaseSearchType: NeteaseExploreSearchType = NeteaseExploreSearchType.SONG,
     val selectedYouTubeMusicSearchType: YouTubeExploreSearchType = YouTubeExploreSearchType.SONG,
@@ -321,12 +324,21 @@ class ExploreViewModel(application: Application) : AndroidViewModel(application)
     private var youtubeEnabled = YouTubeFeatureGate.isEnabled()
     private var aggregateEngine: FederatedSearchEngine<ExploreSearchResult>? = null
     private var aggregateRanker: ExploreSearchRankingSession? = null
+    private val nativeProbeJobs = mutableListOf<Job>()
+    private val nativeProbedProviders = mutableSetOf<String>()
     private var searchAccountContext = neteaseClient.searchSessionIdentity()
 
     private val _uiState = MutableStateFlow(ExploreUiState())
     val uiState: StateFlow<ExploreUiState> = _uiState
 
     init {
+        viewModelScope.launch {
+            var revision = AppContainer.qqMusicAuthRepo.generation()
+            AppContainer.qqMusicAuthRepo.state.collect {
+                val current = AppContainer.qqMusicAuthRepo.generation()
+                if (current != revision) { revision = current; restartAggregateSearch() }
+            }
+        }
         viewModelScope.launch {
             neteaseRepo.authHealthFlow.collect { health ->
                 val isLoggedIn = isNeteaseExploreSearchAvailable(health.state)
@@ -603,6 +615,10 @@ class ExploreViewModel(application: Application) : AndroidViewModel(application)
             FederatedSearchProvider("kuwo") { query, cursor ->
                 val page = AppContainer.kuwoCatalogProvider.search(query, cursor, limit = 20)
                 SearchPage(page.tracks.map(ExploreSearchResult::Catalog), page.nextCursor)
+            },
+            FederatedSearchProvider("qqmusic") { query, cursor ->
+                val page = AppContainer.qqMusicAudioClient.search(query, cursor, limit = 20)
+                SearchPage(page.tracks.map(ExploreSearchResult::Catalog), page.nextCursor)
             }
         ), identity = { it.stableKey }, parallelism = 4)
         searchJob = launchAggregateSearch(keyword, requestVersion, null)
@@ -614,7 +630,8 @@ class ExploreViewModel(application: Application) : AndroidViewModel(application)
         val ranker = checkNotNull(aggregateRanker)
         return viewModelScope.launch {
             engine.search(keyword, previous).collect { snapshot ->
-                val items = withContext(Dispatchers.Default) { ranker.rank(snapshot.interleavedItems()) }
+                val checks = _uiState.value.nativeSourceChecks
+                val items = withContext(Dispatchers.Default) { ranker.rank(snapshot.interleavedItems(), checks) }
                 updateSearchStateIfCurrent(requestVersion, SearchSource.ALL) { state ->
                     val retryableFailure = snapshot.sources.values.any { it.failure != null && it.nextCursor != null }
                     state.copy(
@@ -628,6 +645,53 @@ class ExploreViewModel(application: Application) : AndroidViewModel(application)
                         aggregateSnapshot = snapshot,
                         searchPage = 1
                     )
+                }
+                if (isSearchRequestCurrent(requestVersion, SearchSource.ALL)) probeNativeSources(items, requestVersion, ranker)
+            }
+        }
+    }
+
+    /** Two providers run independently; a failed first result advances to the next, within 4.5s each. */
+    private fun probeNativeSources(items: List<ExploreSearchResult>, requestVersion: Long, ranker: ExploreSearchRankingSession) {
+        for (provider in listOf("qqmusic", "kuwo")) {
+            if (provider in nativeProbedProviders) continue
+            val tracks = items.filterIsInstance<ExploreSearchResult.Catalog>()
+                .filter { it.track.source.provider == provider }.take(3).map { it.track }
+            if (tracks.isEmpty()) continue
+            nativeProbedProviders += provider
+            nativeProbeJobs += viewModelScope.launch {
+                val revision = AppContainer.qqMusicAuthRepo.generation()
+                val deadline = android.os.SystemClock.elapsedRealtime() + 4_500
+                for (track in tracks) {
+                    if (!isSearchRequestCurrent(requestVersion, SearchSource.ALL) ||
+                        revision != AppContainer.qqMusicAuthRepo.generation()) return@launch
+                    val song = moe.ouom.neriplayer.data.unified.catalogPlaybackSong(track) ?: continue
+                    val budget = minOf(1_800L, deadline - android.os.SystemClock.elapsedRealtime())
+                    if (budget <= 0) break
+                    val result = try {
+                        kotlinx.coroutines.withTimeoutOrNull(budget) {
+                            moe.ouom.neriplayer.core.player.PlayerManager.checkSourceAvailability(song,
+                                moe.ouom.neriplayer.data.model.unified.RecordingSourceCandidate(track.source, track.metadata))
+                        } ?: moe.ouom.neriplayer.data.model.unified.SourceCheckResult(
+                            moe.ouom.neriplayer.data.model.unified.SourceCheckStatus.TIMED_OUT, System.currentTimeMillis())
+                    } catch (cancelled: CancellationException) { throw cancelled }
+                    catch (_: Exception) { moe.ouom.neriplayer.data.model.unified.SourceCheckResult(
+                        moe.ouom.neriplayer.data.model.unified.SourceCheckStatus.UNAVAILABLE, System.currentTimeMillis()) }
+                    if (!isSearchRequestCurrent(requestVersion, SearchSource.ALL) ||
+                        revision != AppContainer.qqMusicAuthRepo.generation()) return@launch
+                    updateSearchStateIfCurrent(requestVersion, SearchSource.ALL) { state ->
+                        state.copy(nativeSourceChecks = state.nativeSourceChecks + (track.source to result))
+                    }
+                    while (isSearchRequestCurrent(requestVersion, SearchSource.ALL)) {
+                        val before = _uiState.value
+                        val ranked = withContext(Dispatchers.Default) { ranker.rank(before.searchItems, before.nativeSourceChecks) }
+                        if (!isSearchRequestCurrent(requestVersion, SearchSource.ALL)) return@launch
+                        val current = _uiState.value
+                        if (current.searchItems !== before.searchItems || current.nativeSourceChecks !== before.nativeSourceChecks) continue
+                        _uiState.value = current.copy(searchItems = ranked, searchResults = searchSongItems(ranked))
+                        break
+                    }
+                    if (result.status == moe.ouom.neriplayer.data.model.unified.SourceCheckStatus.ADDRESS_RESOLVED) break
                 }
             }
         }
@@ -711,6 +775,7 @@ class ExploreViewModel(application: Application) : AndroidViewModel(application)
         val requestVersion = invalidateSearchRequest()
         _uiState.value = _uiState.value.copy(
             aggregateSnapshot = null,
+            nativeSourceChecks = emptyMap(),
             searching = true,
             searchError = null,
             searchResults = emptyList(),
@@ -726,6 +791,7 @@ class ExploreViewModel(application: Application) : AndroidViewModel(application)
     }
 
     private fun invalidateSearchRequest(): Long {
+        nativeProbeJobs.forEach { it.cancel() }; nativeProbeJobs.clear(); nativeProbedProviders.clear()
         searchRequestVersion += 1
         return searchRequestVersion
     }

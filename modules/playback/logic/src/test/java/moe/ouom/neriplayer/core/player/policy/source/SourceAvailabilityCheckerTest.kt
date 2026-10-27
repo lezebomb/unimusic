@@ -23,7 +23,8 @@ class SourceAvailabilityCheckerTest {
                 error("Ineligible metadata must never resolve audio")
             }.status)
         }
-        refused(candidate.copy(key = SongSourceKey("kuwo", "42")), SourceCheckStatus.METADATA_ONLY)
+        assertTrue(MusicSourceRegistry.canResolveAudio(SongSourceKey("kuwo", "42")))
+        assertTrue(MusicSourceRegistry.canResolveAudio(SongSourceKey("qqmusic", "003OUlho2HcRHC")))
         refused(candidate.copy(key = SongSourceKey("other", "42")), SourceCheckStatus.UNSUPPORTED)
         refused(candidate.copy(key = SongSourceKey("bilibili", "10")), SourceCheckStatus.UNSUPPORTED)
         refused(candidate.copy(metadata = candidate.metadata.copy(title = "晴天（Ｌｉｖｅ）")), SourceCheckStatus.METADATA_MISMATCH)

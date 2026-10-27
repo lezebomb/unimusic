@@ -54,7 +54,7 @@ class SourceMatchRoomStoreTest {
             val store = SourceMatchRoomStore(db)
             for (invalid in listOf(candidate.copy(metadata = candidate.metadata.copy(title = "晴天（Ｌｉｖｅ）")),
                 candidate.copy(metadata = candidate.metadata.copy(durationMs = 0)),
-                candidate.copy(key = SongSourceKey("kuwo", "9")))) {
+                candidate.copy(key = SongSourceKey("kuwo", "09")))) {
                 var refused = false
                 try { store.decide(subject, invalid, SourceMatchDecision.CONFIRMED) }
                 catch (_: IllegalArgumentException) { refused = true }
@@ -110,6 +110,16 @@ class SourceMatchRoomStoreTest {
             time = resolvedAt + 24 * 60 * 60_000L
             assertTrue(reopened.automaticMatches(subject).isEmpty())
             assertEquals(1, reopened.matches(subject).size) // Expiry preserves the observation and all user data.
+            val nativeKeys = listOf(SongSourceKey("kuwo", "9"), SongSourceKey("qqmusic", "003OUlho2HcRHC"))
+            for (key in nativeKeys) {
+                val native = candidate.copy(key = key)
+                assertNotNull(reopened.rememberAutomatic(subject, native, SourceDecisionStamp()))
+                val song = catalogPlaybackSong(CatalogTrack(key, native.metadata, null))!!
+                val playback = UnifiedPlaybackRoomStore(db)
+                val target = playback.identify(song)
+                assertEquals(key, sourceCandidateForSong(playback.load(target.songId)!!.song)!!.key)
+            }
+            assertEquals(nativeKeys.toSet(), reopened.automaticMatches(subject).map { it.candidate.key }.toSet())
         } finally { db.close(); context.deleteDatabase(file) }
     }
 
@@ -137,7 +147,7 @@ class SourceMatchRoomStoreTest {
             assertNull(store.rememberAutomatic(subject, candidate.copy(key = candidate.key.copy(subResourceId = "12"),
                 metadata = candidate.metadata.copy(title = "晴天 Live")),
                 SourceDecisionStamp()))
-            assertNull(store.rememberAutomatic(subject, candidate.copy(key = SongSourceKey("kuwo", "9")), SourceDecisionStamp()))
+            assertNull(store.rememberAutomatic(subject, candidate.copy(key = SongSourceKey("kuwo", "09")), SourceDecisionStamp()))
         } finally { db.close() }
     }
 }

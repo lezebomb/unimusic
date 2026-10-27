@@ -2,9 +2,15 @@
 
 > 2026-10-27 的02:20和07:25两次单次续跑已执行，对应任务均已删除；没有新建重复计划。10月26日暂停交接仅为历史记录，按本文最新检查点接续。
 
-更新：2026-10-27（Asia/Shanghai）。2K已按用户“我可以分别登录”的要求补QQ官方网页登录、安全凭证仓库、严格身份校验、重新登录与退出，首次设置/设置账号页均接入；4个关键测试、最终APK和边界通过，Room仍v23。没有真实账号或设备验收，QQ完整音频Provider尚未接完。2J的GD精确ID在线播放已接，仍不走音频磁盘缓存/下载/分享；不要退回只查目录或只做缓存。下一步优先在正常账号链上接QQ取流，再核实酷我正常音频，不能把登录成功/地址HTTP200当全量可播。
+更新：2026-10-27（Asia/Shanghai）。2L已接QQ正常标准MP3与酷我官网免费音频、并发备用源匹配、可播性排序与精确持久映射；26个定向JVM检查和Mate60上2个真机检查通过，Debug APK / AndroidTest APK、模块及平台边界通过。酷我样本已由生产播放器实际解码并观察到进度，QQ匿名拒绝被正确保留；真实QQ登录正向取流和完整歌曲/多网络耐久未验收。Room仍v23，无新迁移。手机已开启充电常亮，初次设置中已按用户要求开启播放源兜底；本地音乐权限及云同步未启用。手机密码仅在本机系统验证时输入，未保存到文件/日志/提交。
+
+原D:/Collect/.tooling开发包被用户清理，Android包已按需恢复到项目内已忽略的D:/unimusic/.android-sdk；复用项目内JDK17与C:/Users/24981/.gradle，local.properties指向新SDK。原生模块显式固定NDK27/CMake3.31.6。后续不要继续引用已删除的JDK21/current或旧SDK。可直接使用 `tools_pub/unimusic/build_android.ps1`，它只为当前进程设置项目JDK/SDK；`-GradleArgs`可传任务和`--offline`。
+
+历史报告中“无设备”“酷我仅目录”“QQ未接音频”只描述对应旧阶段；当前以 [2L报告](PHASE_2L_NATIVE_AUDIO_AND_PLAYABILITY.md) 及phase2l证据为准。
 
 ## 已完成和推送
+
+- Phase 2L：本检查点所在提交接QQ/酷我正常音频、自动匹配与可播性排序，实际范围见 [2L](PHASE_2L_NATIVE_AUDIO_AND_PLAYABILITY.md)；以git log/status核对提交推送。
 
 - Phase 0：`b60d74d1`，源码审计与固定上游已归档，不需重做。
 - 工具链：`f2c53ea1`，JDK 17 + API 37.0 / Build Tools 37 / NDK 27.0.12077973 / CMake 3.31.6 均可用。
@@ -25,6 +31,8 @@
 - Phase 2K：本检查点所在提交补QQ正常登录入口/安全存储/身份校验，见 [2K](PHASE_2K_PLATFORM_SIGN_IN.md) 和 `evidence/2026-10-27/phase2k/`，以git log/status确认commit/push及新CI。
 
 ## 实际验证
+
+- Phase 2L：26个直接相关JVM检查（含真实Kotlin客户端匿名联网1个），Mate60上生产播放器解码/进度与QQ匿名拒绝2个检查通过。酷我取址最终包单次700ms，播放请求到观察到2178ms进度耗时4105ms；这些不是首声分位数或完整歌曲结论。APK/测试包及模块/平台边界通过，证据见phase2l。
 
 - Phase 2K：4个新关键测试通过，持久退出修订补齐后只重跑受影响仓库2个；最终Debug APK及模块/QQ协议-存储依赖边界通过。匿名GetLoginUserInfo实测HTTP200/account.code1000，明确没有提供凭证、没有正向账号验证。无设备、官方网页交互、实际Keystore/账号/播放验收。
 
