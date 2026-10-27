@@ -55,6 +55,19 @@ class LocalRecommendationRankerTest {
         assertEquals(3, result.map { it.identityKey }.distinct().size)
     }
 
+    @Test fun `explicit playback evidence affects only the supplied exact identity`() {
+        val a = candidate("a", "Artist A")
+        val b = candidate("b", "Artist B")
+        val input = listOf(a, b)
+        val baseline = LocalRecommendationRanker.rank(input, emptyList(), now)
+        assertEquals(baseline, LocalRecommendationRanker.rank(input, emptyList(), now,
+            feedback = mapOf("unrelated" to LocalPlaybackSignal(skips = 3.0))))
+        assertEquals("b", LocalRecommendationRanker.rank(input, emptyList(), now,
+            feedback = mapOf("a" to LocalPlaybackSignal(skips = 3.0))).first().identityKey)
+        assertEquals("a", LocalRecommendationRanker.rank(input, emptyList(), now,
+            feedback = mapOf("a" to LocalPlaybackSignal(repeats = 2.0))).first().identityKey)
+    }
+
     private fun candidate(key: String, artist: String, source: LocalRecommendationSource = LocalRecommendationSource.LIBRARY) =
         LocalRecommendationCandidate(
             SongItem(key.hashCode().toLong(), "Same title", artist, "album", 0, 180_000, null), key, source

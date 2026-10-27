@@ -30,14 +30,15 @@ data class LocalRecommendation(
  * Identity keys are supplied by the existing repository adapter; titles never merge recordings.
  */
 object LocalRecommendationRanker {
-    const val ALGORITHM_VERSION = 2
+    const val ALGORITHM_VERSION = 3
     private const val DAY_MS = 86_400_000L
 
     fun rank(
         candidates: List<LocalRecommendationCandidate>,
         statistics: List<TrackStat>,
         nowMillis: Long,
-        limit: Int = 12
+        limit: Int = 12,
+        feedback: Map<String, LocalPlaybackSignal> = emptyMap()
     ): List<LocalRecommendation> {
         if (limit <= 0) return emptyList()
         val today = BeijingRecommendationDay.startMillis(nowMillis)
@@ -49,7 +50,7 @@ object LocalRecommendationRanker {
                 ln(1.0 + track.totalListenMs.coerceAtLeast(0L) / 180_000.0) / (1.0 + age / 30.0)
             } }
         val ranked = canonicalCandidates(candidates)
-            .map { candidate -> score(candidate, stats[candidate.identityKey], artistAffinity, today) }
+            .map { candidate -> score(candidate, stats[candidate.identityKey], artistAffinity, today, feedback[candidate.identityKey]) }
             .toMutableList()
         val selected = ArrayList<LocalRecommendation>(limit.coerceAtMost(ranked.size))
         val artistCounts = mutableMapOf<String, Int>()
@@ -89,7 +90,8 @@ object LocalRecommendationRanker {
         candidate: LocalRecommendationCandidate,
         stat: TrackStat?,
         affinity: Map<String, Double>,
-        today: Long
+        today: Long,
+        feedback: LocalPlaybackSignal?
     ): Scored {
         val artist = artistKey(candidate.song.customArtist ?: candidate.song.artist)
         val age = stat?.takeIf { it.lastPlayedAt > 0L }?.let { ageDays(today, it.lastPlayedAt) }
@@ -109,7 +111,9 @@ object LocalRecommendationRanker {
         val familiarity = ln(1.0 + plays.toDouble()) * 3.0 + ln(1.0 + listens / 180_000.0) * 2.0
         val rediscover = knownListening && age != null && age >= 14.0
         val dailyRotation = Math.floorMod((candidate.identityKey + today / DAY_MS).hashCode(), 1_000) / 250.0
-        val score = 40.0 + artistScore + dailyRotation + (if (candidate.favorite) 5.0 else 0.0) +
+        val evidence = feedback?.let { -it.skips.coerceIn(0.0, 3.0) * 12.0 +
+            it.completions.coerceIn(0.0, 2.0) * 3.0 + it.repeats.coerceIn(0.0, 2.0) * 6.0 } ?: 0.0
+        val score = evidence + 40.0 + artistScore + dailyRotation + (if (candidate.favorite) 5.0 else 0.0) +
             (if (recentlyAdded) 12.0 else 0.0) + (if (rediscover) 10.0 else 0.0) +
             (if (!knownListening) 8.0 else 0.0) - repeatPenalty - familiarity
         val reason = when {

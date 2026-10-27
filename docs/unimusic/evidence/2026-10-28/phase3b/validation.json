@@ -1,0 +1,58 @@
+{
+  "phase": "3B",
+  "date": "2026-10-28",
+  "jvm": {
+    "passed": 7,
+    "failed": 0,
+    "classes": {
+      "PlaybackFeedbackTrackerTest": 3,
+      "PlaybackStatsOwnerTest.feedback follows": 1,
+      "LocalPlaybackFeedbackStoreTest": 2,
+      "LocalRecommendationRankerTest.explicit playback evidence": 1
+    }
+  },
+  "deferred_local_tests": {
+    "count": 2,
+    "reason": "playback runtime tests require missing local JDK21; ordinary builds use installed JDK17",
+    "ci_filters": [
+      "AppPlaybackStatsWritePortTest.ready player dependencies*",
+      "AppPlaybackStatsWritePortTest.safe mode uses*"
+    ],
+    "ci_result": "pending push and remote run"
+  },
+  "build": {
+    "success": true,
+    "offline": true,
+    "final_log": "build/unimusic-toolchain/phase3b-final-maintenance-build.log",
+    "artifacts": [
+      {
+        "path": "app/build/outputs/apk/debug/app-debug.apk",
+        "bytes": 62834107,
+        "sha256": "80b7ad752db1d3eece8476293c49ed13648718f1b99bb928c2de516841d07730"
+      },
+      {
+        "path": "app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk",
+        "bytes": 8082795,
+        "sha256": "d007c682da4eb7b49a701b27fc2bbf01b304bc6e4e6a3ff7caca46190f4acc11"
+      }
+    ]
+  },
+  "module_boundaries": "passed",
+  "device": {
+    "model": "Huawei Mate60",
+    "install": "main and AndroidTest APK adb install -r: Success",
+    "test": "PlaybackFeedbackDeviceStorageTest",
+    "result": "OK (1 test)",
+    "scope": "synthetic queue/storage/dedupe/targeted cleanup only",
+    "actual_audio_started": false,
+    "queue_replaced": false,
+    "fixtures_cleaned": true
+  },
+  "not_run": [
+    "actual Media3 SKIP/COMPLETE/REPEAT device capture",
+    "abrupt process kill final event durability",
+    "extreme concurrent clear or clock changes",
+    "large library performance",
+    "feedback dataset sync"
+  ]
+}

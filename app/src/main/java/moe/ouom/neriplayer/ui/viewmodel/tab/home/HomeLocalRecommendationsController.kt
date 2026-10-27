@@ -34,7 +34,8 @@ data class HomeLocalRecommendationsState(
 /** Kept separate from remote Home state so account changes cannot replace the local section. */
 internal class HomeLocalRecommendationsController(application: Application, scope: CoroutineScope) {
     private val feedback = LocalRecommendationFeedbackStore.getInstance(application)
-    private var handledFeedbackRevision = feedback.revision.value
+    private val playbackFeedback = moe.ouom.neriplayer.data.recommendation.LocalPlaybackFeedbackStore.getInstance(application)
+    private var handledFeedbackRevision = feedback.revision.value to playbackFeedback.revision.value
     private val refreshVersion = MutableStateFlow(0L)
     private var handledRefreshVersion = 0L
     val state = channelFlow {
@@ -53,7 +54,7 @@ internal class HomeLocalRecommendationsController(application: Application, scop
                         emit(-1L)
                     },
                     recommendationDays(),
-                    feedback.revision
+                    combine(feedback.revision, playbackFeedback.revision) { explicit, playback -> explicit to playback }
                 ) { playlists, _, _, feedbackRevision ->
                     playlists.map { it.copy(songs = it.songs.toMutableList()) } to feedbackRevision
                 }

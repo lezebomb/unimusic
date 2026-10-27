@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf8'?>
+<testsuite name="moe.ouom.neriplayer.data.recommendation.LocalRecommendationRankerTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2026-10-27T18:16:36.352Z" hostname="local" time="0.01">
+  <properties />
+  <testcase name="explicit playback evidence affects only the supplied exact identity" classname="moe.ouom.neriplayer.data.recommendation.LocalRecommendationRankerTest" time="0.01" />
+  <system-out />
+  <system-err />
+</testsuite>

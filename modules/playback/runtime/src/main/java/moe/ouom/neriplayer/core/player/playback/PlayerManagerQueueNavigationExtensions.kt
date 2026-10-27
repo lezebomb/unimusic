@@ -7,6 +7,8 @@ import moe.ouom.neriplayer.core.player.PlayerManager
 import moe.ouom.neriplayer.core.player.currentPositionMsOrZero
 import moe.ouom.neriplayer.core.player.durationMsOrZero
 import moe.ouom.neriplayer.core.player.persistence.scheduleStatePersist
+import moe.ouom.neriplayer.core.player.session.AppQueueSongIdentity
+import moe.ouom.neriplayer.core.player.runtime.stats.shouldRecordPlaybackSkip
 import moe.ouom.neriplayer.data.model.playback.PlaybackCommandSource
 import moe.ouom.neriplayer.data.model.playback.queue.ListenTogetherTrackFinishPlan
 import moe.ouom.neriplayer.data.model.playback.queue.PlaybackFailureAdvanceAction
@@ -214,11 +216,12 @@ internal fun PlayerManager.nextImpl(
     force: Boolean = false,
     commandSource: PlaybackCommandSource = PlaybackCommandSource.LOCAL,
     bypassLoudVolumeWarning: Boolean = false,
-    allowRememberedLongFormPosition: Boolean = false
+    allowRememberedLongFormPosition: Boolean = false,
+    userInitiated: Boolean = false
 ) {
     ensureInitialized()
     if (!initialized) return
-    requestNextTrack(force, commandSource, bypassLoudVolumeWarning, allowRememberedLongFormPosition)
+    requestNextTrack(force, commandSource, bypassLoudVolumeWarning, allowRememberedLongFormPosition, userInitiated)
 }
 
 private fun PlayerManager.requestNextTrack(
@@ -226,10 +229,11 @@ private fun PlayerManager.requestNextTrack(
     commandSource: PlaybackCommandSource,
     bypassLoudVolumeWarning: Boolean,
     allowRememberedLongFormPosition: Boolean,
+    userInitiated: Boolean,
 ) {
     if (shouldBlockLocalRoomControl(commandSource)) return
     val step = PlayerQueueNavigationOwner.nextStep(currentPlaylist.size, currentIndex, repeatModeSetting, force)
-    confirmNextTrack(step, force, commandSource, bypassLoudVolumeWarning, allowRememberedLongFormPosition)
+    confirmNextTrack(step, force, commandSource, bypassLoudVolumeWarning, allowRememberedLongFormPosition, userInitiated)
 }
 
 private fun PlayerManager.confirmNextTrack(
@@ -238,12 +242,13 @@ private fun PlayerManager.confirmNextTrack(
     commandSource: PlaybackCommandSource,
     bypassLoudVolumeWarning: Boolean,
     allowRememberedLongFormPosition: Boolean,
+    userInitiated: Boolean,
 ) {
     if (step == null) {
         NPLogger.d("NERI-Player", "Already at the end of the playlist.")
         return
     }
-    confirmNextTrackVolume(step, force, commandSource, bypassLoudVolumeWarning, allowRememberedLongFormPosition)
+    confirmNextTrackVolume(step, force, commandSource, bypassLoudVolumeWarning, allowRememberedLongFormPosition, userInitiated)
 }
 
 private fun PlayerManager.confirmNextTrackVolume(
@@ -252,17 +257,18 @@ private fun PlayerManager.confirmNextTrackVolume(
     commandSource: PlaybackCommandSource,
     bypassLoudVolumeWarning: Boolean,
     allowRememberedLongFormPosition: Boolean,
+    userInitiated: Boolean,
 ) {
     logQueueNavigation("next", commandSource)
     if (requestUsbExclusiveLoudPlaybackConfirmation(
             commandSource = commandSource,
             bypassWarning = bypassLoudVolumeWarning,
             continuePlayback = {
-                nextImpl(force, commandSource, true, allowRememberedLongFormPosition)
+                nextImpl(force, commandSource, true, allowRememberedLongFormPosition, userInitiated)
             }
         )
     ) return
-    applyNextTrack(step, force, commandSource, allowRememberedLongFormPosition)
+    applyNextTrack(step, force, commandSource, allowRememberedLongFormPosition, userInitiated)
 }
 
 private fun PlayerManager.applyNextTrack(
@@ -270,9 +276,16 @@ private fun PlayerManager.applyNextTrack(
     force: Boolean,
     commandSource: PlaybackCommandSource,
     allowRememberedLongFormPosition: Boolean,
+    userInitiated: Boolean,
 ) {
     val useTransitionFade = queueNavigationTransitionFade()
-    currentIndex = resolvedNextIndex(step)
+    val previousKey = _currentSongFlow.value?.let(AppQueueSongIdentity::stableKey)
+    val targetIndex = resolvedNextIndex(step)
+    val targetKey = currentPlaylist.getOrNull(targetIndex)?.let(AppQueueSongIdentity::stableKey)
+    if (shouldRecordPlaybackSkip(userInitiated, commandSource, previousKey, targetKey)) {
+        playbackStatsOwner.onUserSkip(writesEnabled = initialized)
+    }
+    currentIndex = targetIndex
     playAtIndex(
         currentIndex,
         useTrackTransitionFade = useTransitionFade,
@@ -297,51 +310,60 @@ private fun PlayerManager.reshuffledWrapIndex(): Int =
 
 internal fun PlayerManager.previousImpl(
     commandSource: PlaybackCommandSource = PlaybackCommandSource.LOCAL,
-    bypassLoudVolumeWarning: Boolean = false
+    bypassLoudVolumeWarning: Boolean = false,
+    userInitiated: Boolean = false
 ) {
     ensureInitialized()
     if (!initialized) return
-    requestPreviousTrack(commandSource, bypassLoudVolumeWarning)
+    requestPreviousTrack(commandSource, bypassLoudVolumeWarning, userInitiated)
 }
 
 private fun PlayerManager.requestPreviousTrack(
     commandSource: PlaybackCommandSource,
     bypassLoudVolumeWarning: Boolean,
+    userInitiated: Boolean,
 ) {
     if (shouldBlockLocalRoomControl(commandSource)) return
     val targetIndex = PlayerQueueNavigationOwner.previousIndex(currentPlaylist.size, currentIndex, repeatModeSetting)
-    confirmPreviousTrack(targetIndex, commandSource, bypassLoudVolumeWarning)
+    confirmPreviousTrack(targetIndex, commandSource, bypassLoudVolumeWarning, userInitiated)
 }
 
 private fun PlayerManager.confirmPreviousTrack(
     targetIndex: Int?,
     commandSource: PlaybackCommandSource,
     bypassLoudVolumeWarning: Boolean,
+    userInitiated: Boolean,
 ) {
     if (targetIndex == null) {
         NPLogger.d("NERI-Player", "Already at the start of the playlist.")
         return
     }
-    confirmPreviousTrackVolume(targetIndex, commandSource, bypassLoudVolumeWarning)
+    confirmPreviousTrackVolume(targetIndex, commandSource, bypassLoudVolumeWarning, userInitiated)
 }
 
 private fun PlayerManager.confirmPreviousTrackVolume(
     targetIndex: Int,
     commandSource: PlaybackCommandSource,
     bypassLoudVolumeWarning: Boolean,
+    userInitiated: Boolean,
 ) {
     logQueueNavigation("previous", commandSource)
     if (requestUsbExclusiveLoudPlaybackConfirmation(
             commandSource = commandSource,
             bypassWarning = bypassLoudVolumeWarning,
-            continuePlayback = { previousImpl(commandSource, true) }
+            continuePlayback = { previousImpl(commandSource, true, userInitiated) }
         )
     ) return
-    applyPreviousTrack(targetIndex, commandSource)
+    applyPreviousTrack(targetIndex, commandSource, userInitiated)
 }
 
-private fun PlayerManager.applyPreviousTrack(targetIndex: Int, commandSource: PlaybackCommandSource) {
+private fun PlayerManager.applyPreviousTrack(targetIndex: Int, commandSource: PlaybackCommandSource, userInitiated: Boolean) {
     val useTransitionFade = queueNavigationTransitionFade()
+    if (shouldRecordPlaybackSkip(userInitiated, commandSource,
+            _currentSongFlow.value?.let(AppQueueSongIdentity::stableKey),
+            currentPlaylist.getOrNull(targetIndex)?.let(AppQueueSongIdentity::stableKey))) {
+        playbackStatsOwner.onUserSkip(writesEnabled = initialized)
+    }
     currentIndex = targetIndex
     playAtIndex(currentIndex, useTrackTransitionFade = useTransitionFade, commandSource = commandSource)
     emitPlaybackCommand(

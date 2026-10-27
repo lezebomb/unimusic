@@ -13,7 +13,8 @@ class PlaybackStatsOwner(
     private val pendingWrites: PlaybackStatsPendingWrites,
     private val blockForPersistence: (Long, suspend () -> Unit) -> Unit = { timeoutMs, block ->
         blockingIo(timeoutMs, block)
-    }
+    },
+    private val feedback: PlaybackFeedbackTracker? = null
 ) {
     private var currentSong: SongItem? = null
     private var currentPlaylistId: Long? = null
@@ -63,12 +64,14 @@ class PlaybackStatsOwner(
             tracker.resetUntrackedPlayCycle()
             return@collect
         }
+        recordFeedback(feedback?.onTrackEnded().orEmpty(), writesEnabled)
         val snapshot = synchronized(tracker) { tracker.onTrackEnded() }
         persist(snapshot, writesEnabled)
     }
 
     fun onManualSeek(positionMs: Long) = pendingWrites.collect(this) {
         synchronized(tracker) { tracker.onManualSeek(positionMs) }
+        feedback?.onManualSeek(positionMs)
     }
 
     fun onProgress(positionMs: Long, writesEnabled: Boolean): Boolean {
@@ -78,6 +81,7 @@ class PlaybackStatsOwner(
                 tracker.onUntrackedPlaybackProgress(positionMs)
                 return@collect
             }
+            recordFeedback(feedback?.onProgress(positionMs).orEmpty(), writesEnabled)
             val snapshot = synchronized(tracker) { tracker.onPlaybackProgress(positionMs) }
             persist(snapshot, writesEnabled)
             sampled = snapshot != null
@@ -99,7 +103,23 @@ class PlaybackStatsOwner(
         if (!pendingWrites.enqueue(snapshot)) suspendSampling()
     }
 
+    fun onUserSkip(writesEnabled: Boolean) = pendingWrites.collect(this) {
+        if (canSample(writesEnabled)) recordFeedback(feedback?.onUserSkip().orEmpty(), writesEnabled)
+    }
+
+    private fun recordFeedback(events: List<moe.ouom.neriplayer.data.model.stats.PlaybackFeedbackEvent>, writesEnabled: Boolean) {
+        if (writesEnabled && events.isNotEmpty()) currentSong?.let { writes.recordFeedback(it, events) }
+    }
+
     private fun canSample(writesEnabled: Boolean): Boolean {
+        val allowed = canSampleStatistics(writesEnabled)
+        feedback?.setEnabled(writesEnabled && allowed)
+        feedback?.onSongChanged(currentSong)
+        feedback?.onPlayingChanged(currentPlaying)
+        return allowed
+    }
+
+    private fun canSampleStatistics(writesEnabled: Boolean): Boolean {
         statisticsEnabled = writesEnabled
         if (pendingWrites.isRestoringStatistics) {
             pauseForStatisticsRestore()
@@ -122,6 +142,7 @@ class PlaybackStatsOwner(
     }
 
     private fun pauseSampling(): Boolean {
+        feedback?.setEnabled(false)
         if (samplingSuspended) return false
         samplingSuspended = true
         val final = synchronized(tracker) { tracker.suspendForPersistence() }
@@ -134,6 +155,7 @@ class PlaybackStatsOwner(
     internal fun rebaseAfterStatisticsRestore() = synchronized(tracker) { tracker.rebaseAfterStatisticsRestore() }
 
     internal fun retireSampling() {
+        feedback?.setEnabled(false)
         if (!samplingSuspended) {
             samplingSuspended = true
             val final = synchronized(tracker) { tracker.suspendForPersistence() }
@@ -216,6 +238,8 @@ class PlaybackStatsOwner(
     }
 
     private fun clearTrackedSong() {
+        feedback?.setEnabled(false)
+        feedback?.onSongChanged(null)
         currentSong = null
         currentPlaylistId = null
         currentPlaying = false

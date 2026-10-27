@@ -420,6 +420,7 @@ class PlaybackStatsRepository internal constructor(
                 val state = roomStore.clear(System.currentTimeMillis())
                 _clearedAt.value = state.clearedAt
                 pendingWrites = false
+                moe.ouom.neriplayer.data.recommendation.LocalPlaybackFeedbackStore.maintain(app) { it.clearBefore(state.clearedAt) }
                 triggerSync()
             }
         }
@@ -433,6 +434,7 @@ class PlaybackStatsRepository internal constructor(
                 requireInitializedLocked()
                 if (!drainPendingLocked()) throw IOException("Playback statistics have pending journal entries")
                 roomStore.removeTracks(keys)
+                moe.ouom.neriplayer.data.recommendation.LocalPlaybackFeedbackStore.maintain(app) { it.forget(keys) }
                 triggerSync()
             }
         }

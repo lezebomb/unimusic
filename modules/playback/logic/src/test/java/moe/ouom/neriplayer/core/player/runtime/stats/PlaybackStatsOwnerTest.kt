@@ -25,6 +25,25 @@ import org.junit.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class PlaybackStatsOwnerTest {
+    @Test fun `feedback follows the confirmed owner and never startup waiting`() = runTest {
+        var now = 0L
+        val port = RecordingPort()
+        val owner = owner(backgroundScope, port, PlaybackStatsTracker({ it.id.toString() }, nowElapsedMs = { now }),
+            feedback = PlaybackFeedbackTracker({ it.id.toString() }, { now }, { 1_000_000L + now }))
+        owner.onSongChanged(song(1), null, true)
+        owner.onEnginePlayingChanged(true, false, true)
+        now = 5000;owner.onUserSkip(true)
+        assertTrue(port.feedbackEvents.isEmpty())
+        owner.onEnginePlayingChanged(true, true, true)
+        now = 7500;owner.onUserSkip(true)
+        assertEquals(1L, port.feedbackEvents.single().first)
+        assertEquals(moe.ouom.neriplayer.data.model.stats.PlaybackFeedbackKind.SKIP, port.feedbackEvents.single().second.kind)
+        owner.onSongChanged(song(2), null, true)
+        now = 10_000;owner.onUserSkip(false)
+        assertEquals(1, port.feedbackEvents.size)
+        runCurrent()
+    }
+
     @Test
     fun `a hung database write keeps every later playback delta with bounded IO workers`() = runTest {
         var now = 0L
@@ -724,11 +743,12 @@ class PlaybackStatsOwnerTest {
         writes: PlaybackStatsWritePort,
         tracker: PlaybackStatsTracker,
         blockForPersistence: ((Long, suspend () -> Unit) -> Unit)? = null,
-        pending: PlaybackStatsPendingWrites = PlaybackStatsPendingWrites(FakePendingStore(), scope)
+        pending: PlaybackStatsPendingWrites = PlaybackStatsPendingWrites(FakePendingStore(), scope),
+        feedback: PlaybackFeedbackTracker? = null
     ): PlaybackStatsOwner = if (blockForPersistence == null) {
-        PlaybackStatsOwner(scope, writes, tracker, pending)
+        PlaybackStatsOwner(scope, writes, tracker, pending, feedback = feedback)
     } else {
-        PlaybackStatsOwner(scope, writes, tracker, pending, blockForPersistence)
+        PlaybackStatsOwner(scope, writes, tracker, pending, blockForPersistence, feedback)
     }
 
     private class FakePendingStore : PlaybackStatsPendingStore {
@@ -749,6 +769,10 @@ class PlaybackStatsOwnerTest {
         var pendingWrites: Boolean = false
     ) : PlaybackStatsWritePort {
         val records = mutableListOf<PlaybackStatsSnapshot>()
+        val feedbackEvents = mutableListOf<Pair<Long, moe.ouom.neriplayer.data.model.stats.PlaybackFeedbackEvent>>()
+        override fun recordFeedback(song: SongItem, events: List<moe.ouom.neriplayer.data.model.stats.PlaybackFeedbackEvent>) {
+            feedbackEvents += events.map { song.id to it }
+        }
         var flushCount = 0
 
         override suspend fun record(snapshot: PlaybackStatsSnapshot) {

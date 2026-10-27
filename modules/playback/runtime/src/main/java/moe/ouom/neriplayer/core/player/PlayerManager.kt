@@ -1713,10 +1713,10 @@ object PlayerManager {
     fun next(
         force: Boolean = false,
         commandSource: PlaybackCommandSource = PlaybackCommandSource.LOCAL
-    ) = this.nextImpl(force, commandSource)
+    ) = this.nextImpl(force, commandSource, userInitiated = true)
 
     fun previous(commandSource: PlaybackCommandSource = PlaybackCommandSource.LOCAL) =
-        this.previousImpl(commandSource)
+        this.previousImpl(commandSource, userInitiated = true)
 
     fun cycleRepeatMode(commandSource: PlaybackCommandSource = PlaybackCommandSource.LOCAL) =
         this.cycleRepeatModeImpl(commandSource)

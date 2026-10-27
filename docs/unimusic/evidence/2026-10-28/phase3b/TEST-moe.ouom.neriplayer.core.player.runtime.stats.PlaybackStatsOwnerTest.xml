@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf8'?>
+<testsuite name="moe.ouom.neriplayer.core.player.runtime.stats.PlaybackStatsOwnerTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2026-10-27T18:21:39.556Z" hostname="local" time="0.389">
+  <properties />
+  <testcase name="feedback follows the confirmed owner and never startup waiting" classname="moe.ouom.neriplayer.core.player.runtime.stats.PlaybackStatsOwnerTest" time="0.384" />
+  <system-out />
+  <system-err />
+</testsuite>

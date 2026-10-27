@@ -27,7 +27,8 @@ class LocalRecommendationRepository(
     private val context: Context,
     private val playbackStats: PlaybackStatsRepository,
     private val dailySnapshots: DailyRecommendationStore = DailyRecommendationStore.getInstance(context),
-    private val feedback: LocalRecommendationFeedbackStore = LocalRecommendationFeedbackStore.getInstance(context)
+    private val feedback: LocalRecommendationFeedbackStore = LocalRecommendationFeedbackStore.getInstance(context),
+    private val playbackFeedback: LocalPlaybackFeedbackStore = LocalPlaybackFeedbackStore.getInstance(context)
 ) {
     suspend fun recommend(
         playlists: List<LocalPlaylist>,
@@ -60,11 +61,17 @@ class LocalRecommendationRepository(
         val eligible = if (dismissed.isEmpty()) candidates else withContext(Dispatchers.Default) {
             candidates.filterNot { recommendationIdentityDigest(it.identityKey) in dismissed }
         }
-        return dailySnapshots.getOrCreate(eligible, nowMillis, forceRefresh) { rankFresh(eligible, nowMillis) }
-            .copy(feedbackAvailable = feedbackAvailable, hasDismissedCandidates = eligible.size < candidates.size)
+        val evidence = try { playbackFeedback.signals(nowMillis, playbackStats.statsClearedAtFlow.value) }
+        catch (failure: Exception) {
+            if (failure is CancellationException) throw failure
+            LocalPlaybackSignals(emptyMap(), available = false)
+        }
+        return dailySnapshots.getOrCreate(eligible, nowMillis, forceRefresh) { rankFresh(eligible, nowMillis, evidence.byDigest) }
+            .copy(feedbackAvailable = feedbackAvailable && evidence.available,
+                hasDismissedCandidates = eligible.size < candidates.size)
     }
 
-    private suspend fun rankFresh(candidates: List<LocalRecommendationCandidate>, nowMillis: Long): LocalRecommendations {
+    private suspend fun rankFresh(candidates: List<LocalRecommendationCandidate>, nowMillis: Long, signals: Map<String, LocalPlaybackSignal>): LocalRecommendations {
         if (candidates.isEmpty()) return LocalRecommendations()
         var statisticsAvailable = true
         val statistics = try {
@@ -78,12 +85,15 @@ class LocalRecommendationRepository(
             emptyList()
         }
         return withContext(Dispatchers.Default) {
+            val feedbackByKey: Map<String, LocalPlaybackSignal> = if (signals.isEmpty()) emptyMap() else candidates.associate { candidate ->
+                candidate.identityKey to (signals[recommendationIdentityDigest(candidate.identityKey)] ?: LocalPlaybackSignal())
+            }
             val favoriteKeys = candidates.filter { it.favorite }.mapTo(hashSetOf()) { it.identityKey }
             LocalRecommendations(
-                items = LocalRecommendationRanker.rank(candidates, statistics, nowMillis),
+                items = LocalRecommendationRanker.rank(candidates, statistics, nowMillis, feedback = feedbackByKey),
                 localFileItems = LocalRecommendationRanker.rank(
                     candidates.filter { it.source == LocalRecommendationSource.LOCAL_FILE }
-                        .map { it.copy(favorite = it.identityKey in favoriteKeys) }, statistics, nowMillis
+                        .map { it.copy(favorite = it.identityKey in favoriteKeys) }, statistics, nowMillis, feedback = feedbackByKey
                 ),
                 statisticsAvailable = statisticsAvailable
             )

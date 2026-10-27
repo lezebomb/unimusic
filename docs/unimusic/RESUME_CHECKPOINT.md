@@ -14,6 +14,10 @@ Phase 4B已把本地歌单匹配与艺人构建/筛选/排序移后台，120ms�
 
 Phase 4C已完成UniMusic名称与Debug覆盖、原创U音符启动图标、自己的源码与独立上游入口/GPL署名，并修复版本no_commit问题。3个构建Git检查、最终APK/边界和Mate60关于页/目视图标/返回检查通过，见 [4C报告](PHASE_4C_PROJECT_IDENTITY.md) 及 [包名签名说明](PACKAGE_AND_SIGNING.md)。APK为实际基础Git修订+dirty的工作树构建；无Release/新包名迁移或Android13真机图标结论。下一步完善推荐所需的真实SKIP/COMPLETE/REPEAT反馈，先核对现有PlaybackStatsTracker与用户操作入口，避免把取流失败或拖动进度误记为不喜欢。
 
+Phase 3B已完成本机播放反馈实现、精确摘要有界存储与推荐规则v3，7个定向JVM、主/测试APK、模块边界、Mate60合成存储测试1项通过，见 [3B报告](PHASE_3B_PLAYBACK_RECOMMENDATION_SIGNALS.md)。真机仅验证合成队列/落盘/去重/清理，未验证实际Media3 SKIP/COMPLETE/REPEAT；不把构建或合成事件当真实播放。2个旧Runtime约定本机因缺JDK21未执行，已交给有JDK21的CI；最终构建日志 `phase3b-final-maintenance-build.log`，原始证据 `evidence/2026-10-28/phase3b/`。Room23不变、账号/歌单保留、测试键清理、播放器暂停。前5阶段CI均已成功；3B要按实际新run确认。
+
+下一步先看3B远端结果，继续完善推荐反馈的用户控制/后续价值事项；实际媒体采样、极端时序、性能和独立UUID dataset同步仍未验收。4C已推送 `c8211f95`。
+
 ## 历史阶段（以最新用户优先级和上述状态为准）
 
 此前阶段：2026-10-27（Asia/Shanghai）。最新 2O 对照原版 b9b6caf3 和已 fetch 的最新上游 0d9ce69f，保留预热/缓存/客户端回退。修复 8 秒共享任务短于原版 12 秒签名窗口的预算冲突：明确 YouTube 主播放 20 秒、共享后台 30 秒，其他主源/自动切源仍 8 秒且不能被嵌套延长。真实匿名响应是 UNPLAYABLE/LOGIN_REQUIRED、无音频格式；新增一轮后明确拒绝与来源 AUTH_REQUIRED、YouTube 专属登录提示，避免重复刷新和泛化超时。9 个关键 JVM 检查、最终 APK/测试包及边界通过，已覆盖安装到 Mate60。YouTube 仍未播通：最终播放器本次 5818ms 提示 LOGIN_REQUIRED，预热诊断一轮 6 次请求后明确拒绝，普通 UI 提示已核对。见 [2O报告](PHASE_2O_UPSTREAM_PLAYBACK_AND_ACCESS_FEEDBACK.md)。2N CI 已成功；网易云登录及 5 首导入保留，不重发验证码。未做 Google 登录，QQ 正向仍待验收。
