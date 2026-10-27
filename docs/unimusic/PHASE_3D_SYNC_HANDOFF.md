@@ -9,6 +9,13 @@
 - `modules/local/.../sync/host/AndroidSyncSnapshotBuilder.kt`目前只装配旧歌单、收藏、历史、删除、统计与歌词数据；未导出unified模型、来源匹配或推荐反馈。
 - 3A/3B/3C摘要文件、开关和每日推荐缓存仍本机私有。不能将它们直接附加到旧SyncData或备份目录，尤其不能上传本地路径、完整音频URL、账号Cookie、令牌和本机设备URI。
 
+## 归档与写入约束（源码已核对）
+
+- `SyncArchiveManifestValidation.kt`明确验证内层protocol为3、非负且相容的数量/字节、空root约束及header不得嵌入records；`SyncArchiveManifestWireGuard.kt`对原manifest与v4外层分别走wire检查。实施计划的旧“2.0数据路径”、内层protocol、v4封装并非同一个版本号，下一轮必须分别追踪。
+- GitHub发布资产的`GitHubReleaseSyncManifest.kt`另有formatVersion=1，校验assetId/名称/正内容长度及64位小写SHA256。不能将统一库schema数字复用为该manifest格式版本，也不能据此推断服务端支持新dataset。
+- WebDAV的`WebDavApiClient.kt`将expectedVersion/createOnly传给`WebDavConditionalHeaders`，没有条件令牌时默认拒绝普通更新；归档删除要求ownedPath与强ETag并发送If-Match。独立dataset也应走这些约束，不能打开allowUnconditionalWrite来掩盖冲突。
+- 上述为只读源码梳理，尚未核实GitHub分支/Contents或Release资产替换的完整竞态流程；该部分不能标记已完成。
+
 ## 建议接续顺序
 
 1. 先读同步archive的manifest/wire budget与GitHub/WebDAV条件写入口，再设计独立且可探测的统一库schema/capability；旧2.0客户端回写不得删除独立dataset。
