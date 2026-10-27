@@ -14,11 +14,15 @@ import moe.ouom.neriplayer.common.io.writeTextAtomically
 import moe.ouom.neriplayer.data.model.unified.sync.*
 
 @Serializable
+private data class IdentityCaptureBaseline(val songId: String, val metadata: PortableSongMetadata)
+
+@Serializable
 private data class IdentityJournalState(
     val schemaVersion: Int = 1,
     val deviceId: String,
     val counter: Long = 0,
-    val dataset: UnifiedIdentityDataset = UnifiedIdentityDataset()
+    val dataset: UnifiedIdentityDataset = UnifiedIdentityDataset(),
+    val baselines: List<IdentityCaptureBaseline> = emptyList()
 )
 
 /**
@@ -51,6 +55,16 @@ class UnifiedIdentityJournal(
             if (counter != old.counter || merged.dataset != old.dataset) persist(old.copy(counter = counter, dataset = merged.dataset))
             merged
         }
+    }
+
+    /** Read-only library observations are committed together; absence never implies deletion. */
+    suspend fun capture(observations: List<LocalIdentityObservation>): UnifiedIdentityCaptureResult = transaction { old ->
+        val plan = UnifiedIdentityCapturePlanner.plan(old.dataset, old.baselines.associate { it.songId to it.metadata },
+            old.deviceId, old.counter, observations)
+        val next = old.copy(counter = plan.counter, dataset = plan.result.merged.dataset,
+            baselines = plan.baselines.map { IdentityCaptureBaseline(it.key, it.value) })
+        if (next != old) persist(next)
+        plan.result
     }
 
     suspend fun upsert(songId: String, metadata: PortableSongMetadata, sources: List<PortableSongIdentity>): UnifiedIdentityMergeResult =
@@ -113,6 +127,13 @@ class UnifiedIdentityJournal(
         val merged = UnifiedIdentityMerger.merge(state.dataset, UnifiedIdentityDataset())
         require(merged.dataset.revisions.filter { it.dot.deviceId == state.deviceId }.all { it.dot.counter <= state.counter }) {
             "Identity journal counter regressed"
+        }
+        require(state.baselines.size <= UnifiedIdentityValidation.MAX_IDENTITIES &&
+            state.baselines.map { it.songId }.distinct().size == state.baselines.size) { "Invalid local capture baseline" }
+        val ids = merged.dataset.identities.mapTo(hashSetOf()) { it.songId }
+        state.baselines.forEach { baseline ->
+            require(baseline.songId in ids) { "Local capture baseline has no identity" }
+            UnifiedIdentityValidation.validateMetadata(baseline.metadata)
         }
         return state.copy(dataset = merged.dataset)
     }

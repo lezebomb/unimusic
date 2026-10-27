@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<testsuite name="moe.ouom.neriplayer.data.unified.UnifiedIdentityCaptureRoomTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2026-10-27T21:50:55.828Z" hostname="local" time="6.006">
+  <properties />
+  <testcase name="portableCapture" classname="moe.ouom.neriplayer.data.unified.UnifiedIdentityCaptureRoomTest" time="5.325" />
+  <system-out />
+  <system-err />
+</testsuite>

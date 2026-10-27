@@ -1,0 +1,10 @@
+<?xml version='1.0' encoding='utf-8'?>
+<testsuite name="moe.ouom.neriplayer.data.sync.unified.UnifiedIdentitySyncTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-10-27T21:49:59.103Z" hostname="local" time="0.012">
+  <properties />
+  <testcase name="merge is commutative associative idempotent and rejects forged causal histories" classname="moe.ouom.neriplayer.data.sync.unified.UnifiedIdentitySyncTest" time="0.003" />
+  <testcase name="exact sources alias but titles and bili parts never do" classname="moe.ouom.neriplayer.data.sync.unified.UnifiedIdentitySyncTest" time="0.0" />
+  <testcase name="strict codec rejects credentials unknown protocols duplicates and private source identities" classname="moe.ouom.neriplayer.data.sync.unified.UnifiedIdentitySyncTest" time="0.008" />
+  <testcase name="offline delete wins concurrent edit and only observed explicit restore revives" classname="moe.ouom.neriplayer.data.sync.unified.UnifiedIdentitySyncTest" time="0.001" />
+  <system-out />
+  <system-err />
+</testsuite>

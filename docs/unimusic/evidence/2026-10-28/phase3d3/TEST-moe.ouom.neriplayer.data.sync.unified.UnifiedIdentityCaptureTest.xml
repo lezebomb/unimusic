@@ -1,0 +1,8 @@
+<?xml version='1.0' encoding='utf-8'?>
+<testsuite name="moe.ouom.neriplayer.data.sync.unified.UnifiedIdentityCaptureTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-10-27T21:49:58.350Z" hostname="local" time="0.469">
+  <properties />
+  <testcase name="actual unambiguous local changes advance once while absence is never a tombstone" classname="moe.ouom.neriplayer.data.sync.unified.UnifiedIdentityCaptureTest" time="0.317" />
+  <testcase name="batch capture writes once and unchanged local rows never undo remote edits or deletion" classname="moe.ouom.neriplayer.data.sync.unified.UnifiedIdentityCaptureTest" time="0.146" />
+  <system-out />
+  <system-err />
+</testsuite>

@@ -35,12 +35,14 @@ object UnifiedIdentityValidation {
             require((revision.context[revision.dot.deviceId] ?: 0L) < revision.dot.counter) { "Causal revision observes itself" }
             val previous = dots.putIfAbsent(revision.dot, revision)
             require(previous == null || previous == revision) { "Conflicting causal dot" }
-            revision.metadata?.let { metadata ->
-                require(metadata.title.length <= 512 && metadata.artist.length <= 512 && metadata.album.length <= 512) { "Metadata too long" }
-                require(metadata.durationMs in 0..7L * 86_400_000L) { "Invalid portable duration" }
-                require(RecordingVersion.entries.any { it.name == metadata.recordingVersion }) { "Unknown recording version" }
-            }
+            revision.metadata?.let(::validateMetadata)
         }
+    }
+
+    fun validateMetadata(metadata: PortableSongMetadata) {
+        require(metadata.title.length <= 512 && metadata.artist.length <= 512 && metadata.album.length <= 512) { "Metadata too long" }
+        require(metadata.durationMs in 0..7L * 86_400_000L) { "Invalid portable duration" }
+        require(RecordingVersion.entries.any { it.name == metadata.recordingVersion }) { "Unknown recording version" }
     }
 
     fun validateIdentity(identity: PortableSongIdentity) {

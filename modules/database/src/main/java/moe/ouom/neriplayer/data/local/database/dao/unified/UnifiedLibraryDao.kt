@@ -29,6 +29,12 @@ interface UnifiedLibraryDao {
         "AND sub_resource_id = :subResourceId AND recording_context = :context LIMIT 1")
     suspend fun source(provider: String, resourceId: String, subResourceId: String, context: String): SongSourceEntity?
 
+    @Query("SELECT * FROM song_source WHERE (:afterId IS NULL OR source_id > :afterId) ORDER BY source_id LIMIT :limit")
+    suspend fun identitySourcesPage(afterId: String?, limit: Int): List<SongSourceEntity>
+
+    @Query("SELECT * FROM unified_song WHERE song_id IN (:ids)")
+    suspend fun songsByIds(ids: List<String>): List<UnifiedSongEntity>
+
     @Query("SELECT * FROM song_source WHERE song_id = :songId ORDER BY source_id")
     suspend fun sources(songId: String): List<SongSourceEntity>
 

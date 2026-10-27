@@ -1,0 +1,9 @@
+<?xml version='1.0' encoding='utf-8'?>
+<testsuite name="moe.ouom.neriplayer.data.sync.unified.UnifiedIdentityJournalTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-10-27T21:49:58.821Z" hostname="local" time="0.28">
+  <properties />
+  <testcase name="failed writes future schemas and regressed counters leave the old document intact" classname="moe.ouom.neriplayer.data.sync.unified.UnifiedIdentityJournalTest" time="0.077" />
+  <testcase name="remote tombstone blocks passive upsert and explicit restore observes both devices" classname="moe.ouom.neriplayer.data.sync.unified.UnifiedIdentityJournalTest" time="0.132" />
+  <testcase name="reopen and concurrent instances never reuse the persisted device counter" classname="moe.ouom.neriplayer.data.sync.unified.UnifiedIdentityJournalTest" time="0.07" />
+  <system-out />
+  <system-err />
+</testsuite>
