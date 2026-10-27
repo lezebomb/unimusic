@@ -1,0 +1,12 @@
+{
+  "real_migration": {
+    "identity_only": false,
+    "migration_required": true,
+    "changed_paths": 29
+  },
+  "latest_identity_entry": {
+    "identity_only": false,
+    "migration_required": true,
+    "changed_paths": 16
+  }
+}

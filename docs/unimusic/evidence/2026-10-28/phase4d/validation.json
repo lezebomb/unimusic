@@ -1,0 +1,12 @@
+{
+  "phase": "4D",
+  "date": "2026-10-28",
+  "validation": [
+    "four concrete routing boundary cases passed",
+    "two actual historical Git ranges classified conservatively",
+    "unknown range keeps complete baseline and migration",
+    "workflow YAML parsed locally"
+  ],
+  "androidBuild": "not repeated: workflow/Python routing only; last actual APK remains phase3d8",
+  "remoteWorkflow": "pending new run; no elapsed-time improvement claimed"
+}

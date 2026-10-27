@@ -119,6 +119,8 @@
 
 ## Phase 4：双标签 UI、端到端与性能
 
+4D已按保守白名单路由身份定向CI、按结构变化执行Android迁移；本地边界/真实Git范围/未知回退及YAML检查通过，见[4D](PHASE_4D_CHANGED_SCOPE_CI.md)。新的Actions执行和实际耗时待确认，未重复构建产品。
+
 4C已完成显示名称、Debug覆盖、原创启动图标、源码/上游入口与构建修订；见 [4C](PHASE_4C_PROJECT_IDENTITY.md) 和 [包名签名说明](PACKAGE_AND_SIGNING.md)。实际包标识与签名配置沿用，Release/包名迁移和全Launcher验收未做。
 
 4B已交付本地歌单/艺人后台筛选、取消与索引复用，见 [4B报告](PHASE_4B_BACKGROUND_LIBRARY_SEARCH.md)，不等同已测量大库性能。

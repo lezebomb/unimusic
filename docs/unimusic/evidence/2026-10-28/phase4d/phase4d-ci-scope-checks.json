@@ -1,0 +1,22 @@
+{
+  "identity_fix": {
+    "identity_only": true,
+    "migration_required": false,
+    "changed_paths": 1
+  },
+  "player_change": {
+    "identity_only": false,
+    "migration_required": false,
+    "changed_paths": 1
+  },
+  "schema_change": {
+    "identity_only": false,
+    "migration_required": true,
+    "changed_paths": 1
+  },
+  "dao_query": {
+    "identity_only": false,
+    "migration_required": false,
+    "changed_paths": 1
+  }
+}
