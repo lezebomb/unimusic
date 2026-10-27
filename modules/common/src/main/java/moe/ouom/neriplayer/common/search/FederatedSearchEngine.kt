@@ -1,6 +1,7 @@
 package moe.ouom.neriplayer.common.search
 
 import java.io.IOException
+import java.net.SocketTimeoutException
 import java.text.Normalizer
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.TimeoutCancellationException
@@ -32,7 +33,9 @@ data class SourceSearchState<T>(
     // Empty string denotes the first page; null denotes a completed source.
     val nextCursor: String? = "",
     val loading: Boolean = false,
-    val failure: SearchSourceFailure? = null
+    val failure: SearchSourceFailure? = null,
+    /** Last completed attempt, including permit wait; monotonic and never persisted. */
+    val elapsedMillis: Long? = null
 )
 
 data class FederatedSearchSnapshot<T>(val query: String, val sources: Map<String, SourceSearchState<T>>) {
@@ -57,7 +60,8 @@ class FederatedSearchEngine<T>(
     private val identity: (T) -> String,
     private val sourceBudgetMs: Long = 6_000,
     parallelism: Int = 3,
-    localProviderIds: Set<String> = emptySet()
+    localProviderIds: Set<String> = emptySet(),
+    private val monotonicNanos: () -> Long = System::nanoTime
 ) {
     private val permits = Semaphore(parallelism)
     private val localProviders = localProviderIds.toSet()
@@ -79,7 +83,8 @@ class FederatedSearchEngine<T>(
         val states = providers.associateTo(linkedMapOf()) { provider ->
             val prior = previous?.sources?.get(provider.id) ?: SourceSearchState()
             val requested = (selected == null || provider.id in selected) && prior.nextCursor != null
-            provider.id to prior.copy(loading = requested, failure = if (requested) null else prior.failure)
+            provider.id to prior.copy(loading = requested, failure = if (requested) null else prior.failure,
+                elapsedMillis = if (requested) null else prior.elapsedMillis)
         }
         val mutex = Mutex()
         send(FederatedSearchSnapshot(normalized, states.toMap()))
@@ -88,6 +93,7 @@ class FederatedSearchEngine<T>(
                 val prior = states.getValue(provider.id)
                 if (!prior.loading) return@forEach
                 launch {
+                    val started = monotonicNanos()
                     val result = try {
                         // Queueing time is included: a saturated/slow platform cannot extend the request forever.
                         withTimeoutOrNull(sourceBudgetMs) {
@@ -110,13 +116,16 @@ class FederatedSearchEngine<T>(
                     } catch (error: SearchSourceException) {
                         prior.copy(loading = false, failure = error.reason,
                             nextCursor = if (error.reason in setOf(SearchSourceFailure.AUTH_REQUIRED, SearchSourceFailure.DISABLED)) null else prior.nextCursor)
+                    } catch (_: SocketTimeoutException) {
+                        prior.copy(loading = false, failure = SearchSourceFailure.TIMEOUT)
                     } catch (_: IOException) {
                         prior.copy(loading = false, failure = SearchSourceFailure.NETWORK)
                     } catch (_: Exception) {
                         prior.copy(loading = false, failure = SearchSourceFailure.UNAVAILABLE)
                     }
                     mutex.withLock {
-                        states[provider.id] = result
+                        states[provider.id] = result.copy(elapsedMillis =
+                            ((monotonicNanos() - started) / 1_000_000).coerceAtLeast(0L))
                         send(FederatedSearchSnapshot(normalized, states.toMap()))
                     }
                 }

@@ -1,0 +1,31 @@
+{
+  "phase": "2W",
+  "date": "2026-10-28",
+  "jvm": [
+    {
+      "suite": "moe.ouom.neriplayer.common.search.FederatedSearchEngineTest",
+      "tests": 6,
+      "failures": 0,
+      "errors": 0
+    },
+    {
+      "suite": "moe.ouom.neriplayer.platform.search.api.client.KuwoCatalogProviderTest",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0
+    }
+  ],
+  "newTests": 1,
+  "timing": "Injected monotonic virtual clock only; not real network performance",
+  "build": "Debug passed; phase2w-search-timing.log",
+  "apk": {
+    "path": "app/build/outputs/apk/debug/app-debug.apk",
+    "sha256": "e0d019d189056cb8b19d53c7da6c1ad161f3ca40eeb8844308c7bab6f82ac325",
+    "bytes": 62990327
+  },
+  "notRun": [
+    "new UI/device installation",
+    "real online search timings",
+    "real audio/account"
+  ]
+}

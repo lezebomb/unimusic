@@ -14,6 +14,29 @@ import org.junit.Test
 
 @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
 class FederatedSearchEngineTest {
+    @Test fun monotonicAttemptTimesIncludeQueueingAndSelectiveRetryKeepsUnrequestedMeasurements() = runTest {
+        var attempts = 0
+        val engine = FederatedSearchEngine(listOf(
+            FederatedSearchProvider("healthy") { _: String, _: String? -> delay(20);SearchPage(listOf("ready")) },
+            FederatedSearchProvider("socket") { _: String, _: String? ->
+                if (++attempts == 1) { delay(5);throw java.net.SocketTimeoutException("fixture") }
+                delay(4);SearchPage(listOf("recovered"))
+            }
+        ), identity = { it }, sourceBudgetMs = 100, parallelism = 1,
+            monotonicNanos = { testScheduler.currentTime * 1_000_000 })
+        val initial = engine.search("song").toList()
+        assertTrue(initial.first().sources.values.all { it.elapsedMillis == null })
+        val finished = initial.last()
+        assertEquals(20L, finished.sources.getValue("healthy").elapsedMillis)
+        assertEquals(25L, finished.sources.getValue("socket").elapsedMillis)
+        assertEquals(SearchSourceFailure.TIMEOUT, finished.sources.getValue("socket").failure)
+        val retry = engine.search("song", finished, finished.retryableSourceIds).toList()
+        assertNull(retry.first().sources.getValue("socket").elapsedMillis)
+        assertEquals(20L, retry.last().sources.getValue("healthy").elapsedMillis)
+        assertEquals(4L, retry.last().sources.getValue("socket").elapsedMillis)
+        assertEquals(listOf("ready", "recovered"), retry.last().interleavedItems())
+    }
+
     @Test fun fastResultsSurviveOtherSourcesFailingOrTimingOut() = runTest {
         val engine = FederatedSearchEngine(listOf(
             FederatedSearchProvider("fast") { _: String, _: String? -> delay(10); SearchPage(listOf("song")) },

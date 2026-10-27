@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="unimusic_search_timing_show">View source timings</string>
+    <string name="unimusic_search_timing_hide">Hide timings</string>
+    <string name="unimusic_search_timing_value">%1$s: %2$.1f s</string>
+    <string name="unimusic_search_timing_description">Search time for this batch, including queueing and metadata processing. Audio checks and playback are measured separately.</string>
+</resources>

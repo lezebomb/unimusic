@@ -63,6 +63,8 @@
 
 ## Phase 2：统一搜索与高精度匹配
 
+2W新增可展开的每源本批次搜索耗时与明确超时分类，7项JVM、Debug通过，见[2W](PHASE_2W_SEARCH_TIMINGS.md)。虚拟时序不是线上速度，实际UI/计时待真机验收。
+
 2V复用不可变查询规范化/分词，内层评分去掉中间列表；7项关键JVM及Debug通过，见[2V](PHASE_2V_PREPARED_SEARCH_QUERY.md)。未测真实CPU/网络性能，不更改匹配阈值。
 
 2U已解决元数据后台排序与可播探测交错的旧证据回填，预计算比较等级；2个新/共10项JVM、Debug通过，见[2U](PHASE_2U_CURRENT_SEARCH_EVIDENCE.md)。无新增线上性能/音频验收。

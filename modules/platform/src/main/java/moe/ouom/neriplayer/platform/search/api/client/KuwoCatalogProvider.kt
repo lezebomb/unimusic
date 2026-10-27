@@ -4,6 +4,8 @@ import java.io.IOException
 import kotlinx.coroutines.withTimeoutOrNull
 import moe.ouom.neriplayer.common.io.readBytesLimited
 import moe.ouom.neriplayer.common.search.normalizeFederatedQuery
+import moe.ouom.neriplayer.common.search.SearchSourceException
+import moe.ouom.neriplayer.common.search.SearchSourceFailure
 import moe.ouom.neriplayer.data.model.unified.CatalogSearchPage
 import moe.ouom.neriplayer.data.model.unified.CatalogTrack
 import moe.ouom.neriplayer.data.model.unified.MusicCatalogProvider
@@ -32,7 +34,7 @@ class KuwoCatalogProvider(private val client: OkHttpClient) : MusicCatalogProvid
                     val body = response.body.byteStream().readBytesLimited(2L * 1024 * 1024).toString(Charsets.UTF_8)
                     parseKuwoCatalogSearch(body, page, limit)
                 }
-        } ?: throw IOException("Kuwo catalog timed out")
+        } ?: throw SearchSourceException(SearchSourceFailure.TIMEOUT)
     }
 }
 
