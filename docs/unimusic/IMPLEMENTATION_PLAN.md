@@ -127,6 +127,8 @@
 
 ## Phase 4：双标签 UI、端到端与性能
 
+4E已在Mate60保留数据安装最终2T APK，完成推荐偏好、GitHub/WebDAV标识入口和0冲突页检查；本机捕获21条标识/修订，未上传/改偏好，见[4E](PHASE_4E_DEVICE_FEATURE_CHECK.md)。真实云同步、外来UUID音频和Media3反馈采样仍未验收。2T及2S远端CI成功。
+
 4D已按保守白名单路由身份定向CI、按结构变化执行Android迁移；本地边界/真实Git范围/未知回退及YAML检查通过，见[4D](PHASE_4D_CHANGED_SCOPE_CI.md)。新的Actions执行和实际耗时待确认，未重复构建产品。
 
 4C已完成显示名称、Debug覆盖、原创启动图标、源码/上游入口与构建修订；见 [4C](PHASE_4C_PROJECT_IDENTITY.md) 和 [包名签名说明](PACKAGE_AND_SIGNING.md)。实际包标识与签名配置沿用，Release/包名迁移和全Launcher验收未做。

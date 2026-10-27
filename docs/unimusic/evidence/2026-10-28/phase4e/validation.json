@@ -1,0 +1,36 @@
+{
+  "phase": "4E",
+  "date": "2026-10-28",
+  "device": "Huawei Mate60",
+  "installedVersion": "98acab4af027.dirty.10280721",
+  "apk": {
+    "path": "app/build/outputs/apk/debug/app-debug.apk",
+    "sha256": "33e3cd873b83b9bb233299b5b8fda37a18f70cdc5300136703108a434fc317b8",
+    "bytes": 62985043
+  },
+  "deviceChecks": {
+    "dataPreservingInstall": "package version confirms final 2T APK is installed",
+    "recommendationPreferences": "enabled switch, clear and done visible; no toggle/clear",
+    "githubIdentitySync": "title, conflict entry and configure visible",
+    "webdavIdentitySync": "title, conflict entry and configure visible",
+    "conflictDialog": "0 pending, opens and closes",
+    "privateCapture": {
+      "schema": 1,
+      "identities": 21,
+      "revisions": 21
+    },
+    "activePlaybackAfter": false
+  },
+  "ci": {
+    "head": "a9b81a4d018db4f965b8d45f6f3176f0893beee8",
+    "run": 40602604349,
+    "conclusion": "success"
+  },
+  "notRun": [
+    "real GitHub/WebDAV upload or two-device sync",
+    "foreign UUID audio",
+    "real Media3 feedback sampling",
+    "live search latency and original-vocal listening",
+    "new login/account/audio acceptance"
+  ]
+}
