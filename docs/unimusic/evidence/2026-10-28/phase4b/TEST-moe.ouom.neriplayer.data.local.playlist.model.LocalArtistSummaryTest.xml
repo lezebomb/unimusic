@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf8'?>
+<testsuite name="moe.ouom.neriplayer.data.local.playlist.model.LocalArtistSummaryTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2026-10-27T17:16:22.313Z" hostname="local" time="1.252">
+  <properties />
+  <testcase name="artist build cancellation stops during source song indexing" classname="moe.ouom.neriplayer.data.local.playlist.model.LocalArtistSummaryTest" time="1.248" />
+  <system-out />
+  <system-err />
+</testsuite>

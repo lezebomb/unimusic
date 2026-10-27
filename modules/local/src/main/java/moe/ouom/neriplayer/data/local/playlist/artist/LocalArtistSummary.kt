@@ -17,13 +17,15 @@ import java.util.Locale
 
 fun buildLocalArtistSummaries(
     playlists: List<LocalPlaylist>,
-    context: Context
+    context: Context,
+    checkActive: () -> Unit = {}
 ): List<LocalArtistSummary> {
     return buildLocalArtistSummariesFromSourceSongs(
         sourceSongs = distinctLocalArtistSourceSongs(
-            playlists.asSequence().flatMap { playlist -> playlist.songs.asSequence() }
+            playlists.asSequence().flatMap { playlist -> playlist.songs.asSequence() }, checkActive
         ),
-        unknownArtist = context.getString(CoreCommonR.string.music_unknown_artist)
+        unknownArtist = context.getString(CoreCommonR.string.music_unknown_artist),
+        checkActive = checkActive
     )
 }
 
@@ -69,12 +71,14 @@ fun findLocalArtistSummary(
 
 private fun buildLocalArtistSummariesFromSourceSongs(
     sourceSongs: List<SongItem>,
-    unknownArtist: String
+    unknownArtist: String,
+    checkActive: () -> Unit = {}
 ): List<LocalArtistSummary> {
     if (sourceSongs.isEmpty()) return emptyList()
 
     val groups = linkedMapOf<String, MutableLocalArtistGroup>()
     sourceSongs.forEach { song ->
+        checkActive()
         localArtistNamesForSong(song, unknownArtist).forEach { artistName ->
             val key = localArtistStableKey(artistName)
             groups.getOrPut(key) { MutableLocalArtistGroup(artistName) }
@@ -84,7 +88,7 @@ private fun buildLocalArtistSummariesFromSourceSongs(
     }
 
     return groups.values
-        .map { group -> LocalArtistSummary(name = group.name, songs = group.songs.toList()) }
+        .map { group -> checkActive(); LocalArtistSummary(name = group.name, songs = group.songs.toList()) }
         .sortedWith(
             compareByDescending<LocalArtistSummary> { summary ->
                 summary.coverSong?.addedAt ?: 0L
@@ -94,10 +98,11 @@ private fun buildLocalArtistSummariesFromSourceSongs(
         )
 }
 
-private fun distinctLocalArtistSourceSongs(songs: Sequence<SongItem>): List<SongItem> {
+private fun distinctLocalArtistSourceSongs(songs: Sequence<SongItem>, checkActive: () -> Unit = {}): List<SongItem> {
     val duplicateIndex = LocalArtistSongDuplicateIndex()
     return buildList {
         songs.forEach { song ->
+            checkActive()
             if (duplicateIndex.contains(song)) return@forEach
             duplicateIndex.add(song)
             add(song)

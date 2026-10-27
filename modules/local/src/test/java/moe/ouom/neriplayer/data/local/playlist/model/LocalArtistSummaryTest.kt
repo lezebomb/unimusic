@@ -15,6 +15,15 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class LocalArtistSummaryTest {
+    @Test fun `artist build cancellation stops during source song indexing`() {
+        val context = org.mockito.Mockito.mock(android.content.Context::class.java)
+        val playlist = LocalPlaylist(1L, "Library", songs = mutableListOf(song(1L, "Track", "Artist")))
+        org.junit.Assert.assertThrows(kotlinx.coroutines.CancellationException::class.java) {
+            buildLocalArtistSummaries(listOf(playlist), context) {
+                throw kotlinx.coroutines.CancellationException("Cancelled search")
+            }
+        }
+    }
 
     @Test
     fun `slash separated duet belongs to each local artist`() {

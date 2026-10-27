@@ -62,6 +62,7 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.DragHandle
 import androidx.compose.material.icons.filled.MoreVert
 import moe.ouom.neriplayer.ui.component.overlay.DensityScaledAlertDialog as AlertDialog
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
@@ -110,7 +111,6 @@ import moe.ouom.neriplayer.data.local.playlist.system.FavoritesPlaylist
 import moe.ouom.neriplayer.data.local.playlist.system.LocalFilesPlaylist
 import moe.ouom.neriplayer.data.model.playlist.LocalArtistSummary
 import moe.ouom.neriplayer.data.model.playlist.LocalPlaylist
-import moe.ouom.neriplayer.data.local.playlist.artist.buildLocalArtistSummaries
 import moe.ouom.neriplayer.data.local.playlist.LocalPlaylistRepository
 import moe.ouom.neriplayer.data.local.playlist.system.SystemLocalPlaylists
 import moe.ouom.neriplayer.data.local.media.displayArtist
@@ -164,15 +164,10 @@ internal fun LocalPlaylistList(
     val autoShowKeyboard by AppContainer.settingsRepo.autoShowKeyboardFlow.collectAsStateWithLifecycle(
         initialValue = false
     )
-    val localArtists = remember(playlists, context) {
-        buildLocalArtistSummaries(playlists, context)
-    }
-    val filteredLocalArtists = remember(localArtists, localSearchQuery) {
-        filterLocalArtists(localArtists, localSearchQuery)
-    }
-    val displayedLocalArtists = remember(filteredLocalArtists, localArtistSortMode) {
-        sortLocalArtists(filteredLocalArtists, localArtistSortMode)
-    }
+    val searchResult = rememberLibraryLocalSearch(
+        playlists, localSearchQuery, selectedLocalCategory == LOCAL_CATEGORY_ARTIST, localArtistSortMode, context
+    )
+    val displayedLocalArtists = searchResult.artists
     val editablePlaylists = remember(playlists, context) {
         playlists.filterNot { SystemLocalPlaylists.isSystemPlaylist(it, context) }
     }
@@ -266,11 +261,11 @@ internal fun LocalPlaylistList(
     val localFilesPlaylist = playlists.firstOrNull { LocalFilesPlaylist.isSystemPlaylist(it, context) }
 
     val displayedFavoritesPlaylist = favoritesPlaylist
-        ?.takeIf { playlist -> playlist.matchesLocalPlaylistSearch(localSearchQuery, context) }
+        ?.takeIf { playlist -> searchResult.playlistIds?.contains(playlist.id) != false }
     val displayedLocalFilesPlaylist = localFilesPlaylist
-        ?.takeIf { playlist -> playlist.matchesLocalPlaylistSearch(localSearchQuery, context) }
+        ?.takeIf { playlist -> searchResult.playlistIds?.contains(playlist.id) != false }
     val displayedPlaylists = reorderablePlaylists
-        .filter { playlist -> playlist.matchesLocalPlaylistSearch(localSearchQuery, context) }
+        .filter { playlist -> searchResult.playlistIds?.contains(playlist.id) != false }
     val hasPlaylistSearchMatches =
         displayedFavoritesPlaylist != null ||
             displayedPlaylists.isNotEmpty() ||
@@ -333,8 +328,18 @@ internal fun LocalPlaylistList(
             )
         }
 
+        if (searchResult.loading) {
+            item(key = "local_library_search_loading") {
+                Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    CircularProgressIndicator(Modifier.size(20.dp), strokeWidth = 2.dp)
+                    Text(stringResource(moe.ouom.neriplayer.R.string.unimusic_library_searching),
+                        style = MaterialTheme.typography.bodySmall)
+                }
+            }
+        }
         if (selectedLocalCategory == LOCAL_CATEGORY_ARTIST) {
-            if (displayedLocalArtists.isEmpty()) {
+            if (!searchResult.loading && displayedLocalArtists.isEmpty()) {
                 item(key = "local_artist_empty") {
                     LibrarySearchEmptyCard(
                         titleResId = if (localSearchQuery.isBlank()) {
@@ -550,7 +555,7 @@ internal fun LocalPlaylistList(
             }
         }
 
-        if (localSearchQuery.isNotBlank() && !hasPlaylistSearchMatches) {
+        if (!searchResult.loading && localSearchQuery.isNotBlank() && !hasPlaylistSearchMatches) {
             item(key = "local_playlist_search_empty") {
                 LibrarySearchEmptyCard(
                     titleResId = CoreCommonR.string.library_local_search_empty,
@@ -1215,9 +1220,10 @@ internal fun sortLocalArtists(
     }
 }
 
-internal fun LocalArtistSummary.matchesLocalArtistSearch(query: String): Boolean {
+internal fun LocalArtistSummary.matchesLocalArtistSearch(query: String, checkActive: () -> Unit = {}): Boolean {
     return queryMatches(query, name) ||
         songs.any { song ->
+            checkActive()
             queryMatches(
                 query,
                 song.displayName(),
@@ -1228,11 +1234,12 @@ internal fun LocalArtistSummary.matchesLocalArtistSearch(query: String): Boolean
         }
 }
 
-internal fun LocalPlaylist.matchesLocalPlaylistSearch(query: String, context: Context): Boolean {
+internal fun LocalPlaylist.matchesLocalPlaylistSearch(query: String, context: Context, checkActive: () -> Unit = {}): Boolean {
     if (query.isBlank()) return true
     val displayName = SystemLocalPlaylists.resolve(id, name, context)?.currentName ?: name
     return queryMatches(query, id, name, displayName, songs.size) ||
         songs.any { song ->
+            checkActive()
             queryMatches(
                 query,
                 song.displayName(),

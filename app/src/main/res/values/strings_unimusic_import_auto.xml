@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="unimusic_import_auto_title">每天刷新已关联歌单</string>
-    <string name="unimusic_import_auto_hint">默认关闭。开启后约每天联网补充新增歌曲，电量低时暂缓；不删除本地修改。关闭后不再安排刷新，已开始的导入可在任务中取消。</string>
+    <string name="unimusic_import_auto_hint">默认关闭。约每天联网刷新已完成且仍关联的歌单，电量低时暂缓；保留本地修改。关闭后不再安排刷新，已开始的导入可手动取消。</string>
     <string name="unimusic_import_auto_failed">无法更新后台刷新计划，请稍后重试。</string>
 </resources>

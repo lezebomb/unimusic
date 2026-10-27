@@ -6,9 +6,11 @@
 
 Phase 4A 已完成“发现／我的”两标签、我的导入/历史/下载/统计入口、设置与调试入口及父子返回兼容。7 个定向 JVM 检查、Debug APK 和模块边界通过；Mate60 数据保留覆盖安装、搜索/设置返回、下载进出及导入弹层开关通过。没有重新验收账号、音频、平板或性能，详见 [4A报告](PHASE_4A_DISCOVER_AND_MY_LIBRARY.md)。APK/哈希、7项 XML 与设备检查保存在 `evidence/2026-10-28/phase4a/`。本阶段已推送；每个完成阶段 commit/push 后接着推进。
 
-Phase 3A 也已完成：精确歌曲30天暂不推荐、撤销和恢复全部隐藏，摘要/期限本机原子保存、过期与旧撤销保护；3个关键JVM、最终Debug构建、边界及Mate60隐藏/撤销/进程重开/恢复通过，播放器保持暂停，测试偏好最终清空。实际范围见 [3A报告](PHASE_3A_LOCAL_RECOMMENDATION_FEEDBACK.md)，不是SKIP/COMPLETE/REPEAT或跨设备同步。4A已推送 `9bb6fe89`，其[CI](https://github.com/lezebomb/unimusic/actions/runs/40543256303)已确认成功。3A已推送 `be36116e`，其CI上次查询仍在运行。
+Phase 3A 也已完成：精确歌曲30天暂不推荐、撤销和恢复全部隐藏，摘要/期限本机原子保存、过期与旧撤销保护；3个关键JVM、最终Debug构建、边界及Mate60隐藏/撤销/进程重开/恢复通过，播放器保持暂停，测试偏好最终清空。实际范围见 [3A报告](PHASE_3A_LOCAL_RECOMMENDATION_FEEDBACK.md)，不是SKIP/COMPLETE/REPEAT或跨设备同步。4A已推送 `9bb6fe89`，其[CI](https://github.com/lezebomb/unimusic/actions/runs/40543256303)已确认成功。3A已推送 `be36116e`，其[CI](https://github.com/lezebomb/unimusic/actions/runs/40545377816)已确认成功。
 
-Phase 1D已完成已关联歌单的可选每日刷新，默认关闭。3个直接相关JVM、主/测试APK、模块边界、Mate60一个调度测试及入口检查通过；仅健康完成的关联歌单自动刷新，不重启取消/失败/暂停，也不关联一次性导入。设备开关最终关闭，没有进行真实远端刷新或等待24小时；见 [1D报告](PHASE_1D_OPTIONAL_LINKED_REFRESH.md) 与 `evidence/2026-10-28/phase1d/`。下一步优化“我的”本地搜索的主线程扫描，保留全部账号和库数据。
+Phase 1D已完成已关联歌单的可选每日刷新，默认关闭。3个直接相关JVM、主/测试APK、模块边界、Mate60一个调度测试及入口检查通过；仅健康完成的关联歌单自动刷新，不重启取消/失败/暂停，也不关联一次性导入。设备开关最终关闭，没有进行真实远端刷新或等待24小时；见 [1D报告](PHASE_1D_OPTIONAL_LINKED_REFRESH.md) 与 `evidence/2026-10-28/phase1d/`。1D已推送 `35ed256a`，其[CI](https://github.com/lezebomb/unimusic/actions/runs/40547749753)已确认成功，保留全部账号和库数据。
+
+Phase 4B已把本地歌单匹配与艺人构建/筛选/排序移后台，120ms去抖、取消过期查询、每快照复用单个艺人索引，无关键词歌单立即恢复；7个定向JVM、Debug构建、模块边界及Mate60搜索/清空/分类检查通过。没有大库性能数字或新的音频验收，见 [4B报告](PHASE_4B_BACKGROUND_LIBRARY_SEARCH.md)。下一步补UniMusic显示名称、自己的源码入口和清晰上游署名。
 
 ## 历史阶段（以最新用户优先级和上述状态为准）
 

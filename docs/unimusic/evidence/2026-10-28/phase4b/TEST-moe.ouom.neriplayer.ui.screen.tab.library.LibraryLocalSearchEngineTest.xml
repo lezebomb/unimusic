@@ -1,0 +1,9 @@
+<?xml version='1.0' encoding='utf8'?>
+<testsuite name="moe.ouom.neriplayer.ui.screen.tab.library.LibraryLocalSearchEngineTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-10-27T17:18:45.106Z" hostname="local" time="1.551">
+  <properties />
+  <testcase name="artist index is reused for queries and invalidated for a new library snapshot" classname="moe.ouom.neriplayer.ui.screen.tab.library.LibraryLocalSearchEngineTest" time="0.324" />
+  <testcase name="playlist search preserves matching order and never builds unused artists" classname="moe.ouom.neriplayer.ui.screen.tab.library.LibraryLocalSearchEngineTest" time="1.209" />
+  <testcase name="cancelled scans stop before publishing an obsolete result" classname="moe.ouom.neriplayer.ui.screen.tab.library.LibraryLocalSearchEngineTest" time="0.014" />
+  <system-out />
+  <system-err />
+</testsuite>

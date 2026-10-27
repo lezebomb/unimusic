@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="unimusic_import_auto_title">Refresh linked playlists daily</string>
-    <string name="unimusic_import_auto_hint">Off by default. Adds new songs about once a day while online with sufficient battery. Keeps local edits. Turning this off stops future refresh scheduling; imports already started can be cancelled below.</string>
+    <string name="unimusic_import_auto_hint">Off by default. Refreshes completed, linked playlists about daily while online with sufficient battery. Keeps local edits. Turning this off stops future scheduling; imports already started can be cancelled.</string>
     <string name="unimusic_import_auto_failed">Unable to update background refresh. Please try again.</string>
 </resources>

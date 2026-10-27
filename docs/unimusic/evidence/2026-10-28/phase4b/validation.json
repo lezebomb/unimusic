@@ -1,0 +1,35 @@
+{
+  "phase": "4B",
+  "date": "2026-10-28",
+  "jvm": {
+    "tests": 7,
+    "failures": 0,
+    "classes": {
+      "LibraryLocalSearchEngineTest": 3,
+      "LibraryLocalSearchMatchingTest": 3,
+      "LocalArtistSummaryTest": 1
+    }
+  },
+  "build": {
+    "success": true,
+    "first_attempt": "compileDebugKotlin type inference failure; explicit Set<Long> repaired",
+    "logs": [
+      "build/unimusic-toolchain/phase4b-library-search-validation.log",
+      "build/unimusic-toolchain/phase4b-library-search-repair.log"
+    ],
+    "apk": "app/build/outputs/apk/debug/app-debug.apk",
+    "bytes": 62800542,
+    "sha256": "9a7d2153720053412ac0835cbab31b7e647308943232495bbbf07b7a1b269f01"
+  },
+  "boundaries": "passed",
+  "device": {
+    "model": "Huawei Mate60",
+    "install": "adb install -r: Success",
+    "checks": "device-search.json"
+  },
+  "not_run": [
+    "large-library or device frame-time benchmark",
+    "new platform search or playback validation",
+    "full upstream suite"
+  ]
+}

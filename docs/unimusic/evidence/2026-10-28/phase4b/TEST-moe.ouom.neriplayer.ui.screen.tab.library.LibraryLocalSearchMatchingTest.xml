@@ -1,0 +1,9 @@
+<?xml version='1.0' encoding='utf8'?>
+<testsuite name="moe.ouom.neriplayer.ui.screen.tab.library.LibraryLocalSearchMatchingTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-10-27T17:18:46.666Z" hostname="local" time="0.276">
+  <properties />
+  <testcase name="local artist search prefers custom song metadata over the original tags" classname="moe.ouom.neriplayer.ui.screen.tab.library.LibraryLocalSearchMatchingTest" time="0.007" />
+  <testcase name="system favorites playlist matches its localized display name" classname="moe.ouom.neriplayer.ui.screen.tab.library.LibraryLocalSearchMatchingTest" time="0.267" />
+  <testcase name="user playlist matches by id name size or song metadata" classname="moe.ouom.neriplayer.ui.screen.tab.library.LibraryLocalSearchMatchingTest" time="0.002" />
+  <system-out />
+  <system-err />
+</testsuite>
