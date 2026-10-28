@@ -1,5 +1,7 @@
 package moe.ouom.neriplayer.platform.qqmusic.api
 
+import moe.ouom.neriplayer.common.search.SearchSourceException
+import moe.ouom.neriplayer.common.search.SearchSourceFailure
 import java.io.IOException
 import java.util.concurrent.TimeUnit
 import kotlin.random.Random
@@ -32,13 +34,13 @@ class QQMusicAudioClient(private val client: OkHttpClient = OkHttpClient.Builder
             .addQueryParameter("p", page.toString()).addQueryParameter("w", query)
             .addQueryParameter("cr", "1").addQueryParameter("g_tk", "5381").build()
         val root = client.newCall(Request.Builder().url(url).header("Referer", "https://y.qq.com/").build()).awaitResponse { response ->
-            if (!response.isSuccessful) throw IOException("QQ search HTTP ${response.code}")
+            if (!response.isSuccessful) throw SearchSourceException(SearchSourceFailure.UNAVAILABLE)
             JSONObject(response.body.byteStream().readBytesLimited(2 * 1024 * 1024L).toString(Charsets.UTF_8))
         }
-        if (root.optInt("code", -1) != 0) throw IOException("QQ search unavailable")
-        val data = root.optJSONObject("data") ?: throw IOException("QQ search unavailable")
+        if (root.optInt("code", -1) != 0) throw SearchSourceException(SearchSourceFailure.UNAVAILABLE)
+        val data = root.optJSONObject("data") ?: throw SearchSourceException(SearchSourceFailure.UNAVAILABLE)
         val song = data.optJSONObject("song")
-        val rows = song?.optJSONArray("list") ?: JSONArray()
+        val rows = song?.optJSONArray("list") ?: throw SearchSourceException(SearchSourceFailure.UNAVAILABLE)
         val tracks = buildList {
             for (i in 0 until rows.length()) {
                 val row = rows.optJSONObject(i) ?: continue

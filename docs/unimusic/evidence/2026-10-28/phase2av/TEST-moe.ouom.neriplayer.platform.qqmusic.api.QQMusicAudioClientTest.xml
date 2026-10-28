@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="moe.ouom.neriplayer.platform.qqmusic.api.QQMusicAudioClientTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2026-10-28T14:08:41.288Z" hostname="XUSHAOYANG" time="0.522">
+  <properties/>
+  <testcase name="searchServiceFailuresStaySeparateFromTransportAndKeepHealthyResults" classname="moe.ouom.neriplayer.platform.qqmusic.api.QQMusicAudioClientTest" time="0.518"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

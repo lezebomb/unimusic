@@ -1,0 +1,78 @@
+{
+  "phase": "2AV",
+  "date": "2026-10-28",
+  "unitTests": {
+    "tests": 1,
+    "cases": "Two providers x server HTTP / invalid data / empty success / IOException / SocketTimeoutException; healthy results retained and retry state checked",
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "build": {
+    "initial": "40s compile failure from a removed JSONArray import; restored import",
+    "final": "BUILD SUCCESSFUL in 1m20s",
+    "log": "build/unimusic-toolchain/phase2av-service-failure-final.log",
+    "platformDomainViolations": 0,
+    "moduleBoundaries": "passed"
+  },
+  "apk": {
+    "archive": "build/outputs/unimusic/UniMusic-20261028-2AV-debug.apk",
+    "sha256": "b959d2848356864570720ac8a815d44f3bb66078a1d4d0bc4b97b687719f82d0",
+    "installedVersion": "df89c94738aa.dirty.10282208",
+    "installation": "adb Success plus package version; data retained"
+  },
+  "actualDeviceAudioOnPreceding2AU": {
+    "bilibili": {
+      "outcome": "PLAYED",
+      "discoveryMs": 1732,
+      "requestToObservedPositionMs": 2697,
+      "observedPositionMs": 2211
+    },
+    "gdstudio_netease": {
+      "outcome": "PLAYED",
+      "discoveryMs": 1924,
+      "requestToObservedPositionMs": 3434,
+      "observedPositionMs": 2099
+    },
+    "playerErrorKind": "NONE for both; paused and volume restored"
+  },
+  "finalDeviceSearch": {
+    "query": "Canon",
+    "aggregateStatus": [
+      "本地文件 0 · 网易云 30 · 哔哩哔哩 20 · YouTube 超时 · 酷我 20 · QQ 音乐 网络错误"
+    ]
+  },
+  "desktopAnonymousQQInvestigation": {
+    "legacy": {
+      "http": 500,
+      "elapsedMs": 5203
+    },
+    "officialWebService": "music.search.SearchCgiService.DoSearchForQQMusicDesktop",
+    "currentRpcProbe": {
+      "http": 200,
+      "rootCode": 0,
+      "serviceCode": 0,
+      "tracks": 0,
+      "total": 0,
+      "elapsedMs": 264
+    },
+    "oneFollowupWithNormalPageParameters": "Still code0 and empty results; no production replacement shipped",
+    "credentialsUsed": false
+  },
+  "ci": {
+    "2AT": {
+      "run": 40700241615,
+      "conclusion": "success"
+    },
+    "2AU": {
+      "run": 40701853652,
+      "conclusion": "success"
+    }
+  },
+  "limitations": [
+    "Device QQ still NETWORK, not proof of desktop HTTP500 cause; QQ authenticated full audio unverified",
+    "YouTube still timeout / audio unverified and extraction paused",
+    "Server rejection classifications validated synthetically, no actual device HTTP500 fault injection",
+    "Sample decode/position only; no full-track or statistical latency claim"
+  ]
+}

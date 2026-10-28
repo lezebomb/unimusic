@@ -4,6 +4,17 @@ import moe.ouom.neriplayer.data.model.unified.*
 import org.json.JSONObject
 import org.junit.Assert.*
 import org.junit.Test
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.flow.toList
+import moe.ouom.neriplayer.common.search.FederatedSearchEngine
+import moe.ouom.neriplayer.common.search.FederatedSearchProvider
+import moe.ouom.neriplayer.common.search.SearchPage
+import moe.ouom.neriplayer.common.search.SearchSourceFailure
+import moe.ouom.neriplayer.platform.search.api.client.KuwoCatalogProvider
+import okhttp3.OkHttpClient
+import okhttp3.Response
+import okhttp3.Protocol
+import okhttp3.ResponseBody.Companion.toResponseBody
 
 class QQMusicAudioClientTest {
     private val mid = "003OUlho2HcRHC"
@@ -36,4 +47,38 @@ class QQMusicAudioClientTest {
         row.put("subtitle", "电视剧主题曲")
         assertEquals("Song", parseQQAudioMetadata(row, mid)!!.title)
     }
+
+    @Test fun searchServiceFailuresStaySeparateFromTransportAndKeepHealthyResults() = runBlocking {
+        for (providerId in listOf("qqmusic", "kuwo")) {
+            for (kind in listOf("http", "invalid", "empty", "network", "timeout")) {
+                val client = OkHttpClient.Builder().addInterceptor { chain ->
+                    if (kind == "network") throw java.io.IOException("fixture transport failure")
+                    if (kind == "timeout") throw java.net.SocketTimeoutException("fixture timeout")
+                    val body = if (kind == "invalid") "{}" else if (providerId == "qqmusic")
+                        """{"code":0,"data":{"song":{"list":[],"totalnum":0}}}""" else """{"abslist":[],"PN":"0","TOTAL":"0"}"""
+                    Response.Builder().request(chain.request()).protocol(Protocol.HTTP_1_1)
+                        .code(if (kind == "http") 500 else 200).message("fixture")
+                        .body(body.toResponseBody()).build()
+                }.build()
+                val provider: MusicCatalogProvider = if (providerId == "qqmusic") QQMusicAudioClient(client) else KuwoCatalogProvider(client)
+                val engine = FederatedSearchEngine(listOf(
+                    FederatedSearchProvider<String>(providerId) { query, cursor ->
+                        SearchPage(provider.search(query, cursor, 20).tracks.map { it.source.toString() })
+                    },
+                    FederatedSearchProvider("healthy") { _: String, _: String? -> SearchPage(listOf("ready")) }
+                ), identity = { it })
+                val result = engine.search("fixture").toList().last()
+                assertEquals(listOf("ready"), result.interleavedItems())
+                val expected = when (kind) {
+                    "network" -> SearchSourceFailure.NETWORK
+                    "timeout" -> SearchSourceFailure.TIMEOUT
+                    "empty" -> null
+                    else -> SearchSourceFailure.UNAVAILABLE
+                }
+                assertEquals("$providerId / $kind", expected, result.sources.getValue(providerId).failure)
+                assertEquals(kind != "empty", providerId in result.retryableSourceIds)
+            }
+        }
+    }
+
 }

@@ -1,5 +1,7 @@
 package moe.ouom.neriplayer.platform.search.api.client
 
+import moe.ouom.neriplayer.common.search.SearchSourceException
+import moe.ouom.neriplayer.common.search.SearchSourceFailure
 import java.io.IOException
 import java.net.SocketTimeoutException
 import kotlinx.coroutines.withTimeoutOrNull
@@ -29,9 +31,10 @@ class KuwoCatalogProvider(private val client: OkHttpClient) : MusicCatalogProvid
         return withTimeoutOrNull(6_000) {
             client.newCall(Request.Builder().url(url).header("User-Agent", "UniMusic-catalog/1.0").build())
                 .awaitResponse { response ->
-                    if (!response.isSuccessful) throw IOException("Kuwo catalog HTTP ${response.code}")
+                    if (!response.isSuccessful) throw SearchSourceException(SearchSourceFailure.UNAVAILABLE)
                     val body = response.body.byteStream().readBytesLimited(2L * 1024 * 1024).toString(Charsets.UTF_8)
-                    parseKuwoCatalogSearch(body, page, limit)
+                    try { parseKuwoCatalogSearch(body, page, limit) }
+                    catch (_: IOException) { throw SearchSourceException(SearchSourceFailure.UNAVAILABLE) }
                 }
         } ?: throw SocketTimeoutException("Kuwo catalog timed out")
     }

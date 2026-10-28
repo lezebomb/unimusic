@@ -1,5 +1,7 @@
 # UniMusic 开发记录
 
+最新：[2AV服务失败与四路实播](PHASE_2AV_SOURCE_SERVICE_ERRORS_AND_DEVICE_AUDIO.md)：换网后网易云/酷我/B站/GD样本解码，服务失败单独处理；QQ和YouTube仍未实播。
+
 最新：[2AU播放失败反馈](PHASE_2AU_PLAYBACK_FAILURE_FEEDBACK.md)：网络/超时不再统一误报权限或登录；已保留数据装机。
 
 最新：[2AT手机播放/会话恢复](PHASE_2AT_DEVICE_NETWORK_AND_SESSION_RECOVERY.md)：用户换网后酷我与网易云实际解码通过，新包已保留数据安装；受限歌曲仍须当前账号权限。
