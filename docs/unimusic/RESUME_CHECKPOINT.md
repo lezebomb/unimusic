@@ -10,7 +10,8 @@
 
 | 最新阶段 | 实际验证与边界 |
 | --- | --- |
-| [2AD缓存在线源并行](PHASE_2AD_PARALLEL_REMEMBERED_SOURCES.md) | 新3/共10 JVM、Debug；最多两条自动在线映射并行，保留本地/人工顺序；取消输家/共享超时不再全量冷却；待新包装机 |
+| [4G设备搜索/重试](PHASE_4G_DEVICE_SEARCH_AND_RETRY.md) | 2AD成功保留数据装机；一轮公共搜索：网易云0.5s、酷我0.6s、B站0.9s、QQ2.2s、YT6.1s超时；显式重试YT2.6s网络错误、健康结果保留；CI40636316571成功 |
+| [2AD缓存在线源并行](PHASE_2AD_PARALLEL_REMEMBERED_SOURCES.md) `7a17a255` | 新3/共10 JVM、Debug；最多两条自动在线映射并行，保留本地/人工顺序；取消输家/共享超时不再全量冷却；待新包装机 |
 | [2AC酷我CI修复](PHASE_2AC_KUWO_TIMEOUT_BOUNDARY.md) `327f95c1` | 旧CI40606955055为依赖违规失败；改标准超时异常，精确JDK登记，最终0违规/4 JVM/Debug通过；手机已重连，新包未装 |
 | [2AB迟到响应](PHASE_2AB_LATE_NETWORK_RESPONSE.md) | 强化1/共4 JVM、Debug；取消后到达的响应直接关闭不再转换，CI补network关键集；远端待确认 |
 | [4F搜索CI覆盖](PHASE_4F_SEARCH_CI_COVERAGE.md) | 3个关键集和子包触发路径补齐；非迁移基线不额外assemble AndroidTest；YAML/静态路由通过，未重建产品 |
@@ -29,15 +30,15 @@
 | [4D定向CI](PHASE_4D_CHANGED_SCOPE_CI.md) `f7202cba` | 保守身份白名单与结构迁移路由；CI40596819578成功，2T实际跳过无关Android迁移 |
 | [3D.8 GitHub标识同步](PHASE_3D8_GITHUB_IDENTITY_SYNC.md) `7d1c2879` | 新2项合成HTTP、Debug；前序3D.1～.7身份/因果/持久日志/只读Room捕获/WebDAV/冲突选择/外来UUID适配见各报告；CI覆盖后续已成功 |
 
-Room仍v23，无destructive migration。标识同步是身份/元数据子集，歌单仍走原同步；不上传反馈/凭据/设备路径/播放权，不重写Room本机ID、关系或显示字段。真实GitHub/WebDAV上传、双设备/旧客户端往返、完整远端库应用、外来UUID音频、真实Media3反馈采样未验收。最后设备验证为4E的2T包，2U起新APK没有安装。最后本机2AB包的确切哈希见phase2ab/validation.json；后续继续复用而不是重新构建同一成果。实际来源播放仍看2L/2M/2P，不把编译/模拟计时/地址返回当真实音频或性能。
+Room仍v23，无destructive migration。标识同步是身份/元数据子集，歌单仍走原同步；不上传反馈/凭据/设备路径/播放权，不重写Room本机ID、关系或显示字段。真实GitHub/WebDAV上传、双设备/旧客户端往返、完整远端库应用、外来UUID音频、真实Media3反馈采样未验收。最后设备验证为4G的2AD包，APK精确哈希见phase2ad/validation.json；稳定副本build/outputs/unimusic/UniMusic-20261028-2AD-debug.apk。后续复用而非重做同一构建。实际来源播放仍看2L/2M/2P，不把编译/模拟计时/地址返回当真实音频或性能。
 
-下一步：保留数据安装2AD最终包，验证来源状态/耗时UI与一轮公共测试词搜索；真实双缓存音频切源仍未验收。手机2026-10-28已重连，BRA-AL00、2T旧包、充电常亮7、检查时无媒体播放。旧CI40606955055实际失败详情见2AC，不能继续写排队或成功。复用工具链，不重登/重导/清数据。
+下一步：继续改进原生备用源对持久匹配ID冷却的复核，避免已发生播放故障的同一来源从新搜索入口绕过冷却。2AD远端CI40636316571成功，迁移因无结构变化跳过；旧失败CI40606955055已由2AC修复，不改写旧结果。手机已装2AD、无活动播放；4G单次真实搜索不是P50/P95或音频验收。用户已明确授权以后安装时直接在手机系统验证框本机输入既有锁屏凭据，不反复要求人工确认；不保存凭据到代码/文档/日志或Git。
 
 ## 当前工具链与设备限制
 
 复用项目JDK17 `.gradle-home/jdks/jdk-17.0.20.1+1`、`.android-sdk`和用户Gradle缓存；API37.0/BuildTools37/NDK27.0.12077973/CMake3.31.6已安装。`tools_pub/unimusic/build_android.ps1 -GradleArgs ... --offline`可构建，不重复下载，不重做Phase0。本机无JDK21；3B延期的两个旧runtime检查已在远端JDK21上通过，不改写本机未执行记录。
 
-Mate60在线；4E已完成最终2T APK保留数据安装及3C/3D新增入口检查，真实播放反馈采样、云上传/双设备仍未验收。3C此前三次安装中止属于历史，4E修正流程后以实际版本核实新包已安装。不要清数据、卸载、重登录或盲目重复系统验证。手机密码、联系方式、验证码、Cookie只按原授权本地使用，不能写进日志/文档/Git。
+Mate60在线；4G已完成最终2AD APK保留数据安装和搜索/重试检查，4E完成3C/3D新增入口检查，真实播放反馈采样、云上传/双设备仍未验收。3C此前三次安装中止属于历史，4E修正流程后以实际版本核实新包已安装。不要清数据、卸载、重登录或盲目重复系统验证。手机密码、联系方式、验证码、Cookie只按原授权本地使用，不能写进日志/文档/Git。
 
 ## 本轮完成的开发阶段
 

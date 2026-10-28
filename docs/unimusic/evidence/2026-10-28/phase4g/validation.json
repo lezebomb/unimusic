@@ -1,0 +1,57 @@
+{
+  "phase": "4G",
+  "date": "2026-10-28",
+  "device": "Huawei Mate60 (BRA-AL00)",
+  "install": {
+    "mode": "adb install -r; Success",
+    "versionName": "327f95c11981.dirty.10281306",
+    "sourcePhase": "2AD",
+    "chargingStayOn": 7
+  },
+  "fixture": "Adele Hello; one initial aggregate query plus one explicit failed-source retry",
+  "initial": {
+    "counts": {
+      "local": 0,
+      "netease": 30,
+      "bilibili": 20,
+      "kuwo": 20,
+      "qqmusic": 20
+    },
+    "sourceSecondsShown": {
+      "local": 0.0,
+      "netease": 0.5,
+      "bilibili": 0.9,
+      "youtube": 6.1,
+      "kuwo": 0.6,
+      "qqmusic": 2.2
+    },
+    "youtubeStatus": "TIMEOUT",
+    "incrementalObservation": "NetEase/Bilibili/Kuwo results were visible while YouTube and QQ still showed loading"
+  },
+  "retry": {
+    "target": "failed source YouTube only",
+    "youtubeStatus": "NETWORK",
+    "youtubeSecondsShown": 2.6,
+    "healthyCountsAndDisplayedTimes": "unchanged"
+  },
+  "cleanup": {
+    "fixtureInputCleared": true,
+    "activePlaybackAfter": false,
+    "dataCleared": false,
+    "relogin": false,
+    "playlistReimport": false,
+    "queueChanged": false
+  },
+  "ci": {
+    "run": 40636316571,
+    "head": "7a17a25543161131446f5c082e36661038581c7e",
+    "conclusion": "success",
+    "androidMigrationStep": "skipped; no structural change"
+  },
+  "limitations": [
+    "one UI timing observation, rounded to 0.1s; not P50/P95 or first-frame measurement",
+    "network type/temperature not captured",
+    "no audio/first-sound/real two-cached-source failover",
+    "no new account/cloud acceptance"
+  ]
+}

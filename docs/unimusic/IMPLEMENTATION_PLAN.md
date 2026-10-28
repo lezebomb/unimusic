@@ -147,6 +147,8 @@
 
 ## Phase 4：双标签 UI、端到端与性能
 
+4G已保留数据装2AD并实际检查来源计时与一次失败源重试；单次网易云0.5秒/B站0.9秒/酷我0.6秒/QQ2.2秒，YT6.1秒超时且不阻塞已返回结果，见[4G](PHASE_4G_DEVICE_SEARCH_AND_RETRY.md)。非稳定性能或音频验收；2AD远端CI成功。
+
 4F补查询匹配/网易云解析关键CI集与子包路径，非迁移不额外assemble设备测试包，保留connected迁移；YAML/路由静态验证通过，见[4F](PHASE_4F_SEARCH_CI_COVERAGE.md)。产品仍是2AA包，未重复本机构建，实际CI结果待确认。
 
 4E已在Mate60保留数据安装最终2T APK，完成推荐偏好、GitHub/WebDAV标识入口和0冲突页检查；本机捕获21条标识/修订，未上传/改偏好，见[4E](PHASE_4E_DEVICE_FEATURE_CHECK.md)。真实云同步、外来UUID音频和Media3反馈采样仍未验收。2T及2S远端CI成功。
