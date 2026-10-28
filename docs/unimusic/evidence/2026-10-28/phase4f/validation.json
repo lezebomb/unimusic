@@ -1,0 +1,14 @@
+{
+  "phase": "4F",
+  "date": "2026-10-28",
+  "checks": [
+    "workflow YAML parsed",
+    "all three new target suites exist and are selected",
+    "subdirectory/parser source and test paths included",
+    "unrelated baseline does not assemble AndroidTest APK",
+    "connected migration checks retained",
+    "workflow change still requests migration; local-search-only change does not"
+  ],
+  "gradle": "not repeated; product source/APK unchanged from Phase 2AA",
+  "remoteCI": "pending after push; cancelled predecessors are not successes or failures"
+}

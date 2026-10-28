@@ -141,6 +141,8 @@
 
 ## Phase 4：双标签 UI、端到端与性能
 
+4F补查询匹配/网易云解析关键CI集与子包路径，非迁移不额外assemble设备测试包，保留connected迁移；YAML/路由静态验证通过，见[4F](PHASE_4F_SEARCH_CI_COVERAGE.md)。产品仍是2AA包，未重复本机构建，实际CI结果待确认。
+
 4E已在Mate60保留数据安装最终2T APK，完成推荐偏好、GitHub/WebDAV标识入口和0冲突页检查；本机捕获21条标识/修订，未上传/改偏好，见[4E](PHASE_4E_DEVICE_FEATURE_CHECK.md)。真实云同步、外来UUID音频和Media3反馈采样仍未验收。2T及2S远端CI成功。
 
 4D已按保守白名单路由身份定向CI、按结构变化执行Android迁移；本地边界/真实Git范围/未知回退及YAML检查通过，见[4D](PHASE_4D_CHANGED_SCOPE_CI.md)。新的Actions执行和实际耗时待确认，未重复构建产品。
