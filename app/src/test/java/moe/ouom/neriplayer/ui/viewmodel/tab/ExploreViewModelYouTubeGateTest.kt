@@ -20,6 +20,18 @@ class ExploreViewModelYouTubeGateTest {
         durationMs = 1_000L
     )
 
+    @Test fun neteaseSessionRefreshResumesTheBlockedQueryAndNeverRestartsUnrelatedSources() {
+        val searched = ExploreUiState(selectedSearchSource = SearchSource.NETEASE,
+            searchKeyword = "api query", searchDisplayQuery = "Displayed query", searchPage = 3)
+        val blocked = searched.withNeteaseAuthRequired("login required")
+        assertEquals("api query" to "Displayed query", blocked.pendingNeteaseSessionSearch())
+        assertEquals("api query" to "Displayed query", searched.copy(selectedSearchSource = SearchSource.ALL).pendingNeteaseSessionSearch())
+        for (source in listOf(SearchSource.BILIBILI, SearchSource.YOUTUBE_MUSIC, SearchSource.LINK_RECOGNITION)) {
+            assertNull(searched.copy(selectedSearchSource = source).pendingNeteaseSessionSearch())
+        }
+        assertNull(searched.copy(searchKeyword = " ").pendingNeteaseSessionSearch())
+    }
+
     @Test
     fun `valid Netease auth keeps search available`() {
         assertTrue(isNeteaseExploreSearchAvailable(SavedCookieAuthState.Valid))

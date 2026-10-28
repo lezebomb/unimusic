@@ -221,6 +221,11 @@ internal fun ExploreUiState.withNeteaseAuthRequired(error: String): ExploreUiSta
     searchPage = 0
 )
 
+/** Only searches depending on the NetEase session are restarted; preserve the display query. */
+internal fun ExploreUiState.pendingNeteaseSessionSearch(): Pair<String, String>? =
+    if (searchKeyword.isNotBlank() && selectedSearchSource in setOf(SearchSource.ALL, SearchSource.NETEASE))
+        searchKeyword to searchDisplayQuery else null
+
 internal fun ExploreUiState.withYouTubeDisabled(): ExploreUiState {
     val searchState = if (selectedSearchSource == SearchSource.YOUTUBE_MUSIC) {
         copy(
@@ -342,6 +347,10 @@ class ExploreViewModel(application: Application) : AndroidViewModel(application)
                     clearNeteaseSearchForAuthRequired()
                 }
                 _uiState.value = _uiState.value.copy(isNeteaseLoggedIn = isLoggedIn)
+                if (isLoggedIn && !currentState.isNeteaseLoggedIn &&
+                    currentState.selectedSearchSource == SearchSource.NETEASE && !currentState.searching) {
+                    _uiState.value.pendingNeteaseSessionSearch()?.let { (query, display) -> search(query, display) }
+                }
             }
         }
         viewModelScope.launch {
@@ -349,7 +358,7 @@ class ExploreViewModel(application: Application) : AndroidViewModel(application)
                 val context = neteaseClient.searchSessionIdentity()
                 if (context !== searchAccountContext) {
                     searchAccountContext = context
-                    restartAggregateSearch()
+                    _uiState.value.pendingNeteaseSessionSearch()?.let { (query, display) -> search(query, display) }
                 }
                 NPLogger.d(TAG, "cookieFlow updated, reload high quality playlists tag=${_uiState.value.selectedTag}")
                 loadHighQuality()

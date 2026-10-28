@@ -1,0 +1,21 @@
+{
+  "phase": "2AA",
+  "date": "2026-10-28",
+  "jvm": {
+    "tests": 4,
+    "failures": 0,
+    "errors": 0
+  },
+  "newTests": 1,
+  "build": "Debug passed; phase2aa-netease-session-search.log",
+  "apk": {
+    "path": "app/build/outputs/apk/debug/app-debug.apk",
+    "sha256": "899aea7e938fab5b467da17abd5474e45bfde2dc6fda317290687fbb75b6aa3a",
+    "bytes": 62996251
+  },
+  "notRun": [
+    "actual account switch/login callback timing",
+    "device installation",
+    "real source/audio latency"
+  ]
+}

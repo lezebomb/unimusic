@@ -1,0 +1,10 @@
+<?xml version='1.0' encoding='utf-8'?>
+<testsuite name="moe.ouom.neriplayer.ui.viewmodel.tab.ExploreViewModelYouTubeGateTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-10-28T00:03:29.513Z" hostname="local" time="0.148">
+  <properties />
+  <testcase name="missing Netease auth clears stale paginated results" classname="moe.ouom.neriplayer.ui.viewmodel.tab.ExploreViewModelYouTubeGateTest" time="0.121" />
+  <testcase name="neteaseSessionRefreshResumesTheBlockedQueryAndNeverRestartsUnrelatedSources" classname="moe.ouom.neriplayer.ui.viewmodel.tab.ExploreViewModelYouTubeGateTest" time="0.02" />
+  <testcase name="valid Netease auth keeps search available" classname="moe.ouom.neriplayer.ui.viewmodel.tab.ExploreViewModelYouTubeGateTest" time="0.001" />
+  <testcase name="missing Netease auth blocks search" classname="moe.ouom.neriplayer.ui.viewmodel.tab.ExploreViewModelYouTubeGateTest" time="0.001" />
+  <system-out />
+  <system-err />
+</testsuite>
