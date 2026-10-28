@@ -1,0 +1,22 @@
+{
+  "phase": "2AB",
+  "date": "2026-10-28",
+  "jvm": {
+    "tests": 4,
+    "failures": 0,
+    "errors": 0
+  },
+  "strengthenedTest": "late success/error responses close without executing transform",
+  "build": "Debug passed; phase2ab-late-network-response.log",
+  "workflow": "YAML parsed; network path, targeted suite and report archive added; remote pending",
+  "apk": {
+    "path": "app/build/outputs/apk/debug/app-debug.apk",
+    "sha256": "eb1acab72e0eedd2c2d4753f6a096410a9c0c56e4a51b75c47da8718db02e4dc",
+    "bytes": 62996351
+  },
+  "notRun": [
+    "new APK device install",
+    "live cancelled-response CPU/network benchmark",
+    "actual audio/account"
+  ]
+}

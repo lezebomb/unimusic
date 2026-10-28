@@ -69,8 +69,10 @@ class OkHttpCallAwaitResponseTest {
     @Test
     fun `callbacks arriving after cancellation are dropped but responses are closed`() = runTest {
         val call = ControlledCall()
+        var transformed = 0
         val job = launch {
             call.awaitResponse { response ->
+                transformed++
                 check(response.code < 500) { "server error" }
                 response.code
             }
@@ -86,6 +88,7 @@ class OkHttpCallAwaitResponseTest {
         call.fail(IOException("late transport failure"))
         runCurrent()
 
+        assertEquals(0, transformed)
         assertTrue(job.isCancelled)
         assertTrue(call.isCanceled())
         assertTrue(lateSuccess.closed)

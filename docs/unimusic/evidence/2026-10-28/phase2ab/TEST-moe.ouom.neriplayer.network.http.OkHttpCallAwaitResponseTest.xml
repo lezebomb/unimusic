@@ -1,0 +1,10 @@
+<?xml version='1.0' encoding='utf-8'?>
+<testsuite name="moe.ouom.neriplayer.network.http.OkHttpCallAwaitResponseTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-10-28T00:08:35.350Z" hostname="local" time="0.551">
+  <properties />
+  <testcase name="transport failures surface as io exceptions" classname="moe.ouom.neriplayer.network.http.OkHttpCallAwaitResponseTest" time="0.489" />
+  <testcase name="transform failures surface to the caller and still close the response" classname="moe.ouom.neriplayer.network.http.OkHttpCallAwaitResponseTest" time="0.026" />
+  <testcase name="responses are transformed and closed" classname="moe.ouom.neriplayer.network.http.OkHttpCallAwaitResponseTest" time="0.021" />
+  <testcase name="callbacks arriving after cancellation are dropped but responses are closed" classname="moe.ouom.neriplayer.network.http.OkHttpCallAwaitResponseTest" time="0.009" />
+  <system-out />
+  <system-err />
+</testsuite>

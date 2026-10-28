@@ -19,6 +19,10 @@ suspend fun <T> Call.awaitResponse(transform: (Response) -> T): T {
             }
 
             override fun onResponse(call: Call, response: Response) {
+                if (!continuation.isActive) {
+                    response.close()
+                    return
+                }
                 runCatching {
                     response.use(transform)
                 }.onSuccess { value ->

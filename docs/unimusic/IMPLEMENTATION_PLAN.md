@@ -63,6 +63,8 @@
 
 ## Phase 2：统一搜索与高精度匹配
 
+2AB在公共网络封装中丢弃并关闭已取消等待者的迟到响应，不执行转换器；4项JVM、Debug通过，CI补对应关键集，见[2AB](PHASE_2AB_LATE_NETWORK_RESPONSE.md)。无实际网络/CPU节省或真机新验收。
+
 2AA修复网易云单源在会话变化/登录恢复后继续当前查询，取消旧请求并保留显示词，4项JVM、Debug通过，见[2AA](PHASE_2AA_NETEASE_SEARCH_SESSION.md)。没有实际账号切换/真机回调验收。
 
 2Z为本地索引筛选和聚合评分/排序/映射加入协作取消，保留索引和正确发布；新2/共7项JVM、Debug通过，见[2Z](PHASE_2Z_COOPERATIVE_SEARCH_CANCELLATION.md)。无大库耗时/帧率结论。
