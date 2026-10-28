@@ -20,6 +20,24 @@ class SourceMatchRoomStoreTest {
     private val candidate = RecordingSourceCandidate(SongSourceKey("bilibili", "10", "11"),
         UnifiedSongMetadata("晴天", "周杰伦", "晴天", 269_000))
 
+    @Test fun neteaseAlternatePersistsForNativeSubjectsButCannotRememberItsOwnOriginalSource() = runTest {
+        val db = Room.inMemoryDatabaseBuilder(ApplicationProvider.getApplicationContext<Context>(),
+            NeriUserDataDatabase::class.java).allowMainThreadQueries().build()
+        try {
+            val store = SourceMatchRoomStore(db) { 1000L }
+            val native = catalogPlaybackSong(CatalogTrack(SongSourceKey("qqmusic", "003OUlho2HcRHC"),
+                candidate.metadata.copy(album = subject.album), null))!!
+            val alternate = candidate.copy(key = SongSourceKey("netease", "42"), metadata = candidate.metadata.copy(album = subject.album))
+            val saved = store.rememberAutomatic(native, alternate, SourceDecisionStamp())!!
+            assertEquals(alternate.key, store.automaticMatches(native).single().candidate.key)
+            assertEquals(saved.id, store.match(native, alternate.key)!!.id)
+            assertNull(store.rememberAutomatic(subject, alternate, SourceDecisionStamp()))
+            store.decide(native, alternate, SourceMatchDecision.REJECTED)
+            assertTrue(store.automaticMatches(native).isEmpty())
+            assertNull(store.rememberAutomatic(native, alternate, SourceDecisionStamp()))
+        } finally { db.close() }
+    }
+
     @Test fun decisionSurvivesReopenAndOldObservation() = runTest {
         val context = ApplicationProvider.getApplicationContext<Context>()
         val file = "source-match-test.db"

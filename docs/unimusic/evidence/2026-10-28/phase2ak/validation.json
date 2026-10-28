@@ -1,0 +1,65 @@
+{
+  "phase": "2AK",
+  "date": "2026-10-28",
+  "newJvmTests": 4,
+  "relatedJvmTests": 5,
+  "jvm": [
+    {
+      "suite": "moe.ouom.neriplayer.platform.netease.mapping.NeteaseSongMappingTest",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0
+    },
+    {
+      "suite": "moe.ouom.neriplayer.core.player.policy.source.AutomaticCatalogChoiceTest",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0
+    },
+    {
+      "suite": "moe.ouom.neriplayer.data.unified.SourceMatchRoomStoreTest",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0
+    }
+  ],
+  "build": "Debug passed in 1m57s; phase2ak-final-verified.log",
+  "moduleBoundaries": "passed after moving adapter to the NetEase catalog package",
+  "platformDomainViolations": 0,
+  "schemaVersion": 23,
+  "schemaChanged": false,
+  "apk": {
+    "path": "build/outputs/unimusic/UniMusic-20261028-2AK-debug.apk",
+    "sha256": "48b1f0f89046158c218f1c0369bb090ce881ea56dbdf35a410d19ab69933b5f7",
+    "bytes": 63017435
+  },
+  "device": {
+    "model": "Huawei Mate60 BRA-AL00",
+    "install": "adb install -r Success; retained user data; only selected Mate60",
+    "installedVersion": "886d59e55d7f.dirty.10281813",
+    "discoverVisible": true,
+    "activeAudio": false,
+    "latestIndependentDnsProbe": "Did not finish within 6s; no repeated online search/audio acceptance"
+  },
+  "ci": {
+    "2AJ": {
+      "run": 40668821070,
+      "conclusion": "success"
+    },
+    "2AI": {
+      "run": 40667670264,
+      "conclusion": "cancelled by newer push"
+    }
+  },
+  "recoveredFailures": [
+    "Room test caught missing NetEase provider in DAO automatic-read whitelist; fixed without schema change",
+    "Moved adapter from generic search API to NetEase catalog to satisfy existing module boundaries",
+    "Added missing PlayerDependencies import and precise java.util.HashSet/domain type inventory; final checks passed"
+  ],
+  "notRun": [
+    "positive real QQ/Kuwo-to-NetEase fallback playback",
+    "new account/permission changes during real resolution",
+    "positive device cache hit or latency benchmark",
+    "new migration/other-device/cloud tests"
+  ]
+}

@@ -9,6 +9,16 @@ class AutomaticCatalogChoiceTest {
     private fun track(id: String, title: String = "Song", artist: String = "Artist", duration: Long = 200_000, album: String = "Album") =
         CatalogTrack(SongSourceKey("kuwo", id), UnifiedSongMetadata(title, artist, album, duration), null)
 
+    @Test fun nativeFailuresChooseTwoOtherPlatformsIncludingNeteaseWithoutSearchingItself() {
+        assertEquals(listOf("netease", "kuwo"), nativeAlternateProviderIds("qqmusic"))
+        assertEquals(listOf("netease", "qqmusic"), nativeAlternateProviderIds("kuwo"))
+        assertEquals(listOf("qqmusic", "kuwo"), nativeAlternateProviderIds("netease"))
+        for (original in listOf("qqmusic", "kuwo", "netease", "bilibili", null)) {
+            val ids = nativeAlternateProviderIds(original)
+            assertEquals(2, ids.distinct().size);assertFalse(original in ids)
+        }
+    }
+
     @Test fun wrongRecordingNeverWinsAndDuplicateEvidenceNeedsDisambiguation() {
         val valid = track("1")
         assertEquals(valid.source, automaticCatalogChoice(expected, listOf(track("2", "Song (Live)"),

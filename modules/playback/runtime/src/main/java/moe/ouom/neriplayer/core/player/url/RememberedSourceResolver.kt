@@ -3,6 +3,7 @@ package moe.ouom.neriplayer.core.player.url
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.asFlow
 import moe.ouom.neriplayer.common.logging.NPLogger
+import moe.ouom.neriplayer.core.player.host.PlayerDependencies
 import moe.ouom.neriplayer.core.player.PlayerManager
 import moe.ouom.neriplayer.core.player.network.isPlaybackNetworkUsable
 import moe.ouom.neriplayer.core.player.policy.source.*
@@ -47,11 +48,14 @@ internal suspend fun PlayerManager.tryResolveAutomaticSource(song: SongItem,
     sideEffects: RefreshResolverSideEffects, local: Boolean, online: Boolean): SongUrlResult.Success? =
     tryResolveStoredSource(song, sideEffects, null, buildSet {
         if (local) add("local")
-        if (online) addAll(setOf("bilibili", "qqmusic", "kuwo"))
+        if (online) addAll(setOf("bilibili", "qqmusic", "kuwo", "netease"))
     })
 
 private fun PlayerManager.automaticSourceEnabled(provider: String): Boolean = when (provider) {
     "local" -> neteaseLocalSourceFallbackEnabled
+    "netease" -> neteaseAutoSourceSwitchEnabled && isPlaybackNetworkUsable(application) &&
+        PlayerDependencies.repositories.neteaseCookieRepo.getAuthHealthOnce().state !=
+            moe.ouom.neriplayer.data.model.auth.SavedCookieAuthState.Missing
     "bilibili", "qqmusic", "kuwo" -> neteaseAutoSourceSwitchEnabled && isPlaybackNetworkUsable(application)
     else -> false
 }

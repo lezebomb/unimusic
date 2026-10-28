@@ -83,7 +83,8 @@ class SourceMatchRoomStore(private val db: NeriUserDataDatabase, private val now
     /** Compare-and-write: a rejection/reset/confirmation made during resolution always wins. */
     suspend fun rememberAutomatic(song: SongItem, candidate: RecordingSourceCandidate,
         stamp: SourceDecisionStamp): RecordingSourceMatch? = db.withTransaction {
-        if (candidate.key.provider !in setOf("local", "bilibili", "qqmusic", "kuwo") || !nativeMatchKey(candidate.key) ||
+        if (candidate.key.provider !in setOf("local", "bilibili", "qqmusic", "kuwo", "netease") ||
+            candidate.key == sourceCandidateForSong(song)?.key || !nativeMatchKey(candidate.key) ||
             stamp.decision != SourceMatchDecision.NONE || decisionStamp(song, candidate.key) != stamp ||
             !RecordingMatchPolicy.assess(sourceMatchMetadata(song).recording(), candidate.metadata.recording(),
                 if (candidate.key.provider == "local") 8_000 else 4_000).accepted) return@withTransaction null

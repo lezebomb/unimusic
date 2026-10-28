@@ -60,7 +60,13 @@ internal suspend fun PlayerManager.resolveNativeCatalogPlayback(song: SongItem, 
     } catch (cancelled: CancellationException) { currentCoroutineContext().ensureActive();null }
     catch (_: Exception) { null }
     if (primary is SourceAttempt.Ready) return primary.value
-    if (neteaseAutoSourceSwitchEnabled) tryResolveNativeCatalogAlternate(song, resolverSideEffects)?.let { return it }
+    if (neteaseAutoSourceSwitchEnabled) {
+        try {
+            tryResolveAutomaticSource(song, resolverSideEffects, local = neteaseLocalSourceFallbackEnabled, online = true)?.let { return it }
+        } catch (cancelled: CancellationException) { throw cancelled }
+        catch (_: Exception) { /* A temporarily unavailable projection must not prevent fresh discovery. */ }
+        tryResolveNativeCatalogAlternate(song, resolverSideEffects)?.let { return it }
+    }
     resolverSideEffects.emitError { postPlayerEvent(moe.ouom.neriplayer.data.model.playback.PlayerEvent.ShowError(
         if (primary is SourceAttempt.Rejected && primary.reason == SourceFailure.AUTH_REQUIRED) "此音源需要登录，请在设置中登录 QQ 音乐"
         else "当前账号无完整播放权限，或音源暂时不可用")) }
@@ -79,24 +85,36 @@ internal suspend fun PlayerManager.tryResolveNativeCatalogAlternate(song: SongIt
     return withTimeoutOrNull(stageBudget) {
         val repositories = PlayerDependencies.repositories
         val backend = SourceMatchBackend(application)
-        val providers = listOf(repositories.qqMusicAudioClient, repositories.kuwoCatalogProvider)
+        val original = sourceCandidateForSong(song)?.key
+        val neteaseAvailable = { repositories.neteaseCookieRepo.getAuthHealthOnce().state !=
+            moe.ouom.neriplayer.data.model.auth.SavedCookieAuthState.Missing }
+        val netease = moe.ouom.neriplayer.platform.netease.catalog.NeteaseCatalogProvider(
+            fetchPage = { query, limit, offset -> repositories.neteaseClient.searchSongsCancellable(query, limit, offset) },
+            sessionIdentity = { repositories.neteaseClient.searchSessionIdentity() }, searchAvailable = neteaseAvailable)
+        val available: Map<String, MusicCatalogProvider> = mapOf("netease" to netease,
+            "qqmusic" to repositories.qqMusicAudioClient, "kuwo" to repositories.kuwoCatalogProvider)
+        val providers = nativeAlternateProviderIds(original?.provider)
+            .filter { it != "netease" || neteaseAvailable() }.map { available.getValue(it) }
         racePlaybackSources(providers.map { provider -> suspend {
             var winner: SongUrlResult.Success? = null
             val session = sourceResolutionSession(provider.providerId)
             val tracks = withTimeoutOrNull(1_200) { provider.search(song.recordingMetadata().title, null, 12).tracks }.orEmpty()
             val choice = automaticCatalogChoice(song.recordingMetadata(), tracks,
-                sourceCandidateForSong(song)?.key)
+                original)
             if (choice != null && !RememberedSourceState.cooldown.cooling(song.stableKey(), choice.key.toString())) {
                 val stamp = backend.decisionStamp(song, choice.key)
                 val previous = backend.match(song, choice.key)
                 val coolingMatch = previous != null && RememberedSourceState.cooldown.cooling(song.stableKey(), previous.id)
-                if (stamp.decision == SourceMatchDecision.NONE && !coolingMatch) {
+                if (stamp.decision == SourceMatchDecision.NONE && !coolingMatch &&
+                    session == sourceResolutionSession(provider.providerId) && neteaseAutoSourceSwitchEnabled) {
                     val attempt = withTimeoutOrNull(2_600) { resolveSourceCandidate(song, choice, sideEffects, automatic = true) }
                     if (attempt is SourceAttempt.Ready && session == sourceResolutionSession(provider.providerId) &&
                         neteaseAutoSourceSwitchEnabled && isPlaybackNetworkUsable(application)) {
                         val stored = backend.rememberAutomatic(song, choice, stamp)
                         // A playback failure can arrive while this address request is in flight.
-                        if (stored != null && !RememberedSourceState.cooldown.cooling(song.stableKey(), stored.id)) {
+                        if (stored != null && !RememberedSourceState.cooldown.cooling(song.stableKey(), stored.id) &&
+                            stamp == backend.decisionStamp(song, choice.key) && session == sourceResolutionSession(provider.providerId) &&
+                            neteaseAutoSourceSwitchEnabled && isPlaybackNetworkUsable(application)) {
                             winner = attempt.value.copy(cacheKeyOverride = "match-${stored.id}-${attempt.value.cacheKeyOverride}")
                         }
                     } else if (attempt !is SourceAttempt.Ready) {

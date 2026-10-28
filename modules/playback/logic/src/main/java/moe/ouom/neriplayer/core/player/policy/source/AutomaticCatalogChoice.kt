@@ -15,3 +15,10 @@ fun automaticCatalogChoice(expected: RecordingMetadata, tracks: List<CatalogTrac
     val track = exactAlbum.singleOrNull() ?: qualified.singleOrNull() ?: return null
     return RecordingSourceCandidate(track.source, track.metadata)
 }
+
+/** Keep two independent alternatives and avoid re-searching the native platform that just failed. */
+fun nativeAlternateProviderIds(originalProvider: String?): List<String> = when (originalProvider) {
+    "qqmusic" -> listOf("netease", "kuwo")
+    "kuwo" -> listOf("netease", "qqmusic")
+    else -> listOf("qqmusic", "kuwo")
+}

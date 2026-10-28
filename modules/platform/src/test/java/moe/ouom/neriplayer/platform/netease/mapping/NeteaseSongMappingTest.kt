@@ -6,9 +6,53 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertThrows
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import kotlinx.coroutines.async
+import kotlinx.coroutines.test.advanceTimeBy
 import org.json.JSONException
 
 class NeteaseSongMappingTest {
+    @Test fun authenticatedCatalogAdapterKeepsVersionEvidenceAndRawPageOffsets() = kotlinx.coroutines.test.runTest {
+        val requests = mutableListOf<Int>()
+        val session = Any()
+        val provider = moe.ouom.neriplayer.platform.netease.catalog.NeteaseCatalogProvider(
+            fetchPage = { _, _, offset -> requests += offset
+                """{"code":200,"result":{"songCount":4,"songs":[{"id":0,"name":"invalid"},
+                {"id":7,"name":"Dream","dt":180000,"alia":["Live"],"ar":[{"id":8,"name":"Artist"}],"al":{"name":"Album"}}]}}"""
+            }, sessionIdentity = { session }, searchAvailable = { true })
+        val first = provider.search("Dream", null, 2)
+        assertEquals("2", first.nextCursor);assertEquals(4L, first.totalCount)
+        assertEquals("netease", first.tracks.single().source.provider)
+        assertEquals("7", first.tracks.single().source.resourceId)
+        assertEquals("Dream (Live)", first.tracks.single().metadata.title)
+        assertEquals(moe.ouom.neriplayer.data.model.unified.SourcePlaybackMode.AUTHORIZED_AUDIO, first.tracks.single().playbackMode)
+        assertNull(provider.search("Dream", first.nextCursor, 2).nextCursor)
+        assertEquals(listOf(0, 2), requests)
+        var invalid = false
+        try { provider.search("Dream", "02", 2) } catch (_: IllegalArgumentException) { invalid = true }
+        assertTrue(invalid);assertEquals(2, requests.size)
+    }
+
+    @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
+    @Test fun authenticatedCatalogCannotReturnAfterSessionReplacementOrCancelledFetch() = kotlinx.coroutines.test.runTest {
+        var session: Any = Any()
+        var available = true
+        var calls = 0
+        val provider = moe.ouom.neriplayer.platform.netease.catalog.NeteaseCatalogProvider(
+            fetchPage = { _, _, _ -> calls++;kotlinx.coroutines.delay(20);"""{"code":200,"result":{"songCount":0,"songs":[]}}""" },
+            sessionIdentity = { session }, searchAvailable = { available })
+        val old = async { runCatching { provider.search("Dream", null, 2) } }
+        advanceTimeBy(1);session = Any()
+        assertTrue(old.await().exceptionOrNull() is java.io.IOException)
+        available = false
+        assertTrue(runCatching { provider.search("Dream", null, 2) }.exceptionOrNull() is java.io.IOException)
+        assertEquals(1, calls)
+        available = true
+        val pending = async { provider.search("Dream", null, 2) }
+        advanceTimeBy(1);pending.cancel()
+        assertTrue(runCatching { pending.await() }.exceptionOrNull() is kotlinx.coroutines.CancellationException)
+        assertEquals(2, calls)
+    }
+
     @Test fun searchRetainsVersionAliasesWithoutMutatingDetailNamesOrOrdinaryTranslations() {
         for ((key, clue) in listOf("alia" to "Live", "alias" to "翻唱", "tns" to "AI generated vocals", "transNames" to "Remix")) {
             val row = org.json.JSONObject("""{"id":7,"name":"Dream","dt":180000,"ar":[{"id":8,"name":"Artist"}],"al":{"name":"Album"}}""")

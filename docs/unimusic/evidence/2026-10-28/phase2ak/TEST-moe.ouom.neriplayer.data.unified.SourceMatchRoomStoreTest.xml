@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="moe.ouom.neriplayer.data.unified.SourceMatchRoomStoreTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2026-10-28T10:14:01.690Z" hostname="XUSHAOYANG" time="9.844">
+  <properties/>
+  <testcase name="neteaseAlternatePersistsForNativeSubjectsButCannotRememberItsOwnOriginalSource" classname="moe.ouom.neriplayer.data.unified.SourceMatchRoomStoreTest" time="8.586"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
