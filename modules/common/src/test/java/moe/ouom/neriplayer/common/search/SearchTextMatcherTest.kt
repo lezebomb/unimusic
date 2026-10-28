@@ -4,12 +4,26 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import kotlinx.coroutines.ensureActive
 
 class SearchTextMatcherTest {
     private data class SearchEntry(
         val title: String,
         val artist: String
     )
+
+    @Test fun indexedScoringHonorsCancellationAndLeavesTheReusableIndexIntact() {
+        val index = SearchTextMatcher.index((1..300).toList()) { listOf("Dream $it") }
+        val job = kotlinx.coroutines.Job()
+        var checkpoints = 0
+        org.junit.Assert.assertThrows(kotlinx.coroutines.CancellationException::class.java) {
+            index.filterAndRank("Dream") {
+                if (++checkpoints == 3) job.cancel()
+                job.ensureActive()
+            }
+        }
+        assertEquals(300, index.filterAndRank("Dream").size)
+    }
 
     @Test fun preparedQueryKeepsWeightedPinyinAccentAndAllTokenMatching() {
         val query = SearchTextMatcher.query("ＱＴ café")

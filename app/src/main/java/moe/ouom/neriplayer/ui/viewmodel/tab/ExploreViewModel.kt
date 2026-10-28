@@ -29,6 +29,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -678,7 +679,10 @@ class ExploreViewModel(application: Application) : AndroidViewModel(application)
                     }
                     while (isSearchRequestCurrent(requestVersion, SearchSource.ALL)) {
                         val before = _uiState.value
-                        val ranked = withContext(Dispatchers.Default) { ranker.rank(before.searchItems, before.nativeSourceChecks) }
+                        val ranked = withContext(Dispatchers.Default) {
+                            val context = kotlinx.coroutines.currentCoroutineContext()
+                            ranker.rank(before.searchItems, before.nativeSourceChecks) { context.ensureActive() }
+                        }
                         if (!isSearchRequestCurrent(requestVersion, SearchSource.ALL)) return@launch
                         val current = _uiState.value
                         if (current.searchItems !== before.searchItems || current.nativeSourceChecks !== before.nativeSourceChecks) continue

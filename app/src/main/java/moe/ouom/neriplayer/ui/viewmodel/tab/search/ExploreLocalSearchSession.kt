@@ -40,7 +40,7 @@ internal class ExploreLocalSearchSession(
                         context.ensureActive();it.searchValues()
                     }.also { index = it }
                 }
-                prepared.filterAndRank(query).also { context.ensureActive();cached = query to it }
+                prepared.filterAndRank(query) { context.ensureActive() }.also { context.ensureActive();cached = query to it }
             }
             val from = offset.coerceAtMost(ranked.size)
             val to = from + (ranked.size - from).coerceAtMost(PAGE_SIZE)

@@ -32,7 +32,10 @@ internal class ExploreSearchRankingSession(query: String) {
         while (isCurrent()) {
             currentCoroutineContext().ensureActive()
             val captured = checks()
-            val ranked = withContext(worker) { rank(items, captured) }
+            val ranked = withContext(worker) {
+                val context = currentCoroutineContext()
+                rank(items, captured) { context.ensureActive() }
+            }
             if (!isCurrent()) return null
             // An address probe may finish while metadata is ranked on the worker. Never publish its old evidence.
             if (checks() === captured) return ranked
@@ -42,11 +45,14 @@ internal class ExploreSearchRankingSession(query: String) {
 
     @Synchronized
     fun rank(items: List<ExploreSearchResult>, checks: Map<moe.ouom.neriplayer.data.model.unified.SongSourceKey,
-        moe.ouom.neriplayer.data.model.unified.SourceCheckResult> = emptyMap()): List<ExploreSearchResult> {
+        moe.ouom.neriplayer.data.model.unified.SourceCheckResult> = emptyMap(),
+        checkActive: () -> Unit = {}): List<ExploreSearchResult> {
+        checkActive()
         if (normalized.isBlank() || items.size <= 1) return items
         val now = System.currentTimeMillis()
         data class Ranked(val item: ExploreSearchResult, val index: Int, val score: Score, val availability: Int)
-        return items.mapIndexed { index, item ->
+        val ranked = items.mapIndexed { index, item ->
+            if (index and 127 == 0) checkActive()
             val cached = scores[item.stableKey]
             val score = if (cached != null && cached.item == item) cached.score else score(item).also { value ->
                 scores[item.stableKey] = Cached(item, value)
@@ -60,7 +66,8 @@ internal class ExploreSearchRankingSession(query: String) {
                 else -> 2
             }
             Ranked(item, index, score, availability)
-        }.sortedWith(compareBy<Ranked> { it.score.text == null }
+        }
+        val comparator = compareBy<Ranked> { it.score.text == null }
             // A bounded version preference must not outweigh a much better title/artist match.
             .thenBy { ((it.score.text?.toLong() ?: Int.MAX_VALUE.toLong()) + minOf(2, it.score.versionPenalty) * 8) / 16 }
             .thenBy { it.score.versionPenalty }
@@ -68,8 +75,15 @@ internal class ExploreSearchRankingSession(query: String) {
             .thenBy { (it.score.text?.toLong() ?: Int.MAX_VALUE.toLong()) + minOf(2, it.score.versionPenalty) * 8 }
             .thenBy { it.score.text ?: Int.MAX_VALUE }
             .thenBy { it.item is ExploreSearchResult.Catalog }
-            .thenBy { it.index })
-            .map { it.item }
+            .thenBy { it.index }
+        var comparisons = 0
+        return ranked.sortedWith { first, second ->
+            if (comparisons++ and 127 == 0) checkActive()
+            comparator.compare(first, second)
+        }.mapIndexed { index, value ->
+            if (index and 127 == 0) checkActive()
+            value.item
+        }
     }
 
     private fun score(item: ExploreSearchResult): Score {

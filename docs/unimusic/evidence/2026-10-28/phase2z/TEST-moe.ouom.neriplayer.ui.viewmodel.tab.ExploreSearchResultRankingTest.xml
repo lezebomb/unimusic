@@ -1,0 +1,9 @@
+<?xml version='1.0' encoding='utf-8'?>
+<testsuite name="moe.ouom.neriplayer.ui.viewmodel.tab.ExploreSearchResultRankingTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-10-28T00:00:36.070Z" hostname="local" time="0.584">
+  <properties />
+  <testcase name="cancelledScoringReleasesTheSessionAndCannotReturnAPartialOrder" classname="moe.ouom.neriplayer.ui.viewmodel.tab.ExploreSearchResultRankingTest" time="0.355" />
+  <testcase name="aReplacedQueryDoesNotPublishItsQueuedRanking" classname="moe.ouom.neriplayer.ui.viewmodel.tab.ExploreSearchResultRankingTest" time="0.211" />
+  <testcase name="aProbeFinishingWhileMetadataIsRankedCannotBeOverwrittenByTheOldOrder" classname="moe.ouom.neriplayer.ui.viewmodel.tab.ExploreSearchResultRankingTest" time="0.013" />
+  <system-out />
+  <system-err />
+</testsuite>

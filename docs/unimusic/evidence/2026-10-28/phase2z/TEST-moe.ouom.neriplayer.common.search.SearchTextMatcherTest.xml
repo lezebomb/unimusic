@@ -1,0 +1,9 @@
+<?xml version='1.0' encoding='utf-8'?>
+<testsuite name="moe.ouom.neriplayer.common.search.SearchTextMatcherTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-10-27T23:59:46.528Z" hostname="local" time="0.221">
+  <properties />
+  <testcase name="filterAndRank prefers weighted title match over artist match" classname="moe.ouom.neriplayer.common.search.SearchTextMatcherTest" time="0.153" />
+  <testcase name="filterAndRank keeps pinyin matches ahead for playlist style lists" classname="moe.ouom.neriplayer.common.search.SearchTextMatcherTest" time="0.002" />
+  <testcase name="indexedScoringHonorsCancellationAndLeavesTheReusableIndexIntact" classname="moe.ouom.neriplayer.common.search.SearchTextMatcherTest" time="0.06" />
+  <system-out />
+  <system-err />
+</testsuite>

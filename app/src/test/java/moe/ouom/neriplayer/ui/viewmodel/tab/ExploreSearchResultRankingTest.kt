@@ -4,6 +4,7 @@ import moe.ouom.neriplayer.data.model.SongItem
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.async
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -99,6 +100,20 @@ class ExploreSearchResultRankingTest {
         val absentAudio = first.copy(channelId = "local", audioId = null, subAudioId = null)
         org.junit.Assert.assertNotEquals(ExploreSearchResult.Song(absentChannel).stableKey, ExploreSearchResult.Song(absentAudio).stableKey)
         assertEquals(ExploreSearchResult.Song(first).stableKey, ExploreSearchResult.Song(first.copy(name = "Display edit")).stableKey)
+    }
+
+    @Test fun cancelledScoringReleasesTheSessionAndCannotReturnAPartialOrder() {
+        val session = ExploreSearchRankingSession("Dream")
+        val items = (1L..300L).map { ExploreSearchResult.Song(song(it, "Dream $it")) }
+        val job = kotlinx.coroutines.Job()
+        var checkpoints = 0
+        org.junit.Assert.assertThrows(kotlinx.coroutines.CancellationException::class.java) {
+            session.rank(items) {
+                if (++checkpoints == 3) job.cancel()
+                job.ensureActive()
+            }
+        }
+        assertEquals(300, session.rank(items).size)
     }
 
     @Test fun aProbeFinishingWhileMetadataIsRankedCannotBeOverwrittenByTheOldOrder() = runTest {

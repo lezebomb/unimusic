@@ -1,0 +1,36 @@
+{
+  "phase": "2Z",
+  "date": "2026-10-28",
+  "jvm": [
+    {
+      "suite": "moe.ouom.neriplayer.common.search.SearchTextMatcherTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0
+    },
+    {
+      "suite": "moe.ouom.neriplayer.ui.viewmodel.tab.ExploreSearchResultRankingTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0
+    },
+    {
+      "suite": "moe.ouom.neriplayer.ui.viewmodel.tab.search.ExploreLocalSearchSessionTest",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0
+    }
+  ],
+  "newTests": 2,
+  "build": "Debug passed; phase2z-cooperative-search-cancellation.log",
+  "apk": {
+    "path": "app/build/outputs/apk/debug/app-debug.apk",
+    "sha256": "a42ec3ecb499da4a440b576858487dadf411f32ba8d9f72aa85a1c0fdb6cfdad",
+    "bytes": 62995895
+  },
+  "notRun": [
+    "device installation",
+    "large-library CPU/frame benchmarks",
+    "live network/audio/account"
+  ]
+}

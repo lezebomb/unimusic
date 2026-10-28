@@ -41,23 +41,27 @@ object SearchTextMatcher {
         private val items: List<T>,
         private val candidates: List<List<SearchCandidate>>
     ) {
-        fun filterAndRank(query: String): List<T> {
+        fun filterAndRank(query: String, checkActive: () -> Unit = {}): List<T> {
+            checkActive()
             val normalizedQuery = query.trim()
             if (normalizedQuery.isBlank()) return items
-
             val queryTokens = normalizedQuery.searchQueryTokens()
             if (queryTokens.isEmpty()) return items
-
-            return items.mapIndexedNotNull { index, item ->
+            val ranked = items.mapIndexedNotNull { index, item ->
+                if (index and 127 == 0) checkActive()
                 val score = SearchTextMatcher.scoreCandidates(queryTokens, candidates[index])
                     ?: return@mapIndexedNotNull null
                 RankedSearchItem(item = item, score = score, index = index)
             }
-                .sortedWith(
-                    compareBy<RankedSearchItem<T>> { it.score }
-                        .thenBy { it.index }
-                )
-                .map { it.item }
+            val comparator = compareBy<RankedSearchItem<T>> { it.score }.thenBy { it.index }
+            var comparisons = 0
+            return ranked.sortedWith { first, second ->
+                if (comparisons++ and 127 == 0) checkActive()
+                comparator.compare(first, second)
+            }.mapIndexed { index, value ->
+                if (index and 127 == 0) checkActive()
+                value.item
+            }
         }
     }
 
