@@ -23,6 +23,7 @@ package moe.ouom.neriplayer.ui.viewmodel.tab
  * Created: 2025/8/11
  */
 
+import moe.ouom.neriplayer.ui.viewmodel.tab.search.requireExploreSearchNetwork
 import moe.ouom.neriplayer.core.player.persistence.toSongItem
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
@@ -633,6 +634,7 @@ class ExploreViewModel(application: Application) : AndroidViewModel(application)
             },
             FederatedSearchProvider("youtube") { query, _ ->
                 if (!youtubeEnabled) throw SearchSourceException(SearchSourceFailure.DISABLED)
+                requireExploreSearchNetwork(app)
                 val songs = withContext(Dispatchers.IO) {
                     AppContainer.youtubeMusicClient.search(query, limit = YOUTUBE_MUSIC_SEARCH_LIMIT, filter = YouTubeMusicSearchFilter.Song)
                         .map { it.toSongItem(app) }
@@ -642,12 +644,14 @@ class ExploreViewModel(application: Application) : AndroidViewModel(application)
             },
             FederatedSearchProvider("kuwo") { query, cursor ->
                 aggregateCache.load("kuwo", query, cursor) {
+                    requireExploreSearchNetwork(app)
                     val page = AppContainer.kuwoCatalogProvider.search(query, cursor, limit = 20)
                     SearchPage(page.tracks.map(ExploreSearchResult::Catalog), page.nextCursor)
                 }
             },
             FederatedSearchProvider("qqmusic") { query, cursor ->
                 aggregateCache.load("qqmusic", query, cursor) {
+                    requireExploreSearchNetwork(app)
                     val page = AppContainer.qqMusicAudioClient.search(query, cursor, limit = 20)
                     SearchPage(page.tracks.map(ExploreSearchResult::Catalog), page.nextCursor)
                 }
@@ -802,6 +806,7 @@ class ExploreViewModel(application: Application) : AndroidViewModel(application)
         matchQuery: String,
         page: Int
     ): ExploreSearchFetchResult {
+        requireExploreSearchNetwork(app)
         val searchPage = withContext(Dispatchers.IO) {
             biliClient.searchVideos(keyword = keyword, page = page)
         }
@@ -1382,6 +1387,7 @@ class ExploreViewModel(application: Application) : AndroidViewModel(application)
         page: Int,
         type: NeteaseExploreSearchType
     ): ExploreSearchFetchResult {
+        requireExploreSearchNetwork(app)
         val offset = (page - 1).coerceAtLeast(0) * NETEASE_SEARCH_PAGE_SIZE
         val raw = withContext(Dispatchers.IO) {
             neteaseClient.searchSongsCancellable(
@@ -1440,6 +1446,7 @@ class ExploreViewModel(application: Application) : AndroidViewModel(application)
         val searchType = _uiState.value.selectedYouTubeMusicSearchType
         searchJob = viewModelScope.launch {
             try {
+                requireExploreSearchNetwork(app)
                 val items = when (searchType) {
                     YouTubeExploreSearchType.SONG,
                     YouTubeExploreSearchType.VIDEO -> {
@@ -1571,7 +1578,9 @@ class ExploreViewModel(application: Application) : AndroidViewModel(application)
     }
 
     private fun searchErrorMessage(source: SearchSource, error: Exception): String {
-        val fallback = error.message ?: app.getString(CoreCommonR.string.github_sync_failed_message)
+        val fallback = if (error is SearchSourceException && error.reason == SearchSourceFailure.NETWORK) {
+            app.getString(CoreCommonR.string.unimusic_search_source_network)
+        } else error.message ?: app.getString(CoreCommonR.string.github_sync_failed_message)
         return when (source) {
             SearchSource.ALL -> app.getString(CoreCommonR.string.search_error)
             SearchSource.NETEASE -> app.getString(CoreCommonR.string.error_netease_search, fallback)

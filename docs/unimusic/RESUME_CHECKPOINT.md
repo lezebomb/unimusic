@@ -10,8 +10,9 @@
 
 | 最新阶段 | 实际验证与边界 |
 | --- | --- |
+| [2AL离线搜索/网络提示](PHASE_2AL_OFFLINE_SEARCH_FEEDBACK.md) | Debug/保留数据装机；一次搜索NetEase NETWORK/四源TIMEOUT，网络检查提示可见；无新增JVM/网络设置变更/新音频，缓存命中待验收 |
 | [2AK原生反向备用](PHASE_2AK_NATIVE_TO_NETEASE_FALLBACK.md) | 新4/共5 JVM、平台0违规/边界/Debug、Mate60保留数据装机；QQ/酷我失败后可走当前账号网易云，最多两源并行，映射可复用；新链路音频未验收 |
-| [2AJ网易云版本别名](PHASE_2AJ_NETEASE_SEARCH_VERSION_ALIASES.md) | 新3/共6 JVM、边界/平台0违规/Debug；搜索保留显式别名证据、AI版本规范化；2AG/2AH CI被新提交替代取消，2AI进行中 |
+| [2AJ网易云版本别名](PHASE_2AJ_NETEASE_SEARCH_VERSION_ALIASES.md) | 新3/共6 JVM、边界/平台0违规/Debug；搜索保留显式别名证据、AI版本规范化；2AG/2AH/2AI CI被新提交替代取消，2AJ的40668821070成功 |
 | [2AI失败副作用复核](PHASE_2AI_CONTEXT_FAILURE_EFFECTS.md) | 新2/共5 JVM/Debug，旧上下文/登录拒绝不冷却，权限/版本只失效证据；纠正不存在的检查任务后续跑成功；未真实账号故障注入 |
 | [2AH完整版本排序](PHASE_2AH_COMPLETE_VERSION_RANKING.md) | 新2/共5 JVM/Debug，标题+专辑+显式版本，保留有限权重和实时地址证据；未重复装机/线上 |
 | [2AG搜索短期元数据](PHASE_2AG_SHORT_LIVED_SEARCH_METADATA.md) | 新3/共5 JVM、平台0违规/边界/Debug、保留数据装机；10秒成功首页缓存、失效/取消保护、UI缓存标签；设备在线源本轮均超时，正向命中待验收 |
@@ -38,15 +39,15 @@
 | [4D定向CI](PHASE_4D_CHANGED_SCOPE_CI.md) `f7202cba` | 保守身份白名单与结构迁移路由；CI40596819578成功，2T实际跳过无关Android迁移 |
 | [3D.8 GitHub标识同步](PHASE_3D8_GITHUB_IDENTITY_SYNC.md) `7d1c2879` | 新2项合成HTTP、Debug；前序3D.1～.7身份/因果/持久日志/只读Room捕获/WebDAV/冲突选择/外来UUID适配见各报告；CI覆盖后续已成功 |
 
-Room仍v23，无destructive migration。标识同步是身份/元数据子集，歌单仍走原同步；不上传反馈/凭据/设备路径/播放权，不重写Room本机ID、关系或显示字段。真实GitHub/WebDAV上传、双设备/旧客户端往返、完整远端库应用、外来UUID音频、真实Media3反馈采样未验收。最后设备已保留数据安装2AK包，版本886d59e55d7f.dirty.10281813，精确哈希见phase2ak/validation.json；稳定副本build/outputs/unimusic/UniMusic-20261028-2AK-debug.apk。4G真实搜索证据对应2AD包，不冒充2AE重复实测。后续复用而非重做同一构建。实际来源播放仍看2L/2M/2P，不把编译/模拟计时/地址返回当真实音频或性能。
+Room仍v23，无destructive migration。标识同步是身份/元数据子集，歌单仍走原同步；不上传反馈/凭据/设备路径/播放权，不重写Room本机ID、关系或显示字段。真实GitHub/WebDAV上传、双设备/旧客户端往返、完整远端库应用、外来UUID音频、真实Media3反馈采样未验收。最后设备已保留数据安装2AL包，版本1637436b622b.dirty.10281822，精确哈希见phase2al/validation.json；稳定副本build/outputs/unimusic/UniMusic-20261028-2AL-debug.apk。4G真实搜索证据对应2AD包，不冒充2AE重复实测。后续复用而非重做同一构建。实际来源播放仍看2L/2M/2P，不把编译/模拟计时/地址返回当真实音频或性能。
 
-下一步：继续搜索/网络失败反馈与剩余后台功能；新反向链路正向音频/缓存命中需设备网络恢复后验证，不反复请求同一公共词。手机已装2AK，版本886d59e55d7f.dirty.10281813，稳定包build/outputs/unimusic/UniMusic-20261028-2AK-debug.apk。2AG手机搜索全部在线源超时、一次重试相同，独立设备DNS探测也未完成，缓存命中仍待正向设备验收；不要断言网络根因。2AF/2AE远端CI均成功，4H的40664083211成功；2AG的40665765427与2AH的40666514625被新提交替代取消；2AI的40667670264也被替代取消，2AJ的40668821070成功。QQ官方网页登录仍未取得可保存凭据，无正向QQ音频验收。真实请求数量/延迟前后比较、缓存双源首声/失败注入、跨设备/云上传仍待验收。用户已授权以后安装时直接在手机系统验证框本机输入既有锁屏凭据，不反复要求人工确认；不保存凭据到代码/文档/日志或Git。
+下一步：继续不依赖设备联网的后台功能，2AL网络提示已实测；新反向链路正向音频/缓存命中需设备网络恢复后验证，不反复请求同一公共词。手机已装2AL，版本1637436b622b.dirty.10281822，稳定包build/outputs/unimusic/UniMusic-20261028-2AL-debug.apk。2AG手机搜索全部在线源超时、一次重试相同，独立设备DNS探测也未完成，缓存命中仍待正向设备验收；不要断言网络根因。2AF/2AE远端CI均成功，4H的40664083211成功；2AG的40665765427与2AH的40666514625被新提交替代取消；2AI的40667670264也被替代取消，2AJ的40668821070成功，2AK的40671124870进行中。QQ官方网页登录仍未取得可保存凭据，无正向QQ音频验收。真实请求数量/延迟前后比较、缓存双源首声/失败注入、跨设备/云上传仍待验收。用户已授权以后安装时直接在手机系统验证框本机输入既有锁屏凭据，不反复要求人工确认；不保存凭据到代码/文档/日志或Git。
 
 ## 当前工具链与设备限制
 
 复用项目JDK17 `.gradle-home/jdks/jdk-17.0.20.1+1`、`.android-sdk`和用户Gradle缓存；API37.0/BuildTools37/NDK27.0.12077973/CMake3.31.6已安装。`tools_pub/unimusic/build_android.ps1 -GradleArgs ... --offline`可构建，不重复下载，不重做Phase0。本机无JDK21；3B延期的两个旧runtime检查已在远端JDK21上通过，不改写本机未执行记录。
 
-Mate60在线；现装2AK。另有第二部物理设备接入，本地phone_ui.py已按型号固定BRA-AL00，后续ADB命令须明确选设备，不能使用无目标adb install/shell，4G完成2AD包的搜索/重试检查，4E完成3C/3D新增入口检查，真实播放反馈采样、云上传/双设备仍未验收。3C此前三次安装中止属于历史，4E修正流程后以实际版本核实新包已安装。不要清数据、卸载、重登录或盲目重复系统验证。手机密码、联系方式、验证码、Cookie只按原授权本地使用，不能写进日志/文档/Git。
+Mate60在线；现装2AL。另有第二部物理设备接入，本地phone_ui.py已按型号固定BRA-AL00，后续ADB命令须明确选设备，不能使用无目标adb install/shell，4G完成2AD包的搜索/重试检查，4E完成3C/3D新增入口检查，真实播放反馈采样、云上传/双设备仍未验收。3C此前三次安装中止属于历史，4E修正流程后以实际版本核实新包已安装。不要清数据、卸载、重登录或盲目重复系统验证。手机密码、联系方式、验证码、Cookie只按原授权本地使用，不能写进日志/文档/Git。
 
 ## 本轮完成的开发阶段
 

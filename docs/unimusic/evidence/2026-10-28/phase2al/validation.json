@@ -1,0 +1,39 @@
+{
+  "phase": "2AL",
+  "date": "2026-10-28",
+  "newJvmTests": 0,
+  "build": "Debug passed in 1m13s; phase2al-offline-search-feedback.log",
+  "apk": {
+    "path": "build/outputs/unimusic/UniMusic-20261028-2AL-debug.apk",
+    "sha256": "62fad615791822ab4ffd875e703bd410ac3e3817c65be281adec4e908b651979",
+    "bytes": 63019387
+  },
+  "device": {
+    "model": "Huawei Mate60 BRA-AL00",
+    "install": "adb install -r Success; user data retained; only Mate60 selected",
+    "installedVersion": "1637436b622b.dirty.10281822",
+    "publicFixtureAttempts": 1,
+    "fixture": "Adele Hello",
+    "sourceStatus": "Local 0; NetEase NETWORK; Bilibili/YouTube/Kuwo/QQ TIMEOUT",
+    "networkHintVisible": true,
+    "cleanup": "Cleared public fixture input and returned to Discover",
+    "discoverVisible": true,
+    "activeAudio": false,
+    "activeDefaultNetworkPresent": true
+  },
+  "ci": {
+    "2AK": {
+      "run": 40671124870,
+      "status": "in_progress"
+    },
+    "2AJ": {
+      "run": 40668821070,
+      "conclusion": "success"
+    }
+  },
+  "notRun": [
+    "device airplane/offline-mode test or network configuration changes",
+    "positive audio/fallback/cache-hit/network recovery checks",
+    "new account/cloud/migration/latency benchmark"
+  ]
+}

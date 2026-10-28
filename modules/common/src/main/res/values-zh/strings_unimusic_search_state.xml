@@ -2,4 +2,5 @@
 <resources>
     <string name="unimusic_search_source_timeout">超时</string>
     <string name="unimusic_search_source_network">网络错误</string>
+    <string name="unimusic_search_check_network">在线来源暂不可用，可检查网络后重试；已显示的结果会保留。</string>
 </resources>

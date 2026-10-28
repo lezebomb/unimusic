@@ -191,3 +191,5 @@ Phase 1 的工具链与 Room 数据保留前置条件已满足。
 2026-10-28补充：2AJ补齐网易云搜索版本别名的解析/排序/播放证据一致性，新3/共6项关键JVM、精确模型依赖登记/平台0违规、边界及Debug通过，见[2AJ](PHASE_2AJ_NETEASE_SEARCH_VERSION_ALIASES.md)。
 
 2026-10-28补充：2AK接QQ/酷我失败后的网易云反向备用与自动映射复用，新4/共5项JVM、平台0违规/边界/Debug及Mate60保留数据安装通过；新链路真实音频尚未验收，见[2AK](PHASE_2AK_NATIVE_TO_NETEASE_FALLBACK.md)。
+
+2026-10-28补充：2AL补明确离线的快速搜索失败与网络检查提示，Debug及Mate60安装/提示检查通过，无新增JVM或网络设置变更；见[2AL](PHASE_2AL_OFFLINE_SEARCH_FEEDBACK.md)。

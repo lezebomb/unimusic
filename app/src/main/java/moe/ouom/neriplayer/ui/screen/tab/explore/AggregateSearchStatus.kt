@@ -49,6 +49,15 @@ internal fun AggregateSearchStatus(snapshot: FederatedSearchSnapshot<ExploreSear
             }
             "$name $suffix"
         }, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        val attemptedOnline = snapshot.sources.filterKeys { it != "local" }.values.filterNot {
+            it.failure in setOf(SearchSourceFailure.AUTH_REQUIRED, SearchSourceFailure.DISABLED)
+        }
+        if (!snapshot.loading && attemptedOnline.isNotEmpty() && attemptedOnline.all {
+                it.items.isEmpty() && it.failure in setOf(SearchSourceFailure.NETWORK, SearchSourceFailure.TIMEOUT)
+            }) {
+            Text(stringResource(CoreCommonR.string.unimusic_search_check_network),
+                style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        }
         if (snapshot.sources.values.any { it.elapsedMillis != null }) {
             androidx.compose.material3.TextButton(onClick = { showTiming = !showTiming }) {
                 Text(stringResource(if (showTiming) CoreCommonR.string.unimusic_search_timing_hide
