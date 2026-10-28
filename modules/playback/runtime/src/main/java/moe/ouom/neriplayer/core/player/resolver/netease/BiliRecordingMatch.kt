@@ -13,8 +13,8 @@ internal data class BiliPageSelection(val page: VideoPage?, val rejection: Sourc
 
 /** A name match is corroborating text, never proof that the account is verified or owns a recording. */
 internal fun hasBiliUploaderArtistEvidence(artist: String, uploader: String): Boolean {
-    val expected = RecordingMatchPolicy.canonicalText(artist)
-    return expected.isNotEmpty() && expected == RecordingMatchPolicy.canonicalText(uploader)
+    val expected = RecordingMatchPolicy.canonicalArtist(artist)
+    return expected.isNotEmpty() && expected == RecordingMatchPolicy.canonicalArtist(uploader)
 }
 
 internal fun biliAutoSourceAccessFailure(info: PlayInfo, expectedDurationMs: Long): SourceFailure? {
@@ -61,7 +61,7 @@ fun biliRecordingMetadata(
         Regex("(?<![\\p{L}\\p{N}])${Regex.escape(artist)}(?![\\p{L}\\p{N}])", RegexOption.IGNORE_CASE)
     } else Regex(Regex.escape(artist), RegexOption.IGNORE_CASE)
     val artistPresent = artistPattern.containsMatchIn(context) ||
-        RecordingMatchPolicy.canonicalText(author) == RecordingMatchPolicy.canonicalText(artist)
+        RecordingMatchPolicy.canonicalArtist(author) == RecordingMatchPolicy.canonicalArtist(artist)
     var cleanTitle = Normalizer.normalize(title, Normalizer.Form.NFKC)
     // Only remove a real artist token; Sia must not be removed from the word Asia.
     cleanTitle = artistPattern.replace(cleanTitle, " ")

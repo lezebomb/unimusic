@@ -11,6 +11,15 @@ import org.junit.Assert.*
 import org.junit.Test
 
 class BiliRecordingMatchTest {
+    @Test fun uploaderCreditBoundariesCannotStandInForADifferentArtist() {
+        assertFalse(hasBiliUploaderArtistEvidence("A / B", "AB"))
+        assertFalse(hasBiliUploaderArtistEvidence("AB", "A / B"))
+        assertTrue(hasBiliUploaderArtistEvidence("A / B", "b & a"))
+        val expected = moe.ouom.neriplayer.core.player.policy.source.RecordingMetadata("Dream", "A / B", 180000)
+        val candidate = biliRecordingMetadata(expected, "Dream", "Dream", "AB", 180000)
+        assertFalse(moe.ouom.neriplayer.core.player.policy.source.RecordingMatchPolicy.assess(expected, candidate).accepted)
+    }
+
     @Test fun titleMentionsCannotEstablishUploaderArtistEvidence() {
         assertTrue(hasBiliUploaderArtistEvidence("周杰伦", "周杰伦"))
         assertFalse(hasBiliUploaderArtistEvidence("周杰伦", "原唱周杰伦的歌迷"))

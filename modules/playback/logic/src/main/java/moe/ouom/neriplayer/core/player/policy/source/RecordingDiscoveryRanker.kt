@@ -20,12 +20,12 @@ object RecordingDiscoveryRanker {
     fun <T> rank(expected: RecordingMetadata, candidates: List<RecordingDiscoveryCandidate<T>>): List<T> {
         val expectedVersions = RecordingMatchPolicy.versions(expected)
         val title = RecordingMatchPolicy.canonicalTitle(expected.title)
-        val artist = RecordingMatchPolicy.canonicalText(expected.artist)
+        val artist = RecordingMatchPolicy.canonicalArtist(expected.artist)
         return candidates.distinctBy { it.id }.mapNotNull { candidate ->
             if ((RecordingMatchPolicy.versions(candidate.metadata) - expectedVersions).isNotEmpty()) return@mapNotNull null
             Ranked(candidate, RecordingMatchPolicy.assess(expected, candidate.metadata).accepted,
                 RecordingMatchPolicy.canonicalTitle(candidate.metadata.title) == title,
-                artist.isNotEmpty() && RecordingMatchPolicy.canonicalText(candidate.metadata.artist) == artist,
+                artist.isNotEmpty() && RecordingMatchPolicy.canonicalArtist(candidate.metadata.artist) == artist,
                 if (expected.durationMs > 0 && candidate.metadata.durationMs > 0)
                     abs(expected.durationMs - candidate.metadata.durationMs) else Long.MAX_VALUE)
         }.sortedWith(compareByDescending<Ranked<T>> { it.accepted }

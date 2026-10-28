@@ -20,6 +20,23 @@ class SourceMatchRoomStoreTest {
     private val candidate = RecordingSourceCandidate(SongSourceKey("bilibili", "10", "11"),
         UnifiedSongMetadata("晴天", "周杰伦", "晴天", 269_000))
 
+    @Test fun oldAutomaticEvidenceWithCollapsedArtistCreditsIsRejectedWithoutDeletingTheObservation() = runTest {
+        val db = Room.inMemoryDatabaseBuilder(ApplicationProvider.getApplicationContext<Context>(),
+            NeriUserDataDatabase::class.java).allowMainThreadQueries().build()
+        try {
+            val store = SourceMatchRoomStore(db) { 1000L }
+            val duet = subject.copy(artist = "A / B")
+            val matched = candidate.copy(metadata = candidate.metadata.copy(artist = "A/B"))
+            val saved = store.rememberAutomatic(duet, matched, SourceDecisionStamp())!!
+            val dao = db.sourceMatchDao()
+            val row = dao.matches(saved.songId).single()
+            dao.upsertMatch(row.copy(artist = "AB")) // Simulate older evidence accepted by flat normalization.
+            assertTrue(store.automaticMatches(duet).isEmpty())
+            assertEquals(saved.id, store.matches(duet).single().id)
+            assertFalse(store.matches(duet).single().current)
+        } finally { db.close() }
+    }
+
     @Test fun neteaseAlternatePersistsForNativeSubjectsButCannotRememberItsOwnOriginalSource() = runTest {
         val db = Room.inMemoryDatabaseBuilder(ApplicationProvider.getApplicationContext<Context>(),
             NeriUserDataDatabase::class.java).allowMainThreadQueries().build()

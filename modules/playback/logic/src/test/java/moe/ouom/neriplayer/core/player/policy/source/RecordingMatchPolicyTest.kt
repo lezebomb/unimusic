@@ -6,6 +6,16 @@ import org.junit.Test
 class RecordingMatchPolicyTest {
     private val studio = RecordingMetadata("晴天", "周杰伦", 269_000)
 
+    @Test fun collaborativeArtistCreditsCannotCollapseIntoADifferentPerformer() {
+        val duet = studio.copy(artist = "A / B")
+        assertEquals(RecordingMismatch.ARTIST, RecordingMatchPolicy.assess(duet, duet.copy(artist = "AB")).reason)
+        assertEquals(RecordingMismatch.ARTIST, RecordingMatchPolicy.assess(duet.copy(artist = "AB"), duet).reason)
+        assertTrue(RecordingMatchPolicy.assess(duet, duet.copy(artist = "b ＆ a")).accepted)
+        assertTrue(RecordingMatchPolicy.assess(duet.copy(artist = "Taylor Swift"), duet.copy(artist = "taylor-swift")).accepted)
+        assertFalse(RecordingMatchPolicy.assess(duet, duet.copy(artist = "A / ")).accepted)
+        assertEquals(RecordingMismatch.ARTIST, RecordingMatchPolicy.assess(duet.copy(artist = "AC/DC"), duet.copy(artist = "ACDC")).reason)
+    }
+
     @Test fun explicitSyntheticAliasCanMatchItsOwnVersionButNeverOriginalOrHumanCover() {
         val title = studio.copy(title = "晴天 (AI generated vocals)")
         val alias = studio.copy(versionContext = "AI generated vocals")

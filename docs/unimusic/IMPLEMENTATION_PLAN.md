@@ -195,3 +195,5 @@ Phase 1 的工具链与 Room 数据保留前置条件已满足。
 2026-10-28补充：2AL补明确离线的快速搜索失败与网络检查提示，Debug及Mate60安装/提示检查通过，无新增JVM或网络设置变更；见[2AL](PHASE_2AL_OFFLINE_SEARCH_FEEDBACK.md)。
 
 2026-10-28补充：2AM让点击播放取消当前搜索的后台音源校验，1项直接协程检查与Debug通过；未测真实首声，见[2AM](PHASE_2AM_FOREGROUND_PLAYBACK_PRIORITY.md)。
+
+2026-10-28补充：2AN修复A/B合唱与AB单署名混淆，本机新2/共4项JVM及Debug通过；B站新增1项因本机缺JDK21待远端，旧映射复核且保留数据，见[2AN](PHASE_2AN_ARTIST_CREDIT_BOUNDARIES.md)。

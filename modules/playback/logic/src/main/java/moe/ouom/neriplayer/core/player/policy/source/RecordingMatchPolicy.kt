@@ -10,5 +10,6 @@ object RecordingMatchPolicy {
     fun hasVersionConflict(expected: RecordingMetadata, candidate: RecordingMetadata) = gate.hasVersionConflict(expected, candidate)
     fun assess(expected: RecordingMetadata, candidate: RecordingMetadata, toleranceMs: Long = 4_000) = gate.assess(expected, candidate, toleranceMs)
     fun canonicalTitle(title: String) = gate.canonicalTitle(title)
+    fun canonicalArtist(value: String) = gate.canonicalArtist(value)
     fun canonicalText(value: String) = gate.canonicalText(value)
 }

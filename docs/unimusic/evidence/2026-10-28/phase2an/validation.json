@@ -1,0 +1,36 @@
+{
+  "phase": "2AN",
+  "date": "2026-10-28",
+  "newTestsWritten": 3,
+  "localNewTestsPassed": 2,
+  "localRelatedTestsPassed": 4,
+  "jvm": [
+    {
+      "suite": "moe.ouom.neriplayer.core.player.policy.source.RecordingMatchPolicyTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0
+    },
+    {
+      "suite": "moe.ouom.neriplayer.data.unified.SourceMatchRoomStoreTest",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0
+    }
+  ],
+  "runtimeBiliTest": "Not executed locally; entire runtime test task requires absent JDK21. Existing remote JDK21 CI selects BiliRecordingMatchTest including the new case.",
+  "initialCommand": "Task configuration failed for missing JDK21 before tests ran; resumed with supported local tasks",
+  "build": "Debug passed in 1m35s; phase2an-artist-boundaries-final.log",
+  "platformDomainViolations": 0,
+  "schemaChanged": false,
+  "apk": {
+    "path": "build/outputs/unimusic/UniMusic-20261028-2AN-debug.apk",
+    "sha256": "674b524de160f5ad18ed3702a5bcef184ac967151cd72fbbd46cf2caf9634a52",
+    "bytes": 63020743
+  },
+  "device": "Not reinstalled; remains on 2AL",
+  "notRun": [
+    "new Bili uploader case until remote JDK21 CI",
+    "real account/audio/accuracy/latency benchmarks"
+  ]
+}

@@ -17,6 +17,7 @@ data class RecordingMatch(val accepted: Boolean, val reason: RecordingMismatch? 
 
 /** Conservative metadata gate, not a calibrated recording-identity probability. */
 object RecordingMatchPolicy {
+    private val artistCreditSeparators = Regex("[/&、;]")
     private val syntheticVoice = Regex(
         """(?<![A-Za-z0-9])ai(?![A-Za-z0-9])[^;\n|]{0,32}(?:翻唱|生成|合成|换声|音色|声线|歌声|人声)|人工智能[^;\n|]{0,16}(?:合成|生成|人声|歌声|翻唱)|声音克隆|人声合成|声线克隆|\b(?:ai[- ]+(?:generated|vocals?|voice|sung|cover(?:ed)?)|voice clon(?:e|ed|ing)|voice conversion)\b""",
         RegexOption.IGNORE_CASE
@@ -65,12 +66,12 @@ object RecordingMatchPolicy {
         require(toleranceMs >= 0)
         if (hasVersionConflict(expected, candidate)) return RecordingMatch(false, RecordingMismatch.VERSION)
         val title = canonicalTitle(expected.title)
-        val artist = canonicalText(expected.artist)
+        val artist = canonicalArtist(expected.artist)
         if (title.isEmpty() || artist.isEmpty() || expected.durationMs <= 0 || candidate.durationMs <= 0) {
             return RecordingMatch(false, RecordingMismatch.MISSING_METADATA)
         }
         if (canonicalTitle(candidate.title) != title) return RecordingMatch(false, RecordingMismatch.TITLE)
-        if (canonicalText(candidate.artist) != artist) return RecordingMatch(false, RecordingMismatch.ARTIST)
+        if (canonicalArtist(candidate.artist) != artist) return RecordingMatch(false, RecordingMismatch.ARTIST)
         if (abs(expected.durationMs - candidate.durationMs) > toleranceMs) return RecordingMatch(false, RecordingMismatch.DURATION)
         return RecordingMatch(true)
     }
@@ -84,6 +85,14 @@ object RecordingMatchPolicy {
         }
         text = text.replace(versionSuffix, "")
         return canonicalText(text)
+    }
+
+    /** Preserve credit boundaries: A/B is not AB. Unknown aliases/band spellings require manual choice. */
+    fun canonicalArtist(value: String): String {
+        val credits = Normalizer.normalize(value, Normalizer.Form.NFKC)
+            .split(artistCreditSeparators).map(::canonicalText)
+        if (credits.any(String::isEmpty)) return ""
+        return credits.sorted().joinToString("|") { "${it.length}:$it" }
     }
 
     fun canonicalText(value: String): String = Normalizer.normalize(value, Normalizer.Form.NFKC)
