@@ -6,6 +6,8 @@ import java.util.concurrent.TimeUnit
 import kotlin.math.ceil
 import kotlin.math.floor
 import kotlin.random.Random
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import moe.ouom.neriplayer.common.io.readBytesLimited
@@ -32,21 +34,32 @@ class KuwoAudioClient(private val client: OkHttpClient = OkHttpClient.Builder()
 
     suspend fun resolve(id: String): CatalogAudioResolution = lock.withLock {
         require(id.toLongOrNull()?.takeIf { it > 0 }?.toString() == id)
+        try {
+            resolveInSession(id)
+        } catch (rejected: KuwoWebSessionRejected) {
+            // One normal anonymous refresh only; the second rejection propagates.
+            if (token == null) throw rejected
+            token = null
+            resolveInSession(id)
+        }
+    }
+
+    private suspend fun resolveInSession(id: String): CatalogAudioResolution {
         if (token == null || token!!.expiresAt <= System.currentTimeMillis()) request("/")
         val detail = request("/api/www/music/musicInfo", id)
         val data = detail.optJSONObject("data")
-        if (detail.optInt("code") != 200 || data == null) return@withLock CatalogAudioResolution(SourceCheckStatus.UNAVAILABLE)
+        if (detail.optInt("code") != 200 || data == null) return CatalogAudioResolution(SourceCheckStatus.UNAVAILABLE)
         val metadata = parseKuwoAudioMetadata(data, id)
-            ?: return@withLock CatalogAudioResolution(SourceCheckStatus.METADATA_MISMATCH)
+            ?: return CatalogAudioResolution(SourceCheckStatus.METADATA_MISMATCH)
         // Missing permission evidence fails closed; PAY/COPYRIGHT search flags are not entitlement.
         if (!data.has("isListenFee") || data.optBoolean("isListenFee", true) || data.optInt("online") != 1 ||
             data.optJSONObject("payInfo")?.optInt("cannotOnlinePlay", 1) != 0) {
-            return@withLock CatalogAudioResolution(SourceCheckStatus.NO_PERMISSION, metadata)
+            return CatalogAudioResolution(SourceCheckStatus.NO_PERMISSION, metadata)
         }
         val play = request("/api/v1/www/music/playUrl", id)
         val url = play.optJSONObject("data")?.optString("url").orEmpty()
         val safe = catalogMediaUrl(url, setOf("kuwo.cn"))
-        CatalogAudioResolution(if (play.optInt("code") == 200 && safe != null) SourceCheckStatus.ADDRESS_RESOLVED
+        return CatalogAudioResolution(if (play.optInt("code") == 200 && safe != null) SourceCheckStatus.ADDRESS_RESOLVED
             else SourceCheckStatus.UNAVAILABLE, metadata, safe.takeIf { play.optInt("code") == 200 })
     }
 
@@ -64,14 +77,22 @@ class KuwoAudioClient(private val client: OkHttpClient = OkHttpClient.Builder()
             request.header("Cookie", "${cookie.name}=${cookie.value}")
             if (id != null) request.header("Secret", kuwoWebSessionHeader(cookie.value))
         }
-        return client.newCall(request.build()).awaitResponse { response ->
+        val (nextToken, payload) = client.newCall(request.build()).awaitResponse { response ->
+            if (id != null && response.code in setOf(401, 403)) throw KuwoWebSessionRejected(response.code)
             if (!response.isSuccessful) throw IOException("Kuwo HTTP ${response.code}")
-            Cookie.parseAll(url, response.headers).firstOrNull { it.name == KUWO_SESSION_COOKIE }?.let { token = it }
+            val cookie = Cookie.parseAll(url, response.headers).firstOrNull { it.name == KUWO_SESSION_COOKIE }
             val raw = response.body.byteStream().readBytesLimited(512 * 1024L).toString(Charsets.UTF_8)
-            if (id == null) JSONObject() else JSONObject(raw)
+            cookie to if (id == null) JSONObject() else JSONObject(raw)
         }
+        // Only the coroutine owning the mutex can commit session state. A cancelled OkHttp
+        // callback may finish parsing later, but must never overwrite a newer request's token.
+        currentCoroutineContext().ensureActive()
+        nextToken?.let { token = it }
+        return payload
     }
 }
+
+private class KuwoWebSessionRejected(status: Int) : IOException("Kuwo web session HTTP $status")
 
 internal const val KUWO_SESSION_COOKIE = "Hm_Iuvt_cdb524f42f23cer9b268564v7y735ewrq2324"
 

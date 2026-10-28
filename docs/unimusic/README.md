@@ -1,5 +1,7 @@
 # UniMusic 开发记录
 
+最新：[2AT手机播放/会话恢复](PHASE_2AT_DEVICE_NETWORK_AND_SESSION_RECOVERY.md)：用户换网后酷我与网易云实际解码通过，新包已保留数据安装；受限歌曲仍须当前账号权限。
+
 基于 NeriPlayer 继续开发的原生 Android 统一音乐客户端；保留上游实现和 GPL 许可，采用渐进模型/数据库迁移。
 
 当前以[续跑检查点](RESUME_CHECKPOINT.md)为准（2026-10-28）。Room为v23，Debug可构建；“发现／我的”、网易云批量导入、本地推荐反馈控制、独立歌曲标识同步入口均已交付对应子阶段。尚无正式Release。

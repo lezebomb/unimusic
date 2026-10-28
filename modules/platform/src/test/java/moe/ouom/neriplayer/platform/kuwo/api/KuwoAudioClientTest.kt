@@ -1,6 +1,18 @@
 package moe.ouom.neriplayer.platform.kuwo.api
 
+import java.io.IOException
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicInteger
+import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.async
+import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.withTimeout
+import okhttp3.ResponseBody
+import okio.Buffer
+import okio.Source
+import okio.Timeout
+import okio.buffer
 import moe.ouom.neriplayer.network.http.awaitResponse
 import kotlinx.coroutines.runBlocking
 import moe.ouom.neriplayer.data.model.unified.SourceCheckStatus
@@ -90,4 +102,112 @@ class KuwoAudioClientTest {
         assertEquals(SourceCheckStatus.NO_PERMISSION, KuwoAudioClient(client).resolve("123").status)
         assertEquals(2, calls)
     }
+
+    @Test fun sessionRejectionRefreshesOnceAndRechecksPermission() = runBlocking {
+        for (feeAfterRefresh in listOf(false, true)) {
+            val paths = mutableListOf<String>()
+            val client = OkHttpClient.Builder().addInterceptor { chain ->
+                val request = chain.request()
+                paths += request.url.encodedPath
+                val n = paths.size
+                if (n in listOf(1, 4)) assertNull(request.header("Cookie"))
+                else assertEquals("$KUWO_SESSION_COOKIE=${if (n < 4) "old" else "new"}", request.header("Cookie"))
+                val body = when (n) {
+                    1, 4 -> "<html/>"
+                    2 -> freeDetail
+                    3 -> "rejected"
+                    5 -> if (feeAfterRefresh) freeDetail.replace("false", "true") else freeDetail
+                    6 -> playable
+                    else -> error("Unexpected retry")
+                }
+                response(request, body, if (n == 3) 403 else 200,
+                    if (n == 1) "old" else if (n == 4) "new" else null)
+            }.build()
+            val result = KuwoAudioClient(client).resolve("123")
+            assertEquals(if (feeAfterRefresh) SourceCheckStatus.NO_PERMISSION else SourceCheckStatus.ADDRESS_RESOLVED, result.status)
+            assertEquals(listOf("/", infoPath, playPath, "/", infoPath) + if (feeAfterRefresh) emptyList() else listOf(playPath), paths)
+            if (feeAfterRefresh) assertNull(result.url)
+        }
+    }
+
+    @Test fun sessionRetryIsBoundedAndOnlyForApiAuthenticationHttpFailure() = runBlocking {
+        for (status in listOf(401, 403, 429, 500, 0)) {
+            var calls = 0
+            val client = OkHttpClient.Builder().addInterceptor { chain ->
+                calls++
+                val root = chain.request().url.encodedPath == "/"
+                if (!root && status == 0) throw IOException("fixture network failure")
+                response(chain.request(), if (root) "<html/>" else "rejected", if (root) 200 else status,
+                    if (root) "fixture" else null)
+            }.build()
+            try {
+                KuwoAudioClient(client).resolve("123")
+                fail("Expected transport rejection")
+            } catch (_: IOException) { }
+            assertEquals(if (status in listOf(401, 403)) 4 else 2, calls)
+        }
+        var roots = 0
+        val rootRejected = OkHttpClient.Builder().addInterceptor { chain ->
+            roots++; response(chain.request(), "rejected", 403)
+        }.build()
+        try { KuwoAudioClient(rootRejected).resolve("123"); fail("Expected root rejection") }
+        catch (_: IOException) { }
+        assertEquals(1, roots)
+    }
+
+    @Test fun sessionCancelledCallbackCannotAdoptOrOverwriteForegroundCookie() = runBlocking {
+        val entered = CountDownLatch(1)
+        val release = CountDownLatch(1)
+        val closed = CountDownLatch(1)
+        val roots = AtomicInteger()
+        val client = OkHttpClient.Builder().addInterceptor { chain ->
+            val request = chain.request()
+            if (request.url.encodedPath == "/" && roots.incrementAndGet() == 1) {
+                val body = object : ResponseBody() {
+                    override fun contentType() = null
+                    override fun contentLength() = -1L
+                    override fun source() = object : Source {
+                        val bytes = Buffer().writeUtf8("<html/>")
+                        override fun read(sink: Buffer, byteCount: Long): Long {
+                            entered.countDown()
+                            check(release.await(5, TimeUnit.SECONDS))
+                            return bytes.read(sink, byteCount)
+                        }
+                        override fun timeout() = Timeout.NONE
+                        override fun close() { closed.countDown() }
+                    }.buffer()
+                }
+                response(request, "", cookie = "cancelled").newBuilder().body(body).build()
+            } else {
+                val root = request.url.encodedPath == "/"
+                if (root) assertNull(request.header("Cookie"))
+                else assertEquals("$KUWO_SESSION_COOKIE=foreground", request.header("Cookie"))
+                response(request, if (root) "<html/>" else if (request.url.encodedPath == infoPath) freeDetail else playable,
+                    cookie = if (root) "foreground" else null)
+            }
+        }.build()
+        val api = KuwoAudioClient(client)
+        val background = async(start = CoroutineStart.UNDISPATCHED) { api.resolve("123") }
+        try {
+            assertTrue(entered.await(2, TimeUnit.SECONDS))
+            background.cancelAndJoin()
+            assertEquals(SourceCheckStatus.ADDRESS_RESOLVED, withTimeout(2_000) { api.resolve("123") }.status)
+            assertEquals(2, roots.get())
+            release.countDown()
+            assertTrue(closed.await(2, TimeUnit.SECONDS))
+            assertEquals(SourceCheckStatus.ADDRESS_RESOLVED, api.resolve("123").status)
+            assertEquals(2, roots.get())
+        } finally { release.countDown(); background.cancelAndJoin() }
+    }
+
+    private fun response(request: okhttp3.Request, body: String, code: Int = 200, cookie: String? = null): Response =
+        Response.Builder().request(request).protocol(Protocol.HTTP_1_1).code(code).message("fixture")
+            .apply { if (cookie != null) header("Set-Cookie", "$KUWO_SESSION_COOKIE=$cookie; Path=/; Secure") }
+            .body(body.toResponseBody()).build()
+
+    private val infoPath = "/api/www/music/musicInfo"
+    private val playPath = "/api/v1/www/music/playUrl"
+    private val freeDetail = """{"code":200,"data":{"rid":123,"name":"Song","artist":"Artist","album":"Album","duration":200,"online":1,"isListenFee":false,"payInfo":{"cannotOnlinePlay":0}}}"""
+    private val playable = """{"code":200,"data":{"url":"https://kw-lv.kuwo.cn/resource/fixture.mp3"}}"""
+
 }

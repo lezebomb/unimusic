@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="moe.ouom.neriplayer.platform.kuwo.api.KuwoAudioClientTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-10-28T13:44:51.730Z" hostname="XUSHAOYANG" time="0.782">
+  <properties/>
+  <testcase name="sessionRejectionRefreshesOnceAndRechecksPermission" classname="moe.ouom.neriplayer.platform.kuwo.api.KuwoAudioClientTest" time="0.655"/>
+  <testcase name="feeOrMissingPermissionNeverRequestsAudio" classname="moe.ouom.neriplayer.platform.kuwo.api.KuwoAudioClientTest" time="0.01"/>
+  <testcase name="sessionCancelledCallbackCannotAdoptOrOverwriteForegroundCookie" classname="moe.ouom.neriplayer.platform.kuwo.api.KuwoAudioClientTest" time="0.068"/>
+  <testcase name="sessionRetryIsBoundedAndOnlyForApiAuthenticationHttpFailure" classname="moe.ouom.neriplayer.platform.kuwo.api.KuwoAudioClientTest" time="0.039"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

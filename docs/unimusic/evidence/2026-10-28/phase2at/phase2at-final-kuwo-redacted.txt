@@ -1,0 +1,11 @@
+INSTRUMENTATION_STATUS: test=kuwoNormalWebSourceDecodesThroughProductionPlayer
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: address_ms=1606
+INSTRUMENTATION_STATUS: observed_position_ms=2151
+INSTRUMENTATION_STATUS: play_request_to_observed_1500ms_position_ms=5979
+INSTRUMENTATION_STATUS: unimusic_source=kuwo
+INSTRUMENTATION_STATUS_CODE: 2
+INSTRUMENTATION_STATUS: test=kuwoNormalWebSourceDecodesThroughProductionPlayer
+INSTRUMENTATION_STATUS_CODE: 0
+OK (1 test)
+INSTRUMENTATION_CODE: -1

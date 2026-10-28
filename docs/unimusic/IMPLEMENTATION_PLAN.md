@@ -207,3 +207,5 @@ Phase 1 的工具链与 Room 数据保留前置条件已满足。
 2026-10-28补充：2AR统一原生官方歌曲页与分享校验，新2/共3唯一JVM、平台0违规/完整边界/Debug及Mate60安装通过；未发送分享或做新音频验收，见[2AR](PHASE_2AR_NATIVE_PUBLIC_PAGES.md)。
 
 2026-10-28补充：2AS一次生产酷我匿名桌面探测返回正常地址并收到HTTP206/8KiB音频头；默认不启用时跳过，非手机/完整解码验收，不改网络设置；见[2AS](PHASE_2AS_DESKTOP_KUWO_TRANSPORT.md)。
+
+2026-10-28补充：2AT复现系统浏览器也断网，用户换网后酷我/网易云真实解码；补酷我HTTP401/403单次正常会话刷新与取消Cookie隔离，4 JVM/领域0违规/边界/Debug/保留数据安装及新包酷我复验通过；权限受限曲目仍可能拒绝。见[2AT](PHASE_2AT_DEVICE_NETWORK_AND_SESSION_RECOVERY.md)。

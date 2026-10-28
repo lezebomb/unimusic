@@ -1,0 +1,25 @@
+INSTRUMENTATION_STATUS: class=moe.ouom.neriplayer.sources.NativeCatalogDeviceTest
+INSTRUMENTATION_STATUS: test=kuwoNormalWebSourceDecodesThroughProductionPlayer
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: address_ms=804
+INSTRUMENTATION_STATUS: observed_position_ms=2129
+INSTRUMENTATION_STATUS: unimusic_source=kuwo
+INSTRUMENTATION_STATUS_CODE: 2
+INSTRUMENTATION_STATUS: class=moe.ouom.neriplayer.sources.NativeCatalogDeviceTest
+INSTRUMENTATION_STATUS: test=kuwoNormalWebSourceDecodesThroughProductionPlayer
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=moe.ouom.neriplayer.sources.NeteaseImportDeviceTest
+INSTRUMENTATION_STATUS: test=importedNeteaseSongDecodesWithoutFallback
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: candidates_checked=3
+INSTRUMENTATION_STATUS: full_address_no_preview=true
+INSTRUMENTATION_STATUS: observed_position_ms=2159
+INSTRUMENTATION_STATUS: play_request_to_observed_position_ms=2674
+INSTRUMENTATION_STATUS: resolve_ms=771
+INSTRUMENTATION_STATUS: source=netease_account_native
+INSTRUMENTATION_STATUS_CODE: 2
+INSTRUMENTATION_STATUS: class=moe.ouom.neriplayer.sources.NeteaseImportDeviceTest
+INSTRUMENTATION_STATUS: test=importedNeteaseSongDecodesWithoutFallback
+INSTRUMENTATION_STATUS_CODE: 0
+OK (2 tests)
+INSTRUMENTATION_CODE: -1

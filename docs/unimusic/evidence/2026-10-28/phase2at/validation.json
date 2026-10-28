@@ -1,0 +1,74 @@
+{
+  "phase": "2AT",
+  "date": "2026-10-28",
+  "unitTests": {
+    "tests": 4,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "build": {
+    "log": "build/unimusic-toolchain/phase2at-session-validation.log",
+    "outcome": "BUILD SUCCESSFUL",
+    "seconds": 134,
+    "platformDomainViolations": 0,
+    "moduleBoundaries": "passed"
+  },
+  "apk": {
+    "archive": "build/outputs/unimusic/UniMusic-20261028-2AT-debug.apk",
+    "sha256": "79503df149eb874b07a9963c0e07b5030294cfdaea8d93ae2b883eff003abd13",
+    "installedVersion": "c1408b01b5b0.dirty.10282144",
+    "installation": "adb Success and package version checked; data preserved"
+  },
+  "networkIncident": {
+    "before": "UI playback at position 0 with no-address dialog; system Edge also DNS_PROBE_FINISHED_NO_INTERNET",
+    "savedWifiReconnect": "Wi-Fi disabled/enabled once without forgetting networks; browser still failed",
+    "userAction": "User reconnected network and asked to retry",
+    "after": {
+      "kuwo": {
+        "http": 200,
+        "elapsedMs": 734
+      },
+      "netease": {
+        "http": 200,
+        "elapsedMs": 612
+      },
+      "directIpControl": {
+        "http": -1,
+        "stage": "TCP_STARTED",
+        "failure": "SocketTimeoutException",
+        "elapsedMs": 3023
+      }
+    },
+    "settings": "No DNS/proxy/VPN/data-saver or credentials changed"
+  },
+  "devicePlaybackBeforeNewPackage": {
+    "kuwo": {
+      "status": "PLAYED",
+      "addressMs": 804,
+      "observedPositionMs": 2129
+    },
+    "neteaseImported": {
+      "status": "PLAYED",
+      "candidatesChecked": 3,
+      "fullAddressNoPreview": true,
+      "resolveMs": 771,
+      "requestToObservedPositionMs": 2674,
+      "observedPositionMs": 2159
+    }
+  },
+  "devicePlaybackAfterNewPackage": {
+    "kuwo": {
+      "status": "PLAYED",
+      "addressMs": 1606,
+      "requestToObservedPositionMs": 5979,
+      "observedPositionMs": 2151
+    }
+  },
+  "limitations": [
+    "N=1 per sample; not first-sound/P50/P95/full-song endurance",
+    "No real HTTP401/403 or late-callback fault injection on phone; these use synthetic unit evidence",
+    "QQ authenticated audio not positively validated; YouTube extraction still paused",
+    "Restricted song returned platform access denial after connectivity returned; no universal-free-play claim"
+  ]
+}
