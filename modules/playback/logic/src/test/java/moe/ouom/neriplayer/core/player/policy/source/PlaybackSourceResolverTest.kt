@@ -10,6 +10,27 @@ import org.junit.Assert.*
 import org.junit.Test
 
 class PlaybackSourceResolverTest {
+    @Test fun staleContextFailuresHaveNoAutomaticMappingOrCooldownSideEffects() {
+        for (failure in SourceFailure.entries) {
+            val action = automaticSourceFailureAction(failure, contextCurrent = false)
+            assertFalse(action.invalidateMapping);assertFalse(action.coolSource)
+        }
+        for (failure in listOf(SourceFailure.AUTH_REQUIRED, SourceFailure.EXTERNAL_PLAYER_REQUIRED, SourceFailure.AMBIGUOUS)) {
+            assertEquals(AutomaticSourceFailureAction.NONE, automaticSourceFailureAction(failure, true))
+        }
+    }
+
+    @Test fun permissionAndMetadataFailuresInvalidateEvidenceWithoutCoolingANewLogin() {
+        for (failure in listOf(SourceFailure.NO_PERMISSION, SourceFailure.NO_MATCH, SourceFailure.PREVIEW_ONLY)) {
+            assertEquals(AutomaticSourceFailureAction.INVALIDATE, automaticSourceFailureAction(failure, true))
+        }
+        for (failure in listOf(SourceFailure.NETWORK, SourceFailure.TIMEOUT, SourceFailure.URL_EXPIRED)) {
+            assertEquals(AutomaticSourceFailureAction.COOL, automaticSourceFailureAction(failure, true))
+        }
+        assertEquals(AutomaticSourceFailureAction.INVALIDATE_AND_COOL,
+            automaticSourceFailureAction(SourceFailure.UNAVAILABLE, true))
+    }
+
     @Test fun cachedParallelSourcesReturnTheFastSuccessWithoutCoolingTheCancelledLoser() = runTest {
         val cooldown = SourceFailureCooldown { testScheduler.currentTime }
         var stopped = false

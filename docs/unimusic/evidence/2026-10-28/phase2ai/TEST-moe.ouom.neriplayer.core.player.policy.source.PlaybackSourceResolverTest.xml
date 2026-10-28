@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="moe.ouom.neriplayer.core.player.policy.source.PlaybackSourceResolverTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-10-28T09:49:56.089Z" hostname="XUSHAOYANG" time="0.545">
+  <properties/>
+  <testcase name="sharedParallelDeadlineAndCallerCancellationDoNotBlacklistUnfinishedSources" classname="moe.ouom.neriplayer.core.player.policy.source.PlaybackSourceResolverTest" time="0.483"/>
+  <testcase name="permissionAndMetadataFailuresInvalidateEvidenceWithoutCoolingANewLogin" classname="moe.ouom.neriplayer.core.player.policy.source.PlaybackSourceResolverTest" time="0.011"/>
+  <testcase name="parallelCandidatesStillEnforceEligibilityAndCoolOnlyAnActualTransientFailure" classname="moe.ouom.neriplayer.core.player.policy.source.PlaybackSourceResolverTest" time="0.025"/>
+  <testcase name="staleContextFailuresHaveNoAutomaticMappingOrCooldownSideEffects" classname="moe.ouom.neriplayer.core.player.policy.source.PlaybackSourceResolverTest" time="0.001"/>
+  <testcase name="cachedParallelSourcesReturnTheFastSuccessWithoutCoolingTheCancelledLoser" classname="moe.ouom.neriplayer.core.player.policy.source.PlaybackSourceResolverTest" time="0.017"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

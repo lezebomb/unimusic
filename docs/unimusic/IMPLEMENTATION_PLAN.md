@@ -185,3 +185,5 @@ Phase 1 的工具链与 Room 数据保留前置条件已满足。
 2026-10-28补充：2AG已完成10秒成功首页元数据复用和上下文失效，5项关键JVM/Debug/保留数据安装通过；手机当轮全部在线源超时，缓存正向设备验收未完成，见[2AG报告](PHASE_2AG_SHORT_LIVED_SEARCH_METADATA.md)。
 
 2026-10-28补充：2AH复用完整版本证据进行展示排序，新2/共5项JVM与Debug通过；保持文字相关性优先和自动播放门槛，见[2AH报告](PHASE_2AH_COMPLETE_VERSION_RANKING.md)。
+
+2026-10-28补充：2AI修复自动来源旧上下文失败的副作用、区分权限与网络冷却，新2/共5 JVM和Debug通过；真实切账号/设备故障注入未验收，见[2AI](PHASE_2AI_CONTEXT_FAILURE_EFFECTS.md)。

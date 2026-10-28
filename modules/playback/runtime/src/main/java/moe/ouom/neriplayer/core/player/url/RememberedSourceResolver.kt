@@ -91,10 +91,14 @@ private suspend fun PlayerManager.tryResolveStoredSource(song: SongItem, sideEff
                         refreshed.revision == match.revision && refreshed.current &&
                         refreshed.decision == (if (automatic) SourceMatchDecision.NONE else SourceMatchDecision.CONFIRMED)
                     if (automatic && attempt is SourceAttempt.Rejected) {
-                        if (attempt.reason in setOf(SourceFailure.NO_MATCH, SourceFailure.NO_PERMISSION,
-                                SourceFailure.PREVIEW_ONLY, SourceFailure.UNAVAILABLE)) backend.invalidateAutomatic(song, match)
-                        RememberedSourceState.cooldown.reject(song.stableKey(), match.id)
-                        coolAutomaticBili(song, match)
+                        val action = automaticSourceFailureAction(attempt.reason, current &&
+                            session == sourceResolutionSession(provider) && automaticSourceEnabled(provider))
+                        if (action.invalidateMapping) backend.invalidateAutomatic(song, match)
+                        // Room invalidation can suspend; recheck account/switch before changing in-memory cooldowns.
+                        if (action.coolSource && session == sourceResolutionSession(provider) && automaticSourceEnabled(provider)) {
+                            RememberedSourceState.cooldown.reject(song.stableKey(), match.id)
+                            coolAutomaticBili(song, match)
+                        }
                     }
                     if (session != sourceResolutionSession(provider)) SourceAttempt.Rejected(SourceFailure.AUTH_REQUIRED)
                     else if (automatic && !automaticSourceEnabled(provider)) SourceAttempt.Rejected(SourceFailure.NO_PERMISSION)

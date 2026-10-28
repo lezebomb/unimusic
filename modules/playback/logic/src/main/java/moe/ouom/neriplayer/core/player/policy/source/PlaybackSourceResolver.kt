@@ -15,6 +15,21 @@ enum class SourceFailure {
     NETWORK, TIMEOUT, URL_EXPIRED, PREVIEW_ONLY, UNAVAILABLE
 }
 
+/** Stale context failures carry no evidence about the current account or automatic mapping. */
+enum class AutomaticSourceFailureAction(val invalidateMapping: Boolean, val coolSource: Boolean) {
+    NONE(false, false), INVALIDATE(true, false), COOL(false, true), INVALIDATE_AND_COOL(true, true)
+}
+
+fun automaticSourceFailureAction(reason: SourceFailure, contextCurrent: Boolean): AutomaticSourceFailureAction = when {
+    !contextCurrent -> AutomaticSourceFailureAction.NONE
+    reason == SourceFailure.UNAVAILABLE -> AutomaticSourceFailureAction.INVALIDATE_AND_COOL
+    reason in setOf(SourceFailure.NO_MATCH, SourceFailure.NO_PERMISSION, SourceFailure.PREVIEW_ONLY) ->
+        AutomaticSourceFailureAction.INVALIDATE
+    reason in setOf(SourceFailure.NETWORK, SourceFailure.TIMEOUT, SourceFailure.URL_EXPIRED) ->
+        AutomaticSourceFailureAction.COOL
+    else -> AutomaticSourceFailureAction.NONE
+}
+
 sealed interface SourceAttempt<out T> {
     data class Ready<T>(val value: T) : SourceAttempt<T>
     data class Rejected(val reason: SourceFailure) : SourceAttempt<Nothing>

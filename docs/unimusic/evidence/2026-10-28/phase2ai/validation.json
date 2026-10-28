@@ -1,0 +1,21 @@
+{
+  "phase": "2AI",
+  "date": "2026-10-28",
+  "newJvmTests": 2,
+  "relatedJvmTests": 5,
+  "failures": 0,
+  "errors": 0,
+  "build": "Debug passed in 1m47s; phase2ai-context-failure-isolation-final.log",
+  "initialCommand": "Task selection failed before checks because verifyDomainDependencies is not defined in playback projects; corrected the task list and resumed automatically",
+  "apk": {
+    "path": "build/outputs/unimusic/UniMusic-20261028-2AI-debug.apk",
+    "sha256": "5a256aea9b01ee165d4dc98be1630c675756ebfd18c5b14f95daa9b5031af86c",
+    "bytes": 63010411
+  },
+  "notRun": [
+    "real account/switch mutation during playback resolution",
+    "new device audio/network acceptance",
+    "new migration tests"
+  ],
+  "device": "Mate60 still on 2AG; local phone helper now selects only BRA-AL00 because another physical phone appeared"
+}
