@@ -1,0 +1,73 @@
+{
+  "phase": "2AW",
+  "newUnitTests": 1,
+  "uniqueUnitTestsRun": 2,
+  "unitFailures": 0,
+  "unitErrors": 0,
+  "unitSkipped": 0,
+  "build": {
+    "initial": "BUILD SUCCESSFUL in 1m28s; new ranking case",
+    "final": "BUILD SUCCESSFUL in 1m5s after rank-publication account recheck; two selected tests",
+    "log": "build/unimusic-toolchain/phase2aw-final-build.log",
+    "moduleBoundaries": "passed",
+    "localizedKeyParity": 7
+  },
+  "apk": {
+    "archive": "build/outputs/unimusic/UniMusic-20261028-2AW-debug.apk",
+    "sha256": "6e50e49b8a7bdafcf9ad74df17cd2a5cdb93a17ea5146f594136da4425d2d833",
+    "installedVersion": "42d76a27cb65.dirty.10282221",
+    "installation": "adb Success and package version; data retained"
+  },
+  "device": {
+    "installedVersion": "42d76a27cb65.dirty.10282221",
+    "query": "Canon",
+    "visibleNeteaseChecks": [
+      "网易云音乐 · 音频地址已校验"
+    ],
+    "clickedCheckedNetease": true,
+    "progressSamples": [
+      {
+        "state": 3,
+        "positionMs": 4145,
+        "speed": 1.0
+      },
+      {
+        "state": 3,
+        "positionMs": 6181,
+        "speed": 1.0
+      }
+    ],
+    "initialObservation": "Checked NetEase result was above retained viewport; returned list to beginning",
+    "pausedAfterCheck": true,
+    "finalPlayerState": {
+      "state": 2,
+      "positionMs": 9260,
+      "speed": 0.0
+    }
+  },
+  "limits": {
+    "providers": [
+      "netease",
+      "qqmusic",
+      "kuwo"
+    ],
+    "maxCandidatesPerProvider": 3,
+    "maxProbeBudgetMsPerProvider": 4500,
+    "maxCandidateBudgetMs": 1800,
+    "stopAfterFirstFullAddress": true,
+    "checkFreshnessMs": 120000,
+    "foregroundPlayCancelsBackgroundChecks": true,
+    "urlsStoredInSearchUi": false
+  },
+  "ci": {
+    "2AV": {
+      "run": 40703835061,
+      "conclusion": "success"
+    }
+  },
+  "notExecuted": [
+    "No true login/logout fault injection on phone",
+    "No before/after first-sound or broad latency benchmark",
+    "No full-song/endurance or all-catalog original-recording / free-play guarantee"
+  ]
+}

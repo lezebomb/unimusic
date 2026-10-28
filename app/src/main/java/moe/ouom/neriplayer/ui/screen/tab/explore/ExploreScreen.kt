@@ -975,7 +975,9 @@ fun ExploreScreen(
                                                     song = song,
                                                     isFavorite = isFavoriteSong,
                                                     favoriteActionEnabled = localPlaylistsReady,
-                                                    offlineMode = offlineMode
+                                                    offlineMode = offlineMode,
+                                                    sourceCheck = moe.ouom.neriplayer.ui.viewmodel.tab.searchAvailabilityCandidate(item)
+                                                        ?.key?.let { ui.nativeSourceChecks[it] }
                                                 ),
                                                 actions = ExploreSongRowActions(
                                                     onClick = {

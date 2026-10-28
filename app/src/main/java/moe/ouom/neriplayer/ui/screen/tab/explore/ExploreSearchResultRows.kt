@@ -376,7 +376,7 @@ internal fun SongRow(
     ) {
         SongRowIndex(state.index)
         SongRowCover(state.song, state.offlineMode)
-        SongRowIdentity(state.song, Modifier.weight(1f))
+        SongRowIdentity(state.song, Modifier.weight(1f), state.sourceCheck)
         SongRowDuration(state.song.durationMs)
         Spacer(Modifier.width(8.dp))
         SongRowMoreButton(state, actions)
@@ -388,7 +388,8 @@ internal class ExploreSongRowState(
     val song: SongItem,
     val isFavorite: Boolean,
     val favoriteActionEnabled: Boolean,
-    val offlineMode: Boolean
+    val offlineMode: Boolean,
+    val sourceCheck: moe.ouom.neriplayer.data.model.unified.SourceCheckResult? = null
 )
 
 internal class ExploreSongRowActions(
@@ -462,7 +463,8 @@ private fun SongRowCover(song: SongItem, offlineMode: Boolean) {
 }
 
 @Composable
-private fun SongRowIdentity(song: SongItem, modifier: Modifier) {
+private fun SongRowIdentity(song: SongItem, modifier: Modifier,
+    check: moe.ouom.neriplayer.data.model.unified.SourceCheckResult?) {
     val context = LocalContext.current
     Column(modifier) {
         Text(
@@ -478,6 +480,11 @@ private fun SongRowIdentity(song: SongItem, modifier: Modifier) {
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
+        if (check != null && System.currentTimeMillis() - check.checkedAtMillis in 0..120_000) {
+            Text(text = stringResource(CoreCommonR.string.platform_netease) + " · " + searchSourceCheckLabel(check),
+                maxLines = 1, overflow = TextOverflow.Ellipsis,
+                style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        }
     }
 }
 

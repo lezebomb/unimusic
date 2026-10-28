@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="unimusic_search_audio_address_checked">音频地址已校验</string>
+    <string name="unimusic_search_audio_login">需要登录</string>
+    <string name="unimusic_search_audio_no_permission">当前无完整播放权限</string>
+    <string name="unimusic_search_audio_preview">仅提供试听</string>
+    <string name="unimusic_search_audio_timeout">校验超时，可重试</string>
+    <string name="unimusic_search_audio_unchecked">播放时检查完整音频权限</string>
+    <string name="unimusic_search_audio_unavailable">暂不可用，可重试</string>
+</resources>

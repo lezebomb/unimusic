@@ -1,5 +1,7 @@
 # UniMusic 开发记录
 
+最新：[2AW网易云搜索可播性](PHASE_2AW_NETEASE_SEARCH_AUDIO_CHECKS.md)：限量后台校验/同版本排序，手机点击地址已校验结果已实际播放；账号歌单保留。
+
 最新：[2AV服务失败与四路实播](PHASE_2AV_SOURCE_SERVICE_ERRORS_AND_DEVICE_AUDIO.md)：换网后网易云/酷我/B站/GD样本解码，服务失败单独处理；QQ和YouTube仍未实播。
 
 最新：[2AU播放失败反馈](PHASE_2AU_PLAYBACK_FAILURE_FEEDBACK.md)：网络/超时不再统一误报权限或登录；已保留数据装机。

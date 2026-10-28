@@ -15,6 +15,23 @@ import moe.ouom.neriplayer.data.model.unified.SourceCheckStatus
 import moe.ouom.neriplayer.data.model.unified.UnifiedSongMetadata
 
 class ExploreSearchResultRankingTest {
+    @Test fun verifiedNeteaseAddressReordersOnlyMatchingProviderAndVersionWhileChecksAreFresh() {
+        fun item(id: Long, name: String = "Dream") = ExploreSearchResult.Song(song(id, name, "Artist")
+            .copy(channelId = "netease", audioId = id.toString(), album = "Album"))
+        val denied = item(1);val unknown = item(2);val ready = item(3);val live = item(4, "Dream (Live)")
+        val now = System.currentTimeMillis()
+        val checks = mapOf(SongSourceKey("netease", "1") to SourceCheckResult(SourceCheckStatus.NO_PERMISSION, now),
+            SongSourceKey("netease", "3") to SourceCheckResult(SourceCheckStatus.ADDRESS_RESOLVED, now),
+            SongSourceKey("netease", "4") to SourceCheckResult(SourceCheckStatus.ADDRESS_RESOLVED, now))
+        val session = ExploreSearchRankingSession("Dream")
+        assertEquals(listOf(ready, unknown, denied, live), session.rank(listOf(denied, live, unknown, ready), checks))
+        assertEquals(listOf(denied, unknown, ready), session.rank(listOf(denied, unknown, ready),
+            checks.mapValues { (_, check) -> check.copy(checkedAtMillis = now - 120_001) }))
+        assertEquals(null, searchAvailabilityCandidate(ready.copy(song = ready.song.copy(channelId = "bilibili"))))
+        assertEquals(null, searchAvailabilityCandidate(ready.copy(song = ready.song.copy(channelId = null))))
+        assertEquals(null, searchAvailabilityCandidate(ready.copy(song = ready.song.copy(streamUrl = "https://fixture.test/audio.mp3"))))
+    }
+
     @Test fun fullVersionEvidenceOutranksFreshAudioAddressForAnUnqualifiedTitle() {
         fun catalog(id: String, album: String = "Album", version: moe.ouom.neriplayer.data.model.unified.RecordingVersion =
             moe.ouom.neriplayer.data.model.unified.RecordingVersion.UNKNOWN) = ExploreSearchResult.Catalog(

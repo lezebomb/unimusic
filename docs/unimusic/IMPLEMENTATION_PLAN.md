@@ -213,3 +213,5 @@ Phase 1 的工具链与 Room 数据保留前置条件已满足。
 2026-10-28补充：2AU细分音源失败原因及网易云降档超时归因，Debug及保留数据安装通过；2AT另有实际聚合搜索点击/进度增加证据。见[2AU](PHASE_2AU_PLAYBACK_FAILURE_FEEDBACK.md)。
 
 2026-10-28补充：2AV区分QQ/酷我服务拒绝与传输错误，新1组合JVM/领域0违规/边界/Debug/保留数据安装；B站/GD实际解码，已验证四路样本。QQ仍未接通、现行RPC匿名空结果不作为成功。见[2AV](PHASE_2AV_SOURCE_SERVICE_ERRORS_AND_DEVICE_AUDIO.md)。
+
+2026-10-28补充：2AW网易云加入聚合结果限量后台完整地址检查、账号复核、同版本排序和行内标签；新1/共2关键JVM、边界/Debug/保留数据装机及搜索点击4145→6181ms进度通过。见[2AW](PHASE_2AW_NETEASE_SEARCH_AUDIO_CHECKS.md)。

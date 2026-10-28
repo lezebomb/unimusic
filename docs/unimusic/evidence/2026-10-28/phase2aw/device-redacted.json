@@ -1,0 +1,27 @@
+{
+  "installedVersion": "42d76a27cb65.dirty.10282221",
+  "query": "Canon",
+  "visibleNeteaseChecks": [
+    "网易云音乐 · 音频地址已校验"
+  ],
+  "clickedCheckedNetease": true,
+  "progressSamples": [
+    {
+      "state": 3,
+      "positionMs": 4145,
+      "speed": 1.0
+    },
+    {
+      "state": 3,
+      "positionMs": 6181,
+      "speed": 1.0
+    }
+  ],
+  "initialObservation": "Checked NetEase result was above retained viewport; returned list to beginning",
+  "pausedAfterCheck": true,
+  "finalPlayerState": {
+    "state": 2,
+    "positionMs": 9260,
+    "speed": 0.0
+  }
+}

@@ -59,7 +59,7 @@ internal class ExploreSearchRankingSession(query: String) {
                 scores[item.stableKey] = Cached(item, value)
                 while (scores.size > 2048) scores.remove(scores.keys.first())
             }
-            val check = (item as? ExploreSearchResult.Catalog)?.let { checks[it.track.source] }
+            val check = searchAvailabilityCandidate(item)?.let { checks[it.key] }
                 ?.takeIf { now - it.checkedAtMillis in 0..120_000 }
             val availability = when (check?.status) {
                 SourceCheckStatus.ADDRESS_RESOLVED -> 0
@@ -112,3 +112,11 @@ internal fun rankExploreSongSearchResults(query: String, songs: List<SongItem>):
 /** Preserve field boundaries even when provider data contains separators or missing components. */
 internal fun songSearchResultKey(song: SongItem): String = listOf("song", song.channelId.orEmpty(), song.audioId.orEmpty(),
     song.subAudioId.orEmpty(), song.mediaUri.orEmpty(), song.id.toString()).joinToString("|") { "${it.length}:$it" }
+
+/** Only explicit provider identities can receive a result's transient audio check. No legacy-ID guessing. */
+internal fun searchAvailabilityCandidate(item: ExploreSearchResult): moe.ouom.neriplayer.data.model.unified.RecordingSourceCandidate? = when (item) {
+    is ExploreSearchResult.Catalog -> moe.ouom.neriplayer.data.model.unified.RecordingSourceCandidate(item.track.source, item.track.metadata)
+    is ExploreSearchResult.Song -> if (item.song.channelId == "netease")
+        moe.ouom.neriplayer.data.unified.sourceCandidateForSong(item.song) else null
+    else -> null
+}

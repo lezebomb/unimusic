@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="unimusic_search_audio_address_checked">Audio address checked</string>
+    <string name="unimusic_search_audio_login">Login required</string>
+    <string name="unimusic_search_audio_no_permission">No full playback permission</string>
+    <string name="unimusic_search_audio_preview">Preview only</string>
+    <string name="unimusic_search_audio_timeout">Check timed out; retry</string>
+    <string name="unimusic_search_audio_unchecked">Full playback permission checked when played</string>
+    <string name="unimusic_search_audio_unavailable">Temporarily unavailable; retry</string>
+</resources>

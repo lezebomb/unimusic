@@ -694,49 +694,54 @@ class ExploreViewModel(application: Application) : AndroidViewModel(application)
                         searchPage = 1
                     )
                 }
-                if (isSearchRequestCurrent(requestVersion, SearchSource.ALL)) probeNativeSources(items, requestVersion, ranker)
+                if (isSearchRequestCurrent(requestVersion, SearchSource.ALL)) probeSearchSources(items, requestVersion, ranker)
             }
         }
     }
 
-    /** Two providers run independently; a failed first result advances to the next, within 4.5s each. */
-    private fun probeNativeSources(items: List<ExploreSearchResult>, requestVersion: Long, ranker: ExploreSearchRankingSession) {
-        for (provider in listOf("qqmusic", "kuwo")) {
+    /** Three providers run independently, at most three candidates / 4.5s each, stopping at a full address. */
+    private fun probeSearchSources(items: List<ExploreSearchResult>, requestVersion: Long, ranker: ExploreSearchRankingSession) {
+        for (provider in listOf("netease", "qqmusic", "kuwo")) {
             if (nativeProbes.isClaimed(provider)) continue
-            val tracks = items.filterIsInstance<ExploreSearchResult.Catalog>()
-                .filter { it.track.source.provider == provider }.take(3).map { it.track }
-            if (tracks.isEmpty()) continue
+            val candidates = items.mapNotNull { item ->
+                val candidate = searchAvailabilityCandidate(item)?.takeIf { it.key.provider == provider } ?: return@mapNotNull null
+                val song = when (item) {
+                    is ExploreSearchResult.Song -> item.song
+                    is ExploreSearchResult.Catalog -> moe.ouom.neriplayer.data.unified.catalogPlaybackSong(item.track)
+                    else -> null
+                } ?: return@mapNotNull null
+                song to candidate
+            }.distinctBy { it.second.key }.take(3)
+            if (candidates.isEmpty()) continue
             if (!nativeProbes.claim(provider)) continue
             nativeProbes.track(viewModelScope.launch {
-                val revision = AppContainer.qqMusicAuthRepo.generation()
+                val session = if (provider == "netease") neteaseClient.searchSessionIdentity() else AppContainer.qqMusicAuthRepo.generation()
+                fun current() = isSearchRequestCurrent(requestVersion, SearchSource.ALL) &&
+                    session == (if (provider == "netease") neteaseClient.searchSessionIdentity() else AppContainer.qqMusicAuthRepo.generation())
                 val deadline = android.os.SystemClock.elapsedRealtime() + 4_500
-                for (track in tracks) {
-                    if (!isSearchRequestCurrent(requestVersion, SearchSource.ALL) ||
-                        revision != AppContainer.qqMusicAuthRepo.generation()) return@launch
-                    val song = moe.ouom.neriplayer.data.unified.catalogPlaybackSong(track) ?: continue
+                for ((song, candidate) in candidates) {
+                    if (!current()) return@launch
                     val budget = minOf(1_800L, deadline - android.os.SystemClock.elapsedRealtime())
                     if (budget <= 0) break
                     val result = try {
                         kotlinx.coroutines.withTimeoutOrNull(budget) {
-                            moe.ouom.neriplayer.core.player.PlayerManager.checkSourceAvailability(song,
-                                moe.ouom.neriplayer.data.model.unified.RecordingSourceCandidate(track.source, track.metadata))
+                            moe.ouom.neriplayer.core.player.PlayerManager.checkSourceAvailability(song, candidate)
                         } ?: moe.ouom.neriplayer.data.model.unified.SourceCheckResult(
                             moe.ouom.neriplayer.data.model.unified.SourceCheckStatus.TIMED_OUT, System.currentTimeMillis())
                     } catch (cancelled: CancellationException) { throw cancelled }
                     catch (_: Exception) { moe.ouom.neriplayer.data.model.unified.SourceCheckResult(
                         moe.ouom.neriplayer.data.model.unified.SourceCheckStatus.UNAVAILABLE, System.currentTimeMillis()) }
-                    if (!isSearchRequestCurrent(requestVersion, SearchSource.ALL) ||
-                        revision != AppContainer.qqMusicAuthRepo.generation()) return@launch
+                    if (!current()) return@launch
                     updateSearchStateIfCurrent(requestVersion, SearchSource.ALL) { state ->
-                        state.copy(nativeSourceChecks = state.nativeSourceChecks + (track.source to result))
+                        state.copy(nativeSourceChecks = state.nativeSourceChecks + (candidate.key to result))
                     }
-                    while (isSearchRequestCurrent(requestVersion, SearchSource.ALL)) {
+                    while (current()) {
                         val before = _uiState.value
                         val ranked = withContext(Dispatchers.Default) {
                             val context = kotlinx.coroutines.currentCoroutineContext()
                             ranker.rank(before.searchItems, before.nativeSourceChecks) { context.ensureActive() }
                         }
-                        if (!isSearchRequestCurrent(requestVersion, SearchSource.ALL)) return@launch
+                        if (!current()) return@launch
                         val current = _uiState.value
                         if (current.searchItems !== before.searchItems || current.nativeSourceChecks !== before.nativeSourceChecks) continue
                         _uiState.value = current.copy(searchItems = ranked, searchResults = searchSongItems(ranked))

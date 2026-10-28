@@ -93,14 +93,7 @@ internal fun CatalogSearchResultRow(track: CatalogTrack,
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
                 text = (if (track.source.provider == "qqmusic") "QQ 音乐" else stringResource(CoreCommonR.string.explore_catalog_kuwo)) +
-                    " · " + when (check?.takeIf { System.currentTimeMillis() - it.checkedAtMillis in 0..120_000 }?.status) {
-                        moe.ouom.neriplayer.data.model.unified.SourceCheckStatus.ADDRESS_RESOLVED -> "音频地址已校验"
-                        moe.ouom.neriplayer.data.model.unified.SourceCheckStatus.AUTH_REQUIRED -> "需要登录"
-                        moe.ouom.neriplayer.data.model.unified.SourceCheckStatus.NO_PERMISSION -> "当前无完整播放权限"
-                        moe.ouom.neriplayer.data.model.unified.SourceCheckStatus.TIMED_OUT -> "校验超时，可重试"
-                        null -> "播放时检查完整音频权限"
-                        else -> "暂不可用，可重试"
-                    },
+                    " · " + searchSourceCheckLabel(check),
                 modifier = Modifier.weight(1f),
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -129,3 +122,16 @@ internal fun CatalogSearchResultRow(track: CatalogTrack,
         }
     }
 }
+
+
+@Composable
+internal fun searchSourceCheckLabel(check: moe.ouom.neriplayer.data.model.unified.SourceCheckResult?): String = stringResource(
+    when (check?.takeIf { System.currentTimeMillis() - it.checkedAtMillis in 0..120_000 }?.status) {
+        moe.ouom.neriplayer.data.model.unified.SourceCheckStatus.ADDRESS_RESOLVED -> CoreCommonR.string.unimusic_search_audio_address_checked
+        moe.ouom.neriplayer.data.model.unified.SourceCheckStatus.AUTH_REQUIRED -> CoreCommonR.string.unimusic_search_audio_login
+        moe.ouom.neriplayer.data.model.unified.SourceCheckStatus.NO_PERMISSION -> CoreCommonR.string.unimusic_search_audio_no_permission
+        moe.ouom.neriplayer.data.model.unified.SourceCheckStatus.PREVIEW_ONLY -> CoreCommonR.string.unimusic_search_audio_preview
+        moe.ouom.neriplayer.data.model.unified.SourceCheckStatus.TIMED_OUT -> CoreCommonR.string.unimusic_search_audio_timeout
+        null -> CoreCommonR.string.unimusic_search_audio_unchecked
+        else -> CoreCommonR.string.unimusic_search_audio_unavailable
+    })

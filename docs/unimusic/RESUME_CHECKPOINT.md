@@ -10,6 +10,7 @@
 
 | 最新阶段 | 实际验证与边界 |
 | --- | --- |
+| [2AW网易云搜索可播性](PHASE_2AW_NETEASE_SEARCH_AUDIO_CHECKS.md) | 网易云加入限量后台检查/同版本排序/状态标签；新1/共2 JVM、边界/最终Debug/保留数据安装；手机地址已校验结果点击播放4145→6181ms，已暂停；2AV CI成功 |
 | [2AV服务失败/其他音频](PHASE_2AV_SOURCE_SERVICE_ERRORS_AND_DEVICE_AUDIO.md) | QQ/酷我服务拒绝与网络异常分开，新1组合JVM/领域0违规/边界/Debug/保留数据安装；2AU包实际B站/GD解码，合计四路样本播放；QQ仍失败/YT仍暂停 |
 | [2AU播放失败原因](PHASE_2AU_PLAYBACK_FAILURE_FEEDBACK.md) | 网络/超时/账号/权限/试听/版本分别提示，网易云降档超时不再误报登录；Debug/中英键检查/保留数据安装，未故障注入；2AT搜索点击实际播放进度增加 |
 | [2AT手机网络/会话恢复](PHASE_2AT_DEVICE_NETWORK_AND_SESSION_RECOVERY.md) | 换网后酷我/网易云真实解码；新包酷我再次实播。401/403单次正常刷新及取消Cookie隔离，4 JVM/领域0违规/边界/Debug/保留数据安装通过；限制曲目仍受当前账号权限约束 |
@@ -51,13 +52,13 @@
 
 Room仍v23，无destructive migration。标识同步是身份/元数据子集，歌单仍走原同步；不上传反馈/凭据/设备路径/播放权，不重写Room本机ID、关系或显示字段。真实GitHub/WebDAV上传、双设备/旧客户端往返、完整远端库应用、外来UUID音频、真实Media3反馈采样未验收。最后设备已保留数据安装2AR包，版本9ce8d1f21c41.dirty.10281917，精确哈希见phase2ar/validation.json；稳定副本build/outputs/unimusic/UniMusic-20261028-2AR-debug.apk。4G真实搜索证据对应2AD包，不冒充2AE重复实测。后续复用而非重做同一构建。实际来源播放仍看2L/2M/2P，不把编译/模拟计时/地址返回当真实音频或性能。
 
-下一步：继续来源可播性与搜索联动，避免用户反复点受限结果；保持原唱/版本严格门槛。用户换网后已确认网易云、酷我、B站、GD四路样本实际解码，2AT另有聚合搜索点击/进度增加。最终2AV已保留数据安装，版本df89c94738aa.dirty.10282208，稳定副本build/outputs/unimusic/UniMusic-20261028-2AV-debug.apk。最终搜索网易云30/B站20/酷我20，QQ仍NETWORK，YouTube超时且取流暂停。QQ旧匿名接口桌面500，官方现行RPC普通匿名请求0条，未上线未验证替换，不能声称QQ接通。2AT/2AU CI均成功。保留账号与两份共5首导入、Room v23，不清数据；不把样本播放当全量免费或性能/原唱准确率。
+下一步：继续真实来源失败恢复及搜索可播性剩余项；网易云限量检查/标签已在2AW完成并手机点击播通，不重做。最终2AW保留数据安装，版本42d76a27cb65.dirty.10282221，稳定包build/outputs/unimusic/UniMusic-20261028-2AW-debug.apk；手机停在Canon搜索、已暂停。换网后四路样本网易云/酷我/B站/GD实际解码，最终网易云地址已校验结果点击4145→6181ms。QQ仍NETWORK，旧匿名搜索桌面500、官网RPC匿名空结果，不能假装已接通；YouTube超时/音频未验证且继续暂停取流。2AT/2AU/2AV CI均成功。保留Google/网易云账号与两份共5首导入、Room v23；禁止destructive migration。不要用更多空探测/重复构建代替真实来源或有价值修复。
 
 ## 当前工具链与设备限制
 
 复用项目JDK17 `.gradle-home/jdks/jdk-17.0.20.1+1`、`.android-sdk`和用户Gradle缓存；API37.0/BuildTools37/NDK27.0.12077973/CMake3.31.6已安装。`tools_pub/unimusic/build_android.ps1 -GradleArgs ... --offline`可构建，不重复下载，不重做Phase0。本机无JDK21；3B延期的两个旧runtime检查已在远端JDK21上通过，不改写本机未执行记录。
 
-Mate60在线；现装2AV，用户换网后正常样本音频已复验。另有第二部物理设备接入，本地phone_ui.py已按型号固定BRA-AL00，后续ADB命令须明确选设备，不能使用无目标adb install/shell，4G完成2AD包的搜索/重试检查，4E完成3C/3D新增入口检查，真实播放反馈采样、云上传/双设备仍未验收。3C此前三次安装中止属于历史，4E修正流程后以实际版本核实新包已安装。不要清数据、卸载、重登录或盲目重复系统验证。手机密码、联系方式、验证码、Cookie只按原授权本地使用，不能写进日志/文档/Git。
+Mate60在线；现装2AW，用户换网后正常样本音频已复验。另有第二部物理设备接入，本地phone_ui.py已按型号固定BRA-AL00，后续ADB命令须明确选设备，不能使用无目标adb install/shell，4G完成2AD包的搜索/重试检查，4E完成3C/3D新增入口检查，真实播放反馈采样、云上传/双设备仍未验收。3C此前三次安装中止属于历史，4E修正流程后以实际版本核实新包已安装。不要清数据、卸载、重登录或盲目重复系统验证。手机密码、联系方式、验证码、Cookie只按原授权本地使用，不能写进日志/文档/Git。
 
 ## 本轮完成的开发阶段
 

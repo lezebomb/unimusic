@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="moe.ouom.neriplayer.ui.viewmodel.tab.ExploreSearchPaginationTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2026-10-28T14:22:20.483Z" hostname="XUSHAOYANG" time="0.431">
+  <properties/>
+  <testcase name="foregroundPlaybackCancelsProbeLockHolderWithoutRestartingOnLateMetadata" classname="moe.ouom.neriplayer.ui.viewmodel.tab.ExploreSearchPaginationTest" time="0.424"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
