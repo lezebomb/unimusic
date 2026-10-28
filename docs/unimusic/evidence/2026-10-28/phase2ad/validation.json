@@ -1,0 +1,22 @@
+{
+  "phase": "2AD",
+  "date": "2026-10-28",
+  "jvm": {
+    "tests": 10,
+    "failures": 0,
+    "errors": 0
+  },
+  "newTests": 3,
+  "timing": "40ms and deadlines are virtual scheduling, not real failover speed",
+  "build": "Debug passed; phase2ad-parallel-remembered-sources.log",
+  "apk": {
+    "path": "app/build/outputs/apk/debug/app-debug.apk",
+    "sha256": "77ba39a529857017e34a6cd0a8ae9531b8080a744711b8b8870e602d9a1f419b",
+    "bytes": 62999679
+  },
+  "notRun": [
+    "latest APK installation/device search UI",
+    "real cached two-source failover/audio",
+    "new account/cloud acceptance"
+  ]
+}

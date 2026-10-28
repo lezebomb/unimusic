@@ -1,7 +1,7 @@
 package moe.ouom.neriplayer.core.player.url
 
 import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.asFlow
 import moe.ouom.neriplayer.common.logging.NPLogger
 import moe.ouom.neriplayer.core.player.PlayerManager
 import moe.ouom.neriplayer.core.player.network.isPlaybackNetworkUsable
@@ -75,12 +75,11 @@ private suspend fun PlayerManager.tryResolveStoredSource(song: SongItem, sideEff
         val matches = if (automatic) stored.filterNot { RememberedSourceState.cooldown.cooling(song.stableKey(), it.id) }.take(2)
             else stored
         if (matches.isEmpty()) return null
-        val candidates = flow {
-            matches.forEach { match ->
+        val candidates = matches.map { match ->
                 val provider = match.candidate.key.provider
                 val allowed = (provider == "local" || isPlaybackNetworkUsable(application)) &&
                     (provider != "youtube_music" || YouTubeFeatureGate.isEnabled())
-                emit(PlaybackSourceCandidate(match.id, allowed) {
+                PlaybackSourceCandidate(match.id, allowed) {
                     val session = sourceResolutionSession(provider)
                     val attempt = try { resolveSourceCandidate(song, match.candidate, sideEffects, automatic) }
                     catch (cancelled: CancellationException) { throw cancelled }
@@ -107,20 +106,19 @@ private suspend fun PlayerManager.tryResolveStoredSource(song: SongItem, sideEff
                                 ?: "match-${match.id}-${attempt.value.cacheKeyOverride ?: provider}"))
                         is SourceAttempt.Rejected -> attempt
                     }
-                })
-            }
+                }
         }
         val hasPublicSource = matches.any { it.candidate.key.provider in setOf("gdstudio_netease", "qqmusic", "kuwo") }
         val budget = if (automatic) sourceStageBudgetMs(1_200, 2_500)
             else if (hasPublicSource) sourceStageBudgetMs(5_000, 8_000) else sourceStageBudgetMs(2_000, 8_000)
         if (budget <= 0) return null
-        val result = PlaybackSourceResolver(RememberedSourceState.cooldown).resolve(song.stableKey(), candidates,
-            totalBudgetMs = budget, candidateBudgetMs = (if (automatic) sourceStageBudgetMs(1_000, 2_000)
-                else if (hasPublicSource) sourceStageBudgetMs(4_500, 4_500)
-                else sourceStageBudgetMs(1_500, 4_000)).coerceAtLeast(1))
-        if (automatic && result.value == null && SourceFailure.TIMEOUT in result.failures) {
-            matches.forEach { RememberedSourceState.cooldown.reject(song.stableKey(), it.id) }
-        }
+        val resolver = PlaybackSourceResolver(RememberedSourceState.cooldown)
+        val candidateBudget = (if (automatic) sourceStageBudgetMs(1_000, 2_000)
+            else if (hasPublicSource) sourceStageBudgetMs(4_500, 4_500)
+            else sourceStageBudgetMs(1_500, 4_000)).coerceAtLeast(1)
+        val result = if (automatic && matches.none { it.candidate.key.provider == "local" })
+            resolver.resolveParallel(song.stableKey(), candidates, budget, candidateBudget)
+        else resolver.resolve(song.stableKey(), candidates.asFlow(), budget, candidateBudget)
         if (automatic) matches.forEach { coolAutomaticBili(song, it) }
         return result.value
     } catch (cancelled: CancellationException) {

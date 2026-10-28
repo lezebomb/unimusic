@@ -10,6 +10,56 @@ import org.junit.Assert.*
 import org.junit.Test
 
 class PlaybackSourceResolverTest {
+    @Test fun cachedParallelSourcesReturnTheFastSuccessWithoutCoolingTheCancelledLoser() = runTest {
+        val cooldown = SourceFailureCooldown { testScheduler.currentTime }
+        var stopped = false
+        val result = PlaybackSourceResolver(cooldown).resolveParallel("song", listOf(
+            PlaybackSourceCandidate("slow", true) {
+                try { delay(9000);SourceAttempt.Ready("late") } finally { stopped = true }
+            },
+            PlaybackSourceCandidate("fast", true) { delay(40);SourceAttempt.Ready("audio") }
+        ), totalBudgetMs = 1200, candidateBudgetMs = 1000)
+        assertEquals("audio", result.value)
+        assertEquals("fast", result.candidateId)
+        assertEquals(40L, testScheduler.currentTime)
+        assertTrue(stopped)
+        assertFalse(cooldown.cooling("song", "slow"))
+        assertTrue(result.failures.isEmpty())
+    }
+
+    @Test fun sharedParallelDeadlineAndCallerCancellationDoNotBlacklistUnfinishedSources() = runTest {
+        val cooldown = SourceFailureCooldown { testScheduler.currentTime }
+        val resolver = PlaybackSourceResolver(cooldown)
+        val candidates = listOf("a", "b").map { id -> PlaybackSourceCandidate(id, true) {
+            delay(9000);SourceAttempt.Ready("late")
+        } }
+        val result = resolver.resolveParallel("song", candidates, totalBudgetMs = 20, candidateBudgetMs = 1000)
+        assertNull(result.value)
+        assertEquals(listOf(SourceFailure.TIMEOUT), result.failures)
+        assertFalse(cooldown.cooling("song", "a"))
+        assertFalse(cooldown.cooling("song", "b"))
+        var cancelled = false
+        try { withTimeout(10) { resolver.resolveParallel("song", candidates, 1200, 1000) } }
+        catch (_: CancellationException) { cancelled = true }
+        assertTrue(cancelled)
+        assertFalse(cooldown.cooling("song", "a"))
+        assertFalse(cooldown.cooling("song", "b"))
+    }
+
+    @Test fun parallelCandidatesStillEnforceEligibilityAndCoolOnlyAnActualTransientFailure() = runTest {
+        val cooldown = SourceFailureCooldown { testScheduler.currentTime }
+        val resolver = PlaybackSourceResolver(cooldown)
+        val result = resolver.resolveParallel("song", listOf(
+            PlaybackSourceCandidate<String>("broken", true) { throw java.io.IOException("fixture") },
+            PlaybackSourceCandidate<String>("external", false) { error("Ineligible source must not resolve") }
+        ), 1200, 1000)
+        assertNull(result.value)
+        assertTrue(SourceFailure.NETWORK in result.failures)
+        assertTrue(SourceFailure.EXTERNAL_PLAYER_REQUIRED in result.failures)
+        assertTrue(cooldown.cooling("song", "broken"))
+        assertFalse(cooldown.cooling("song", "external"))
+    }
+
     @Test fun anAdaptersOwnTimeoutOrExceptionAdvancesToTheNextCandidate() = runTest {
         val cooldown = SourceFailureCooldown { testScheduler.currentTime }
         val result = PlaybackSourceResolver(cooldown).resolve("song", flowOf(

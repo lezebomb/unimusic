@@ -1,6 +1,7 @@
 package moe.ouom.neriplayer.core.player.policy.source
 
 import java.util.LinkedHashMap
+import java.util.concurrent.ConcurrentLinkedQueue
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.currentCoroutineContext
@@ -66,26 +67,12 @@ class PlaybackSourceResolver(private val cooldown: SourceFailureCooldown = Sourc
                     reasons += SourceFailure.EXTERNAL_PLAYER_REQUIRED
                     return@firstOrNull false
                 }
-                val attempt = try {
-                    withTimeoutOrNull(candidateBudgetMs) { candidate.resolve() }
-                        ?: SourceAttempt.Rejected(SourceFailure.TIMEOUT)
-                } catch (cancelled: CancellationException) {
-                    currentCoroutineContext().ensureActive()
-                    SourceAttempt.Rejected(if (cancelled is TimeoutCancellationException) SourceFailure.TIMEOUT else SourceFailure.UNAVAILABLE)
-                } catch (_: java.net.SocketTimeoutException) {
-                    SourceAttempt.Rejected(SourceFailure.TIMEOUT)
-                } catch (_: java.io.IOException) {
-                    SourceAttempt.Rejected(SourceFailure.NETWORK)
-                } catch (_: Exception) {
-                    SourceAttempt.Rejected(SourceFailure.UNAVAILABLE)
-                }
+                val attempt = attempt(candidate, candidateBudgetMs)
                 when (attempt) {
                     is SourceAttempt.Ready -> { selected = attempt.value; selectedId = candidate.id; true }
                     is SourceAttempt.Rejected -> {
                         reasons += attempt.reason
-                        if (attempt.reason in setOf(SourceFailure.NETWORK, SourceFailure.TIMEOUT, SourceFailure.URL_EXPIRED, SourceFailure.UNAVAILABLE)) {
-                            cooldown.reject(request, candidate.id)
-                        }
+                        coolFailure(request, candidate.id, attempt.reason)
                         false
                     }
                 }
@@ -94,5 +81,55 @@ class PlaybackSourceResolver(private val cooldown: SourceFailureCooldown = Sourc
         }
         if (completed == null) reasons += SourceFailure.TIMEOUT
         return SourceResolution(selected, selectedId, reasons.toList())
+    }
+
+    /** At most two previously validated automatic sources. Manual source order uses resolve(). */
+    suspend fun <T> resolveParallel(
+        request: String,
+        candidates: List<PlaybackSourceCandidate<T>>,
+        totalBudgetMs: Long,
+        candidateBudgetMs: Long
+    ): SourceResolution<T> {
+        require(totalBudgetMs > 0 && candidateBudgetMs > 0 && candidates.size <= 2)
+        val reasons = ConcurrentLinkedQueue<SourceFailure>()
+        var completed = false
+        val winner = withTimeoutOrNull(totalBudgetMs) {
+            racePlaybackSources(candidates.distinctBy { it.id }.map { candidate -> suspend {
+                if (cooldown.cooling(request, candidate.id)) null
+                else if (!candidate.audioAllowed) {
+                    reasons.add(SourceFailure.EXTERNAL_PLAYER_REQUIRED)
+                    null
+                } else when (val result = attempt(candidate, candidateBudgetMs)) {
+                    is SourceAttempt.Ready -> SourceResolution(result.value, candidate.id, emptyList())
+                    is SourceAttempt.Rejected -> {
+                        reasons.add(result.reason)
+                        coolFailure(request, candidate.id, result.reason)
+                        null
+                    }
+                }
+            } }).also { completed = true }
+        }
+        // A cancelled losing child or the caller's shared deadline is not evidence against that source.
+        if (!completed) reasons.add(SourceFailure.TIMEOUT)
+        return SourceResolution(winner?.value, winner?.candidateId, reasons.toList())
+    }
+
+    private suspend fun <T> attempt(candidate: PlaybackSourceCandidate<T>, budgetMs: Long): SourceAttempt<T> = try {
+        withTimeoutOrNull(budgetMs) { candidate.resolve() } ?: SourceAttempt.Rejected(SourceFailure.TIMEOUT)
+    } catch (cancelled: CancellationException) {
+        currentCoroutineContext().ensureActive()
+        SourceAttempt.Rejected(if (cancelled is TimeoutCancellationException) SourceFailure.TIMEOUT else SourceFailure.UNAVAILABLE)
+    } catch (_: java.net.SocketTimeoutException) {
+        SourceAttempt.Rejected(SourceFailure.TIMEOUT)
+    } catch (_: java.io.IOException) {
+        SourceAttempt.Rejected(SourceFailure.NETWORK)
+    } catch (_: Exception) {
+        SourceAttempt.Rejected(SourceFailure.UNAVAILABLE)
+    }
+
+    private fun coolFailure(request: String, source: String, reason: SourceFailure) {
+        if (reason in setOf(SourceFailure.NETWORK, SourceFailure.TIMEOUT, SourceFailure.URL_EXPIRED, SourceFailure.UNAVAILABLE)) {
+            cooldown.reject(request, source)
+        }
     }
 }

@@ -63,6 +63,8 @@
 
 ## Phase 2：统一搜索与高精度匹配
 
+2AD对最多两条已缓存自动在线源并行，首合格成功即返回；共享取消不再全量冷却，本地/人工顺序沿用。新3/共10 JVM、Debug通过，见[2AD](PHASE_2AD_PARALLEL_REMEMBERED_SOURCES.md)。无真实切源音频性能结论，待装机入口检查。
+
 2AC修复酷我Provider公共搜索状态依赖导致的CI失败，改标准Socket超时异常和精确JDK登记；平台0违规、4项JVM、Debug通过，见[2AC](PHASE_2AC_KUWO_TIMEOUT_BOUNDARY.md)。手机已重连，待最终包一次安装。
 
 2AB在公共网络封装中丢弃并关闭已取消等待者的迟到响应，不执行转换器；4项JVM、Debug通过，CI补对应关键集，见[2AB](PHASE_2AB_LATE_NETWORK_RESPONSE.md)。无实际网络/CPU节省或真机新验收。

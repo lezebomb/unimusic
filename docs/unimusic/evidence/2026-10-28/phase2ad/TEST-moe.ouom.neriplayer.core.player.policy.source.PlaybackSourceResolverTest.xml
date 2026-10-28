@@ -1,0 +1,16 @@
+<?xml version='1.0' encoding='utf-8'?>
+<testsuite name="moe.ouom.neriplayer.core.player.policy.source.PlaybackSourceResolverTest" tests="10" skipped="0" failures="0" errors="0" timestamp="2026-10-28T05:06:35.695Z" hostname="local" time="0.538">
+  <properties />
+  <testcase name="sharedParallelDeadlineAndCallerCancellationDoNotBlacklistUnfinishedSources" classname="moe.ouom.neriplayer.core.player.policy.source.PlaybackSourceResolverTest" time="0.411" />
+  <testcase name="anAdaptersOwnTimeoutOrExceptionAdvancesToTheNextCandidate" classname="moe.ouom.neriplayer.core.player.policy.source.PlaybackSourceResolverTest" time="0.043" />
+  <testcase name="totalBudgetIncludesDiscoveryAndEachSlowCandidate" classname="moe.ouom.neriplayer.core.player.policy.source.PlaybackSourceResolverTest" time="0.023" />
+  <testcase name="parallelCandidatesStillEnforceEligibilityAndCoolOnlyAnActualTransientFailure" classname="moe.ouom.neriplayer.core.player.policy.source.PlaybackSourceResolverTest" time="0.01" />
+  <testcase name="firstSuccessStopsDiscoveryAndSkipsIneligibleAudio" classname="moe.ouom.neriplayer.core.player.policy.source.PlaybackSourceResolverTest" time="0.007" />
+  <testcase name="parentCancellationPropagatesAndDoesNotBlacklistTheSource" classname="moe.ouom.neriplayer.core.player.policy.source.PlaybackSourceResolverTest" time="0.006" />
+  <testcase name="aSelfCancelledParallelSourceCannotLeaveTheReceiverWaitingForItsMissingResult" classname="moe.ouom.neriplayer.core.player.policy.source.PlaybackSourceResolverTest" time="0.012" />
+  <testcase name="parallelRaceStillPropagatesCallerCancellationAndStopsEveryChild" classname="moe.ouom.neriplayer.core.player.policy.source.PlaybackSourceResolverTest" time="0.006" />
+  <testcase name="transientFailureCoolsDownWithoutPoisoningOtherSongs" classname="moe.ouom.neriplayer.core.player.policy.source.PlaybackSourceResolverTest" time="0.007" />
+  <testcase name="cachedParallelSourcesReturnTheFastSuccessWithoutCoolingTheCancelledLoser" classname="moe.ouom.neriplayer.core.player.policy.source.PlaybackSourceResolverTest" time="0.007" />
+  <system-out />
+  <system-err />
+</testsuite>
