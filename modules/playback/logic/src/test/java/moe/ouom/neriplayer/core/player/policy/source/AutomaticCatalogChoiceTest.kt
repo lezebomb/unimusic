@@ -9,6 +9,21 @@ class AutomaticCatalogChoiceTest {
     private fun track(id: String, title: String = "Song", artist: String = "Artist", duration: Long = 200_000, album: String = "Album") =
         CatalogTrack(SongSourceKey("kuwo", id), UnifiedSongMetadata(title, artist, album, duration), null)
 
+    @Test fun onlyTheSelectedAnonymousPrimaryStreamCanTriggerMediaFailureReordering() {
+        val kuwo = SongSourceKey("kuwo", "42")
+        for (reason in listOf("playback_error_ERROR_CODE_IO_BAD_HTTP_STATUS", "startup_stall_BUFFERING", "runtime_stall_BUFFERING")) {
+            assertTrue(isKuwoPrimaryMediaFailure(kuwo, "catalogstream-kuwo-42", reason))
+        }
+        for (key in listOf(null, "catalogstream-kuwo-43", "catalogstream-kuwo-42-extra", "match-uuid-catalogstream-kuwo-42")) {
+            assertFalse(isKuwoPrimaryMediaFailure(kuwo, key, "playback_error_ERROR_CODE_IO"))
+        }
+        assertFalse(isKuwoPrimaryMediaFailure(kuwo, "catalogstream-kuwo-42", "manual_refresh"))
+        assertFalse(isKuwoPrimaryMediaFailure(kuwo, "catalogstream-kuwo-42", "startup_stall_offline_cache"))
+        assertFalse(isKuwoPrimaryMediaFailure(SongSourceKey("kuwo", "042"), "catalogstream-kuwo-042", "playback_error_ERROR_CODE_IO"))
+        assertFalse(isKuwoPrimaryMediaFailure(SongSourceKey("qqmusic", "003OUlho2HcRHC"),
+            "catalogstream-qqmusic-003OUlho2HcRHC", "playback_error_ERROR_CODE_IO"))
+    }
+
     @Test fun nativeFailuresChooseTwoOtherPlatformsIncludingNeteaseWithoutSearchingItself() {
         assertEquals(listOf("netease", "kuwo"), nativeAlternateProviderIds("qqmusic"))
         assertEquals(listOf("netease", "qqmusic"), nativeAlternateProviderIds("kuwo"))

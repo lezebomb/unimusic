@@ -199,3 +199,5 @@ Phase 1 的工具链与 Room 数据保留前置条件已满足。
 2026-10-28补充：2AN修复A/B合唱与AB单署名混淆，本机新2/共4项JVM及Debug通过；B站新增1项因本机缺JDK21待远端，旧映射复核且保留数据，见[2AN](PHASE_2AN_ARTIST_CREDIT_BOUNDARIES.md)。
 
 2026-10-28补充：2AO补10秒按账号隔离的近期失败调度，1项JVM、Debug/完整边界及Mate60保留数据安装通过；2AN远端JDK21 B站新增用例已核实。未做真实首声/提速验收，见[2AO](PHASE_2AO_RECENT_PRIMARY_FAILURE_HINT.md)。
+
+2026-10-28补充：2AP让匿名酷我主源实际错误恢复先试备用且保留新主源机会，1项JVM/Debug通过；真实故障注入未验收，见[2AP](PHASE_2AP_KUWO_MEDIA_FAILURE_RECOVERY.md)。

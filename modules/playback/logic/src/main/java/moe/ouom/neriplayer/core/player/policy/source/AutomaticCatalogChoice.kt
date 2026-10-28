@@ -22,3 +22,9 @@ fun nativeAlternateProviderIds(originalProvider: String?): List<String> = when (
     "kuwo" -> listOf("netease", "qqmusic")
     else -> listOf("qqmusic", "kuwo")
 }
+
+/** Only a failed, actually selected anonymous Kuwo stream can reorder recovery. Never parse signed URLs. */
+fun isKuwoPrimaryMediaFailure(source: SongSourceKey, activeCacheKey: String?, reason: String): Boolean =
+    source.provider == "kuwo" && MusicSourceRegistry.validKey(source) &&
+        activeCacheKey == "catalogstream-kuwo-${source.resourceId}" && !reason.endsWith("offline_cache") &&
+        (reason.startsWith("playback_error_") || reason.startsWith("startup_stall_") || reason.startsWith("runtime_stall_"))

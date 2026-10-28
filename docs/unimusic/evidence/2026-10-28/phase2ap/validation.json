@@ -1,0 +1,27 @@
+{
+  "phase": "2AP",
+  "date": "2026-10-28",
+  "newJvmTests": 1,
+  "relatedJvmTests": 1,
+  "failures": 0,
+  "errors": 0,
+  "build": "Debug passed in 57s; phase2ap-kuwo-media-recovery.log",
+  "apk": {
+    "path": "build/outputs/unimusic/UniMusic-20261028-2AP-debug.apk",
+    "sha256": "b635372e9dbe6292fdc5e59efed19ce618c08e674aee6966d598d7d8463f2a83",
+    "bytes": 63025571
+  },
+  "scope": "Anonymous Kuwo primary stream recovery only; exact selected cache key and actual failure/stall reason; 10s alternate-first ordering with fresh primary still attempted if alternatives fail under remaining budget",
+  "ci": {
+    "2AO": {
+      "run": 40675719227,
+      "conclusion": "success"
+    }
+  },
+  "device": "Not reinstalled; Mate60 remains on 2AO",
+  "notRun": [
+    "real decoder/CDN failure injection or first-audio benchmark",
+    "QQ credential-bound stream failure recovery",
+    "new account/cloud/migration tests"
+  ]
+}

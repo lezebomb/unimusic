@@ -946,8 +946,10 @@ internal fun PlayerManager.refreshCurrentSongUrlImpl(
     val song = _currentSongFlow.value ?: return
     if (isLocalSong(song) && !allowLocalSongRecovery) return
     if (isPlaybackNetworkUsable(application)) {
-        NeteaseAutoSourceState.failed(song, currentPlaybackCacheKeyForRecovery(), reason)
-        RememberedSourceState.failed(song, currentPlaybackCacheKeyForRecovery(), reason)
+        val failedCacheKey = currentPlaybackCacheKeyForRecovery()
+        NeteaseAutoSourceState.failed(song, failedCacheKey, reason)
+        RememberedSourceState.failed(song, failedCacheKey, reason)
+        recordNativePrimaryMediaFailure(song, failedCacheKey, reason)
     }
     NPLogger.d(
         "NERI-PlayerManager",

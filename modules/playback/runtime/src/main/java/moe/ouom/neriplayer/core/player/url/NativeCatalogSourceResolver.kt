@@ -21,6 +21,14 @@ import moe.ouom.neriplayer.data.unified.SourceMatchBackend
 import moe.ouom.neriplayer.data.unified.sourceCandidateForSong
 
 private val recentNativePrimaryFailures = RecentPrimaryFailureHint()
+private val failedKuwoPrimaryMedia = SourceFailureCooldown()
+
+internal fun PlayerManager.recordNativePrimaryMediaFailure(song: SongItem, activeCacheKey: String?, reason: String) {
+    val source = sourceCandidateForSong(song)?.key ?: return
+    if (isKuwoPrimaryMediaFailure(source, activeCacheKey, reason)) {
+        failedKuwoPrimaryMedia.reject(song.stableKey(), source.toString(), durationMs = 10_000)
+    }
+}
 
 internal suspend fun PlayerManager.resolveNativeCatalogSource(subject: SongItem,
     candidate: RecordingSourceCandidate): SourceAttempt<SongUrlResult.Success> {
@@ -64,8 +72,17 @@ internal suspend fun PlayerManager.resolveNativeCatalogPlayback(song: SongItem, 
     } catch (cancelled: CancellationException) { throw cancelled }
     catch (_: Exception) { null } // A temporary projection error must not prevent primary/fresh discovery.
     var rememberedTried = false
+    var freshAlternatesTried = false
     val hintSession = sourceResolutionSession(candidate.key.provider)
-    if (neteaseAutoSourceSwitchEnabled && recentNativePrimaryFailures.recent(requestKey, sourceKey, hintSession)) {
+    if (neteaseAutoSourceSwitchEnabled && candidate.key.provider == "kuwo" && failedKuwoPrimaryMedia.cooling(requestKey, sourceKey)) {
+        rememberedTried = true
+        val cached = remembered()
+        if (cached != null && neteaseAutoSourceSwitchEnabled) return cached
+        freshAlternatesTried = true
+        val alternate = tryResolveNativeCatalogAlternate(song, resolverSideEffects)
+        if (alternate != null && neteaseAutoSourceSwitchEnabled) return alternate
+        // No alternate succeeded: still allow a fresh primary URL under the remaining shared deadline.
+    } else if (neteaseAutoSourceSwitchEnabled && recentNativePrimaryFailures.recent(requestKey, sourceKey, hintSession)) {
         rememberedTried = true
         remembered()?.let { ready ->
             if (hintSession == sourceResolutionSession(candidate.key.provider) && neteaseAutoSourceSwitchEnabled) return ready
@@ -86,7 +103,7 @@ internal suspend fun PlayerManager.resolveNativeCatalogPlayback(song: SongItem, 
     }
     if (neteaseAutoSourceSwitchEnabled) {
         val alternate = (if (!rememberedTried) remembered() else null)
-            ?: tryResolveNativeCatalogAlternate(song, resolverSideEffects)
+            ?: if (!freshAlternatesTried) tryResolveNativeCatalogAlternate(song, resolverSideEffects) else null
         if (alternate != null) {
             val reason = (primary as? SourceAttempt.Rejected)?.reason
             if (primarySession == sourceResolutionSession(candidate.key.provider) && reason in setOf(

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="moe.ouom.neriplayer.core.player.policy.source.AutomaticCatalogChoiceTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2026-10-28T10:59:17.488Z" hostname="XUSHAOYANG" time="0.118">
+  <properties/>
+  <testcase name="onlyTheSelectedAnonymousPrimaryStreamCanTriggerMediaFailureReordering" classname="moe.ouom.neriplayer.core.player.policy.source.AutomaticCatalogChoiceTest" time="0.113"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
