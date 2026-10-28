@@ -1,0 +1,34 @@
+{
+  "phase": "2AC",
+  "date": "2026-10-28",
+  "jvm": [
+    {
+      "suite": "moe.ouom.neriplayer.platform.search.api.client.KuwoCatalogProviderTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0
+    },
+    {
+      "suite": "moe.ouom.neriplayer.common.search.FederatedSearchEngineTest",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0
+    }
+  ],
+  "build": "Debug passed; phase2ac-final-boundary.log",
+  "domainDependencies": {
+    "violations": 0,
+    "change": "exact JDK SocketTimeoutException dependency; no common search state dependency"
+  },
+  "priorFailure": {
+    "ci": 40606955055,
+    "cause": "Kuwo provider referenced forbidden common search state types"
+  },
+  "localAttempt": "Initial replacement exposed missing exact JDK allowlist entry; final check passed after registering that standard exception",
+  "apk": {
+    "path": "app/build/outputs/apk/debug/app-debug.apk",
+    "sha256": "c03485ba189da5be87e7985b35872394f86483c428b5210f8263ef5398bfde22",
+    "bytes": 62996343
+  },
+  "device": "Connected, previous 2T version installed, charging stay-on=7, no active playback; new APK not installed yet"
+}
