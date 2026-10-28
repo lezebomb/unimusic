@@ -6,6 +6,15 @@ import org.junit.Test
 class RecordingMatchPolicyTest {
     private val studio = RecordingMetadata("晴天", "周杰伦", 269_000)
 
+    @Test fun explicitSyntheticAliasCanMatchItsOwnVersionButNeverOriginalOrHumanCover() {
+        val title = studio.copy(title = "晴天 (AI generated vocals)")
+        val alias = studio.copy(versionContext = "AI generated vocals")
+        assertEquals("晴天", RecordingMatchPolicy.canonicalTitle(title.title))
+        assertTrue(RecordingMatchPolicy.assess(title, alias).accepted)
+        assertEquals(RecordingMismatch.VERSION, RecordingMatchPolicy.assess(studio, title).reason)
+        assertEquals(RecordingMismatch.VERSION, RecordingMatchPolicy.assess(studio.copy(title = "晴天 (Cover)"), title).reason)
+    }
+
     @Test fun versionConflictsOverridePerfectTextAndDuration() {
         listOf("Live", "Ｌｉｖｅ", "Ｃｏｖｅｒ", "Ｒｅｍｉｘ", "翻唱", "伴奏", "Remix", "Radio Edit", "Sped Up", "Remastered", "重录", "吉他教学", "Tutorial", "Reaction").forEach { tag ->
             val candidate = studio.copy(title = "晴天 ($tag)")

@@ -2405,6 +2405,8 @@
       "moe.ouom.neriplayer.data.local.database.store.PlatformPlaylistCacheTrackRecord",
       "moe.ouom.neriplayer.data.model.NeteaseArtistSummary",
       "moe.ouom.neriplayer.data.model.SongItem",
+      "moe.ouom.neriplayer.data.model.unified.RecordingMatchPolicy",
+      "moe.ouom.neriplayer.data.model.unified.RecordingMetadata",
       "moe.ouom.neriplayer.data.model.auth.SavedCookieAuthHealth",
       "moe.ouom.neriplayer.data.model.auth.SavedCookieAuthState",
       "moe.ouom.neriplayer.data.model.music.MusicPlatform",

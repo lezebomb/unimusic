@@ -79,7 +79,8 @@ object RecordingMatchPolicy {
         var text = Normalizer.normalize(title, Normalizer.Form.NFKC).lowercase(Locale.ROOT).trim()
         text = brackets.replace(text) { match ->
             val inner = match.value.drop(1).dropLast(1).trim()
-            if (decorations.matches(inner) || markers.values.any { it.containsMatchIn(inner) }) " " else match.value
+            if (decorations.matches(inner) || markers.values.any { it.containsMatchIn(inner) } ||
+                syntheticVoice.containsMatchIn(inner)) " " else match.value
         }
         text = text.replace(versionSuffix, "")
         return canonicalText(text)

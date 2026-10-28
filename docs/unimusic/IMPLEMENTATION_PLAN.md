@@ -187,3 +187,5 @@ Phase 1 的工具链与 Room 数据保留前置条件已满足。
 2026-10-28补充：2AH复用完整版本证据进行展示排序，新2/共5项JVM与Debug通过；保持文字相关性优先和自动播放门槛，见[2AH报告](PHASE_2AH_COMPLETE_VERSION_RANKING.md)。
 
 2026-10-28补充：2AI修复自动来源旧上下文失败的副作用、区分权限与网络冷却，新2/共5 JVM和Debug通过；真实切账号/设备故障注入未验收，见[2AI](PHASE_2AI_CONTEXT_FAILURE_EFFECTS.md)。
+
+2026-10-28补充：2AJ补齐网易云搜索版本别名的解析/排序/播放证据一致性，新3/共6项关键JVM、精确模型依赖登记/平台0违规、边界及Debug通过，见[2AJ](PHASE_2AJ_NETEASE_SEARCH_VERSION_ALIASES.md)。

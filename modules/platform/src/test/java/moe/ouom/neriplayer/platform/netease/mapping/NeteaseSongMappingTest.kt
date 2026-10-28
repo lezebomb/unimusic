@@ -9,6 +9,23 @@ import org.junit.Test
 import org.json.JSONException
 
 class NeteaseSongMappingTest {
+    @Test fun searchRetainsVersionAliasesWithoutMutatingDetailNamesOrOrdinaryTranslations() {
+        for ((key, clue) in listOf("alia" to "Live", "alias" to "翻唱", "tns" to "AI generated vocals", "transNames" to "Remix")) {
+            val row = org.json.JSONObject("""{"id":7,"name":"Dream","dt":180000,"ar":[{"id":8,"name":"Artist"}],"al":{"name":"Album"}}""")
+                .put(key, org.json.JSONArray().put(clue).put(clue).put(3).put(org.json.JSONObject.NULL))
+            val root = org.json.JSONObject().put("code",200).put("result", org.json.JSONObject().put("songs",org.json.JSONArray().put(row)))
+            val before = root.toString()
+            val song = parseNeteaseSearchSongs(root).single()
+            assertEquals("Dream ($clue)", song.name)
+            assertEquals("7", song.audioId);assertEquals(180000L, song.durationMs)
+            assertEquals(before, root.toString())
+            assertEquals("Dream", parseNeteaseSongDetail(org.json.JSONObject().put("code",200)
+                .put("songs",org.json.JSONArray().put(row)).toString())!!.name)
+        }
+        assertEquals("Dream", parseNeteaseSearchSongs("""{"code":200,"result":{"songs":[
+            {"id":7,"name":"Dream","alia":["dream","梦","Ordinary Translation","AI"]}]}}""").single().name)
+    }
+
     @Test
     fun `mixed song arrays preserve valid order and retain business field validation`() {
         val songs = parseNeteaseSearchSongs(

@@ -6,6 +6,26 @@ import org.junit.Test
 
 class NeteaseSearchSongParserTest {
 
+    @Test fun parsedVersionAliasesRemainVisibleToAggregateRankingAndPlaybackMetadata() {
+        val raw = """{"code":200,"result":{"songCount":4,"songs":[
+            {"id":1,"name":"Dream","dt":180000,"ar":[{"id":8,"name":"Artist"}],"al":{"name":"Album"},"alia":["Live"]},
+            {"id":2,"name":"Dream","dt":180000,"ar":[{"id":8,"name":"Artist"}],"al":{"name":"Album"},"alias":["Cover"]},
+            {"id":3,"name":"Dream","dt":180000,"ar":[{"id":8,"name":"Artist"}],"al":{"name":"Album"},"tns":["AI generated vocals"]},
+            {"id":4,"name":"Dream","dt":180000,"ar":[{"id":8,"name":"Artist"}],"al":{"name":"Album"}}]}}"""
+        val parsed = parseNeteaseSearchResults(raw, NeteaseExploreSearchType.SONG)
+        assertEquals(4, parsed.totalCount)
+        val ranked = ExploreSearchRankingSession("Dream").rank(parsed.items)
+        assertEquals(4L, (ranked.first() as ExploreSearchResult.Song).song.id)
+        val live = ExploreSearchRankingSession("Dream Live").rank(parsed.items).first() as ExploreSearchResult.Song
+        assertEquals(1L, live.song.id)
+        val expected = moe.ouom.neriplayer.core.player.policy.source.RecordingMetadata("Dream", "Artist", 180000)
+        for (item in parsed.items.take(3)) {
+            val song = (item as ExploreSearchResult.Song).song
+            assertTrue(moe.ouom.neriplayer.core.player.policy.source.RecordingMatchPolicy.hasVersionConflict(
+                expected, expected.copy(title = song.name)))
+        }
+    }
+
     @Test fun sharedSongRootKeepsSourceMetadataCountsAndValidOrderWithoutMutation() {
         val root = org.json.JSONObject("""{"code":200,"result":{"songCount":32,"songs":[
             {"id":7,"name":"Dream","dt":180000,"ar":[{"id":8,"name":"Artist"}],"al":{"id":9,"name":"Album"}},

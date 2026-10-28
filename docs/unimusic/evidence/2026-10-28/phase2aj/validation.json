@@ -1,0 +1,54 @@
+{
+  "phase": "2AJ",
+  "date": "2026-10-28",
+  "newJvmTests": 3,
+  "relatedJvmTests": 6,
+  "jvm": [
+    {
+      "suite": "moe.ouom.neriplayer.platform.netease.mapping.NeteaseSongMappingTest",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0
+    },
+    {
+      "suite": "moe.ouom.neriplayer.core.player.policy.source.RecordingMatchPolicyTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0
+    },
+    {
+      "suite": "moe.ouom.neriplayer.ui.viewmodel.tab.NeteaseSearchSongParserTest",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0
+    }
+  ],
+  "moduleBoundaries": "passed",
+  "platformDomainViolations": 0,
+  "build": "Debug passed in 1m39s; phase2aj-version-aliases-final.log",
+  "initialFailure": "2 forbidden model class references in Netease mapping; added precisely RecordingMetadata and RecordingMatchPolicy to platform-netease-repository inventory; retained other boundaries",
+  "apk": {
+    "path": "build/outputs/unimusic/UniMusic-20261028-2AJ-debug.apk",
+    "sha256": "5a7cd482f03715b298064185175e20553aadf424bb2cbab86969753ebba135cf",
+    "bytes": 63011183
+  },
+  "ci": {
+    "2AG": {
+      "run": 40665765427,
+      "conclusion": "cancelled by newer push"
+    },
+    "2AH": {
+      "run": 40666514625,
+      "conclusion": "cancelled by newer push"
+    },
+    "2AI": {
+      "run": 40667670264,
+      "status": "in_progress"
+    }
+  },
+  "notRun": [
+    "new APK device installation; Mate60 remains on 2AG",
+    "actual platform alias response/accuracy benchmark",
+    "new account/audio/network acceptance"
+  ]
+}
