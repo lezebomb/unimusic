@@ -10,6 +10,7 @@
 
 | 最新阶段 | 实际验证与边界 |
 | --- | --- |
+| [2AG搜索短期元数据](PHASE_2AG_SHORT_LIVED_SEARCH_METADATA.md) | 新3/共5 JVM、平台0违规/边界/Debug、保留数据装机；10秒成功首页缓存、失效/取消保护、UI缓存标签；设备在线源本轮均超时，正向命中待验收 |
 | [4H分类选中状态](PHASE_4H_GENRE_SELECTION_SEMANTICS.md) | Debug38s、保留数据安装成功，流行/华语/全部checked语义逐项通过，最终全部/发现，无活动音频；2AF/2AE远端CI成功 |
 | [2AF发现歌单请求](PHASE_2AF_PLAYLIST_REQUEST_LIFECYCLE.md) | 新2/共5 JVM、平台0违规/Debug；合并同分类/会话加载，忽略常规Cookie更新，取消/8秒预算/后台解析/旧结果复核；装机分类检查见4H |
 | [2AE原生故障冷却](PHASE_2AE_NATIVE_COOLDOWN_GUARD.md) | 编译/保留数据安装成功；原生重新搜索同时核对来源键与匹配UUID冷却，返回前再核对；无真实失败注入；CI40638348465成功 |
@@ -33,15 +34,15 @@
 | [4D定向CI](PHASE_4D_CHANGED_SCOPE_CI.md) `f7202cba` | 保守身份白名单与结构迁移路由；CI40596819578成功，2T实际跳过无关Android迁移 |
 | [3D.8 GitHub标识同步](PHASE_3D8_GITHUB_IDENTITY_SYNC.md) `7d1c2879` | 新2项合成HTTP、Debug；前序3D.1～.7身份/因果/持久日志/只读Room捕获/WebDAV/冲突选择/外来UUID适配见各报告；CI覆盖后续已成功 |
 
-Room仍v23，无destructive migration。标识同步是身份/元数据子集，歌单仍走原同步；不上传反馈/凭据/设备路径/播放权，不重写Room本机ID、关系或显示字段。真实GitHub/WebDAV上传、双设备/旧客户端往返、完整远端库应用、外来UUID音频、真实Media3反馈采样未验收。最后设备已保留数据安装2AE包，版本9dba7d0d8c36.dirty.10281325、App启动/发现可见且无活动音频，精确哈希见phase2ae/validation.json；稳定副本build/outputs/unimusic/UniMusic-20261028-2AE-debug.apk。4G真实搜索证据对应2AD包，不冒充2AE重复实测。后续复用而非重做同一构建。实际来源播放仍看2L/2M/2P，不把编译/模拟计时/地址返回当真实音频或性能。
+Room仍v23，无destructive migration。标识同步是身份/元数据子集，歌单仍走原同步；不上传反馈/凭据/设备路径/播放权，不重写Room本机ID、关系或显示字段。真实GitHub/WebDAV上传、双设备/旧客户端往返、完整远端库应用、外来UUID音频、真实Media3反馈采样未验收。最后设备已保留数据安装2AG包，版本54c45c0120cf.dirty.10281729，精确哈希见phase2ag/validation.json；稳定副本build/outputs/unimusic/UniMusic-20261028-2AG-debug.apk。4G真实搜索证据对应2AD包，不冒充2AE重复实测。后续复用而非重做同一构建。实际来源播放仍看2L/2M/2P，不把编译/模拟计时/地址返回当真实音频或性能。
 
-下一步：继续重复聚合搜索的短期元数据复用和失效保护，不重复旧构建/整轮公共词搜索。手机已装4H，版本de169c6fa860.dirty.10281540，稳定包build/outputs/unimusic/UniMusic-20261028-4H-debug.apk，2AF/2AE远端CI均成功。QQ官方网页登录仍未取得可保存凭据，无正向QQ音频验收。真实请求数量/延迟前后比较、缓存双源首声/失败注入、跨设备/云上传仍待验收。用户已授权以后安装时直接在手机系统验证框本机输入既有锁屏凭据，不反复要求人工确认；不保存凭据到代码/文档/日志或Git。
+下一步：补聚合排序对平台显式版本字段的使用，不重跑整轮公共词搜索。手机已装2AG，版本54c45c0120cf.dirty.10281729，稳定包build/outputs/unimusic/UniMusic-20261028-2AG-debug.apk。2AG手机搜索全部在线源超时、一次重试相同，独立设备DNS探测也未完成，缓存命中仍待正向设备验收；不要断言网络根因。2AF/2AE远端CI均成功，4H的40664083211待确认。QQ官方网页登录仍未取得可保存凭据，无正向QQ音频验收。真实请求数量/延迟前后比较、缓存双源首声/失败注入、跨设备/云上传仍待验收。用户已授权以后安装时直接在手机系统验证框本机输入既有锁屏凭据，不反复要求人工确认；不保存凭据到代码/文档/日志或Git。
 
 ## 当前工具链与设备限制
 
 复用项目JDK17 `.gradle-home/jdks/jdk-17.0.20.1+1`、`.android-sdk`和用户Gradle缓存；API37.0/BuildTools37/NDK27.0.12077973/CMake3.31.6已安装。`tools_pub/unimusic/build_android.ps1 -GradleArgs ... --offline`可构建，不重复下载，不重做Phase0。本机无JDK21；3B延期的两个旧runtime检查已在远端JDK21上通过，不改写本机未执行记录。
 
-Mate60在线；现装4H，4G完成2AD包的搜索/重试检查，4E完成3C/3D新增入口检查，真实播放反馈采样、云上传/双设备仍未验收。3C此前三次安装中止属于历史，4E修正流程后以实际版本核实新包已安装。不要清数据、卸载、重登录或盲目重复系统验证。手机密码、联系方式、验证码、Cookie只按原授权本地使用，不能写进日志/文档/Git。
+Mate60在线；现装2AG，4G完成2AD包的搜索/重试检查，4E完成3C/3D新增入口检查，真实播放反馈采样、云上传/双设备仍未验收。3C此前三次安装中止属于历史，4E修正流程后以实际版本核实新包已安装。不要清数据、卸载、重登录或盲目重复系统验证。手机密码、联系方式、验证码、Cookie只按原授权本地使用，不能写进日志/文档/Git。
 
 ## 本轮完成的开发阶段
 

@@ -32,6 +32,7 @@ internal fun AggregateSearchStatus(snapshot: FederatedSearchSnapshot<ExploreSear
     val disabled = stringResource(CoreCommonR.string.explore_source_disabled)
     val timedOut = stringResource(CoreCommonR.string.unimusic_search_source_timeout)
     val network = stringResource(CoreCommonR.string.unimusic_search_source_network)
+    val cached = stringResource(CoreCommonR.string.unimusic_search_cached)
     val unavailable = stringResource(CoreCommonR.string.explore_source_unavailable)
     Column(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 6.dp)) {
         Text(snapshot.sources.entries.joinToString(" · ") { (id, state) ->
@@ -43,6 +44,7 @@ internal fun AggregateSearchStatus(snapshot: FederatedSearchSnapshot<ExploreSear
                 state.failure == SearchSourceFailure.TIMEOUT -> timedOut
                 state.failure == SearchSourceFailure.NETWORK -> network
                 state.failure != null -> unavailable
+                state.fromCache -> "${state.items.size} ($cached)"
                 else -> state.items.size.toString()
             }
             "$name $suffix"
@@ -56,7 +58,7 @@ internal fun AggregateSearchStatus(snapshot: FederatedSearchSnapshot<ExploreSear
                 snapshot.sources.forEach { (id, state) ->
                     state.elapsedMillis?.let { elapsed ->
                         Text(stringResource(CoreCommonR.string.unimusic_search_timing_value,
-                            names[id] ?: id, elapsed / 1000.0), style = MaterialTheme.typography.labelSmall)
+                            (names[id] ?: id) + if (state.fromCache) " ($cached)" else "", elapsed / 1000.0), style = MaterialTheme.typography.labelSmall)
                     }
                 }
                 Text(stringResource(CoreCommonR.string.unimusic_search_timing_description),

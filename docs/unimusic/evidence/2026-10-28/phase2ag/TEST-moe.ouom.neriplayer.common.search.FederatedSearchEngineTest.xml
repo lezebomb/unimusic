@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="moe.ouom.neriplayer.common.search.FederatedSearchEngineTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-10-28T09:29:38.439Z" hostname="XUSHAOYANG" time="0.516">
+  <properties/>
+  <testcase name="firstPageCacheReusesOnlyFreshMatchingProviderMetadataAndMarksSnapshots" classname="moe.ouom.neriplayer.common.search.FederatedSearchEngineTest" time="0.44"/>
+  <testcase name="healthyPaginationDoesNotRetryFailedSourcesAndExplicitRetryKeepsHealthyCursors" classname="moe.ouom.neriplayer.common.search.FederatedSearchEngineTest" time="0.016"/>
+  <testcase name="firstPageCacheBoundsCopiesAndDoesNotRetainEmptyFailedOrOversizedPages" classname="moe.ouom.neriplayer.common.search.FederatedSearchEngineTest" time="0.027"/>
+  <testcase name="monotonicAttemptTimesIncludeQueueingAndSelectiveRetryKeepsUnrequestedMeasurements" classname="moe.ouom.neriplayer.common.search.FederatedSearchEngineTest" time="0.02"/>
+  <testcase name="firstPageCacheCannotBeRepopulatedByInvalidatedOrCancelledLoads" classname="moe.ouom.neriplayer.common.search.FederatedSearchEngineTest" time="0.009"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

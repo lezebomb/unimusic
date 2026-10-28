@@ -36,6 +36,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
+import moe.ouom.neriplayer.common.search.FirstSearchPageCache
 import moe.ouom.neriplayer.common.search.FederatedSearchEngine
 import moe.ouom.neriplayer.common.search.FederatedSearchProvider
 import moe.ouom.neriplayer.common.search.FederatedSearchSnapshot
@@ -336,6 +337,7 @@ class ExploreViewModel(application: Application) : AndroidViewModel(application)
     private var ytMusicPlaylistsPending = false
     private var searchRequestVersion = 0L
     private var youtubeEnabled = YouTubeFeatureGate.isEnabled()
+    private val aggregateCache = FirstSearchPageCache<ExploreSearchResult>()
     private var aggregateEngine: FederatedSearchEngine<ExploreSearchResult>? = null
     private var aggregateRanker: ExploreSearchRankingSession? = null
     private val nativeProbeJobs = mutableListOf<Job>()
@@ -350,7 +352,7 @@ class ExploreViewModel(application: Application) : AndroidViewModel(application)
             var revision = AppContainer.qqMusicAuthRepo.generation()
             AppContainer.qqMusicAuthRepo.state.collect {
                 val current = AppContainer.qqMusicAuthRepo.generation()
-                if (current != revision) { revision = current; restartAggregateSearch() }
+                if (current != revision) { revision = current; aggregateCache.invalidate(); restartAggregateSearch() }
             }
         }
         viewModelScope.launch {
@@ -365,6 +367,10 @@ class ExploreViewModel(application: Application) : AndroidViewModel(application)
                     clearNeteaseSearchForAuthRequired()
                 }
                 _uiState.value = _uiState.value.copy(isNeteaseLoggedIn = isLoggedIn)
+                if (currentState.isNeteaseLoggedIn != isLoggedIn) {
+                    aggregateCache.invalidate()
+                    restartAggregateSearch()
+                }
                 if (isLoggedIn && !currentState.isNeteaseLoggedIn &&
                     currentState.selectedSearchSource == SearchSource.NETEASE && !currentState.searching) {
                     _uiState.value.pendingNeteaseSessionSearch()?.let { (query, display) -> search(query, display) }
@@ -377,6 +383,7 @@ class ExploreViewModel(application: Application) : AndroidViewModel(application)
                 val context = neteaseClient.searchSessionIdentity()
                 val sessionChanged = context !== searchAccountContext
                 if (sessionChanged) {
+                    aggregateCache.invalidate()
                     searchAccountContext = context
                     _uiState.value.pendingNeteaseSessionSearch()?.let { (query, display) -> search(query, display) }
                 }
@@ -388,6 +395,7 @@ class ExploreViewModel(application: Application) : AndroidViewModel(application)
         }
         viewModelScope.launch {
             AppContainer.settingsRepo.youtubeEnabledFlow.collect { enabled ->
+                if (youtubeEnabled != enabled) aggregateCache.invalidate()
                 youtubeEnabled = enabled
                 restartAggregateSearch()
                 if (!enabled) {
@@ -609,9 +617,15 @@ class ExploreViewModel(application: Application) : AndroidViewModel(application)
                 if (!isNeteaseSearchAllowed() || accountContext !== neteaseClient.searchSessionIdentity()) {
                     throw SearchSourceException(SearchSourceFailure.AUTH_REQUIRED)
                 }
-                val page = fetchNeteaseSearchPage(query, query, cursor?.toIntOrNull() ?: 1, NeteaseExploreSearchType.SONG)
-                if (accountContext !== neteaseClient.searchSessionIdentity()) throw SearchSourceException(SearchSourceFailure.AUTH_REQUIRED)
-                SearchPage(page.items, (page.page + 1).takeIf { page.hasMore }?.toString())
+                val page = aggregateCache.load("netease", query, cursor) {
+                    val fetched = fetchNeteaseSearchPage(query, query, cursor?.toIntOrNull() ?: 1, NeteaseExploreSearchType.SONG)
+                    if (accountContext !== neteaseClient.searchSessionIdentity()) throw SearchSourceException(SearchSourceFailure.AUTH_REQUIRED)
+                    SearchPage(fetched.items, (fetched.page + 1).takeIf { fetched.hasMore }?.toString())
+                }
+                if (!isNeteaseSearchAllowed() || accountContext !== neteaseClient.searchSessionIdentity()) {
+                    throw SearchSourceException(SearchSourceFailure.AUTH_REQUIRED)
+                }
+                page
             },
             FederatedSearchProvider("bilibili") { query, cursor ->
                 val page = fetchBilibiliSearchPage(query, query, cursor?.toIntOrNull() ?: 1)
@@ -627,12 +641,16 @@ class ExploreViewModel(application: Application) : AndroidViewModel(application)
                 SearchPage(songs.map(ExploreSearchResult::Song))
             },
             FederatedSearchProvider("kuwo") { query, cursor ->
-                val page = AppContainer.kuwoCatalogProvider.search(query, cursor, limit = 20)
-                SearchPage(page.tracks.map(ExploreSearchResult::Catalog), page.nextCursor)
+                aggregateCache.load("kuwo", query, cursor) {
+                    val page = AppContainer.kuwoCatalogProvider.search(query, cursor, limit = 20)
+                    SearchPage(page.tracks.map(ExploreSearchResult::Catalog), page.nextCursor)
+                }
             },
             FederatedSearchProvider("qqmusic") { query, cursor ->
-                val page = AppContainer.qqMusicAudioClient.search(query, cursor, limit = 20)
-                SearchPage(page.tracks.map(ExploreSearchResult::Catalog), page.nextCursor)
+                aggregateCache.load("qqmusic", query, cursor) {
+                    val page = AppContainer.qqMusicAudioClient.search(query, cursor, limit = 20)
+                    SearchPage(page.tracks.map(ExploreSearchResult::Catalog), page.nextCursor)
+                }
             }
         ), identity = { it.stableKey }, parallelism = 5, localProviderIds = setOf("local"))
         searchJob = launchAggregateSearch(keyword, requestVersion, null)

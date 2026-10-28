@@ -1,0 +1,37 @@
+{
+  "phase": "2AG",
+  "date": "2026-10-28",
+  "newJvmTests": 3,
+  "relatedJvmTests": 5,
+  "failures": 0,
+  "errors": 0,
+  "platformDomainViolations": 0,
+  "moduleBoundaries": "passed",
+  "build": "Debug passed in 1m54s; phase2ag-first-page-cache.log",
+  "apk": {
+    "path": "build/outputs/unimusic/UniMusic-20261028-2AG-debug.apk",
+    "sha256": "9d45325ab560cd4badbd1d4db5ad45f00d41fc8ac9c6eed277963a716486f53b",
+    "bytes": 63008691
+  },
+  "device": {
+    "model": "Huawei Mate60 BRA-AL00",
+    "install": "adb install -r Success; retained user data",
+    "installedVersion": "54c45c0120cf.dirty.10281729",
+    "searchFixture": "Adele Hello",
+    "attempts": 2,
+    "result": "Local empty; all five online sources timed out on initial attempt and one explicit retry; no successful page available for cache-hit check",
+    "cacheBadgePositiveVerified": false,
+    "wifiValidatedCapability": true,
+    "systemHttpProxyConfigured": false,
+    "privateDnsMode": "off",
+    "separateDeviceDnsProbes": "music.163.com and www.kuwo.cn ping/DNS processes did not finish within 6s; not proof of root cause",
+    "desktopDnsResolved": true,
+    "recentLogFatalOrOwnedAnrFound": false,
+    "cleanup": "Cleared only public fixture input; returned to Discover; no active audio"
+  },
+  "notRun": [
+    "positive device cache-hit/latency comparison",
+    "real account-switch cache check",
+    "new audio/cloud/migration acceptance"
+  ]
+}

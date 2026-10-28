@@ -14,6 +14,63 @@ import org.junit.Test
 
 @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
 class FederatedSearchEngineTest {
+    @Test fun firstPageCacheReusesOnlyFreshMatchingProviderMetadataAndMarksSnapshots() = runTest {
+        val cache = FirstSearchPageCache<String>(ttlMillis = 100,
+            monotonicNanos = { testScheduler.currentTime * 1_000_000 })
+        var calls = 0
+        suspend fun page(provider: String, query: String, cursor: String? = null) =
+            cache.load(provider, query, cursor) { calls++;SearchPage(listOf("song"), "next") }
+        assertFalse(page("one", "  Ｄｒｅａｍ  song ").fromCache)
+        val engine = FederatedSearchEngine(listOf(FederatedSearchProvider("one") { query: String, cursor: String? ->
+            page("one", query, cursor)
+        }), identity = { it })
+        val hit = engine.search("Dream song").toList().last().sources.getValue("one")
+        assertTrue(hit.fromCache);assertEquals("next", hit.nextCursor);assertEquals(1, calls)
+        assertFalse(page("two", "Dream song").fromCache)
+        assertFalse(page("one", "Dream song", "next").fromCache)
+        advanceTimeBy(99);assertTrue(page("one", "Dream song").fromCache)
+        advanceTimeBy(1);assertFalse(page("one", "Dream song").fromCache)
+        assertEquals(4, calls)
+    }
+
+    @Test fun firstPageCacheCannotBeRepopulatedByInvalidatedOrCancelledLoads() = runTest {
+        val cache = FirstSearchPageCache<String>()
+        var calls = 0
+        suspend fun load(wait: Long) = cache.load("one", "song", null) {
+            calls++;delay(wait);SearchPage(listOf("song"))
+        }
+        val old = launch { load(20) }
+        advanceTimeBy(1);cache.invalidate();old.join()
+        assertFalse(load(0).fromCache);assertEquals(2, calls)
+        cache.invalidate()
+        val cancelled = launch { load(20) }
+        advanceTimeBy(1);cancelled.cancelAndJoin()
+        assertFalse(load(0).fromCache);assertEquals(4, calls)
+        assertTrue(load(0).fromCache)
+    }
+
+    @Test fun firstPageCacheBoundsCopiesAndDoesNotRetainEmptyFailedOrOversizedPages() = runTest {
+        val cache = FirstSearchPageCache<String>(maxEntries = 2, maxItems = 2)
+        val mutable = mutableListOf("original")
+        suspend fun fresh(query: String) = cache.load("one", query, null) { SearchPage(listOf(query)) }
+        cache.load("one", "a", null) { SearchPage(mutable) }
+        mutable += "outside"
+        val hit = fresh("a");assertEquals(listOf("original"), hit.items)
+        (hit.items as? MutableList<String>)?.let { runCatching { it.clear() } }
+        assertEquals(listOf("original"), fresh("a").items)
+        fresh("b");fresh("a");fresh("c") // Reading a keeps it ahead of b in the LRU.
+        assertFalse(fresh("b").fromCache)
+        cache.load("one", "empty", null) { SearchPage(emptyList()) }
+        assertFalse(fresh("empty").fromCache)
+        try { cache.load("one", "failed", null) { throw IOException("fixture") };fail("Expected failure") }
+        catch (_: IOException) { }
+        assertFalse(fresh("failed").fromCache)
+        cache.load("one", "large", null) { SearchPage(listOf("1", "2", "3")) }
+        assertFalse(fresh("large").fromCache)
+        val longQuery = "x".repeat(257)
+        assertFalse(fresh(longQuery).fromCache);assertFalse(fresh(longQuery).fromCache)
+    }
+
     @Test fun monotonicAttemptTimesIncludeQueueingAndSelectiveRetryKeepsUnrequestedMeasurements() = runTest {
         var attempts = 0
         val engine = FederatedSearchEngine(listOf(

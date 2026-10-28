@@ -4,4 +4,5 @@
     <string name="unimusic_search_timing_hide">收起耗时</string>
     <string name="unimusic_search_timing_value">%1$s：%2$.1f秒</string>
     <string name="unimusic_search_timing_description">当前批次的搜索耗时，包括排队和元数据处理；不含音频校验或播放时间。</string>
+    <string name="unimusic_search_cached">缓存</string>
 </resources>

@@ -21,7 +21,7 @@ enum class SearchSourceFailure { AUTH_REQUIRED, DISABLED, NETWORK, TIMEOUT, UNAV
 
 class SearchSourceException(val reason: SearchSourceFailure) : Exception(reason.name)
 
-data class SearchPage<T>(val items: List<T>, val nextCursor: String? = null)
+data class SearchPage<T>(val items: List<T>, val nextCursor: String? = null, val fromCache: Boolean = false)
 
 data class FederatedSearchProvider<T>(
     val id: String,
@@ -35,7 +35,9 @@ data class SourceSearchState<T>(
     val loading: Boolean = false,
     val failure: SearchSourceFailure? = null,
     /** Last completed attempt, including permit wait; monotonic and never persisted. */
-    val elapsedMillis: Long? = null
+    val elapsedMillis: Long? = null,
+    /** Whether the last completed page came from short-lived metadata cache, not a new network request. */
+    val fromCache: Boolean = false
 )
 
 data class FederatedSearchSnapshot<T>(val query: String, val sources: Map<String, SourceSearchState<T>>) {
@@ -84,7 +86,8 @@ class FederatedSearchEngine<T>(
             val prior = previous?.sources?.get(provider.id) ?: SourceSearchState()
             val requested = (selected == null || provider.id in selected) && prior.nextCursor != null
             provider.id to prior.copy(loading = requested, failure = if (requested) null else prior.failure,
-                elapsedMillis = if (requested) null else prior.elapsedMillis)
+                elapsedMillis = if (requested) null else prior.elapsedMillis,
+                fromCache = if (requested) false else prior.fromCache)
         }
         val mutex = Mutex()
         send(FederatedSearchSnapshot(normalized, states.toMap()))
@@ -106,7 +109,7 @@ class FederatedSearchEngine<T>(
                             if (cursor != null && merged.size == prior.items.size) {
                                 // A changing cursor without new identities must not drive an endless auto-page loop.
                                 prior.copy(loading = false, failure = SearchSourceFailure.UNAVAILABLE)
-                            } else SourceSearchState(merged, cursor)
+                            } else SourceSearchState(merged, cursor, fromCache = page.fromCache)
                         } ?: prior.copy(loading = false, failure = SearchSourceFailure.TIMEOUT)
                     } catch (cancelled: CancellationException) {
                         // An adapter's own timeout must finish this source; actual query cancellation still propagates.

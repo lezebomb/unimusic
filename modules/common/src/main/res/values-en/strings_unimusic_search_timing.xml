@@ -4,4 +4,5 @@
     <string name="unimusic_search_timing_hide">Hide timings</string>
     <string name="unimusic_search_timing_value">%1$s: %2$.1f s</string>
     <string name="unimusic_search_timing_description">Search time for this batch, including queueing and metadata processing. Audio checks and playback are measured separately.</string>
+    <string name="unimusic_search_cached">Cached</string>
 </resources>
