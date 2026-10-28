@@ -1,0 +1,52 @@
+{
+  "phase": "2AS",
+  "date": "2026-10-28",
+  "productionCodeChanged": false,
+  "apk": "Reuses already installed 2AR; no product rebuild",
+  "desktopLiveProbe": {
+    "count": 1,
+    "provider": "kuwo",
+    "resourceId": "328578424",
+    "account": "anonymous normal web flow; no existing credentials read",
+    "apiStatus": "ADDRESS_RESOLVED",
+    "apiElapsedMillis": 998,
+    "mediaHttpStatus": 206,
+    "mediaElapsedMillis": 1175,
+    "prefixBytes": 8192,
+    "audioHeaderRecognized": true,
+    "prefixElapsedMillis": 1344,
+    "fullTrackDecoded": false
+  },
+  "defaultGuard": {
+    "environmentFlag": "UNIMUSIC_LIVE_KUWO_PROBE=1 required",
+    "withoutFlag": "1 test skipped; no live request"
+  },
+  "phoneReadOnlyChecks": {
+    "clockDifferenceSeconds": 0.1,
+    "internetPermissionGranted": true,
+    "networkStatePermissionGranted": true,
+    "activeTransport": "WIFI",
+    "activeCapabilities": [
+      "INTERNET",
+      "VALIDATED",
+      "NOT_METERED",
+      "NOT_RESTRICTED",
+      "FOREGROUND",
+      "NOT_SUSPENDED"
+    ],
+    "alwaysOnVpnConfigured": false,
+    "lockdownVpnConfigured": false,
+    "activeWifiProxyFieldPresent": false,
+    "appWlanAllowed": true,
+    "appMobileDataAllowed": true,
+    "appBackgroundDataAllowed": true,
+    "dataSaverEnabled": true,
+    "ownedAppExceptionMentions": {},
+    "networkSettingsChanged": false
+  },
+  "limitations": [
+    "Desktop transport N=1, not phone performance or audio decode",
+    "Phone request failure root cause remains undetermined",
+    "No new account/audio/fault injection acceptance"
+  ]
+}

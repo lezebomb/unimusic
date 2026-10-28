@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="moe.ouom.neriplayer.platform.kuwo.api.KuwoAudioClientTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2026-10-28T12:10:49.769Z" hostname="XUSHAOYANG" time="1.441">
+  <properties/>
+  <testcase name="optInDesktopKuwoTransportProbe" classname="moe.ouom.neriplayer.platform.kuwo.api.KuwoAudioClientTest" time="1.436"/>
+  <system-out><![CDATA[UNIMUSIC_PROBE provider=kuwo stage=api status=ADDRESS_RESOLVED elapsed_ms=998
+UNIMUSIC_PROBE provider=kuwo stage=media http=206 elapsed_ms=1175
+UNIMUSIC_PROBE provider=kuwo stage=prefix bytes=8192 audio_header=true elapsed_ms=1344
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

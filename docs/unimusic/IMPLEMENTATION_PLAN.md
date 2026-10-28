@@ -205,3 +205,5 @@ Phase 1 的工具链与 Room 数据保留前置条件已满足。
 2026-10-28补充：2AQ防止QQ/酷我本机散列/封面/歌词提示冒作网易云收藏身份，新1/共3 JVM、平台0违规/Debug通过，无账号上传或本地数据修改，见[2AQ](PHASE_2AQ_NATIVE_FAVORITE_IDENTITY.md)。
 
 2026-10-28补充：2AR统一原生官方歌曲页与分享校验，新2/共3唯一JVM、平台0违规/完整边界/Debug及Mate60安装通过；未发送分享或做新音频验收，见[2AR](PHASE_2AR_NATIVE_PUBLIC_PAGES.md)。
+
+2026-10-28补充：2AS一次生产酷我匿名桌面探测返回正常地址并收到HTTP206/8KiB音频头；默认不启用时跳过，非手机/完整解码验收，不改网络设置；见[2AS](PHASE_2AS_DESKTOP_KUWO_TRANSPORT.md)。
