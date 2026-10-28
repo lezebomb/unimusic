@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="moe.ouom.neriplayer.ui.viewmodel.tab.ExploreSearchResultRankingTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-10-28T09:42:24.155Z" hostname="XUSHAOYANG" time="0.166">
+  <properties/>
+  <testcase name="bare title prefers unmodified recording while explicit version stays discoverable" classname="moe.ouom.neriplayer.ui.viewmodel.tab.ExploreSearchResultRankingTest" time="0.148"/>
+  <testcase name="version preference does not promote an artist match over the requested song title" classname="moe.ouom.neriplayer.ui.viewmodel.tab.ExploreSearchResultRankingTest" time="0.001"/>
+  <testcase name="albumVersionLabelsAndSyntheticVoiceRemainRelevantToTheRequestedVersion" classname="moe.ouom.neriplayer.ui.viewmodel.tab.ExploreSearchResultRankingTest" time="0.005"/>
+  <testcase name="verifiedNativeAddressRanksAboveEqualUnknownOrDeniedSourcesWithoutPromotingLive" classname="moe.ouom.neriplayer.ui.viewmodel.tab.ExploreSearchResultRankingTest" time="0.007"/>
+  <testcase name="fullVersionEvidenceOutranksFreshAudioAddressForAnUnqualifiedTitle" classname="moe.ouom.neriplayer.ui.viewmodel.tab.ExploreSearchResultRankingTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -1,0 +1,30 @@
+{
+  "phase": "2AH",
+  "date": "2026-10-28",
+  "newJvmTests": 2,
+  "relatedJvmTests": 5,
+  "failures": 0,
+  "errors": 0,
+  "build": "Debug passed in 1m34s; phase2ah-full-version-ranking.log",
+  "apk": {
+    "path": "build/outputs/unimusic/UniMusic-20261028-2AH-debug.apk",
+    "sha256": "ec366a64efebd731317584c8cddbdf7ab542af28419415965cd21340448fa5da",
+    "bytes": 63009211
+  },
+  "device": "Not reinstalled; Mate60 remains on 2AG; online search/cache-hit acceptance pending after all-source timeouts",
+  "ci": {
+    "4H": {
+      "run": 40664083211,
+      "conclusion": "success"
+    },
+    "2AG": {
+      "run": 40665765427,
+      "status": "in_progress"
+    }
+  },
+  "notRun": [
+    "new device/account/audio tests",
+    "labeled original-recording accuracy benchmark",
+    "real network latency comparison"
+  ]
+}

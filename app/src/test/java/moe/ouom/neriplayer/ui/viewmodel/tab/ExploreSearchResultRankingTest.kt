@@ -15,6 +15,34 @@ import moe.ouom.neriplayer.data.model.unified.SourceCheckStatus
 import moe.ouom.neriplayer.data.model.unified.UnifiedSongMetadata
 
 class ExploreSearchResultRankingTest {
+    @Test fun fullVersionEvidenceOutranksFreshAudioAddressForAnUnqualifiedTitle() {
+        fun catalog(id: String, album: String = "Album", version: moe.ouom.neriplayer.data.model.unified.RecordingVersion =
+            moe.ouom.neriplayer.data.model.unified.RecordingVersion.UNKNOWN) = ExploreSearchResult.Catalog(
+            CatalogTrack(SongSourceKey("kuwo", id), UnifiedSongMetadata("Dream", "Artist", album, 180_000, version), null))
+        val studio = catalog("1")
+        val explicitLive = catalog("2", version = moe.ouom.neriplayer.data.model.unified.RecordingVersion.LIVE)
+        val albumCover = catalog("3", album = "Acoustic Cover")
+        val checks = listOf(explicitLive, albumCover).associate { it.track.source to
+            SourceCheckResult(SourceCheckStatus.ADDRESS_RESOLVED, System.currentTimeMillis()) }
+        val session = ExploreSearchRankingSession("Dream")
+        assertEquals(listOf(studio, explicitLive, albumCover), session.rank(listOf(explicitLive, albumCover, studio), checks))
+        // Updating metadata under the same source key must also replace its cached version score.
+        val corrected = explicitLive.copy(track = explicitLive.track.copy(metadata = explicitLive.track.metadata.copy(
+            version = moe.ouom.neriplayer.data.model.unified.RecordingVersion.STUDIO)))
+        assertEquals(corrected, session.rank(listOf(studio, corrected), checks).first())
+    }
+
+    @Test fun albumVersionLabelsAndSyntheticVoiceRemainRelevantToTheRequestedVersion() {
+        val original = song(1, "Dream", "Artist")
+        val live = original.copy(id = 2, album = "Live")
+        val unrelated = original.copy(id = 3, name = "Other", artist = "Dream", album = "Live")
+        assertEquals(live, rankExploreSongSearchResults("Dream Live", listOf(unrelated, original, live)).first())
+        val human = original.copy(id = 4, name = "Dream (Cover)")
+        val synthetic = human.copy(id = 5, album = "AI vocals")
+        assertEquals(human, rankExploreSongSearchResults("Dream Cover", listOf(synthetic, human)).first())
+        assertEquals(synthetic, rankExploreSongSearchResults("Dream AI vocals", listOf(human, synthetic)).first())
+    }
+
     @Test fun verifiedNativeAddressRanksAboveEqualUnknownOrDeniedSourcesWithoutPromotingLive() {
         fun catalog(id: String, title: String = "Dream") = ExploreSearchResult.Catalog(
             moe.ouom.neriplayer.data.model.unified.CatalogTrack(

@@ -20,7 +20,8 @@ import moe.ouom.neriplayer.util.search.searchValues
 internal class ExploreSearchRankingSession(query: String) {
     private val normalized = normalizeFederatedQuery(query)
     private val textQuery = SearchTextMatcher.query(normalized)
-    private val requestedVersions = RecordingMatchPolicy.versions(RecordingMetadata(normalized, "", 0))
+    private val requestedMetadata = RecordingMetadata(normalized, "", 0)
+    private val requestedVersions = RecordingMatchPolicy.versions(requestedMetadata)
     private data class Score(val text: Int?, val versionPenalty: Int)
     private data class Cached(val item: ExploreSearchResult, val score: Score)
     private val scores = LinkedHashMap<String, Cached>(64, 0.75f, true)
@@ -87,14 +88,20 @@ internal class ExploreSearchRankingSession(query: String) {
     }
 
     private fun score(item: ExploreSearchResult): Score {
-        val (title, values) = when (item) {
-            is ExploreSearchResult.Song -> item.song.name to item.song.searchValues()
-            is ExploreSearchResult.Catalog -> item.track.metadata.title to catalogSearchValues(item.track)
+        val (metadata, values) = when (item) {
+            is ExploreSearchResult.Song -> with(item.song) {
+                RecordingMetadata(name, artist, durationMs, versionContext = album) to searchValues()
+            }
+            is ExploreSearchResult.Catalog -> with(item.track.metadata) {
+                RecordingMetadata(title, artist, durationMs, version, album) to catalogSearchValues(item.track)
+            }
             else -> return Score(null, 0)
         }
-        val versions = RecordingMatchPolicy.versions(RecordingMetadata(title, "", 0))
-        return Score(textQuery.score(values),
-            (versions - requestedVersions).size + (requestedVersions - versions).size)
+        val versions = RecordingMatchPolicy.versions(metadata)
+        val difference = (versions - requestedVersions).size + (requestedVersions - versions).size
+        // Same enum sets can still hide added labels or synthetic vocals; retain the shared policy's evidence.
+        val penalty = difference.takeIf { it > 0 } ?: if (RecordingMatchPolicy.hasVersionConflict(requestedMetadata, metadata)) 1 else 0
+        return Score(textQuery.score(values), penalty)
     }
 }
 
