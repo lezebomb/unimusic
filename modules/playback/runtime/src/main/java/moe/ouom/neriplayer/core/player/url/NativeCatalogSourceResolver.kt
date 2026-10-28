@@ -88,12 +88,17 @@ internal suspend fun PlayerManager.tryResolveNativeCatalogAlternate(song: SongIt
                 sourceCandidateForSong(song)?.key)
             if (choice != null && !RememberedSourceState.cooldown.cooling(song.stableKey(), choice.key.toString())) {
                 val stamp = backend.decisionStamp(song, choice.key)
-                if (stamp.decision == SourceMatchDecision.NONE) {
+                val previous = backend.match(song, choice.key)
+                val coolingMatch = previous != null && RememberedSourceState.cooldown.cooling(song.stableKey(), previous.id)
+                if (stamp.decision == SourceMatchDecision.NONE && !coolingMatch) {
                     val attempt = withTimeoutOrNull(2_600) { resolveSourceCandidate(song, choice, sideEffects, automatic = true) }
                     if (attempt is SourceAttempt.Ready && session == sourceResolutionSession(provider.providerId) &&
                         neteaseAutoSourceSwitchEnabled && isPlaybackNetworkUsable(application)) {
                         val stored = backend.rememberAutomatic(song, choice, stamp)
-                        if (stored != null) winner = attempt.value.copy(cacheKeyOverride = "match-${stored.id}-${attempt.value.cacheKeyOverride}")
+                        // A playback failure can arrive while this address request is in flight.
+                        if (stored != null && !RememberedSourceState.cooldown.cooling(song.stableKey(), stored.id)) {
+                            winner = attempt.value.copy(cacheKeyOverride = "match-${stored.id}-${attempt.value.cacheKeyOverride}")
+                        }
                     } else RememberedSourceState.cooldown.reject(song.stableKey(), choice.key.toString())
                 }
             }

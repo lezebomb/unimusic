@@ -1,0 +1,25 @@
+{
+  "phase": "2AE",
+  "date": "2026-10-28",
+  "change": "Native automatic discovery checks both source key cooldown and persisted match UUID cooldown before URL lookup, and checks UUID again before returning",
+  "build": "Debug passed; phase2ae-native-match-cooldown.log",
+  "tests": "No new or repeated unit suite for this small integration guard; cooldown/parallel mechanism last passed 10 targeted JVM checks in 2AD",
+  "device": {
+    "install": "adb install -r; Success",
+    "versionName": "9dba7d0d8c36.dirty.10281325",
+    "appVisibleAfter": true,
+    "discoveryVisibleAfter": true,
+    "activePlaybackAfter": false
+  },
+  "apk": {
+    "path": "build/outputs/unimusic/UniMusic-20261028-2AE-debug.apk",
+    "sha256": "5c5a6e160093b0699f229364db401242d6ac4113a212de6d3aad3a51a73ccb73",
+    "bytes": 63000195
+  },
+  "notRun": [
+    "real decoder failure injection/cooldown recovery",
+    "audio/first-sound",
+    "new account/cloud",
+    "repeat of unaffected search UI; prior real search is Phase 4G on 2AD"
+  ]
+}
