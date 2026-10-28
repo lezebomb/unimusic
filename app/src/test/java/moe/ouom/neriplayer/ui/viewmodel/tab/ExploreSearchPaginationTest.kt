@@ -8,6 +8,31 @@ import org.junit.Test
 
 class ExploreSearchPaginationTest {
 
+    @Test fun feedLoadsCoalesceAndOldCompletionCannotClearTheReplacement() {
+        val gate = ExplorePlaylistRequestGate()
+        val session = Any()
+        val first = requireNotNull(gate.begin("all", session))
+        org.junit.Assert.assertNull(gate.begin("all", session))
+        val replacement = requireNotNull(gate.begin("rock", session))
+        assertFalse(gate.current(first, session))
+        assertFalse(gate.finish(first))
+        org.junit.Assert.assertNull(gate.begin("rock", session))
+        assertTrue(gate.current(replacement, session))
+        assertTrue(gate.finish(replacement))
+        org.junit.Assert.assertNotNull(gate.begin("rock", session))
+    }
+
+    @Test fun feedResultsCannotCrossAnAccountChangeEvenBeforeItsObserverReloads() {
+        val gate = ExplorePlaylistRequestGate()
+        val oldSession = Any()
+        val newSession = Any()
+        val old = requireNotNull(gate.begin("all", oldSession))
+        assertFalse(gate.current(old, newSession))
+        val current = requireNotNull(gate.begin("all", newSession))
+        assertFalse(gate.finish(old))
+        assertTrue(gate.current(current, newSession))
+    }
+
     @Test
     fun `merge keeps existing order and removes duplicate stable keys`() {
         val first = ExploreSearchResult.Notice(title = "first", message = "one")

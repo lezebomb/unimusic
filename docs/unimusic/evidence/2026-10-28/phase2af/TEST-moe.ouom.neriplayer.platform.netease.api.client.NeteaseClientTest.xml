@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<testsuite name="moe.ouom.neriplayer.platform.netease.api.client.NeteaseClientTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2026-10-28T07:19:36.785Z" hostname="local" time="0.265">
+  <properties />
+  <testcase name="sessionStore_preservesSessionWhenOnlyRuntimeCookiesChange" classname="moe.ouom.neriplayer.platform.netease.api.client.NeteaseClientTest" time="0.259" />
+  <system-out />
+  <system-err />
+</testsuite>

@@ -63,6 +63,8 @@
 
 ## Phase 2：统一搜索与高精度匹配
 
+2AF修复发现歌单重复触发/常规Cookie重载，合并同键请求、会话/分类隔离，可取消网络/8秒预算/后台解析；新2/共5 JVM、平台0违规及Debug通过，见[2AF](PHASE_2AF_PLAYLIST_REQUEST_LIFECYCLE.md)。未测实际请求/速度前后差异。
+
 2AE补原生自动重新搜索对持久匹配UUID故障冷却的前后复核，Debug/保留数据装机启动通过；未重复机制单元集或搜索UI，真实失败注入未执行，见[2AE](PHASE_2AE_NATIVE_COOLDOWN_GUARD.md)。
 
 2AD对最多两条已缓存自动在线源并行，首合格成功即返回；共享取消不再全量冷却，本地/人工顺序沿用。新3/共10 JVM、Debug通过，见[2AD](PHASE_2AD_PARALLEL_REMEMBERED_SOURCES.md)。无真实切源音频性能结论，待装机入口检查。

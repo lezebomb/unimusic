@@ -35,6 +35,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeoutOrNull
 import moe.ouom.neriplayer.common.search.FederatedSearchEngine
 import moe.ouom.neriplayer.common.search.FederatedSearchProvider
 import moe.ouom.neriplayer.common.search.FederatedSearchSnapshot
@@ -308,10 +309,27 @@ private data class ExploreSearchFetchResult(
     val songs: List<SongItem> = searchSongItems(items)
 }
 
+/** UI-owner confined. Old completions cannot clear a newer category/account request. */
+internal class ExplorePlaylistRequestGate {
+    class Ticket internal constructor(val category: String, internal val session: Any)
+    private var active: Ticket? = null
+    fun begin(category: String, session: Any): Ticket? {
+        if (active?.let { it.category == category && it.session === session } == true) return null
+        return Ticket(category, session).also { active = it }
+    }
+    fun current(ticket: Ticket, session: Any): Boolean = active === ticket && ticket.session === session
+    fun finish(ticket: Ticket): Boolean {
+        if (active !== ticket) return false
+        active = null
+        return true
+    }
+}
+
 class ExploreViewModel(application: Application) : AndroidViewModel(application) {
     private val app = application
     private val neteaseRepo = AppContainer.neteaseCookieRepo
     private var highQualityLoadJob: Job? = null
+    private val playlistRequests = ExplorePlaylistRequestGate()
     private var searchJob: Job? = null
     private var searchMoreJob: Job? = null
     private var ytMusicPlaylistsJob: Job? = null
@@ -354,14 +372,18 @@ class ExploreViewModel(application: Application) : AndroidViewModel(application)
             }
         }
         viewModelScope.launch {
+            var initialFeedRequested = false
             neteaseRepo.cookieFlow.collect {
                 val context = neteaseClient.searchSessionIdentity()
-                if (context !== searchAccountContext) {
+                val sessionChanged = context !== searchAccountContext
+                if (sessionChanged) {
                     searchAccountContext = context
                     _uiState.value.pendingNeteaseSessionSearch()?.let { (query, display) -> search(query, display) }
                 }
-                NPLogger.d(TAG, "cookieFlow updated, reload high quality playlists tag=${_uiState.value.selectedTag}")
-                loadHighQuality()
+                if (!initialFeedRequested || sessionChanged) {
+                    initialFeedRequested = true
+                    loadHighQuality()
+                }
             }
         }
         viewModelScope.launch {
@@ -831,6 +853,8 @@ class ExploreViewModel(application: Application) : AndroidViewModel(application)
         val realCat = cat ?: currentState.selectedTag
         val previousTag = currentState.selectedTag
         val previousPlaylists = currentState.playlists
+        val session = neteaseClient.searchSessionIdentity()
+        val ticket = playlistRequests.begin(realCat, session) ?: return
 
         highQualityLoadJob?.cancel()
         _uiState.value = currentState.copy(
@@ -846,10 +870,13 @@ class ExploreViewModel(application: Application) : AndroidViewModel(application)
             try {
                 // Convert tag key to Chinese API category
                 val apiCategory = TAG_TO_API_CATEGORY[realCat] ?: realCat
-                val raw = withContext(Dispatchers.IO) {
-                    neteaseClient.getHighQualityPlaylists(apiCategory, 50, 0L)
-                }
-                val mapped = parseExploreHighQualityPlaylists(raw)
+                val mapped = withTimeoutOrNull(8_000) {
+                    val raw = withContext(Dispatchers.IO) {
+                        neteaseClient.getHighQualityPlaylistsCancellable(apiCategory, 50, 0L)
+                    }
+                    withContext(Dispatchers.Default) { parseExploreHighQualityPlaylists(raw) }
+                } ?: throw java.net.SocketTimeoutException(app.getString(CoreCommonR.string.unimusic_search_source_timeout))
+                if (!playlistRequests.current(ticket, neteaseClient.searchSessionIdentity())) return@launch
                 NPLogger.d(TAG, "loadHighQuality success: tag=$realCat, count=${mapped.size}")
 
                 _uiState.value = _uiState.value.copy(
@@ -861,6 +888,7 @@ class ExploreViewModel(application: Application) : AndroidViewModel(application)
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
+                if (!playlistRequests.current(ticket, neteaseClient.searchSessionIdentity())) return@launch
                 val shouldRestorePreviousContent = previousPlaylists.isNotEmpty() && realCat != previousTag
                 NPLogger.e(
                     TAG,
@@ -876,6 +904,8 @@ class ExploreViewModel(application: Application) : AndroidViewModel(application)
                     playlists = if (shouldRestorePreviousContent) previousPlaylists else emptyList(),
                     selectedTag = if (shouldRestorePreviousContent) previousTag else realCat
                 )
+            } finally {
+                if (playlistRequests.finish(ticket)) _uiState.value = _uiState.value.copy(loading = false)
             }
         }
     }

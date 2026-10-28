@@ -21,5 +21,18 @@
     "audio/first-sound",
     "new account/cloud",
     "repeat of unaffected search UI; prior real search is Phase 4G on 2AD"
-  ]
+  ],
+  "ci": {
+    "run": 40638348465,
+    "conclusion": "success",
+    "head": "e369255131ef28782e9cd752e340efab66354cc1"
+  },
+  "qqLoginAttempt": {
+    "officialHost": "y.qq.com",
+    "nativeQQInstalled": true,
+    "saveRemainedOnLoginPage": true,
+    "newCredentialsSaved": false,
+    "positiveAudioVerified": false,
+    "leftLoginPage": true
+  }
 }

@@ -1191,6 +1191,11 @@ class NeteaseClient(
         return callWeApi("/playlist/highquality/list", params, usePersistedCookies = true)
     }
 
+    suspend fun getHighQualityPlaylistsCancellable(cat: String = "全部", limit: Int = 50, before: Long = 0L): String =
+        requestCancellable("https://music.163.com/weapi/playlist/highquality/list", mapOf(
+            "cat" to cat, "limit" to limit, "lasttime" to before, "total" to true
+        ), CryptoMode.WEAPI, "POST", usePersistedCookies = true)
+
     /**
      * 获取用户创建的歌单
      * @param userId 用户 ID; 传 0 时自动使用当前登录用户 ID

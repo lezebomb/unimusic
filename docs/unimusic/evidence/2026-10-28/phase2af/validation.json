@@ -1,0 +1,37 @@
+{
+  "phase": "2AF",
+  "date": "2026-10-28",
+  "newTests": 2,
+  "jvm": [
+    {
+      "suite": "moe.ouom.neriplayer.ui.viewmodel.tab.ExploreSearchPaginationTest",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0
+    },
+    {
+      "suite": "moe.ouom.neriplayer.ui.viewmodel.tab.ExploreViewModelMappingTest",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0
+    },
+    {
+      "suite": "moe.ouom.neriplayer.platform.netease.api.client.NeteaseClientTest",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0
+    }
+  ],
+  "platformDomainViolations": 0,
+  "build": "Debug passed; phase2af-playlist-request-lifecycle.log",
+  "apk": {
+    "path": "build/outputs/unimusic/UniMusic-20261028-2AF-debug.apk",
+    "sha256": "a30cb50c49b06e0ada3081be8840acba934455b28e75e40b55d843242c4cb78c",
+    "bytes": 63002059
+  },
+  "notRun": [
+    "new APK device/category switch check",
+    "actual request-count/latency before-after benchmark",
+    "new account/audio/cloud"
+  ]
+}
