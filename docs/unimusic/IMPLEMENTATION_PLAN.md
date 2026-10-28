@@ -203,3 +203,5 @@ Phase 1 的工具链与 Room 数据保留前置条件已满足。
 2026-10-28补充：2AP让匿名酷我主源实际错误恢复先试备用且保留新主源机会，1项JVM/Debug通过；真实故障注入未验收，见[2AP](PHASE_2AP_KUWO_MEDIA_FAILURE_RECOVERY.md)。
 
 2026-10-28补充：2AQ防止QQ/酷我本机散列/封面/歌词提示冒作网易云收藏身份，新1/共3 JVM、平台0违规/Debug通过，无账号上传或本地数据修改，见[2AQ](PHASE_2AQ_NATIVE_FAVORITE_IDENTITY.md)。
+
+2026-10-28补充：2AR统一原生官方歌曲页与分享校验，新2/共3唯一JVM、平台0违规/完整边界/Debug及Mate60安装通过；未发送分享或做新音频验收，见[2AR](PHASE_2AR_NATIVE_PUBLIC_PAGES.md)。

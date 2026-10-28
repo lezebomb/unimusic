@@ -22,6 +22,12 @@ private val SHAREABLE_CATALOG_HOSTS = setOf(
 )
 
 fun buildRemoteSongShareUrl(originalSong: SongItem, queue: List<SongItem>): String? {
+    val provider = originalSong.channelId?.lowercase(Locale.ROOT)
+    if (provider in setOf("qqmusic", "kuwo")) {
+        val resourceId = originalSong.audioId?.takeIf(String::isNotBlank) ?: return null
+        return moe.ouom.neriplayer.data.model.unified.MusicSourceRegistry.publicPageUrl(
+            moe.ouom.neriplayer.data.model.unified.SongSourceKey(requireNotNull(provider), resourceId))
+    }
     extractYouTubeMusicVideoId(originalSong.mediaUri)?.let { videoId ->
         if (videoId.isNotBlank()) {
             return "https://music.youtube.com/watch?v=$videoId"
@@ -63,6 +69,7 @@ fun buildRemoteSongShareUrl(originalSong: SongItem, queue: List<SongItem>): Stri
 fun isShareablePublicHttpUrl(url: String?): Boolean {
     if (url.isNullOrBlank()) return false
     val uri = runCatching { URI(url.trim()) }.getOrNull() ?: return false
+    if (uri.rawUserInfo != null) return false
     val scheme = uri.scheme?.lowercase(Locale.US) ?: return false
     if (scheme != "http" && scheme != "https") return false
     val host = uri.host?.lowercase(Locale.US)?.trimEnd('.') ?: return false

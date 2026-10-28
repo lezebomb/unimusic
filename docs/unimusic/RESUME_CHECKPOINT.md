@@ -10,6 +10,7 @@
 
 | 最新阶段 | 实际验证与边界 |
 | --- | --- |
+| [2AR原生官方页面](PHASE_2AR_NATIVE_PUBLIC_PAGES.md) | 新2/共3唯一JVM、平台0违规/当前边界/Debug、Mate60保留数据装机；规范真实资源ID页面及userinfo保护；2AQ CI成功 |
 | [2AQ原生收藏身份隔离](PHASE_2AQ_NATIVE_FAVORITE_IDENTITY.md) | 新1/共3 JVM、平台0违规/Debug；原生散列/封面/歌词不再冒作网易云ID上传；不改本地数据，无真实上传 |
 | [2AP酷我媒体失败恢复](PHASE_2AP_KUWO_MEDIA_FAILURE_RECOVERY.md) | 新1 JVM/Debug；精确原源键/真实错误触发10秒备用优先，无备用仍尝试新主源；未实际故障注入，手机仍2AO；2AO CI成功 |
 | [2AO近期主源失败提示](PHASE_2AO_RECENT_PRIMARY_FAILURE_HINT.md) | 新1 JVM/Debug/当前边界/保留数据装机；10秒按账号隔离调度、当前备用先试且失败仍试主源；2AN远端成功且B站新用例已核实 |
@@ -44,15 +45,15 @@
 | [4D定向CI](PHASE_4D_CHANGED_SCOPE_CI.md) `f7202cba` | 保守身份白名单与结构迁移路由；CI40596819578成功，2T实际跳过无关Android迁移 |
 | [3D.8 GitHub标识同步](PHASE_3D8_GITHUB_IDENTITY_SYNC.md) `7d1c2879` | 新2项合成HTTP、Debug；前序3D.1～.7身份/因果/持久日志/只读Room捕获/WebDAV/冲突选择/外来UUID适配见各报告；CI覆盖后续已成功 |
 
-Room仍v23，无destructive migration。标识同步是身份/元数据子集，歌单仍走原同步；不上传反馈/凭据/设备路径/播放权，不重写Room本机ID、关系或显示字段。真实GitHub/WebDAV上传、双设备/旧客户端往返、完整远端库应用、外来UUID音频、真实Media3反馈采样未验收。最后设备已保留数据安装2AO包，版本e202974a7fbc.dirty.10281845，精确哈希见phase2ao/validation.json；稳定副本build/outputs/unimusic/UniMusic-20261028-2AO-debug.apk。4G真实搜索证据对应2AD包，不冒充2AE重复实测。后续复用而非重做同一构建。实际来源播放仍看2L/2M/2P，不把编译/模拟计时/地址返回当真实音频或性能。
+Room仍v23，无destructive migration。标识同步是身份/元数据子集，歌单仍走原同步；不上传反馈/凭据/设备路径/播放权，不重写Room本机ID、关系或显示字段。真实GitHub/WebDAV上传、双设备/旧客户端往返、完整远端库应用、外来UUID音频、真实Media3反馈采样未验收。最后设备已保留数据安装2AR包，版本9ce8d1f21c41.dirty.10281917，精确哈希见phase2ar/validation.json；稳定副本build/outputs/unimusic/UniMusic-20261028-2AR-debug.apk。4G真实搜索证据对应2AD包，不冒充2AE重复实测。后续复用而非重做同一构建。实际来源播放仍看2L/2M/2P，不把编译/模拟计时/地址返回当真实音频或性能。
 
-下一步：补齐原生QQ/酷我分享的官方页面，统一与目录页面的严格ID/上下文校验；2AP/2AQ已构建未装机；2AM/2AN/2AO代码已随2AO装机，2AL网络提示已实测；新反向链路正向音频/缓存命中需设备网络恢复后验证，不反复请求同一公共词。手机已装2AO，版本e202974a7fbc.dirty.10281845，稳定包build/outputs/unimusic/UniMusic-20261028-2AO-debug.apk。2AG手机搜索全部在线源超时、一次重试相同，独立设备DNS探测也未完成，缓存命中仍待正向设备验收；不要断言网络根因。2AF/2AE远端CI均成功，4H的40664083211成功；2AG的40665765427与2AH的40666514625被新提交替代取消；2AI的40667670264也被替代取消，2AJ的40668821070成功，2AK的40671124870成功，2AL的40672256267被新提交替代取消，2AM的40673434202、2AN的40674351163和2AO的40675719227成功。QQ官方网页登录仍未取得可保存凭据，无正向QQ音频验收。真实请求数量/延迟前后比较、缓存双源首声/失败注入、跨设备/云上传仍待验收。用户已授权以后安装时直接在手机系统验证框本机输入既有锁屏凭据，不反复要求人工确认；不保存凭据到代码/文档/日志或Git。
+下一步：检查最新CI并接续剩余后台工作；核对原生下载入口是否已隐藏不支持的下载动作（后台已拒绝Native下载，尚未改UI），不以推测创建重复功能。2AP/2AQ/2AR已随2AR装机；2AM/2AN/2AO代码已随2AO装机，2AL网络提示已实测；新反向链路正向音频/缓存命中需设备网络恢复后验证，不反复请求同一公共词。手机已装2AR，版本9ce8d1f21c41.dirty.10281917，稳定包build/outputs/unimusic/UniMusic-20261028-2AR-debug.apk。2AG手机搜索全部在线源超时、一次重试相同，独立设备DNS探测也未完成，缓存命中仍待正向设备验收；不要断言网络根因。2AF/2AE远端CI均成功，4H的40664083211成功；2AG的40665765427与2AH的40666514625被新提交替代取消；2AI的40667670264也被替代取消，2AJ的40668821070成功，2AK的40671124870成功，2AL的40672256267被新提交替代取消，2AM的40673434202、2AN的40674351163和2AO的40675719227、2AQ的40678014543成功；2AP的40677250962被替代取消。QQ官方网页登录仍未取得可保存凭据，无正向QQ音频验收。真实请求数量/延迟前后比较、缓存双源首声/失败注入、跨设备/云上传仍待验收。用户已授权以后安装时直接在手机系统验证框本机输入既有锁屏凭据，不反复要求人工确认；不保存凭据到代码/文档/日志或Git。
 
 ## 当前工具链与设备限制
 
 复用项目JDK17 `.gradle-home/jdks/jdk-17.0.20.1+1`、`.android-sdk`和用户Gradle缓存；API37.0/BuildTools37/NDK27.0.12077973/CMake3.31.6已安装。`tools_pub/unimusic/build_android.ps1 -GradleArgs ... --offline`可构建，不重复下载，不重做Phase0。本机无JDK21；3B延期的两个旧runtime检查已在远端JDK21上通过，不改写本机未执行记录。
 
-Mate60在线；现装2AO。另有第二部物理设备接入，本地phone_ui.py已按型号固定BRA-AL00，后续ADB命令须明确选设备，不能使用无目标adb install/shell，4G完成2AD包的搜索/重试检查，4E完成3C/3D新增入口检查，真实播放反馈采样、云上传/双设备仍未验收。3C此前三次安装中止属于历史，4E修正流程后以实际版本核实新包已安装。不要清数据、卸载、重登录或盲目重复系统验证。手机密码、联系方式、验证码、Cookie只按原授权本地使用，不能写进日志/文档/Git。
+Mate60在线；现装2AR。另有第二部物理设备接入，本地phone_ui.py已按型号固定BRA-AL00，后续ADB命令须明确选设备，不能使用无目标adb install/shell，4G完成2AD包的搜索/重试检查，4E完成3C/3D新增入口检查，真实播放反馈采样、云上传/双设备仍未验收。3C此前三次安装中止属于历史，4E修正流程后以实际版本核实新包已安装。不要清数据、卸载、重登录或盲目重复系统验证。手机密码、联系方式、验证码、Cookie只按原授权本地使用，不能写进日志/文档/Git。
 
 ## 本轮完成的开发阶段
 
@@ -180,3 +181,5 @@ Mate60在线；现装2AO。另有第二部物理设备接入，本地phone_ui.py
 - 最新日志：`build/unimusic-toolchain/phase2k-final-build-io.log`、`phase2k-final-validation.log`、`phase2k-validation.log`和`phase2k-final-boundaries.log`；4个关键检查XML及匿名协议实测已归档。2J/2I/2H等保留独立证据，避免重跑完整上游套件。
 - 运行 Python 检查时 Windows 使用 `python -X utf8`，避免默认 GBK 读取 UTF-8 源文件失败。
 - 本机普通沙箱执行器此前初始化失败，必要 shell 使用 require_escalated 入口。Git 单次加 `-c safe.directory=D:/unimusic`，网络再加 `-c http.sslBackend=openssl`，不改全局安全设置。
+
+恢复记录：上次额度99%后，归档/commit/push命令被自动审批的额度错误拦下且未执行。用户继续后额度工具报告普通使用允许、五小时窗已用1%，按相同审批流程重试；未消耗重置券。可恢复错误自行修复续跑，不因阶段结束暂停。手机仍请求失败，不推断网络根因。

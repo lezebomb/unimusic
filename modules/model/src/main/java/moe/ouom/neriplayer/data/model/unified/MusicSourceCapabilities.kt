@@ -33,6 +33,16 @@ object MusicSourceRegistry {
     fun canResolveAudio(key: SongSourceKey): Boolean = validKey(key) &&
         capabilities(key.provider).audio in setOf(SourceAudioSupport.LOCAL_FILE, SourceAudioSupport.PLATFORM_API)
 
+    /** Canonical public metadata pages only; source identity grants no audio entitlement. */
+    fun publicPageUrl(key: SongSourceKey): String? {
+        if (!validKey(key)) return null
+        return when (key.provider) {
+            "qqmusic" -> "https://y.qq.com/n/ryqq/songDetail/${key.resourceId}"
+            "kuwo" -> "https://www.kuwo.cn/play_detail/${key.resourceId}"
+            else -> null
+        }
+    }
+
     private fun positiveId(value: String) = value.toLongOrNull()?.takeIf { it > 0 }?.toString() == value
 }
 

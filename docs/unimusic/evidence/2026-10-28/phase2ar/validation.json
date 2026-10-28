@@ -1,0 +1,59 @@
+{
+  "phase": "2AR",
+  "date": "2026-10-28",
+  "newJvmTests": 2,
+  "uniqueRelatedJvmTests": 3,
+  "jvm": [
+    {
+      "suite": "moe.ouom.neriplayer.core.player.policy.source.SourceAvailabilityCheckerTest",
+      "case": "nativePublicPagesRequireExactPhysicalIdsAndSupportedContexts",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0
+    },
+    {
+      "suite": "moe.ouom.neriplayer.ui.viewmodel.tab.ExploreCatalogSearchTest",
+      "case": "externalNavigationRequiresTheExactOfficialPageAndCatalogCapability",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0
+    },
+    {
+      "suite": "moe.ouom.neriplayer.ui.viewmodel.tab.ExploreCatalogSearchTest",
+      "case": "nativeSharingUsesPhysicalKeysAndExcludesEphemeralOrAuthenticatedMediaUrls",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0
+    }
+  ],
+  "build": "Initial Debug 1m39s; added direct share-function/userinfo guard check, final Debug59s; phase2ar-share-function-final.log",
+  "moduleBoundaries": "passed for final sources",
+  "platformDomainViolations": 0,
+  "apk": {
+    "path": "build/outputs/unimusic/UniMusic-20261028-2AR-debug.apk",
+    "sha256": "5392582d2ec251feb51dcc1887dd68d215d39e8abe05d2b797bb63acdbeb84fa",
+    "bytes": 63025867
+  },
+  "device": {
+    "model": "Huawei Mate60 BRA-AL00",
+    "install": "adb install -r Success; retained user data; only Mate60 selected",
+    "installedVersion": "9ce8d1f21c41.dirty.10281917",
+    "discoverVisible": true,
+    "activeAudio": false
+  },
+  "ci": {
+    "2AQ": {
+      "run": 40678014543,
+      "conclusion": "success"
+    },
+    "2AP": {
+      "run": 40677250962,
+      "conclusion": "cancelled by newer push"
+    }
+  },
+  "notRun": [
+    "sending/sharing to another app or person",
+    "new positive audio/fallback/cache-hit acceptance",
+    "live account sync, device failure injection, latency/accuracy benchmark"
+  ]
+}

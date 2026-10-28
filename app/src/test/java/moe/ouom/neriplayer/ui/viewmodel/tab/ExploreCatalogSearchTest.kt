@@ -31,6 +31,18 @@ class ExploreCatalogSearchTest {
         assertNotEquals(playable.stableKey, catalog.stableKey)
     }
 
+    @Test fun nativeSharingUsesPhysicalKeysAndExcludesEphemeralOrAuthenticatedMediaUrls() {
+        val native = song(999L, "Fixture").copy(channelId = "qqmusic", audioId = "003OUlho2HcRHC", album = "NeteaseAlbum",
+            mediaUri = "https://cdn.example.test/a.mp3?signature=fixture", streamUrl = "https://cdn.example.test/private.mp3")
+        assertEquals("https://y.qq.com/n/ryqq/songDetail/003OUlho2HcRHC",
+            moe.ouom.neriplayer.util.media.buildRemoteSongShareUrl(native, emptyList()))
+        assertEquals("https://www.kuwo.cn/play_detail/42",
+            moe.ouom.neriplayer.util.media.buildRemoteSongShareUrl(native.copy(channelId = "KUWO", audioId = "42"), emptyList()))
+        assertNull(moe.ouom.neriplayer.util.media.buildRemoteSongShareUrl(native.copy(audioId = "invalid"), emptyList()))
+        assertFalse(moe.ouom.neriplayer.util.media.isShareablePublicHttpUrl("https://fixture:fixture@music.163.com/#/song?id=42"))
+        assertTrue(moe.ouom.neriplayer.util.media.isShareablePublicHttpUrl("https://music.163.com/#/song?id=42"))
+    }
+
     @Test fun externalNavigationRequiresTheExactOfficialPageAndCatalogCapability() {
         assertEquals("https://www.kuwo.cn/play_detail/1", catalogExternalPageUrl(track))
         listOf("http://www.kuwo.cn/play_detail/1", "javascript:alert(1)",
@@ -44,6 +56,7 @@ class ExploreCatalogSearchTest {
         assertEquals(qq.externalPageUrl, catalogExternalPageUrl(qq))
         assertNull(catalogExternalPageUrl(qq.copy(externalPageUrl = qq.externalPageUrl + "?redirect=elsewhere")))
         assertNull(catalogExternalPageUrl(track.copy(source = SongSourceKey("other", "1"))))
+        assertNull(catalogExternalPageUrl(track.copy(source = track.source.copy(recordingContext = "unknown"))))
     }
 
     @Test fun catalogIdentityKeepsSubresourceAndContextBoundaries() {

@@ -16,6 +16,19 @@ class SourceAvailabilityCheckerTest {
     private val candidate = RecordingSourceCandidate(SongSourceKey("bilibili", "10", "11"),
         UnifiedSongMetadata("晴天", "周杰伦", "叶惠美", 269_000))
 
+    @Test fun nativePublicPagesRequireExactPhysicalIdsAndSupportedContexts() {
+        assertEquals("https://www.kuwo.cn/play_detail/42", MusicSourceRegistry.publicPageUrl(SongSourceKey("kuwo", "42")))
+        assertEquals("https://y.qq.com/n/ryqq/songDetail/003OUlho2HcRHC",
+            MusicSourceRegistry.publicPageUrl(SongSourceKey("qqmusic", "003OUlho2HcRHC")))
+        for (id in listOf("042", "-42", "42?token=private", "../42", "9223372036854775808")) {
+            assertNull(MusicSourceRegistry.publicPageUrl(SongSourceKey("kuwo", id)))
+        }
+        assertNull(MusicSourceRegistry.publicPageUrl(SongSourceKey("qqmusic", "42")))
+        assertNull(MusicSourceRegistry.publicPageUrl(SongSourceKey("kuwo", "42", "1")))
+        assertNull(MusicSourceRegistry.publicPageUrl(SongSourceKey("kuwo", "42", recordingContext = "unknown")))
+        assertNull(MusicSourceRegistry.publicPageUrl(SongSourceKey("other", "42")))
+    }
+
     @Test fun anAdaptersOwnTimeoutIsACompletedCheckRatherThanACancelledCaller() = runTest {
         val result = checker.check(expected, candidate, true, true, false) {
             kotlinx.coroutines.withTimeout(10) { kotlinx.coroutines.awaitCancellation() }
