@@ -18,7 +18,7 @@
       "errors": 0
     }
   ],
-  "runtimeBiliTest": "Not executed locally; entire runtime test task requires absent JDK21. Existing remote JDK21 CI selects BiliRecordingMatchTest including the new case.",
+  "runtimeBiliTest": "Not executed locally (JDK21 absent); remote JDK21 run40674351163 passed and report XML confirms the new uploader case.",
   "initialCommand": "Task configuration failed for missing JDK21 before tests ran; resumed with supported local tasks",
   "build": "Debug passed in 1m35s; phase2an-artist-boundaries-final.log",
   "platformDomainViolations": 0,
@@ -30,7 +30,13 @@
   },
   "device": "Not reinstalled; remains on 2AL",
   "notRun": [
-    "new Bili uploader case until remote JDK21 CI",
     "real account/audio/accuracy/latency benchmarks"
-  ]
+  ],
+  "remoteCi": {
+    "run": 40674351163,
+    "head": "e202974a7fbcc2a4152b7e287b5147e372b95211",
+    "conclusion": "success",
+    "biliSuiteTests": 8,
+    "newCreditCaseVerified": true
+  }
 }

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="moe.ouom.neriplayer.core.player.resolver.netease.BiliRecordingMatchTest" tests="8" skipped="0" failures="0" errors="0" timestamp="2026-10-28T10:49:29.464Z" hostname="runnervm48cm3" time="0.103">
+  <properties/>
+  <testcase name="uploaderCreditBoundariesCannotStandInForADifferentArtist" classname="moe.ouom.neriplayer.core.player.resolver.netease.BiliRecordingMatchTest" time="0.037"/>
+  <testcase name="confirmedCidDisambiguatesOnlyTheSelectedCompatiblePage" classname="moe.ouom.neriplayer.core.player.resolver.netease.BiliRecordingMatchTest" time="0.009"/>
+  <testcase name="onlyActualAutoSourceFailuresTriggerCooldown" classname="moe.ouom.neriplayer.core.player.resolver.netease.BiliRecordingMatchTest" time="0.001"/>
+  <testcase name="previewDrmAndIncompleteStreamsAreNotFullSongSources" classname="moe.ouom.neriplayer.core.player.resolver.netease.BiliRecordingMatchTest" time="0.02"/>
+  <testcase name="titleMentionsCannotEstablishUploaderArtistEvidence" classname="moe.ouom.neriplayer.core.player.resolver.netease.BiliRecordingMatchTest" time="0.001"/>
+  <testcase name="genericSinglePartCanUseVideoTitleButArtistSubstringCannotMatch" classname="moe.ouom.neriplayer.core.player.resolver.netease.BiliRecordingMatchTest" time="0.015"/>
+  <testcase name="headerCannotRescueWrongVersionOrAmbiguousPages" classname="moe.ouom.neriplayer.core.player.resolver.netease.BiliRecordingMatchTest" time="0.006"/>
+  <testcase name="oneMatchingPageUsesItsOwnCidAndFullMetadata" classname="moe.ouom.neriplayer.core.player.resolver.netease.BiliRecordingMatchTest" time="0.011"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

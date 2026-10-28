@@ -10,6 +10,24 @@ import org.junit.Assert.*
 import org.junit.Test
 
 class PlaybackSourceResolverTest {
+    @Test fun recentPrimaryHintsExpireWithoutSlidingAndCannotCrossAccountsOrSources() {
+        var now = 0L
+        val hints = RecentPrimaryFailureHint { now }
+        val account = Any();val changed = Any()
+        hints.record("song", "qqmusic", account)
+        assertTrue(hints.recent("song", "qqmusic", account))
+        assertFalse(hints.recent("song", "kuwo", account));assertFalse(hints.recent("other", "qqmusic", account))
+        now = 9_999;assertTrue(hints.recent("song", "qqmusic", account))
+        now = 10_000;assertFalse(hints.recent("song", "qqmusic", account))
+        hints.record("song", "qqmusic", account)
+        assertFalse(hints.recent("song", "qqmusic", changed));assertFalse(hints.recent("song", "qqmusic", account))
+        hints.record("song", "qqmusic", changed);hints.clear("song", "qqmusic", account)
+        assertTrue(hints.recent("song", "qqmusic", changed))
+        hints.clear("song", "qqmusic", changed);assertFalse(hints.recent("song", "qqmusic", changed))
+        for (i in 0..64) hints.record("song-$i", "kuwo", account)
+        assertFalse(hints.recent("song-0", "kuwo", account));assertTrue(hints.recent("song-64", "kuwo", account))
+    }
+
     @Test fun staleContextFailuresHaveNoAutomaticMappingOrCooldownSideEffects() {
         for (failure in SourceFailure.entries) {
             val action = automaticSourceFailureAction(failure, contextCurrent = false)

@@ -1,0 +1,43 @@
+{
+  "phase": "2AO",
+  "date": "2026-10-28",
+  "newJvmTests": 1,
+  "relatedJvmTests": 1,
+  "failures": 0,
+  "errors": 0,
+  "build": "Debug passed in 57s; phase2ao-recent-primary-failure.log",
+  "moduleBoundaries": "passed for current sources including 2AL/2AM/2AN/2AO",
+  "apk": {
+    "path": "build/outputs/unimusic/UniMusic-20261028-2AO-debug.apk",
+    "sha256": "ae5d0d8731433fee50aab4f05158444f49ba4b85c3a649f3d44588050578034e",
+    "bytes": 63024871
+  },
+  "device": {
+    "model": "Huawei Mate60 BRA-AL00",
+    "install": "adb install -r Success; user data retained; only authorized Mate60 selected",
+    "installedVersion": "e202974a7fbc.dirty.10281845",
+    "discoverVisible": true,
+    "activeAudio": false
+  },
+  "ci": {
+    "2AN": {
+      "run": 40674351163,
+      "conclusion": "success",
+      "remoteBiliTests": 8,
+      "newCreditBoundaryCaseConfirmedInXml": true
+    },
+    "2AM": {
+      "run": 40673434202,
+      "conclusion": "success"
+    },
+    "2AL": {
+      "run": 40672256267,
+      "conclusion": "cancelled by newer push"
+    }
+  },
+  "notRun": [
+    "real duplicate primary request/latency or first-audio comparison",
+    "new positive source fallback/cache-hit audio acceptance",
+    "new account/cloud/migration tests"
+  ]
+}

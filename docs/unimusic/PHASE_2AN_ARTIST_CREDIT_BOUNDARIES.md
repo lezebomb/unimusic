@@ -7,3 +7,5 @@
 新增3项检查，本机新2/共4项通过：合唱/单人隔离、顺序/标点兼容及既有歌名/歌手/时长门槛；模拟旧算法已保存的错误歌手映射，现在不再自动使用，但观察、UUID和数据仍保留。B站新增上传者边界检查因整个runtime测试任务要求本机没有的JDK21未执行，交现有远端JDK21套件；初始命令在配置阶段失败，没有冒称执行通过。纠正任务后平台0违规、Debug 1分35秒成功。
 
 Room仍v23、不改schema或清数据；旧映射即使算法版本未变，也在读取current时复核新门槛。未新装机/线上/准确率或性能验收，手机仍2AL。[本机实际证据、XML及APK哈希](evidence/2026-10-28/phase2an/validation.json)。
+
+后续确认：2AN远端CI40674351163成功，JDK21的BiliRecordingMatchTest报告共8项/0失败，新增上传者署名边界用例已在XML中核实。仍未在本机JDK17执行，未改变本机4项记录，详见evidence中的REMOTE-TEST-BiliRecordingMatchTest.xml。

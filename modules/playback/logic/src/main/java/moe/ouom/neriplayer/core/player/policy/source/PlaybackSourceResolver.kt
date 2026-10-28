@@ -63,6 +63,33 @@ class SourceFailureCooldown(private val now: () -> Long = { System.nanoTime() / 
     }
 }
 
+/** Ten-second scheduling hint after a failed primary and successful alternate, never a rights/audio cache. */
+class RecentPrimaryFailureHint(private val nowMillis: () -> Long = { System.nanoTime() / 1_000_000 }) {
+    private data class Key(val request: String, val source: String)
+    private data class Entry(val session: Any, val observedAt: Long)
+    private val entries = LinkedHashMap<Key, Entry>()
+
+    @Synchronized fun record(request: String, source: String, session: Any) {
+        val now = nowMillis()
+        entries.entries.removeAll { now - it.value.observedAt !in 0 until 10_000 }
+        entries[Key(request, source)] = Entry(session, now)
+        while (entries.size > 64) entries.remove(entries.keys.first())
+    }
+
+    @Synchronized fun recent(request: String, source: String, session: Any): Boolean {
+        val key = Key(request, source)
+        val value = entries[key] ?: return false
+        if (value.session == session && nowMillis() - value.observedAt in 0 until 10_000) return true
+        entries.remove(key)
+        return false
+    }
+
+    @Synchronized fun clear(request: String, source: String, session: Any) {
+        val key = Key(request, source)
+        if (entries[key]?.session == session) entries.remove(key)
+    }
+}
+
 class PlaybackSourceResolver(private val cooldown: SourceFailureCooldown = SourceFailureCooldown()) {
     suspend fun <T> resolve(
         request: String,

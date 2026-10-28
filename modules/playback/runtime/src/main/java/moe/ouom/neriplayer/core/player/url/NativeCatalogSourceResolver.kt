@@ -20,6 +20,8 @@ import moe.ouom.neriplayer.data.model.unified.*
 import moe.ouom.neriplayer.data.unified.SourceMatchBackend
 import moe.ouom.neriplayer.data.unified.sourceCandidateForSong
 
+private val recentNativePrimaryFailures = RecentPrimaryFailureHint()
+
 internal suspend fun PlayerManager.resolveNativeCatalogSource(subject: SongItem,
     candidate: RecordingSourceCandidate): SourceAttempt<SongUrlResult.Success> {
     val source = candidate.key
@@ -55,18 +57,47 @@ internal suspend fun PlayerManager.resolveNativeCatalogSource(subject: SongItem,
 
 internal suspend fun PlayerManager.resolveNativeCatalogPlayback(song: SongItem, candidate: RecordingSourceCandidate,
     resolverSideEffects: RefreshResolverSideEffects): SongUrlResult {
+    val requestKey = song.stableKey()
+    val sourceKey = candidate.key.toString()
+    suspend fun remembered(): SongUrlResult.Success? = try {
+        tryResolveAutomaticSource(song, resolverSideEffects, local = neteaseLocalSourceFallbackEnabled, online = true)
+    } catch (cancelled: CancellationException) { throw cancelled }
+    catch (_: Exception) { null } // A temporary projection error must not prevent primary/fresh discovery.
+    var rememberedTried = false
+    val hintSession = sourceResolutionSession(candidate.key.provider)
+    if (neteaseAutoSourceSwitchEnabled && recentNativePrimaryFailures.recent(requestKey, sourceKey, hintSession)) {
+        rememberedTried = true
+        remembered()?.let { ready ->
+            if (hintSession == sourceResolutionSession(candidate.key.provider) && neteaseAutoSourceSwitchEnabled) return ready
+        }
+    }
+    val primarySession = sourceResolutionSession(candidate.key.provider)
     val primary = try {
         withTimeoutOrNull(sourceStageBudgetMs(3_000, 5_000).coerceAtLeast(1)) { resolveNativeCatalogSource(song, candidate) }
-    } catch (cancelled: CancellationException) { currentCoroutineContext().ensureActive();null }
-    catch (_: Exception) { null }
-    if (primary is SourceAttempt.Ready) return primary.value
-    if (neteaseAutoSourceSwitchEnabled) {
-        try {
-            tryResolveAutomaticSource(song, resolverSideEffects, local = neteaseLocalSourceFallbackEnabled, online = true)?.let { return it }
-        } catch (cancelled: CancellationException) { throw cancelled }
-        catch (_: Exception) { /* A temporarily unavailable projection must not prevent fresh discovery. */ }
-        tryResolveNativeCatalogAlternate(song, resolverSideEffects)?.let { return it }
+            ?: SourceAttempt.Rejected(SourceFailure.TIMEOUT)
+    } catch (cancelled: CancellationException) {
+        currentCoroutineContext().ensureActive();SourceAttempt.Rejected(SourceFailure.UNAVAILABLE)
+    } catch (_: java.net.SocketTimeoutException) { SourceAttempt.Rejected(SourceFailure.TIMEOUT) }
+    catch (_: java.io.IOException) { SourceAttempt.Rejected(SourceFailure.NETWORK) }
+    catch (_: Exception) { SourceAttempt.Rejected(SourceFailure.UNAVAILABLE) }
+    if (primary is SourceAttempt.Ready && primarySession == sourceResolutionSession(candidate.key.provider)) {
+        recentNativePrimaryFailures.clear(requestKey, sourceKey, primarySession)
+        return primary.value
     }
+    if (neteaseAutoSourceSwitchEnabled) {
+        val alternate = (if (!rememberedTried) remembered() else null)
+            ?: tryResolveNativeCatalogAlternate(song, resolverSideEffects)
+        if (alternate != null) {
+            val reason = (primary as? SourceAttempt.Rejected)?.reason
+            if (primarySession == sourceResolutionSession(candidate.key.provider) && reason in setOf(
+                    SourceFailure.AUTH_REQUIRED, SourceFailure.NO_PERMISSION, SourceFailure.NETWORK,
+                    SourceFailure.TIMEOUT, SourceFailure.UNAVAILABLE)) {
+                recentNativePrimaryFailures.record(requestKey, sourceKey, primarySession)
+            }
+            return alternate
+        }
+    }
+    recentNativePrimaryFailures.clear(requestKey, sourceKey, primarySession)
     resolverSideEffects.emitError { postPlayerEvent(moe.ouom.neriplayer.data.model.playback.PlayerEvent.ShowError(
         if (primary is SourceAttempt.Rejected && primary.reason == SourceFailure.AUTH_REQUIRED) "此音源需要登录，请在设置中登录 QQ 音乐"
         else "当前账号无完整播放权限，或音源暂时不可用")) }
