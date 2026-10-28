@@ -5,8 +5,29 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.test.runCurrent
 
 class ExploreSearchPaginationTest {
+
+    @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
+    @Test fun foregroundPlaybackCancelsProbeLockHolderWithoutRestartingOnLateMetadata() = kotlinx.coroutines.test.runTest {
+        val owner = moe.ouom.neriplayer.ui.viewmodel.tab.search.ExploreNativeProbeOwner()
+        val sessionLock = kotlinx.coroutines.sync.Mutex()
+        assertTrue(owner.claim("kuwo"))
+        val probe = launch { sessionLock.withLock { kotlinx.coroutines.awaitCancellation() } }
+        owner.track(probe);runCurrent();assertTrue(sessionLock.isLocked)
+        owner.yieldToPlayback()
+        var playbackEntered = false
+        val playback = launch { sessionLock.withLock { playbackEntered = true } }
+        runCurrent();assertTrue(probe.isCancelled);assertTrue(playbackEntered);playback.join()
+        assertFalse(owner.claim("qqmusic"));assertTrue(owner.isClaimed("kuwo"))
+        val lateProbe = kotlinx.coroutines.Job();owner.track(lateProbe);assertTrue(lateProbe.isCancelled)
+        // A new explicit query restores discovery without affecting the caller's scope.
+        owner.reset();assertTrue(owner.claim("kuwo"));assertTrue(owner.claim("qqmusic"))
+        assertTrue(kotlinx.coroutines.currentCoroutineContext()[kotlinx.coroutines.Job]!!.isActive)
+    }
 
     @Test fun feedLoadsCoalesceAndOldCompletionCannotClearTheReplacement() {
         val gate = ExplorePlaylistRequestGate()

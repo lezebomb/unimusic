@@ -1,0 +1,29 @@
+{
+  "phase": "2AM",
+  "date": "2026-10-28",
+  "newJvmTests": 1,
+  "relatedJvmTests": 1,
+  "failures": 0,
+  "errors": 0,
+  "build": "Debug passed in 1m11s; phase2am-playback-priority.log",
+  "apk": {
+    "path": "build/outputs/unimusic/UniMusic-20261028-2AM-debug.apk",
+    "sha256": "1250c674fc1ce9c480d78565c10260fd1e770e038a04c70201c778f86e71f19f",
+    "bytes": 63020063
+  },
+  "ci": {
+    "2AK": {
+      "run": 40671124870,
+      "conclusion": "success"
+    },
+    "2AL": {
+      "run": 40672256267,
+      "status": "in_progress"
+    }
+  },
+  "device": "Not reinstalled; Mate60 remains on 2AL",
+  "notRun": [
+    "actual network lock contention or first-audio benchmark",
+    "new device/account/audio tests"
+  ]
+}

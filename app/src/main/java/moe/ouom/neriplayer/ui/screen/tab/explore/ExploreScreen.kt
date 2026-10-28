@@ -958,7 +958,10 @@ fun ExploreScreen(
                                     when (item) {
                                         is ExploreSearchResult.Catalog -> CatalogSearchResultRow(item.track,
                                             check = ui.nativeSourceChecks[item.track.source]) { track ->
-                                            moe.ouom.neriplayer.data.unified.catalogPlaybackSong(track)?.let { onSongClick(listOf(it), 0) }
+                                            moe.ouom.neriplayer.data.unified.catalogPlaybackSong(track)?.let {
+                                                vm.prepareForSearchPlayback()
+                                                onSongClick(listOf(it), 0)
+                                            }
                                         }
                                         is ExploreSearchResult.Song -> {
                                             val song = item.song
@@ -976,6 +979,7 @@ fun ExploreScreen(
                                                 ),
                                                 actions = ExploreSongRowActions(
                                                     onClick = {
+                                                        vm.prepareForSearchPlayback()
                                                         if (shouldShowBiliPartsPicker(song)) {
                                                             scope.launch {
                                                                 try {
@@ -1007,7 +1011,7 @@ fun ExploreScreen(
                                                             )
                                                         }
                                                     },
-                                                    onPlayNow = { onSongPlayPreservingQueue(song) },
+                                                    onPlayNow = { vm.prepareForSearchPlayback(); onSongPlayPreservingQueue(song) },
                                                     onPlayNext = { onSongPlayNext(song) },
                                                     onAddToQueueEnd = { onSongAddToQueueEnd(song) },
                                                     onDownload = {

@@ -23,6 +23,7 @@ package moe.ouom.neriplayer.ui.viewmodel.tab
  * Created: 2025/8/11
  */
 
+import moe.ouom.neriplayer.ui.viewmodel.tab.search.ExploreNativeProbeOwner
 import moe.ouom.neriplayer.ui.viewmodel.tab.search.requireExploreSearchNetwork
 import moe.ouom.neriplayer.core.player.persistence.toSongItem
 import android.app.Application
@@ -341,8 +342,7 @@ class ExploreViewModel(application: Application) : AndroidViewModel(application)
     private val aggregateCache = FirstSearchPageCache<ExploreSearchResult>()
     private var aggregateEngine: FederatedSearchEngine<ExploreSearchResult>? = null
     private var aggregateRanker: ExploreSearchRankingSession? = null
-    private val nativeProbeJobs = mutableListOf<Job>()
-    private val nativeProbedProviders = mutableSetOf<String>()
+    private val nativeProbes = ExploreNativeProbeOwner()
     private var searchAccountContext = neteaseClient.searchSessionIdentity()
 
     private val _uiState = MutableStateFlow(ExploreUiState())
@@ -702,12 +702,12 @@ class ExploreViewModel(application: Application) : AndroidViewModel(application)
     /** Two providers run independently; a failed first result advances to the next, within 4.5s each. */
     private fun probeNativeSources(items: List<ExploreSearchResult>, requestVersion: Long, ranker: ExploreSearchRankingSession) {
         for (provider in listOf("qqmusic", "kuwo")) {
-            if (provider in nativeProbedProviders) continue
+            if (nativeProbes.isClaimed(provider)) continue
             val tracks = items.filterIsInstance<ExploreSearchResult.Catalog>()
                 .filter { it.track.source.provider == provider }.take(3).map { it.track }
             if (tracks.isEmpty()) continue
-            nativeProbedProviders += provider
-            nativeProbeJobs += viewModelScope.launch {
+            if (!nativeProbes.claim(provider)) continue
+            nativeProbes.track(viewModelScope.launch {
                 val revision = AppContainer.qqMusicAuthRepo.generation()
                 val deadline = android.os.SystemClock.elapsedRealtime() + 4_500
                 for (track in tracks) {
@@ -744,9 +744,12 @@ class ExploreViewModel(application: Application) : AndroidViewModel(application)
                     }
                     if (result.status == moe.ouom.neriplayer.data.model.unified.SourceCheckStatus.ADDRESS_RESOLVED) break
                 }
-            }
+            })
         }
     }
+
+    /** A foreground play action takes priority over speculative source checks for this query. */
+    fun prepareForSearchPlayback() = nativeProbes.yieldToPlayback()
 
     private fun restartAggregateSearch() {
         val state = _uiState.value
@@ -845,7 +848,7 @@ class ExploreViewModel(application: Application) : AndroidViewModel(application)
     }
 
     private fun invalidateSearchRequest(): Long {
-        nativeProbeJobs.forEach { it.cancel() }; nativeProbeJobs.clear(); nativeProbedProviders.clear()
+        nativeProbes.reset()
         searchRequestVersion += 1
         return searchRequestVersion
     }
