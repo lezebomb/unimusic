@@ -1,0 +1,38 @@
+{
+  "phase": "2AU",
+  "build": {
+    "log": "build/unimusic-toolchain/phase2au-feedback-build.log",
+    "outcome": "BUILD SUCCESSFUL",
+    "seconds": 95
+  },
+  "resources": {
+    "defaultAndChineseKeysMatch": true,
+    "count": 9
+  },
+  "apk": {
+    "archive": "build/outputs/unimusic/UniMusic-20261028-2AU-debug.apk",
+    "sha256": "597e2cb97232dbd49426e142241622733fd95fa52ba8ca3fa0a997909928d777",
+    "installedVersion": "c3dfd7178397.dirty.10282156",
+    "installation": "adb Success plus package version; data preserved"
+  },
+  "additionalUnitTestsRun": 0,
+  "preceding2ATManualSearchClick": {
+    "query": "Canon",
+    "chosenCredit": "Johann Pachelbel / Silence 2",
+    "permissionDialog": false,
+    "noAddressDialog": false,
+    "playingState": 3,
+    "positionSamplesMs": [
+      6190,
+      96059,
+      98082
+    ],
+    "twoLaterSamplesSeparatedAboutMs": 2000,
+    "pausedAfterCheck": true
+  },
+  "notExecuted": [
+    "No phone network/session/permission fault injection for the new error-message branches",
+    "No new account login or QQ full-audio acceptance",
+    "No first-sound/statistical performance claim"
+  ]
+}

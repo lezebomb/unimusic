@@ -33,16 +33,18 @@ internal suspend fun PlayerManager.getNeteaseSongUrl(
         var previewFallback: SongUrlResult.Success? = null
         var lastFailureReason: NeteasePlaybackResponseParser.FailureReason? = null
         var requiresLogin = false
+        var primaryTimedOut = false
         val primaryBudget = sourceStageBudgetMs(2_500, 8_000)
         if (primaryBudget <= 0) return@withContext SongUrlResult.Failure
         val deadline = SystemClock.elapsedRealtime() + primaryBudget
 
         for ((index, quality) in qualityCandidates.withIndex()) {
             val remainingMs = deadline - SystemClock.elapsedRealtime()
-            if (remainingMs <= 0L) break
+            if (remainingMs <= 0L) { primaryTimedOut = true; break }
             val resp = withTimeoutOrNull(minOf(sourceStageBudgetMs(1_500, 3_000), remainingMs)) {
                 neteaseClient.getSongDownloadUrlCancellable(song.id, level = quality)
-            } ?: break
+            }
+            if (resp == null) { primaryTimedOut = true; break }
             NPLogger.d("NERI-PlayerManager", "Netease URL response: id=${song.id}, requestedQuality=$quality")
 
             when (val parsed = NeteasePlaybackResponseParser.parsePlayback(resp, song.durationMs)) {
@@ -125,12 +127,12 @@ internal suspend fun PlayerManager.getNeteaseSongUrl(
             previewFallback?.let { return@withContext it }
         }
 
-        if (requiresLogin) {
+        if (requiresLogin && !primaryTimedOut) {
             return@withContext SongUrlResult.RequiresLogin
         }
 
         if (!suppressError) {
-            val messageRes = when (lastFailureReason) {
+            val messageRes = if (primaryTimedOut) CoreCommonR.string.unimusic_source_request_timeout else when (lastFailureReason) {
                 NeteasePlaybackResponseParser.FailureReason.NO_PERMISSION ->
                     CoreCommonR.string.player_netease_no_permission_switch_platform
                 NeteasePlaybackResponseParser.FailureReason.NO_PLAY_URL,
@@ -152,10 +154,11 @@ internal suspend fun PlayerManager.getNeteaseSongUrl(
             sideEffects.emitError {
                 postPlayerEvent(
                     PlayerEvent.ShowError(
-                        getLocalizedString(
-                            CoreCommonR.string.player_playback_url_error_detail,
-                            e.javaClass.simpleName
-                        )
+                        getLocalizedString(when (e) {
+                            is java.net.SocketTimeoutException -> CoreCommonR.string.unimusic_source_request_timeout
+                            is java.io.IOException -> CoreCommonR.string.player_playback_network_error
+                            else -> CoreCommonR.string.error_no_play_url
+                        })
                     )
                 )
             }

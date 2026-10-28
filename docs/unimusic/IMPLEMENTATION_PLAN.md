@@ -209,3 +209,5 @@ Phase 1 的工具链与 Room 数据保留前置条件已满足。
 2026-10-28补充：2AS一次生产酷我匿名桌面探测返回正常地址并收到HTTP206/8KiB音频头；默认不启用时跳过，非手机/完整解码验收，不改网络设置；见[2AS](PHASE_2AS_DESKTOP_KUWO_TRANSPORT.md)。
 
 2026-10-28补充：2AT复现系统浏览器也断网，用户换网后酷我/网易云真实解码；补酷我HTTP401/403单次正常会话刷新与取消Cookie隔离，4 JVM/领域0违规/边界/Debug/保留数据安装及新包酷我复验通过；权限受限曲目仍可能拒绝。见[2AT](PHASE_2AT_DEVICE_NETWORK_AND_SESSION_RECOVERY.md)。
+
+2026-10-28补充：2AU细分音源失败原因及网易云降档超时归因，Debug及保留数据安装通过；2AT另有实际聚合搜索点击/进度增加证据。见[2AU](PHASE_2AU_PLAYBACK_FAILURE_FEEDBACK.md)。

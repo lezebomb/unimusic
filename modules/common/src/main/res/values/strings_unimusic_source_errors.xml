@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="unimusic_source_request_timeout">The audio source request timed out. Check your connection and retry.</string>
+    <string name="unimusic_source_qq_login">This source requires QQ Music login. Sign in from Settings and retry.</string>
+    <string name="unimusic_source_session_changed">The source session changed. Please retry.</string>
+    <string name="unimusic_source_no_full_permission">This source does not currently grant full playback. Sign in to the platform or find the same recording from Sources.</string>
+    <string name="unimusic_source_preview_only">This source only provides a preview. Find a full version of the same recording from Sources.</string>
+    <string name="unimusic_source_recording_mismatch">The recording metadata or version does not match. Select a source from Sources.</string>
+    <string name="unimusic_source_external_player">This source requires its official player.</string>
+    <string name="unimusic_source_url_expired">The audio address expired. Please retry.</string>
+    <string name="unimusic_source_unavailable">This audio source is unavailable. Retry later or select another source.</string>
+</resources>

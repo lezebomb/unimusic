@@ -1,5 +1,6 @@
 package moe.ouom.neriplayer.core.player.url
 
+import moe.ouom.neriplayer.common.R as CoreCommonR
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
@@ -115,9 +116,20 @@ internal suspend fun PlayerManager.resolveNativeCatalogPlayback(song: SongItem, 
         }
     }
     recentNativePrimaryFailures.clear(requestKey, sourceKey, primarySession)
+    val message = when ((primary as? SourceAttempt.Rejected)?.reason) {
+        SourceFailure.NETWORK -> CoreCommonR.string.player_playback_network_error
+        SourceFailure.TIMEOUT -> CoreCommonR.string.unimusic_source_request_timeout
+        SourceFailure.AUTH_REQUIRED -> if (candidate.key.provider == "qqmusic")
+            CoreCommonR.string.unimusic_source_qq_login else CoreCommonR.string.unimusic_source_session_changed
+        SourceFailure.NO_PERMISSION -> CoreCommonR.string.unimusic_source_no_full_permission
+        SourceFailure.PREVIEW_ONLY -> CoreCommonR.string.unimusic_source_preview_only
+        SourceFailure.NO_MATCH, SourceFailure.AMBIGUOUS -> CoreCommonR.string.unimusic_source_recording_mismatch
+        SourceFailure.EXTERNAL_PLAYER_REQUIRED -> CoreCommonR.string.unimusic_source_external_player
+        SourceFailure.URL_EXPIRED -> CoreCommonR.string.unimusic_source_url_expired
+        else -> CoreCommonR.string.unimusic_source_unavailable
+    }
     resolverSideEffects.emitError { postPlayerEvent(moe.ouom.neriplayer.data.model.playback.PlayerEvent.ShowError(
-        if (primary is SourceAttempt.Rejected && primary.reason == SourceFailure.AUTH_REQUIRED) "此音源需要登录，请在设置中登录 QQ 音乐"
-        else "当前账号无完整播放权限，或音源暂时不可用")) }
+        getLocalizedString(message))) }
     return SongUrlResult.Failure
 }
 
