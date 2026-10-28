@@ -11,6 +11,8 @@ import java.util.Locale
 internal const val NETEASE_ALBUM_PREFIX = "Netease"
 
 internal fun resolveNeteaseSongId(song: SongItem): Long? {
+    // Native catalog Long IDs are local UUID hashes; cover/lyric hints do not establish a NetEase identity.
+    if (song.channelId.equals("qqmusic", ignoreCase = true) || song.channelId.equals("kuwo", ignoreCase = true)) return null
     resolveNeteaseAudioId(song)?.let { return it }
     val songId = song.id.takeIf { it > 0 } ?: return null
     if (song.hasNeteaseSongSource()) {

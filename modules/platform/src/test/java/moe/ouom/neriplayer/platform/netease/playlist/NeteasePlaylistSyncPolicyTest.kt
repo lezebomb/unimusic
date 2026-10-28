@@ -18,6 +18,24 @@ class NeteasePlaylistSyncPolicyTest {
     @get:Rule
     val tempFolder = TemporaryFolder()
 
+    @Test fun nativeCatalogIdsCannotBecomeNeteaseFavoritesThroughCoverAlbumOrLyricHints() {
+        val original = song(id = 11L)
+        for (provider in listOf("qqmusic", "kuwo", "QQMUSIC", "KUWO")) {
+            for (id in listOf(42L, -42L)) {
+                val native = original.copy(id = id, channelId = provider,
+                    audioId = if (provider.equals("kuwo", true)) "9" else "003OUlho2HcRHC",
+                    album = "NeteaseAlbum", coverUrl = "https://p1.music.126.net/cover.jpg",
+                    originalCoverUrl = "https://p2.music.126.net/cover.jpg",
+                    matchedLyricSource = MusicPlatform.CLOUD_MUSIC, matchedSongId = "77")
+                assertNull(resolveNeteaseSongId(native))
+                val summary = buildLocalNeteaseCandidates(listOf(native, original))
+                assertEquals(listOf(11L), summary.candidates.map { it.neteaseId })
+                assertEquals(1, summary.supportedSongs);assertEquals(1, summary.skippedUnsupported)
+                assertEquals(id, native.id) // No local identity or metadata mutation.
+            }
+        }
+    }
+
     @Test
     fun `bulk netease candidate filtering preserves duplicate original rows`() {
         val sync = NeteasePlaylistSync(noPause) { null }

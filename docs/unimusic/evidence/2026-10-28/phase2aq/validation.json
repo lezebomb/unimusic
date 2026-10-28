@@ -1,0 +1,20 @@
+{
+  "phase": "2AQ",
+  "date": "2026-10-28",
+  "newJvmTests": 1,
+  "relatedJvmTests": 3,
+  "failures": 0,
+  "errors": 0,
+  "platformDomainViolations": 0,
+  "build": "Debug passed in 1m8s; phase2aq-native-favorite-identity.log",
+  "apk": {
+    "path": "build/outputs/unimusic/UniMusic-20261028-2AQ-debug.apk",
+    "sha256": "6a0b2d669d09b6f1fa9e0145b7afc9347f8e7fb4e936f84d8e266166afb8f013",
+    "bytes": 63025691
+  },
+  "device": "Not reinstalled; remains on 2AO",
+  "notRun": [
+    "live NetEase favorites/playlist upload (no remote account mutation performed)",
+    "new device/account/audio/migration tests"
+  ]
+}
