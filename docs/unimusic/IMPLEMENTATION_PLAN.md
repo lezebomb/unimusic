@@ -179,3 +179,5 @@
 4. 实际账号/平台授权仅用于线上验收，不阻塞 Fake provider 开发；任何平台暂不可接入时明确标记其 capability 与降级方式。
 
 Phase 1 的工具链与 Room 数据保留前置条件已满足。
+
+2026-10-28补充：4H已完成发现分类选中语义及Mate60逐项检查，Debug/保留数据覆盖安装成功；2AF/2AE CI成功。实际边界见[4H报告](PHASE_4H_GENRE_SELECTION_SEMANTICS.md)。

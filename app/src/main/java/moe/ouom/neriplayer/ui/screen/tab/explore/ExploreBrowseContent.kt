@@ -45,6 +45,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -194,6 +196,7 @@ internal fun ExploreTagChip(
     icon: ImageVector? = null
 ) {
     ExploreGlassPillSurface(
+        modifier = Modifier.semantics { this.selected = selected },
         fallbackColor = tagContainerColor(selected, selectedAlpha, unselectedAlpha),
         tintColor = tagTintColor(selected),
         contentColor = tagContentColor(selected),

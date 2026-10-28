@@ -1,0 +1,46 @@
+{
+  "phase": "4H",
+  "date": "2026-10-28",
+  "build": "Debug passed in 38s; phase4h-genre-selection-semantics.log",
+  "newJvmTests": 0,
+  "device": "Huawei Mate60 BRA-AL00",
+  "install": "adb install -r Success; user data preserved",
+  "installedVersion": "de169c6fa860.dirty.10281540",
+  "apk": {
+    "path": "build/outputs/unimusic/UniMusic-20261028-4H-debug.apk",
+    "sha256": "855b083b87cc6f4a04772ebce16e00d8a18de94e4bdcbbb77d0c23925aeceb45",
+    "bytes": 63002339
+  },
+  "categoryCheckedStates": {
+    "pop": {
+      "all": false,
+      "pop": true,
+      "chinese": false
+    },
+    "chinese": {
+      "all": false,
+      "pop": false,
+      "chinese": true
+    },
+    "all": {
+      "all": true,
+      "pop": false,
+      "chinese": false
+    }
+  },
+  "activeAudioAfterCheck": false,
+  "ci": {
+    "2AF": {
+      "run": 40649825254,
+      "conclusion": "success"
+    },
+    "2AE": {
+      "run": 40638348465,
+      "conclusion": "success"
+    }
+  },
+  "notRun": [
+    "request count or real latency before-after benchmark",
+    "new account/audio/migration tests"
+  ]
+}

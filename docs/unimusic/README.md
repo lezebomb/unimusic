@@ -13,7 +13,7 @@
 | 搜索/备用来源 | [2R](PHASE_2R_EXPLICIT_VERSION_AND_VOICE_GATES.md)保守原唱/版本门槛、[2T](PHASE_2T_SELECTIVE_SEARCH_RETRY.md)单源重试、[2W](PHASE_2W_SEARCH_TIMINGS.md)分来源计时、[2X](PHASE_2X_SOURCE_FAILURE_ISOLATION.md)失败隔离、[2AD](PHASE_2AD_PARALLEL_REMEMBERED_SOURCES.md)缓存在线源并行、[2AE](PHASE_2AE_NATIVE_COOLDOWN_GUARD.md)原生故障冷却；不承诺未测的速度/原唱准确率 |
 | 后台计算 | [2U](PHASE_2U_CURRENT_SEARCH_EVIDENCE.md)并发证据、[2V](PHASE_2V_PREPARED_SEARCH_QUERY.md)查询复用、[2Y](PHASE_2Y_BACKGROUND_ONLINE_PAGES.md)在线页后台解析、[2Z](PHASE_2Z_COOPERATIVE_SEARCH_CANCELLATION.md)协作取消、[2AA](PHASE_2AA_NETEASE_SEARCH_SESSION.md)账号查询恢复 |
 | 推荐/同步 | 3A～3C本机隐藏/反馈/清除；[3D.8](PHASE_3D8_GITHUB_IDENTITY_SYNC.md)GitHub/WebDAV歌曲身份/元数据子集与冲突选择，真实双设备/上传/Media3采样仍未验收 |
-| 设备/CI | [4G](PHASE_4G_DEVICE_SEARCH_AND_RETRY.md)Mate60单次聚合搜索与失败源重试；最新2AE包已安装、启动可见。2AD远端CI成功，2AE新CI待确认 |
+| 设备/CI | [4G](PHASE_4G_DEVICE_SEARCH_AND_RETRY.md)Mate60单次聚合搜索与失败源重试；[4H](PHASE_4H_GENRE_SELECTION_SEMANTICS.md)分类选中语义、最新4H已装；2AD/2AE/2AF远端CI成功 |
 
 各报告明确区分合成测试、构建、地址校验和真实音频；新标识同步不上传账号/本地路径/播放权限，不重写旧库ID、关系和显示字段。保留已登录账户与歌单，禁止destructive migration。工具链复用及未执行项见检查点。
 
