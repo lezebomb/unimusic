@@ -1,0 +1,8 @@
+<testsuite name="moe.ouom.neriplayer.ui.viewmodel.tab.search.ExploreSearchArtistIntentTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-10-29T23:49:33.351Z" hostname="local" time="0.422">
+  <properties />
+  <testcase name="workQueryRestoresCreditedBandSongsAheadOfLiteralCoversAndResourcePromotions" classname="moe.ouom.neriplayer.ui.viewmodel.tab.search.ExploreSearchArtistIntentTest" time="0.238" />
+  <testcase name="optionalArtistLookupRejectsOldContextAndPropagatesActualCancellation" classname="moe.ouom.neriplayer.ui.viewmodel.tab.search.ExploreSearchArtistIntentTest" time="0.17" />
+  <testcase name="repeatedArtistLookupsSurviveTransientFailuresWhileSongPagesStayFreshAndContextsExpire" classname="moe.ouom.neriplayer.ui.viewmodel.tab.search.ExploreSearchArtistIntentTest" time="0.012" />
+  <system-out />
+  <system-err />
+</testsuite>

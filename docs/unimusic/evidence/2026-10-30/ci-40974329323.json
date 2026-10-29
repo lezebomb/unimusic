@@ -1,0 +1,36 @@
+{
+  "runId": 40974329323,
+  "head": "7561fcdf112dd521c96efbc6a733fb99da2f4d40",
+  "conclusion": "success",
+  "androidAdditiveMigration": "success",
+  "mandatoryDomainCheck": "success",
+  "actualXmlSummary": {
+    "BiliStreamCredentialInterceptorTest": {
+      "tests": 2,
+      "failures": 0,
+      "skipped": 0
+    },
+    "DatabaseUpgradeInstrumentedTest": {
+      "tests": 3,
+      "failures": 0,
+      "skipped": 0
+    },
+    "ExploreSearchArtistIntentTest": {
+      "tests": 12,
+      "failures": 0,
+      "skipped": 0
+    },
+    "PlaybackFeedbackTrackerTest": {
+      "tests": 4,
+      "failures": 0,
+      "skipped": 0
+    },
+    "UnifiedLibraryMigrationTest": {
+      "tests": 1,
+      "failures": 0,
+      "skipped": 0
+    }
+  },
+  "deduplication": "class and test name",
+  "limits": "Covers2BO; normal API regression2BP and cache2BQ are later, not claimed here"
+}

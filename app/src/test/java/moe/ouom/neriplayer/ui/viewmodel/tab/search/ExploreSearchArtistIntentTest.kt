@@ -74,6 +74,35 @@ class ExploreSearchArtistIntentTest {
         assertNotNull(inferSearchArtistIntent(real.artist.name, emptyList(), listOf(real)))
     }
 
+    @Test fun repeatedArtistLookupsSurviveTransientFailuresWhileSongPagesStayFreshAndContextsExpire() = runTest {
+        var nanos = 0L
+        var artistCalls = 0
+        var songCalls = 0
+        val artists = createArtistIntentPageCache<String> { nanos }
+        val songs = moe.ouom.neriplayer.common.search.FirstSearchPageCache<String>(monotonicNanos = { nanos })
+        suspend fun songPage() = songs.load("netease", "AC/DC", null) {
+            songCalls++; moe.ouom.neriplayer.common.search.SearchPage(listOf("song-$songCalls"))
+        }
+        suspend fun artistPage(fail: Boolean = false) = launchOptionalSearchLookup(1_200, { true }) {
+            artists.load("netease_artist_intent", "AC/DC", null) {
+                artistCalls++
+                if (fail) error("Transient index failure")
+                moe.ouom.neriplayer.common.search.SearchPage(listOf("artist-$artistCalls"))
+            }
+        }.await()
+        assertEquals(listOf("song-1"), songPage().items)
+        assertEquals(listOf("artist-1"), artistPage()!!.items)
+        nanos = 20_000_000_000L
+        assertEquals(listOf("song-2"), songPage().items)
+        assertEquals(listOf("artist-1"), artistPage(fail = true)!!.items)
+        assertEquals(1, artistCalls)
+        artists.invalidate()
+        assertEquals(listOf("artist-2"), artistPage()!!.items)
+        nanos += 120_000_000_000L
+        assertNull(artistPage(fail = true))
+        assertEquals(listOf("artist-4"), artistPage()!!.items)
+    }
+
     @Test fun optionalArtistLookupOverlapsSongsAndReusesItsSingleResult() = runTest {
         var calls = 0
         val lookup = launchOptionalSearchLookup(1_200, { true }) { calls++; delay(600); "artist" }

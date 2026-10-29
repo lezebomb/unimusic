@@ -1,0 +1,22 @@
+{
+  "stage": "2BQ",
+  "localTests": {
+    "class": "ExploreSearchArtistIntentTest",
+    "tests": 3,
+    "failures": 0
+  },
+  "moduleBoundaries": "passed",
+  "build": "BUILD SUCCESSFUL in 53s",
+  "apk": "build/outputs/unimusic/UniMusic-20261030-2BQ-debug.apk",
+  "versionName": "eaac3fa7faaf.dirty.10300749",
+  "sha256": "91c9b40ec3dbc2709b806898d0c788122839b75028f6da0d5a8736718df5071f",
+  "cachePolicy": {
+    "artistTtlSeconds": 120,
+    "maxQueries": 8,
+    "maxItemsEach": 4,
+    "songTtlSecondsUnchanged": 10,
+    "credentialsOrAudioUrlsCached": false
+  },
+  "deviceValidation": "not installed; earlier3K observations do not validate new cache/API boundary",
+  "remoteCI": "Prior mandatory2BO workflow40974329323 succeeded including Android;2BP/2BQ pending next cumulative push"
+}

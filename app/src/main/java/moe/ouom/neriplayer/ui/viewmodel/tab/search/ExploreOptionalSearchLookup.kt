@@ -7,6 +7,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withTimeoutOrNull
+import moe.ouom.neriplayer.common.search.FirstSearchPageCache
 
 /** Optional metadata starts eagerly and has its own budget, independent of the primary song request. */
 internal fun <T> CoroutineScope.launchOptionalSearchLookup(
@@ -29,3 +30,7 @@ internal fun <T> CoroutineScope.launchOptionalSearchLookup(
         }
     }
 }
+
+/** Small public artist indexes may outlive song pages; owner invalidates both on account/source changes. */
+internal fun <T> createArtistIntentPageCache(monotonicNanos: () -> Long = System::nanoTime): FirstSearchPageCache<T> =
+    FirstSearchPageCache(ttlMillis = 120_000, maxEntries = 8, maxItems = 4, monotonicNanos = monotonicNanos)

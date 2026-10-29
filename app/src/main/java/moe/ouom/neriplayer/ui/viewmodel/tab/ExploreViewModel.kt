@@ -25,6 +25,7 @@ package moe.ouom.neriplayer.ui.viewmodel.tab
 
 import moe.ouom.neriplayer.ui.viewmodel.tab.search.ExploreNativeProbeOwner
 import moe.ouom.neriplayer.ui.viewmodel.tab.search.launchOptionalSearchLookup
+import moe.ouom.neriplayer.ui.viewmodel.tab.search.createArtistIntentPageCache
 import moe.ouom.neriplayer.ui.viewmodel.tab.search.requireExploreSearchNetwork
 import moe.ouom.neriplayer.core.player.persistence.toSongItem
 import android.app.Application
@@ -344,6 +345,7 @@ class ExploreViewModel(application: Application) : AndroidViewModel(application)
     private var searchRequestVersion = 0L
     private var youtubeEnabled = YouTubeFeatureGate.isEnabled()
     private val aggregateCache = FirstSearchPageCache<ExploreSearchResult>()
+    private val artistIntentCache = createArtistIntentPageCache<ExploreSearchResult>()
     private var aggregateEngine: FederatedSearchEngine<ExploreSearchResult>? = null
     private var aggregateRanker: ExploreSearchRankingSession? = null
     private val nativeProbes = ExploreNativeProbeOwner()
@@ -361,7 +363,7 @@ class ExploreViewModel(application: Application) : AndroidViewModel(application)
             var revision = AppContainer.qqMusicAuthRepo.generation()
             AppContainer.qqMusicAuthRepo.state.collect {
                 val current = AppContainer.qqMusicAuthRepo.generation()
-                if (current != revision) { revision = current; aggregateCache.invalidate(); restartAggregateSearch() }
+                if (current != revision) { revision = current; invalidateSearchMetadataCaches(); restartAggregateSearch() }
             }
         }
         viewModelScope.launch {
@@ -377,7 +379,7 @@ class ExploreViewModel(application: Application) : AndroidViewModel(application)
                 }
                 _uiState.value = _uiState.value.copy(isNeteaseLoggedIn = isLoggedIn)
                 if (currentState.isNeteaseLoggedIn != isLoggedIn) {
-                    aggregateCache.invalidate()
+                    invalidateSearchMetadataCaches()
                     restartAggregateSearch()
                 }
                 if (isLoggedIn && !currentState.isNeteaseLoggedIn &&
@@ -392,7 +394,7 @@ class ExploreViewModel(application: Application) : AndroidViewModel(application)
                 val context = neteaseClient.searchSessionIdentity()
                 val sessionChanged = context !== searchAccountContext
                 if (sessionChanged) {
-                    aggregateCache.invalidate()
+                    invalidateSearchMetadataCaches()
                     searchAccountContext = context
                     _uiState.value.pendingNeteaseSessionSearch()?.let { (query, display) -> search(query, display) }
                 }
@@ -404,7 +406,7 @@ class ExploreViewModel(application: Application) : AndroidViewModel(application)
         }
         viewModelScope.launch {
             AppContainer.settingsRepo.youtubeEnabledFlow.collect { enabled ->
-                if (youtubeEnabled != enabled) aggregateCache.invalidate()
+                if (youtubeEnabled != enabled) invalidateSearchMetadataCaches()
                 youtubeEnabled = enabled
                 restartAggregateSearch()
                 if (!enabled) {
@@ -772,6 +774,11 @@ class ExploreViewModel(application: Application) : AndroidViewModel(application)
         }
     }
 
+    private fun invalidateSearchMetadataCaches() {
+        aggregateCache.invalidate()
+        artistIntentCache.invalidate()
+    }
+
     /** Start the one optional artist lookup alongside songs; only publish after song evidence exists. */
     private fun prefetchArtistIntent(keyword: String, requestVersion: Long, source: SearchSource) {
         if (artistIntentLookup != null || !isSearchRequestCurrent(requestVersion, source) || !isNeteaseSearchAllowed()) return
@@ -779,7 +786,7 @@ class ExploreViewModel(application: Application) : AndroidViewModel(application)
         fun current() = isSearchRequestCurrent(requestVersion, source) &&
             session === neteaseClient.searchSessionIdentity() && isNeteaseSearchAllowed()
         artistIntentLookup = viewModelScope.launchOptionalSearchLookup(1_200, ::current) {
-            aggregateCache.load("netease_artist_intent", keyword, null) {
+            artistIntentCache.load("netease_artist_intent", keyword, null) {
                 requireExploreSearchNetwork(app)
                 val raw = neteaseClient.searchSongsCancellable(keyword, limit = 4, type = 100)
                 val page = withContext(Dispatchers.Default) {
