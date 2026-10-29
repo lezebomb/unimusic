@@ -6,4 +6,4 @@
 
 新增1项/共2项直接相关JVM通过：真实异步队列触发合成写失败，持续故障时每次读取只重试一次并保持原文件，恢复后健康标记正确且重复读取不写；既有队列flush、故障文件/未知格式保护也通过。模块边界和Debug46s通过，Room v23/算法v4/两个schema1不变。
 
-APK `build/outputs/unimusic/UniMusic-20261030-3I-debug.apk`，版本e1c5ee79f2ce.dirty.10300059，SHA-256 `6507555f7befa8bb46b34da29ac93d2cbcecb56568ef8f6ee0c5c8095cb140a6`。本阶段未装机，没有真实手机磁盘满/存储恢复/账号或新音频验收；仅合成写入器故障。XML和实际边界见[evidence](evidence/2026-10-30/phase3i/validation.json)。远端以最新CI为准，不将取消的前序任务当成功。
+APK `build/outputs/unimusic/UniMusic-20261030-3I-debug.apk`，版本e1c5ee79f2ce.dirty.10300059，SHA-256 `6507555f7befa8bb46b34da29ac93d2cbcecb56568ef8f6ee0c5c8095cb140a6`。本阶段未装机，没有真实手机磁盘满/存储恢复/账号或新音频验收；仅合成写入器故障。XML和实际边界见[evidence](evidence/2026-10-30/phase3i/validation.json)。源码9b87ef00的[CI40917256200](https://github.com/lezebomb/unimusic/actions/runs/40917256200)整体成功，下载XML确认LocalPlaybackFeedbackStoreTest 4项0失败，含新增异步恢复用例；此前取消任务仍保持原记录。

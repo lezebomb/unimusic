@@ -8,4 +8,4 @@
 
 新增2项/共4项直接相关JVM通过：旧v1兼容、三个清除/开关上下文跨重启重建及稳定命中、反馈不可读不复用旧偏好且保留正常磁盘文件、原私有摘要/元数据恢复及反馈控制代次；Debug1m51s、模块边界通过。APK `build/outputs/unimusic/UniMusic-20261030-3F-debug.apk`，版本fa223bda6fcd.dirty.10300043，SHA-256 `9c0066fd568a6e065bb32745a47e577073c541ec985b860743c77a41e22873f3`。
 
-本阶段未装机，未执行手机清除/重启/真实反馈、账号、音频或准确率验收；不更改手机设置，也不反复轮询离线设备。XML及实际边界见[evidence](evidence/2026-10-30/phase3f/validation.json)。现有CI选择DailyRecommendationStoreTest和LocalPlaybackFeedbackStoreTest，新用例无需扩充测试集；远端待提交后确认。
+本阶段未装机，未执行手机清除/重启/真实反馈、账号、音频或准确率验收；不更改手机设置，也不反复轮询离线设备。XML及实际边界见[evidence](evidence/2026-10-30/phase3f/validation.json)。现有CI选择DailyRecommendationStoreTest和LocalPlaybackFeedbackStoreTest，新用例无需扩充测试集；后续[CI40917256200](https://github.com/lezebomb/unimusic/actions/runs/40917256200)整体成功，下载XML确认DailyRecommendationStoreTest 8项、LocalPlaybackFeedbackStoreTest 4项，均0失败，含本阶段用例。

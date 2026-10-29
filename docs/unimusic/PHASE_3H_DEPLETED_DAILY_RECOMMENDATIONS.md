@@ -6,4 +6,4 @@
 
 新增2项/共3项相关JVM、模块边界和Debug1m10s通过：空快照后入库、原歌曲全部移除后替换、停用来源无重建循环、离线栏目填充/替换且另一栏目稳定，以及既有跨重启/删除过滤/私有摘要保护。Room v23、算法v4、日缓存schema1均不变。
 
-APK `build/outputs/unimusic/UniMusic-20261030-3H-debug.apk`，版本4d8d57e7b814.dirty.10300054，SHA-256 `1bcf12f8e64b6184ca4fdeb593563b7fba266c9f3c46f28182c84a172bf2e611`。本轮无真机安装、导入/下载后栏目UI或新音频验收，不宣称测得实际速度或推荐准确率。XML及实际结果见[evidence](evidence/2026-10-30/phase3h/validation.json)。远端状态按最新CI确认，前序被替代取消不标为通过。
+APK `build/outputs/unimusic/UniMusic-20261030-3H-debug.apk`，版本4d8d57e7b814.dirty.10300054，SHA-256 `1bcf12f8e64b6184ca4fdeb593563b7fba266c9f3c46f28182c84a172bf2e611`。本轮无真机安装、导入/下载后栏目UI或新音频验收，不宣称测得实际速度或推荐准确率。XML及实际结果见[evidence](evidence/2026-10-30/phase3h/validation.json)。后续[CI40917256200](https://github.com/lezebomb/unimusic/actions/runs/40917256200)整体成功，下载XML确认DailyRecommendationStoreTest 8项0失败，含两新增用例；前序被替代取消仍不标为通过。

@@ -8,4 +8,4 @@ UUID查询后、发布内存快照前和执行原子缓存写入前再次复核�
 
 APK `build/outputs/unimusic/UniMusic-20261030-3G-debug.apk`，版本74ea0b24bc0b.dirty.10300050，SHA-256 `0e7689d016af6cb38e01b532fd5b5d9903c42bba75f42a1c34f38c4fc0192251`。没有真机安装、实际大库耗时/帧率、账号或新音频验收；测试候选规模不是性能测量。XML及实际结果见[evidence](evidence/2026-10-30/phase3g/validation.json)。
 
-2BB远端40913939981被后续提交替代取消，不能标记成功；3F的40914837908最后观察仍在运行，它的普通行为集包含歌手意图测试。后续以最终CI状态和实际XML确认，不重复本机已通过检查。
+2BB远端40913939981被后续提交替代取消，不能标记成功；3F的40914837908最后观察仍在运行，它的普通行为集包含歌手意图测试。后续[CI40917256200](https://github.com/lezebomb/unimusic/actions/runs/40917256200)整体成功，下载XML确认LocalRecommendationRankerTest 7项、DailyRecommendationStoreTest 8项，均0失败，含本阶段用例。不重复本机已通过检查。

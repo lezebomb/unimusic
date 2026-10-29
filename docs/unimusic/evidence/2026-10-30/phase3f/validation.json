@@ -33,5 +33,13 @@
     "No device installation or real settings/restart check",
     "No new audio, account or recommendation accuracy acceptance"
   ],
-  "ci": "pending commit/push; existing recommendation selectors include these cases"
+  "ci": {
+    "runId": 40917256200,
+    "sourceCommit": "9b87ef001edececacd829d281281208ae777fd39",
+    "conclusion": "success",
+    "url": "https://github.com/lezebomb/unimusic/actions/runs/40917256200",
+    "verifiedXmlSummary": "../ci-40917256200.json",
+    "scope": "Includes this phase; 2BC source not included"
+  },
+  "ciHistory": "pending commit/push; existing recommendation selectors include these cases"
 }

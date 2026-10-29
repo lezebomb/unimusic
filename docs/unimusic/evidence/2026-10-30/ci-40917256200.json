@@ -1,0 +1,67 @@
+{
+  "runId": 40917256200,
+  "commit": "9b87ef001edececacd829d281281208ae777fd39",
+  "conclusion": "success",
+  "url": "https://github.com/lezebomb/unimusic/actions/runs/40917256200",
+  "verifiedTestClasses": {
+    "ExploreSearchArtistIntentTest": {
+      "tests": 7,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "testNames": [
+        "optionalArtistLookupOverlapsSongsAndReusesItsSingleResult",
+        "workQueryRestoresCreditedBandSongsAheadOfLiteralCoversAndResourcePromotions",
+        "optionalArtistLookupRejectsOldContextAndPropagatesActualCancellation",
+        "optionalArtistTimeoutAndProviderFailuresKeepPrimarySongsAvailable",
+        "intentArrivingDuringBackgroundRankingIsAppliedBeforePublicationAndOldQueriesStayCancelled",
+        "exactAliasesWorkWhileSongTitleAmbiguityWeakConsensusAndCoverRequestsDoNotInventIntent",
+        "verifiedCatalogDjVariantCannotOutrankAnArtistsUnmodifiedRecording"
+      ]
+    },
+    "DailyRecommendationStoreTest": {
+      "tests": 8,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "testNames": [
+        "Beijing midnight and explicit refresh rebuild while UTC midnight does not",
+        "reopen keeps daily order and real UUIDs but restores only current library metadata",
+        "new local files fill an empty offline mode without reshuffling valid library recommendations",
+        "unavailable feedback avoids a biased snapshot and never overwrites healthy disk evidence",
+        "reopened snapshots respect cleared statistics feedback resets and disabled consent",
+        "corrupt unknown or oversized caches rebuild and failed IO still returns recommendations",
+        "empty or fully removed daily recommendations refill only when eligible library items exist",
+        "cancelled UUID capture cannot replace a healthy memory or disk snapshot"
+      ]
+    },
+    "LocalPlaybackFeedbackStoreTest": {
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "testNames": [
+        "events deduplicate survive reopening and cannot cross clear or retention fences",
+        "disabled recording persists and clear fences reject queued old evidence",
+        "queued writes flush without changing unrelated evidence and failed writes preserve disk",
+        "failed async feedback storage recovers on read without rewriting every healthy read"
+      ]
+    },
+    "LocalRecommendationRankerTest": {
+      "tests": 7,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "testNames": [
+        "ranking deduplicates identities and keeps distinct recordings with the same title",
+        "cancelledLargeRankingStopsWithoutChangingHealthyOrderOrReasons",
+        "retiredOnlineSourcesLeaveRecommendationsWhilePlayableLocalCopiesRemain",
+        "explicit playback evidence affects only the supplied exact identity",
+        "familiar artist affinity does not fill the first recommendations with one artist",
+        "recent listening is lowered while older listening earns a rediscovery reason",
+        "collaborativeCreditsShareAffinityAndDiversityWithoutMergingSingleArtistNames"
+      ]
+    }
+  },
+  "scope": "2BB and 3F through 3I source present; 2BC not included"
+}

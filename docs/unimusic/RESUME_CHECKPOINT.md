@@ -10,7 +10,7 @@
 
 新2/共3纯逻辑JVM通过，最终Debug42s及边界通过；首两次编译泛型/返回类型问题已修，原通过用例未无意义重跑。最新APK build/outputs/unimusic/UniMusic-20261030-2BC-debug.apk，精确版本/哈希见报告；未装机、测真实速度/新音频。固定JDK21 runtime套件本机未执行，不要重复下载/尝试。
 
-3I已commit/push 9b87ef00，CI40917256200最后观察in_progress（普通行为检查）；当前2BC提交/推送与最终CI按git/Actions确认。前面被后续提交替代的任务不标记成功；最新普通行为集包含这些搜索/推荐与SourceResolver用例。当前无运行中本地Gradle；接续CI失败修复或其他有价值后台，少量定向验证，不重复这批已通过构建。唯一UniMusic定时计划Oct30 05:30仍保留，触发后删除并接续本检查点，别重做2BB/3F～3I/2BC或同时启动构建。
+3I已commit/push 9b87ef00，CI40917256200整体SUCCESS；已下载XML确认ArtistIntent 7、DailyStore 8、PlaybackFeedbackStore 4、LocalRanker 7项均0失败，覆盖2BB与3F～3I。2BC已commit/push 8cec801f，其CI40918996595最后观察in_progress，需接续最终结果。前面被后续提交替代的任务不标记成功；最新普通行为集包含这些搜索/推荐与SourceResolver用例。当前无运行中本地Gradle；接续CI失败修复或其他有价值后台，少量定向验证，不重复这批已通过构建。唯一UniMusic定时计划Oct30 05:30仍保留，触发后删除并接续本检查点，别重做2BB/3F～3I/2BC或同时启动构建。
 
 ## 当前3I：异步播放反馈存储恢复
 

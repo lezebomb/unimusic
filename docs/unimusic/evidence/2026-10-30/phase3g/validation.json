@@ -26,5 +26,13 @@
     "No actual large-library latency benchmark",
     "No device installation, UI, new audio or account acceptance"
   ],
-  "ci": "pending commit/push; previous 2BB run 40913939981 cancelled by 3F push, not success; 3F run 40914837908 last seen in progress and its normal behavior suite includes ArtistIntentTest"
+  "ci": {
+    "runId": 40917256200,
+    "sourceCommit": "9b87ef001edececacd829d281281208ae777fd39",
+    "conclusion": "success",
+    "url": "https://github.com/lezebomb/unimusic/actions/runs/40917256200",
+    "verifiedXmlSummary": "../ci-40917256200.json",
+    "scope": "Includes this phase; 2BC source not included"
+  },
+  "ciHistory": "pending commit/push; previous 2BB run 40913939981 cancelled by 3F push, not success; 3F run 40914837908 last seen in progress and its normal behavior suite includes ArtistIntentTest"
 }

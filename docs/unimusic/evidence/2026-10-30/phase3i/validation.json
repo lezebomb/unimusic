@@ -27,5 +27,13 @@
     "No device installation, new audio or account acceptance"
   ],
   "data": "Room v23, algorithm v4 and cache/feedback schema v1 unchanged; no settings or user records cleared",
-  "ci": "pending commit/push; latest normal behavior suite covers prior search and recommendation changes; cancelled earlier runs are not successes"
+  "ci": {
+    "runId": 40917256200,
+    "sourceCommit": "9b87ef001edececacd829d281281208ae777fd39",
+    "conclusion": "success",
+    "url": "https://github.com/lezebomb/unimusic/actions/runs/40917256200",
+    "verifiedXmlSummary": "../ci-40917256200.json",
+    "scope": "Includes this phase; 2BC source not included"
+  },
+  "ciHistory": "pending commit/push; latest normal behavior suite covers prior search and recommendation changes; cancelled earlier runs are not successes"
 }
