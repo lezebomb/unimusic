@@ -29,7 +29,7 @@ import moe.ouom.neriplayer.data.model.stats.PlaybackFeedbackKind
 
 /** Decayed counts for exact device-local identities. Missing evidence stays unknown. */
 data class LocalPlaybackSignal(val skips: Double = 0.0, val completions: Double = 0.0, val repeats: Double = 0.0)
-data class LocalPlaybackSignals(val byDigest: Map<String, LocalPlaybackSignal>, val available: Boolean, val enabled: Boolean = true)
+data class LocalPlaybackSignals(val byDigest: Map<String, LocalPlaybackSignal>, val available: Boolean, val enabled: Boolean = true, val clearedAt: Long = 0L)
 
 /** Bounded, device-only evidence. Best-effort enqueue never blocks playback or authoritative statistics. */
 class LocalPlaybackFeedbackStore internal constructor(
@@ -136,7 +136,7 @@ class LocalPlaybackFeedbackStore internal constructor(
                     PlaybackFeedbackKind.REPEAT -> current.copy(repeats = current.repeats + weight)
                 }
             }
-            LocalPlaybackSignals(result, !failed, old.enabled)
+            LocalPlaybackSignals(result, !failed, old.enabled, epoch)
         }
     }
 

@@ -50,10 +50,12 @@ class LocalPlaybackFeedbackStoreTest {
         now += 1000
         store.setEnabled(false)
         assertFalse(store.signals(now, 0).enabled)
+        assertEquals(now, store.signals(now, 0).clearedAt)
         now += 1000
         store.record("b", event())
         val reopened = LocalPlaybackFeedbackStore(file, now = { now })
         assertFalse(reopened.signals(now, 0).enabled)
+        assertEquals(now - 1000, reopened.signals(now, 0).clearedAt)
         assertTrue(reopened.signals(now, 0).byDigest.isEmpty())
         val beforeEnabled = event()
         now += 1000
@@ -66,6 +68,7 @@ class LocalPlaybackFeedbackStoreTest {
         assertEquals(1, reopened.signals(now, 0).byDigest.size)
         now += 1000
         reopened.clearSignals()
+        assertEquals(now, reopened.signals(now, 0).clearedAt)
         reopened.record("a", beforeClear)
         assertTrue(reopened.signals(now, 0).enabled)
         assertTrue(reopened.signals(now, 0).byDigest.isEmpty())

@@ -18,13 +18,25 @@ internal data class DailyRecommendationEntry(
     val source: LocalRecommendationSource
 )
 
+/** Device-only reset/consent context; contains no events, identities, paths or account information. */
+data class RecommendationEvidenceContext(
+    val statisticsClearedAt: Long = 0L,
+    val feedbackClearedAt: Long = 0L,
+    val feedbackEnabled: Boolean = true,
+    val feedbackAvailable: Boolean = true
+) {
+    init { require(statisticsClearedAt >= 0L && feedbackClearedAt >= 0L) }
+}
+
 internal data class DailyRecommendationSnapshot(
     val day: String,
     val algorithmVersion: Int,
-    val modes: Map<DailyRecommendationMode, List<DailyRecommendationEntry>>
+    val modes: Map<DailyRecommendationMode, List<DailyRecommendationEntry>>,
+    val evidenceContext: RecommendationEvidenceContext = RecommendationEvidenceContext()
 ) {
-    fun matches(nowMillis: Long): Boolean = day == BeijingRecommendationDay.key(nowMillis) &&
-        algorithmVersion == LocalRecommendationRanker.ALGORITHM_VERSION
+    fun matches(nowMillis: Long, context: RecommendationEvidenceContext): Boolean =
+        day == BeijingRecommendationDay.key(nowMillis) && algorithmVersion == LocalRecommendationRanker.ALGORITHM_VERSION &&
+            evidenceContext == context
 }
 
 internal fun recommendationIdentityDigest(identityKey: String): String {
@@ -49,6 +61,12 @@ internal object DailyRecommendationSnapshotCodec {
         addProperty("schemaVersion", SCHEMA_VERSION)
         addProperty("day", snapshot.day)
         addProperty("algorithmVersion", snapshot.algorithmVersion)
+        add("evidenceContext", JsonObject().apply {
+            addProperty("statisticsClearedAt", snapshot.evidenceContext.statisticsClearedAt)
+            addProperty("feedbackClearedAt", snapshot.evidenceContext.feedbackClearedAt)
+            addProperty("feedbackEnabled", snapshot.evidenceContext.feedbackEnabled)
+            addProperty("feedbackAvailable", snapshot.evidenceContext.feedbackAvailable)
+        })
         add("modes", JsonArray().apply {
             DailyRecommendationMode.entries.forEach { mode ->
                 add(JsonObject().apply {
@@ -99,7 +117,25 @@ internal object DailyRecommendationSnapshotCodec {
             require(entries.map { it.localKeyDigest }.distinct().size == entries.size)
             modes[mode] = entries
         }
-        return DailyRecommendationSnapshot(day, root.integer("algorithmVersion"), modes)
+        // Legacy v1 caches are reusable only for the untouched default evidence context.
+        val context = if (!root.has("evidenceContext")) RecommendationEvidenceContext() else {
+            val value = root.getAsJsonObject("evidenceContext")
+            RecommendationEvidenceContext(value.nonnegativeLong("statisticsClearedAt"), value.nonnegativeLong("feedbackClearedAt"),
+                value.boolean("feedbackEnabled"), value.boolean("feedbackAvailable"))
+        }
+        return DailyRecommendationSnapshot(day, root.integer("algorithmVersion"), modes, context)
+    }
+
+    private fun JsonObject.nonnegativeLong(name: String): Long {
+        val value = get(name)
+        require(value != null && value.isJsonPrimitive && value.asJsonPrimitive.isNumber)
+        return requireNotNull(value.asString.toLongOrNull()).also { require(it >= 0L) }
+    }
+
+    private fun JsonObject.boolean(name: String): Boolean {
+        val value = get(name)
+        require(value != null && value.isJsonPrimitive && value.asJsonPrimitive.isBoolean)
+        return value.asBoolean
     }
 
     private fun JsonObject.text(name: String): String {

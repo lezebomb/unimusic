@@ -62,12 +62,14 @@ class LocalRecommendationRepository(
         val eligible = if (dismissed.isEmpty()) candidates else withContext(Dispatchers.Default) {
             candidates.filterNot { recommendationIdentityDigest(it.identityKey) in dismissed }
         }
-        val evidence = try { playbackFeedback.signals(nowMillis, playbackStats.statsClearedAtFlow.value) }
+        val statisticsClearedAt = playbackStats.statsClearedAtFlow.value.coerceAtLeast(0L)
+        val evidence = try { playbackFeedback.signals(nowMillis, statisticsClearedAt) }
         catch (failure: Exception) {
             if (failure is CancellationException) throw failure
             LocalPlaybackSignals(emptyMap(), available = false)
         }
-        return dailySnapshots.getOrCreate(eligible, nowMillis, forceRefresh) { rankFresh(eligible, nowMillis, evidence.byDigest) }
+        val context = RecommendationEvidenceContext(statisticsClearedAt, evidence.clearedAt, evidence.enabled, evidence.available)
+        return dailySnapshots.getOrCreate(eligible, nowMillis, forceRefresh, context) { rankFresh(eligible, nowMillis, evidence.byDigest) }
             .copy(feedbackAvailable = feedbackAvailable && evidence.available,
                 hasDismissedCandidates = eligible.size < candidates.size,
                 playbackFeedbackEnabled = evidence.enabled)

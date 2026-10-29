@@ -2,6 +2,8 @@
 
 [当前搜索规则与边界](SEARCH_BEHAVIOR.md)：歌手/作品意图、跨源录音证据、版本和可播状态、列表锚定及实际验收。
 
+最新：[3F推荐缓存上下文](PHASE_3F_RECOMMENDATION_CACHE_CONTEXT.md)：日缓存核对清除代次/反馈开关和健康状态；4 JVM/Debug通过，保留用户记录与旧缓存兼容。
+
 最新：[2BB并行歌手索引](PHASE_2BB_PARALLEL_ARTIST_LOOKUP.md)：歌曲与歌手索引并行，保留取消/权限/录音门槛；4 JVM/Debug通过，无真机速度声明。
 
 最新：[3E试听偏好隔离](PHASE_3E_PREVIEW_FEEDBACK_ISOLATION.md)：明确试听不产生跳过/听完/重播偏好，实际收听统计保留；4 JVM/构建/装机通过，断连后设备采样待补。

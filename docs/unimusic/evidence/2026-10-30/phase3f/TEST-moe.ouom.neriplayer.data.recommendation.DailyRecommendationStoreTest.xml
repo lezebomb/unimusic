@@ -1,0 +1,8 @@
+<testsuite name="moe.ouom.neriplayer.data.recommendation.DailyRecommendationStoreTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-10-29T16:44:31.161Z" hostname="local" time="0.329">
+  <properties />
+  <testcase name="reopen keeps daily order and real UUIDs but restores only current library metadata" classname="moe.ouom.neriplayer.data.recommendation.DailyRecommendationStoreTest" time="0.225" />
+  <testcase name="unavailable feedback avoids a biased snapshot and never overwrites healthy disk evidence" classname="moe.ouom.neriplayer.data.recommendation.DailyRecommendationStoreTest" time="0.024" />
+  <testcase name="reopened snapshots respect cleared statistics feedback resets and disabled consent" classname="moe.ouom.neriplayer.data.recommendation.DailyRecommendationStoreTest" time="0.078" />
+  <system-out />
+  <system-err />
+</testsuite>

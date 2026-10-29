@@ -39,7 +39,7 @@ class DailyRecommendationStoreTest {
         listOf("content://", "https://", "/private/", "token=", "secret", "Private title", "localFilePath", "streamUrl").forEach {
             assertFalse("Snapshot leaked $it", json.contains(it))
         }
-        assertEquals(setOf("schemaVersion", "day", "algorithmVersion", "modes"), JsonParser.parseString(json).asJsonObject.keySet())
+        assertEquals(setOf("schemaVersion", "day", "algorithmVersion", "evidenceContext", "modes"), JsonParser.parseString(json).asJsonObject.keySet())
         val decoded = DailyRecommendationSnapshotCodec.decode(json)
         assertEquals(uuid, decoded.modes.getValue(DailyRecommendationMode.LIBRARY).first().songUuid)
         assertTrue(decoded.modes.values.flatten().all { it.localKeyDigest.length == 64 })
@@ -108,6 +108,48 @@ class DailyRecommendationStoreTest {
         val directoryInsteadOfFile = temporary.newFolder("unreadable-cache")
         assertEquals("song", DailyRecommendationStore(directoryInsteadOfFile, lookupSongUuid = { null })
             .getOrCreate(library, now) { recommendations(library) }.items.single().identityKey)
+    }
+
+    @Test fun `reopened snapshots respect cleared statistics feedback resets and disabled consent`() = runTest {
+        val file = File(temporary.root, "context.json")
+        val library = listOf(candidate("a", "First"), candidate("b", "Second"))
+        val original = DailyRecommendationStore(file, lookupSongUuid = { null })
+        original.getOrCreate(library, now) { recommendations(library) }
+        // Legacy v1 snapshots without context remain readable for the untouched default only.
+        val legacy = JsonParser.parseString(file.readText()).asJsonObject.apply { remove("evidenceContext") }
+        file.writeText(legacy.toString())
+        DailyRecommendationStore(file, lookupSongUuid = { null }).getOrCreate(library, now) { error("Healthy legacy hit") }
+        val contexts = listOf(
+            RecommendationEvidenceContext(statisticsClearedAt = now - 100),
+            RecommendationEvidenceContext(statisticsClearedAt = now - 100, feedbackClearedAt = now - 50),
+            RecommendationEvidenceContext(statisticsClearedAt = now - 100, feedbackClearedAt = now - 50, feedbackEnabled = false)
+        )
+        var builds = 0
+        contexts.forEachIndexed { index, context ->
+            val order = if (index % 2 == 0) library.reversed() else library
+            val reopened = DailyRecommendationStore(file, lookupSongUuid = { null })
+            val result = reopened.getOrCreate(library, now, evidenceContext = context) { builds++; recommendations(order) }
+            assertEquals(order.map { it.identityKey }, result.items.map { it.identityKey })
+            assertEquals(context, DailyRecommendationSnapshotCodec.decode(file.readText()).evidenceContext)
+            assertEquals(result, reopened.getOrCreate(library, now + 1, evidenceContext = context) { error("Same context stays stable") })
+            assertEquals(result, DailyRecommendationStore(file, lookupSongUuid = { null })
+                .getOrCreate(library, now + 2, evidenceContext = context) { error("Context persists over restart") })
+        }
+        assertEquals(3, builds)
+    }
+
+    @Test fun `unavailable feedback avoids a biased snapshot and never overwrites healthy disk evidence`() = runTest {
+        val file = File(temporary.root, "health.json")
+        val library = listOf(candidate("a", "First"), candidate("b", "Second"))
+        val store = DailyRecommendationStore(file, lookupSongUuid = { null })
+        val healthy = store.getOrCreate(library, now) { recommendations(library) }
+        val disk = file.readText()
+        val unavailable = RecommendationEvidenceContext(feedbackAvailable = false)
+        val fallback = store.getOrCreate(library, now + 1, evidenceContext = unavailable) { recommendations(library.reversed()) }
+        assertEquals(library.reversed().map { it.identityKey }, fallback.items.map { it.identityKey })
+        assertEquals(disk, file.readText())
+        assertEquals(fallback, store.getOrCreate(library, now + 2, evidenceContext = unavailable) { error("Stable degraded memory") })
+        assertEquals(healthy, store.getOrCreate(library, now + 3) { error("Healthy disk may be reused after recovery") })
     }
 
     private fun candidate(key: String, title: String, local: Boolean = false): LocalRecommendationCandidate = LocalRecommendationCandidate(

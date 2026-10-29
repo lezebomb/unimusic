@@ -25,12 +25,13 @@ class DailyRecommendationStore internal constructor(
         candidates: List<LocalRecommendationCandidate>,
         nowMillis: Long,
         forceRefresh: Boolean = false,
+        evidenceContext: RecommendationEvidenceContext = RecommendationEvidenceContext(),
         build: suspend () -> LocalRecommendations
     ): LocalRecommendations = withContext(Dispatchers.IO) {
         mutex.withLock {
             if (!forceRefresh) {
-                val cached = memory?.takeIf { it.matches(nowMillis) }
-                    ?: readSnapshot()?.takeIf { it.matches(nowMillis) }?.also {
+                val cached = memory?.takeIf { it.matches(nowMillis, evidenceContext) }
+                    ?: readSnapshot()?.takeIf { it.matches(nowMillis, evidenceContext) }?.also {
                         memory = it
                         memoryStatisticsAvailable = true
                     }
@@ -49,12 +50,12 @@ class DailyRecommendationStore internal constructor(
                 mapOf(
                     DailyRecommendationMode.LIBRARY to fresh.items.map { it.toSnapshotEntry(ids[it.identityKey]) },
                     DailyRecommendationMode.LOCAL_FILES to fresh.localFileItems.map { it.toSnapshotEntry(ids[it.identityKey]) }
-                )
+                ), evidenceContext
             )
             memory = snapshot
             memoryStatisticsAvailable = fresh.statisticsAvailable
-            // A degraded fallback stays in memory; a restart may retry genuine listening statistics.
-            if (fresh.statisticsAvailable) {
+            // Keep a fallback in memory without overwriting a healthy disk snapshot; context changes retry it.
+            if (fresh.statisticsAvailable && evidenceContext.feedbackAvailable) {
                 try { write(file, DailyRecommendationSnapshotCodec.encode(snapshot)) } catch (failure: Exception) {
                     if (failure is CancellationException) throw failure
                 }

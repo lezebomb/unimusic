@@ -1,0 +1,6 @@
+<testsuite name="moe.ouom.neriplayer.data.recommendation.LocalPlaybackFeedbackStoreTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2026-10-29T16:44:31.495Z" hostname="local" time="0.08">
+  <properties />
+  <testcase name="disabled recording persists and clear fences reject queued old evidence" classname="moe.ouom.neriplayer.data.recommendation.LocalPlaybackFeedbackStoreTest" time="0.08" />
+  <system-out />
+  <system-err />
+</testsuite>

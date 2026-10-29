@@ -145,6 +145,8 @@
 
 ## Phase 3：本地推荐与同步
 
+3F补日推荐缓存与统计/播放反馈清除代次、开关和健康状态一致；旧v1兼容、正常磁盘快照保留，4相关JVM/Debug/边界通过，设备未验收，见[3F](PHASE_3F_RECOMMENDATION_CACHE_CONTEXT.md)。
+
 3E已完成明确试听与偏好反馈隔离，保留实际统计，4 JVM/Debug/保留数据装机通过；手机断连后真实切歌采样待补，见[3E](PHASE_3E_PREVIEW_FEEDBACK_ISOLATION.md)。
 
 3A/3B/3C已交付本机暂不推荐/撤销/恢复、播放反馈及关闭/清除，实际Media3采样/异常耐久尚未验收。3D.1～3D.8已交付独立身份/因果合并、持久日志、只读Room捕获、本机基线、条件WebDAV/GitHub后台与手动入口、显式冲突及外来UUID适配，见[3D.8](PHASE_3D8_GITHUB_IDENTITY_SYNC.md)与续跑检查点。3D.7远端CI成功，3D.8新2项合成JVM/最终APK/边界通过。

@@ -49,10 +49,10 @@ internal class HomeLocalRecommendationsController(application: Application, scop
                 val recommendations = LocalRecommendationRepository(application, statistics)
                 combine(
                     library.playlists,
-                    statistics.revisionFlow.catch { failure ->
+                    combine(statistics.revisionFlow.catch { failure ->
                         if (failure is CancellationException) throw failure
                         emit(-1L)
-                    },
+                    }, statistics.statsClearedAtFlow) { revision, clearedAt -> revision to clearedAt },
                     recommendationDays(),
                     combine(feedback.revision, playbackFeedback.revision) { explicit, playback -> explicit to playback }
                 ) { playlists, _, _, feedbackRevision ->

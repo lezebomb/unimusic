@@ -1,0 +1,37 @@
+{
+  "phase": "3F",
+  "date": "2026-10-30",
+  "uniqueUnitTests": 4,
+  "newTestMethods": 2,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "validation": {
+    "selectedTestsAndDebug": "phase3f-recommendation-cache-context.log: BUILD SUCCESSFUL in 1m51s",
+    "moduleBoundaries": "passed"
+  },
+  "apk": {
+    "archive": "build/outputs/unimusic/UniMusic-20261030-3F-debug.apk",
+    "version": "fa223bda6fcd.dirty.10300043",
+    "sha256": "9c0066fd568a6e065bb32745a47e577073c541ec985b860743c77a41e22873f3",
+    "installedThisPhase": false
+  },
+  "implementation": {
+    "dailySnapshotSchemaVersion": 1,
+    "legacySnapshot": "Missing evidenceContext means untouched default; mismatched reset/consent context rebuilds",
+    "cacheContext": [
+      "statistics clear epoch",
+      "playback feedback clear epoch",
+      "playback feedback enabled",
+      "playback feedback readable"
+    ],
+    "degradedFeedback": "Memory fallback only; healthy disk file preserved",
+    "dailyOrder": "Stable within same day, algorithm and evidence context"
+  },
+  "data": "Room v23, algorithm v4, playlists and accounts unchanged; no statistics or preference records erased",
+  "unexecuted": [
+    "No device installation or real settings/restart check",
+    "No new audio, account or recommendation accuracy acceptance"
+  ],
+  "ci": "pending commit/push; existing recommendation selectors include these cases"
+}
