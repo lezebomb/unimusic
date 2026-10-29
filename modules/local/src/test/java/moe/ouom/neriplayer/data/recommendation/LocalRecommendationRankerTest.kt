@@ -1,5 +1,8 @@
 package moe.ouom.neriplayer.data.recommendation
 
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.ensureActive
 import moe.ouom.neriplayer.data.model.SongItem
 import moe.ouom.neriplayer.data.model.stats.TrackStat
 import org.junit.Assert.assertEquals
@@ -92,6 +95,24 @@ class LocalRecommendationRankerTest {
         val input = listOf(qq, yt, local, active)
         assertEquals(setOf("downloaded", "active"), LocalRecommendationRanker.rank(input, emptyList(), now).map { it.identityKey }.toSet())
         assertEquals(setOf("downloaded", "active"), LocalRecommendationRanker.canonicalCandidates(input).map { it.identityKey }.toSet())
+    }
+
+    @Test fun cancelledLargeRankingStopsWithoutChangingHealthyOrderOrReasons() {
+        val library = (1..2_000).map { candidate("song-$it", "Artist ${it % 20}") }
+        val expected = LocalRecommendationRanker.rank(library, emptyList(), now)
+        val active = Job()
+        assertEquals(expected, LocalRecommendationRanker.rank(library.reversed(), emptyList(), now,
+            checkCancellation = { active.ensureActive() }))
+        val cancelled = Job()
+        var visited = 0
+        try {
+            LocalRecommendationRanker.rank(library, emptyList(), now, checkCancellation = {
+                if (++visited == 50) cancelled.cancel()
+                cancelled.ensureActive()
+            })
+            org.junit.Assert.fail("Cancelled ranking must stop")
+        } catch (_: CancellationException) { }
+        assertTrue(visited < library.size)
     }
 
     private fun candidate(key: String, artist: String, source: LocalRecommendationSource = LocalRecommendationSource.LIBRARY) =

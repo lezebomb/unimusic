@@ -4,6 +4,8 @@ import android.content.Context
 import java.io.File
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
@@ -28,19 +30,23 @@ class DailyRecommendationStore internal constructor(
         evidenceContext: RecommendationEvidenceContext = RecommendationEvidenceContext(),
         build: suspend () -> LocalRecommendations
     ): LocalRecommendations = withContext(Dispatchers.IO) {
+        val context = currentCoroutineContext()
         mutex.withLock {
+            context.ensureActive()
             if (!forceRefresh) {
                 val cached = memory?.takeIf { it.matches(nowMillis, evidenceContext) }
                     ?: readSnapshot()?.takeIf { it.matches(nowMillis, evidenceContext) }?.also {
                         memory = it
                         memoryStatisticsAvailable = true
                     }
-                if (cached != null) return@withLock restore(cached, candidates, memoryStatisticsAvailable)
+                if (cached != null) return@withLock restore(cached, candidates, memoryStatisticsAvailable) { context.ensureActive() }
             }
             if (candidates.isEmpty() && !forceRefresh) return@withLock LocalRecommendations()
             val fresh = build()
+            context.ensureActive()
             val ids = (fresh.items + fresh.localFileItems).map { it.identityKey }.distinct().associateWith { key ->
-                try { lookupSongUuid(key) } catch (failure: Exception) {
+                context.ensureActive()
+                try { lookupSongUuid(key).also { context.ensureActive() } } catch (failure: Exception) {
                     if (failure is CancellationException) throw failure
                     null
                 }
@@ -52,15 +58,20 @@ class DailyRecommendationStore internal constructor(
                     DailyRecommendationMode.LOCAL_FILES to fresh.localFileItems.map { it.toSnapshotEntry(ids[it.identityKey]) }
                 ), evidenceContext
             )
+            context.ensureActive()
             memory = snapshot
             memoryStatisticsAvailable = fresh.statisticsAvailable
             // Keep a fallback in memory without overwriting a healthy disk snapshot; context changes retry it.
             if (fresh.statisticsAvailable && evidenceContext.feedbackAvailable) {
-                try { write(file, DailyRecommendationSnapshotCodec.encode(snapshot)) } catch (failure: Exception) {
+                try {
+                    val encoded = DailyRecommendationSnapshotCodec.encode(snapshot)
+                    context.ensureActive()
+                    write(file, encoded)
+                } catch (failure: Exception) {
                     if (failure is CancellationException) throw failure
                 }
             }
-            restore(snapshot, candidates, fresh.statisticsAvailable)
+            restore(snapshot, candidates, fresh.statisticsAvailable) { context.ensureActive() }
         }
     }
 
@@ -87,11 +98,13 @@ class DailyRecommendationStore internal constructor(
     private fun restore(
         snapshot: DailyRecommendationSnapshot,
         candidates: List<LocalRecommendationCandidate>,
-        statisticsAvailable: Boolean
+        statisticsAvailable: Boolean,
+        checkCancellation: () -> Unit
     ): LocalRecommendations {
-        val byDigest = LocalRecommendationRanker.canonicalCandidates(candidates)
-            .associateBy { recommendationIdentityDigest(it.identityKey) }
+        val byDigest = LocalRecommendationRanker.canonicalCandidates(candidates, checkCancellation)
+            .associateBy { checkCancellation(); recommendationIdentityDigest(it.identityKey) }
         fun items(mode: DailyRecommendationMode): List<LocalRecommendation> = snapshot.modes.getValue(mode).mapNotNull { entry ->
+            checkCancellation()
             val candidate = byDigest[entry.localKeyDigest] ?: return@mapNotNull null
             if (mode == DailyRecommendationMode.LOCAL_FILES && candidate.source != LocalRecommendationSource.LOCAL_FILE) {
                 return@mapNotNull null

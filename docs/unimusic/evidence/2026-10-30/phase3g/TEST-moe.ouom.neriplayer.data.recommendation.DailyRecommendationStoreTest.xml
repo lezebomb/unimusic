@@ -1,0 +1,6 @@
+<testsuite name="moe.ouom.neriplayer.data.recommendation.DailyRecommendationStoreTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2026-10-29T16:51:06.140Z" hostname="local" time="0.252">
+  <properties />
+  <testcase name="cancelled UUID capture cannot replace a healthy memory or disk snapshot" classname="moe.ouom.neriplayer.data.recommendation.DailyRecommendationStoreTest" time="0.249" />
+  <system-out />
+  <system-err />
+</testsuite>

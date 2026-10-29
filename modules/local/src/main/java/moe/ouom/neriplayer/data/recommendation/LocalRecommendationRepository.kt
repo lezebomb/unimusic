@@ -3,6 +3,8 @@ package moe.ouom.neriplayer.data.recommendation
 import android.content.Context
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withContext
 import moe.ouom.neriplayer.data.identity.stableKey
 import moe.ouom.neriplayer.data.local.media.LocalSongSupport
@@ -37,9 +39,12 @@ class LocalRecommendationRepository(
         forceRefresh: Boolean = false
     ): LocalRecommendations {
         val candidates = withContext(Dispatchers.Default) {
+            val workContext = currentCoroutineContext()
             playlists.flatMap { playlist ->
+                workContext.ensureActive()
                 val favorite = FavoritesPlaylist.isSystemPlaylist(playlist, context)
                 playlist.songs.map { song ->
+                    workContext.ensureActive()
                     val source = when {
                         LocalSongSupport.isLocalSong(song, context) -> LocalRecommendationSource.LOCAL_FILE
                         else -> when (song.channelId?.lowercase(Locale.ROOT) ?: song.album.lowercase(Locale.ROOT)) {
@@ -60,7 +65,8 @@ class LocalRecommendationRepository(
             emptySet()
         }
         val eligible = if (dismissed.isEmpty()) candidates else withContext(Dispatchers.Default) {
-            candidates.filterNot { recommendationIdentityDigest(it.identityKey) in dismissed }
+            val workContext = currentCoroutineContext()
+            candidates.filterNot { workContext.ensureActive(); recommendationIdentityDigest(it.identityKey) in dismissed }
         }
         val statisticsClearedAt = playbackStats.statsClearedAtFlow.value.coerceAtLeast(0L)
         val evidence = try { playbackFeedback.signals(nowMillis, statisticsClearedAt) }
@@ -89,15 +95,17 @@ class LocalRecommendationRepository(
             emptyList()
         }
         return withContext(Dispatchers.Default) {
+            val workContext = currentCoroutineContext()
             val feedbackByKey: Map<String, LocalPlaybackSignal> = if (signals.isEmpty()) emptyMap() else candidates.associate { candidate ->
+                workContext.ensureActive()
                 candidate.identityKey to (signals[recommendationIdentityDigest(candidate.identityKey)] ?: LocalPlaybackSignal())
             }
-            val favoriteKeys = candidates.filter { it.favorite }.mapTo(hashSetOf()) { it.identityKey }
+            val favoriteKeys = candidates.filter { workContext.ensureActive(); it.favorite }.mapTo(hashSetOf()) { it.identityKey }
             LocalRecommendations(
-                items = LocalRecommendationRanker.rank(candidates, statistics, nowMillis, feedback = feedbackByKey),
+                items = LocalRecommendationRanker.rank(candidates, statistics, nowMillis, feedback = feedbackByKey, checkCancellation = { workContext.ensureActive() }),
                 localFileItems = LocalRecommendationRanker.rank(
-                    candidates.filter { it.source == LocalRecommendationSource.LOCAL_FILE }
-                        .map { it.copy(favorite = it.identityKey in favoriteKeys) }, statistics, nowMillis, feedback = feedbackByKey
+                    candidates.filter { workContext.ensureActive(); it.source == LocalRecommendationSource.LOCAL_FILE }
+                        .map { it.copy(favorite = it.identityKey in favoriteKeys) }, statistics, nowMillis, feedback = feedbackByKey, checkCancellation = { workContext.ensureActive() }
                 ),
                 statisticsAvailable = statisticsAvailable
             )

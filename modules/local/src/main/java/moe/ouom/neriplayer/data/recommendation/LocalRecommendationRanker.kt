@@ -38,13 +38,16 @@ object LocalRecommendationRanker {
         statistics: List<TrackStat>,
         nowMillis: Long,
         limit: Int = 12,
-        feedback: Map<String, LocalPlaybackSignal> = emptyMap()
+        feedback: Map<String, LocalPlaybackSignal> = emptyMap(),
+        checkCancellation: () -> Unit = {}
     ): List<LocalRecommendation> {
+        checkCancellation()
         if (limit <= 0) return emptyList()
         val today = BeijingRecommendationDay.startMillis(nowMillis)
-        val stats = statistics.associateBy { it.identityKey }
+        val stats = statistics.associateBy { checkCancellation(); it.identityKey }
         val artistAffinity = mutableMapOf<String, Double>()
         statistics.forEach { track ->
+            checkCancellation()
             val credits = artistKeys(track.customArtist ?: track.artist)
             if (credits.isNotEmpty()) {
                 val weight = ln(1.0 + track.totalListenMs.coerceAtLeast(0L) / 180_000.0) /
@@ -52,16 +55,18 @@ object LocalRecommendationRanker {
                 credits.forEach { artist -> artistAffinity[artist] = artistAffinity.getOrDefault(artist, 0.0) + weight }
             }
         }
-        val ranked = canonicalCandidates(candidates)
-            .map { candidate -> score(candidate, stats[candidate.identityKey], artistAffinity, today, feedback[candidate.identityKey]) }
+        val ranked = canonicalCandidates(candidates, checkCancellation)
+            .map { candidate -> checkCancellation(); score(candidate, stats[candidate.identityKey], artistAffinity, today, feedback[candidate.identityKey]) }
             .toMutableList()
         val selected = ArrayList<LocalRecommendation>(limit.coerceAtMost(ranked.size))
         val artistCounts = mutableMapOf<String, Int>()
         while (selected.size < limit && ranked.isNotEmpty()) {
+            checkCancellation()
             // Normalize previous credits once per selection, not once per comparator invocation.
             val previousArtists = selected.lastOrNull()?.song?.let { artistKeys(it.customArtist ?: it.artist) }.orEmpty()
             // A greedy diversity penalty also separates adjacent tracks sharing any credited artist.
             val best = ranked.maxWithOrNull(compareBy<Scored> {
+                checkCancellation()
                 it.score - (it.artists.maxOfOrNull { artist -> artistCounts.getOrDefault(artist, 0) } ?: 0) * 22.0 -
                     if (it.artists.any { artist -> artist in previousArtists }) 12.0 else 0.0
             }.thenByDescending { it.candidate.identityKey }) ?: break
@@ -72,18 +77,21 @@ object LocalRecommendationRanker {
         return selected
     }
 
-    internal fun canonicalCandidates(candidates: List<LocalRecommendationCandidate>): List<LocalRecommendationCandidate> =
-        candidates.filter { candidate ->
+    internal fun canonicalCandidates(
+        candidates: List<LocalRecommendationCandidate>, checkCancellation: () -> Unit = {}
+    ): List<LocalRecommendationCandidate> =
+        candidates.asSequence().onEach { checkCancellation() }.filter { candidate ->
             candidate.source == LocalRecommendationSource.LOCAL_FILE ||
                 (candidate.source != LocalRecommendationSource.YOUTUBE_MUSIC &&
                     candidate.song.channelId?.lowercase() !in setOf("qqmusic", "qq", "youtube", "youtubemusic", "youtube_music"))
         }.groupBy { it.identityKey }.values.map { duplicates ->
+            checkCancellation()
             duplicates.minWith(compareBy<LocalRecommendationCandidate>(
-                { it.source != LocalRecommendationSource.LOCAL_FILE }, { it.source.ordinal }, { !it.favorite },
+                { checkCancellation(); it.source != LocalRecommendationSource.LOCAL_FILE }, { it.source.ordinal }, { !it.favorite },
                 { it.song.customName ?: it.song.name }, { it.song.customArtist ?: it.song.artist },
                 { -(it.song.membershipAddedAtMs?.takeIf { time -> time > 0L } ?: it.song.addedAt).coerceAtLeast(0L) },
                 { it.song.mediaUri.orEmpty() }, { it.song.localFilePath.orEmpty() }
-            )).copy(favorite = duplicates.any { it.favorite })
+            )).copy(favorite = duplicates.any { checkCancellation(); it.favorite })
         }
 
     private data class Scored(

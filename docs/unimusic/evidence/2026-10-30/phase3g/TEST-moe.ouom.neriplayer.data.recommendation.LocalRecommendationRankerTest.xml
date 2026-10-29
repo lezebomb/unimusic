@@ -1,0 +1,7 @@
+<testsuite name="moe.ouom.neriplayer.data.recommendation.LocalRecommendationRankerTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-10-29T16:51:06.398Z" hostname="local" time="0.087">
+  <properties />
+  <testcase name="cancelledLargeRankingStopsWithoutChangingHealthyOrderOrReasons" classname="moe.ouom.neriplayer.data.recommendation.LocalRecommendationRankerTest" time="0.084" />
+  <testcase name="collaborativeCreditsShareAffinityAndDiversityWithoutMergingSingleArtistNames" classname="moe.ouom.neriplayer.data.recommendation.LocalRecommendationRankerTest" time="0.002" />
+  <system-out />
+  <system-err />
+</testsuite>

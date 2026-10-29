@@ -4,6 +4,10 @@ import com.google.gson.JsonParser
 import java.io.File
 import java.io.IOException
 import java.time.Instant
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.async
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.test.runTest
 import moe.ouom.neriplayer.data.model.SongItem
 import org.junit.Assert.assertEquals
@@ -150,6 +154,25 @@ class DailyRecommendationStoreTest {
         assertEquals(disk, file.readText())
         assertEquals(fallback, store.getOrCreate(library, now + 2, evidenceContext = unavailable) { error("Stable degraded memory") })
         assertEquals(healthy, store.getOrCreate(library, now + 3) { error("Healthy disk may be reused after recovery") })
+    }
+
+    @Test fun `cancelled UUID capture cannot replace a healthy memory or disk snapshot`() = runTest {
+        val file = File(temporary.root, "cancelled.json")
+        val library = listOf(candidate("a", "First"), candidate("b", "Second"))
+        var cancelCapture = false
+        val store = DailyRecommendationStore(file, lookupSongUuid = {
+            if (cancelCapture) currentCoroutineContext().cancel()
+            null
+        })
+        val healthy = store.getOrCreate(library, now) { recommendations(library) }
+        val original = file.readText()
+        cancelCapture = true
+        val refresh = async { store.getOrCreate(library, now + 1, forceRefresh = true) { recommendations(library.reversed()) } }
+        try { refresh.await();org.junit.Assert.fail("Cancelled refresh must propagate") } catch (_: CancellationException) { }
+        assertEquals(original, file.readText())
+        assertEquals(healthy, store.getOrCreate(library, now + 2) { error("Healthy memory must remain") })
+        assertEquals(healthy, DailyRecommendationStore(file, lookupSongUuid = { null })
+            .getOrCreate(library, now + 3) { error("Healthy disk must remain") })
     }
 
     private fun candidate(key: String, title: String, local: Boolean = false): LocalRecommendationCandidate = LocalRecommendationCandidate(

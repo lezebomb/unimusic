@@ -4,11 +4,17 @@
 
 **当前优先级：按最新用户要求弃用QQ音乐和YouTube音源，完善其余来源、搜索与推荐。** 保留已登录的Google/网易云及既有两份共5首导入，不重新登录/收验证码或重导全部歌单。YouTube实际音频仍未接通，其他来源/实际播放范围看2L/2M/2P报告，不扩大结论。
 
+## 当前3G：推荐计算与快照发布取消保护
+
+候选收集/摘要/去重/评分/多样性/恢复同步循环现检查取消；UUID后、内存发布和原子缓存写入前再复核。新2/共3 JVM和最终Debug51s、边界通过，初次24s编译的Context重名已修。APK build/outputs/unimusic/UniMusic-20261030-3G-debug.apk，精确哈希/版本见[3G](PHASE_3G_CANCELLABLE_RECOMMENDATIONS.md)。无真机/性能/新音频验收，数据及算法不变。
+
+3F已commit/push 74ea0b24；2BB CI40913939981被替代取消而非成功，3F CI40914837908最后观察in_progress，其普通行为集包含ArtistIntentTest。3G提交/CI以git和最新检查为准。不要重跑已通过本地测试或并发构建。下一步补日快照在整个原候选已从库移除后的空栏恢复，保留部分有效推荐顺序；再按计划推进其他有价值功能。
+
 ## 当前3F：推荐缓存与清除/开关上下文一致
 
 日快照核对统计/播放反馈清除代次、反馈开关和读取状态；不匹配重算，反馈不可读只留内存降级，不覆盖正常磁盘文件。旧v1可兼容，算法v4/Room v23/用户数据不变。新2/共4 JVM、边界、Debug1m51s通过；APK build/outputs/unimusic/UniMusic-20261030-3F-debug.apk，哈希/版本见[3F](PHASE_3F_RECOMMENDATION_CACHE_CONTEXT.md)。未装机或执行真实开关/重启/音频验收。
 
-2BB已commit/push fa223bda，CI40913939981最后观察in_progress，下一次查最终结果，不重跑本机构建。3F提交/推送以git log/status为准。接着可完善大音乐库推荐计算的取消响应：现rank/canonical/restore是同步大循环，collectLatest取消后仍可能占用后台任务；只做必要改动与定向验证。
+2BB已commit/push fa223bda，CI40913939981最后观察in_progress，下一次查最终结果，不重跑本机构建。3F提交/推送以git log/status为准。大库推荐取消响应已由3G完成；只做必要改动与定向验证。
 
 ## 当前2BB：歌曲与可选歌手索引并行
 

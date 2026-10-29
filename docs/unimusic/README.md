@@ -2,6 +2,8 @@
 
 [当前搜索规则与边界](SEARCH_BEHAVIOR.md)：歌手/作品意图、跨源录音证据、版本和可播状态、列表锚定及实际验收。
 
+最新：[3G推荐取消响应](PHASE_3G_CANCELLABLE_RECOMMENDATIONS.md)：候选/排名/缓存恢复协作取消，UUID捕获取消不替换正常快照；3 JVM/最终Debug通过，无性能声明。
+
 最新：[3F推荐缓存上下文](PHASE_3F_RECOMMENDATION_CACHE_CONTEXT.md)：日缓存核对清除代次/反馈开关和健康状态；4 JVM/Debug通过，保留用户记录与旧缓存兼容。
 
 最新：[2BB并行歌手索引](PHASE_2BB_PARALLEL_ARTIST_LOOKUP.md)：歌曲与歌手索引并行，保留取消/权限/录音门槛；4 JVM/Debug通过，无真机速度声明。
