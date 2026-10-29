@@ -53,7 +53,11 @@ private fun parseNeteaseSearchArtists(result: JSONObject): List<NeteaseSearchArt
                     .ifBlank { artist.optString("img1v1Url", "") }
             ).takeIf { it.isNotBlank() },
             musicSize = artist.optInt("musicSize", 0),
-            albumSize = artist.optInt("albumSize", 0)
+            albumSize = artist.optInt("albumSize", 0),
+            aliases = (listOf("alias", "alia", "transNames", "tns").flatMap { key ->
+                val values = artist.optJSONArray(key) ?: return@flatMap emptyList()
+                (0 until values.length()).mapNotNull { values.opt(it) as? String }
+            } + artist.optString("trans")).map(String::trim).filter { it.isNotEmpty() && it.length <= 256 }.distinct().take(16)
         )
     }
 }

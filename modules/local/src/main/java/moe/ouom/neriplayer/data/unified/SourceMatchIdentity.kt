@@ -49,4 +49,4 @@ internal fun positiveSourceId(value: String): Boolean = value.toLongOrNull()?.ta
 
 internal fun validMatchKey(key: SongSourceKey) = MusicSourceRegistry.validKey(key)
 
-internal fun nativeMatchKey(key: SongSourceKey) = MusicSourceRegistry.canResolveAudio(key)
+internal fun nativeMatchKey(key: SongSourceKey) = MusicSourceRegistry.hasAudioAdapter(key)

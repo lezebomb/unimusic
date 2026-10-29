@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="moe.ouom.neriplayer.platform.netease.api.client.NeteaseSearchIntentTransportTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2026-10-29T00:36:45.974Z" hostname="XUSHAOYANG" time="0.718">
+  <properties/>
+  <testcase name="optInPublicSearchIntentProbe" classname="moe.ouom.neriplayer.platform.netease.api.client.NeteaseSearchIntentTransportTest" time="0.715"/>
+  <system-out><![CDATA[INTENT_PROBE type=1 code=50000005 count=0
+INTENT_PROBE type=100 code=50000005 count=0
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -1,6 +1,8 @@
 # UniMusic 开发记录
 
-最新：[2AX可用来源与推荐v4](PHASE_2AX_ACTIVE_SOURCES_AND_RECOMMENDATION_CREDITS.md)：QQ/YT按用户要求停用，保留数据；推荐合唱成员偏好与多样性。乐队查询翻唱问题待修。
+最新：[2AY歌手/作品搜索意图](PHASE_2AY_ARTIST_AND_WORK_SEARCH.md)：乐队查询优先相关歌手及署名歌曲，聚合/网易云实机通过；样本仅20秒试听，完整版未验收。
+
+最新：[2AX可用来源与推荐v4](PHASE_2AX_ACTIVE_SOURCES_AND_RECOMMENDATION_CREDITS.md)：QQ/YT按用户要求停用，保留数据；推荐合唱成员偏好与多样性。乐队查询翻唱排序已在2AY修正。
 
 最新：[2AW网易云搜索可播性](PHASE_2AW_NETEASE_SEARCH_AUDIO_CHECKS.md)：限量后台校验/同版本排序，手机点击地址已校验结果已实际播放；账号歌单保留。
 
@@ -12,14 +14,14 @@
 
 基于 NeriPlayer 继续开发的原生 Android 统一音乐客户端；保留上游实现和 GPL 许可，采用渐进模型/数据库迁移。
 
-当前以[续跑检查点](RESUME_CHECKPOINT.md)为准（2026-10-28）。Room为v23，Debug可构建；“发现／我的”、网易云批量导入、本地推荐反馈控制、独立歌曲标识同步入口均已交付对应子阶段。尚无正式Release。
+当前以[续跑检查点](RESUME_CHECKPOINT.md)为准（2026-10-29）。Room为v23，Debug可构建；“发现／我的”、网易云批量导入、本地推荐反馈控制、独立歌曲标识同步入口均已交付对应子阶段。尚无正式Release。
 
 | 功能 | 已有证据与边界 |
 | --- | --- |
 | 网易云导入/播放 | [2M](PHASE_2M_ACCOUNT_IMPORT_AND_DEVICE_AUDIO.md)：实际登录、两份5首导入、无重复重导和正常完整音频样本播放 |
 | B站/GD、酷我 | B站/GD样本见2M；[2L](PHASE_2L_NATIVE_AUDIO_AND_PLAYABILITY.md)酷我正常免费音频样本实际解码/进度通过，不再是只有目录。覆盖率未验收 |
-| QQ音乐 | 正常搜索/音频接口和登录入口已接，匿名拒绝正确保留；真实QQ账号正向音频仍未验收 |
-| YouTube | [2P](PHASE_2P_GOOGLE_LOGIN_AND_AUTHENTICATED_SOURCE_PROBE.md)Google会话验证通过，实际音频仍失败；按用户要求暂缓取流排查 |
+| QQ音乐 | 已按用户要求停用在线来源，保留历史身份/本地数据 |
+| YouTube | 已按用户要求停用在线来源，保留原Google会话和历史数据 |
 | 搜索/备用来源 | [2R](PHASE_2R_EXPLICIT_VERSION_AND_VOICE_GATES.md)保守原唱/版本门槛、[2AH](PHASE_2AH_COMPLETE_VERSION_RANKING.md)完整版本证据排序、[2AJ](PHASE_2AJ_NETEASE_SEARCH_VERSION_ALIASES.md)网易云搜索版本别名、[2AN](PHASE_2AN_ARTIST_CREDIT_BOUNDARIES.md)歌手署名边界、[2T](PHASE_2T_SELECTIVE_SEARCH_RETRY.md)单源重试、[2W](PHASE_2W_SEARCH_TIMINGS.md)分来源计时、[2X](PHASE_2X_SOURCE_FAILURE_ISOLATION.md)失败隔离、[2AD](PHASE_2AD_PARALLEL_REMEMBERED_SOURCES.md)缓存在线源并行、[2AE](PHASE_2AE_NATIVE_COOLDOWN_GUARD.md)原生故障冷却、[2AI](PHASE_2AI_CONTEXT_FAILURE_EFFECTS.md)旧上下文失败隔离、[2AK](PHASE_2AK_NATIVE_TO_NETEASE_FALLBACK.md)QQ/酷我→网易云备用、[2AM](PHASE_2AM_FOREGROUND_PLAYBACK_PRIORITY.md)点击播放取消后台校验、[2AO](PHASE_2AO_RECENT_PRIMARY_FAILURE_HINT.md)近期主源失败调度、[2AP](PHASE_2AP_KUWO_MEDIA_FAILURE_RECOVERY.md)酷我实际媒体失败恢复、[2AQ](PHASE_2AQ_NATIVE_FAVORITE_IDENTITY.md)出站收藏身份隔离、[2AR](PHASE_2AR_NATIVE_PUBLIC_PAGES.md)规范官方页面分享、[2AS](PHASE_2AS_DESKTOP_KUWO_TRANSPORT.md)桌面正常流传输诊断、[2AG](PHASE_2AG_SHORT_LIVED_SEARCH_METADATA.md)短期元数据复用；不承诺未测的速度/原唱准确率 |
 | 后台计算 | [2U](PHASE_2U_CURRENT_SEARCH_EVIDENCE.md)并发证据、[2V](PHASE_2V_PREPARED_SEARCH_QUERY.md)查询复用、[2Y](PHASE_2Y_BACKGROUND_ONLINE_PAGES.md)在线页后台解析、[2Z](PHASE_2Z_COOPERATIVE_SEARCH_CANCELLATION.md)协作取消、[2AA](PHASE_2AA_NETEASE_SEARCH_SESSION.md)账号查询恢复 |
 | 推荐/同步 | 3A～3C本机隐藏/反馈/清除；[3D.8](PHASE_3D8_GITHUB_IDENTITY_SYNC.md)GitHub/WebDAV歌曲身份/元数据子集与冲突选择，真实双设备/上传/Media3采样仍未验收 |

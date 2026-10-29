@@ -107,6 +107,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarState
 import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
@@ -292,13 +293,27 @@ internal val ExploreSearchContentMaxWidth = 1040.dp
 internal fun exploreSearchResultsHorizontalPadding(isTabletLayout: Boolean): Dp =
     if (isTabletLayout) 28.dp else 0.dp
 
+private class SearchResultsContentRef(var value: Any? = null)
+
 @Composable
 internal fun ExploreSearchResultsList(
     state: LazyListState,
     isTabletLayout: Boolean,
     miniPlayerHeight: Dp,
+    resultsIdentity: Any? = null,
     content: LazyListScope.() -> Unit
 ) {
+    val previousContent = remember(state) { SearchResultsContentRef() }
+    val followTop by remember(state) { derivedStateOf {
+        state.firstVisibleItemIndex == 0 && state.firstVisibleItemScrollOffset == 0 && !state.isScrollInProgress
+    } }
+    SideEffect {
+        if (previousContent.value !== resultsIdentity) {
+            previousContent.value = resultsIdentity
+            // Keep the new best result visible at the top; retain the anchor after an actual user scroll.
+            if (resultsIdentity != null && followTop) state.requestScrollToItem(0)
+        }
+    }
     val horizontalPadding = exploreSearchResultsHorizontalPadding(isTabletLayout)
     LazyColumn(
         state = state,
@@ -949,7 +964,8 @@ fun ExploreScreen(
                                 ExploreSearchResultsList(
                                     state = searchListState,
                                     isTabletLayout = isTabletLayout,
-                                    miniPlayerHeight = miniPlayerHeight
+                                    miniPlayerHeight = miniPlayerHeight,
+                                    resultsIdentity = ui.searchItems
                                 ) {
                                 itemsIndexed(
                                     items = ui.searchItems,

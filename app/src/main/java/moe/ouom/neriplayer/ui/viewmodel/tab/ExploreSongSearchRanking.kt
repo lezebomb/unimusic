@@ -25,6 +25,7 @@ internal class ExploreSearchRankingSession(query: String) {
     private data class Score(val text: Int?, val versionPenalty: Int)
     private data class Cached(val item: ExploreSearchResult, val score: Score)
     private val scores = LinkedHashMap<String, Cached>(64, 0.75f, true)
+    @Volatile var artistIntent: moe.ouom.neriplayer.ui.viewmodel.tab.search.SearchArtistIntent? = null
 
     /** Called on the UI state owner. Publish immediately after return, without another suspension. */
     suspend fun rankWithCurrentChecks(items: List<ExploreSearchResult>,
@@ -33,13 +34,14 @@ internal class ExploreSearchRankingSession(query: String) {
         while (isCurrent()) {
             currentCoroutineContext().ensureActive()
             val captured = checks()
+            val capturedIntent = artistIntent
             val ranked = withContext(worker) {
                 val context = currentCoroutineContext()
                 rank(items, captured) { context.ensureActive() }
             }
             if (!isCurrent()) return null
             // An address probe may finish while metadata is ranked on the worker. Never publish its old evidence.
-            if (checks() === captured) return ranked
+            if (checks() === captured && artistIntent === capturedIntent) return ranked
         }
         return null
     }
@@ -49,10 +51,12 @@ internal class ExploreSearchRankingSession(query: String) {
         moe.ouom.neriplayer.data.model.unified.SourceCheckResult> = emptyMap(),
         checkActive: () -> Unit = {}): List<ExploreSearchResult> {
         checkActive()
-        if (normalized.isBlank() || items.size <= 1) return items
+        val intent = artistIntent
+        val displayItems = if (intent == null) items else (intent.cards() + items).distinctBy { it.stableKey }
+        if (normalized.isBlank() || displayItems.size <= 1) return displayItems
         val now = System.currentTimeMillis()
-        data class Ranked(val item: ExploreSearchResult, val index: Int, val score: Score, val availability: Int)
-        val ranked = items.mapIndexed { index, item ->
+        data class Ranked(val item: ExploreSearchResult, val index: Int, val score: Score, val availability: Int, val intentTier: Int, val promotion: Int)
+        val ranked = displayItems.mapIndexed { index, item ->
             if (index and 127 == 0) checkActive()
             val cached = scores[item.stableKey]
             val score = if (cached != null && cached.item == item) cached.score else score(item).also { value ->
@@ -66,9 +70,14 @@ internal class ExploreSearchRankingSession(query: String) {
                 null -> 1
                 else -> 2
             }
-            Ranked(item, index, score, availability)
+            Ranked(item, index, score, availability, intent?.tier(item) ?: 0,
+                moe.ouom.neriplayer.ui.viewmodel.tab.search.searchPromotionPenalty(normalized, item))
         }
-        val comparator = compareBy<Ranked> { it.score.text == null }
+        val comparator = compareBy<Ranked> { it.promotion }
+            .thenBy { it.intentTier }
+            // Artist/work relevance is already established: a literal work label must not lift Live above studio.
+            .thenBy { if (intent != null && it.intentTier == 1) it.score.versionPenalty else 0 }
+            .thenBy { it.score.text == null }
             // A bounded version preference must not outweigh a much better title/artist match.
             .thenBy { ((it.score.text?.toLong() ?: Int.MAX_VALUE.toLong()) + minOf(2, it.score.versionPenalty) * 8) / 16 }
             .thenBy { it.score.versionPenalty }

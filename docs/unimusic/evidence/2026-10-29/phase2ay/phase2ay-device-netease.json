@@ -1,0 +1,53 @@
+{
+  "query": "哭泣少女乐队",
+  "source": "netease_song",
+  "relatedBandVisible": true,
+  "secondBandVisible": true,
+  "publicLabels": [
+    "哭泣少女乐队",
+    "搜索关键词",
+    "搜索历史",
+    "哭泣少女乐队",
+    "Canon",
+    "聚合",
+    "网易云",
+    "哔哩哔哩",
+    "链接",
+    "歌曲",
+    "歌单",
+    "歌手",
+    "トゲナシトゲアリ",
+    "109 首歌曲 · 40 张专辑",
+    "ダイヤモンドダスト",
+    "6 首歌曲 · 2 张专辑",
+    "3",
+    "雑踏、僕らの街",
+    "トゲナシトゲアリ · 雑踏、僕らの街",
+    "03:04",
+    "4",
+    "Cycle Of Sorrow",
+    "ダイヤモンドダスト · 棘ナシ",
+    "03:18",
+    "搜索",
+    "君をなぞるだけの夜",
+    "秋葵AKIAOI / 理想放逐",
+    "发现"
+  ],
+  "selectedCreditedTrack": "雑踏、僕らの街",
+  "progressSamples": [
+    {
+      "state": 3,
+      "positionMs": 2133,
+      "speed": 1.0
+    },
+    {
+      "state": 3,
+      "positionMs": 4206,
+      "speed": 1.0
+    }
+  ],
+  "permissionDialog": false,
+  "pauseClicked": true,
+  "playerDisplayedDuration": "00:20",
+  "audioAcceptance": "Preview segment only, not complete-track acceptance"
+}

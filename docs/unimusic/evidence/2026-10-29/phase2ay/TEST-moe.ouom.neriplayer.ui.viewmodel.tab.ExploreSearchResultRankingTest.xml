@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="moe.ouom.neriplayer.ui.viewmodel.tab.ExploreSearchResultRankingTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2026-10-29T00:40:55.424Z" hostname="XUSHAOYANG" time="0.117">
+  <properties/>
+  <testcase name="verifiedNeteaseAddressReordersOnlyMatchingProviderAndVersionWhileChecksAreFresh" classname="moe.ouom.neriplayer.ui.viewmodel.tab.ExploreSearchResultRankingTest" time="0.114"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

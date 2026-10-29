@@ -6,7 +6,7 @@
     <string name="settings_search_empty">没有匹配的设置</string>
     <string name="settings_general">通用</string>
     <string name="settings_general_desc">触感、后台服务与界面缩放</string>
-    <string name="settings_accounts_desc">管理网易云、哔哩哔哩和 YouTube 登录状态</string>
+    <string name="settings_accounts_desc">管理网易云与哔哩哔哩登录状态</string>
     <string name="settings_personalization">个性化</string>
     <string name="settings_network">网络设置</string>
     <string name="settings_bypass_proxy">绕过系统代理</string>

@@ -6,7 +6,7 @@
     <string name="settings_search_empty">No matching settings</string>
     <string name="settings_general">General</string>
     <string name="settings_general_desc">Haptics, background service and interface scale</string>
-    <string name="settings_accounts_desc">Manage NetEase, Bilibili, and YouTube sign-in states</string>
+    <string name="settings_accounts_desc">Manage NetEase and Bilibili sign-in states</string>
     <string name="settings_personalization">Personalization</string>
     <string name="settings_network">Network</string>
     <string name="settings_bypass_proxy">Bypass Proxy</string>

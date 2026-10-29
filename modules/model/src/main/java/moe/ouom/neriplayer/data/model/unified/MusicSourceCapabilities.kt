@@ -33,8 +33,11 @@ object MusicSourceRegistry {
         else -> false
     }
 
-    fun canResolveAudio(key: SongSourceKey): Boolean = isEnabled(key.provider) && validKey(key) &&
+    /** Historical metadata can be reconstructed even when this product no longer enables its transport. */
+    fun hasAudioAdapter(key: SongSourceKey): Boolean = validKey(key) &&
         capabilities(key.provider).audio in setOf(SourceAudioSupport.LOCAL_FILE, SourceAudioSupport.PLATFORM_API)
+
+    fun canResolveAudio(key: SongSourceKey): Boolean = isEnabled(key.provider) && hasAudioAdapter(key)
 
     /** Canonical public metadata pages only; source identity grants no audio entitlement. */
     fun publicPageUrl(key: SongSourceKey): String? {

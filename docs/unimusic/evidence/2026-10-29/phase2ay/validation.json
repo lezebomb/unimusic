@@ -1,0 +1,63 @@
+{
+  "phase": "2AY",
+  "date": "2026-10-29",
+  "uniquePositiveUnitTests": 8,
+  "newSearchTestMethods": 3,
+  "counts": {
+    "searchIntent": 3,
+    "existingSearchAudioRanking": 1,
+    "historicalRoomCompatibility": 3,
+    "retiredTransportPolicy": 1
+  },
+  "failures": 0,
+  "errors": 0,
+  "separateOptionalDiagnosticSkipped": 1,
+  "validation": {
+    "searchTestsAndBuild": "phase2ay-final-version-check.log: BUILD SUCCESSFUL in 50s",
+    "existingSearchAudioRanking": "phase2ay-final-validation.log: BUILD SUCCESSFUL in 48s",
+    "compatibilityTestsAndFinalAPK": "phase2ay-identity-compatibility.log: BUILD SUCCESSFUL in 2m41s",
+    "platformDomainViolations": 0,
+    "moduleBoundaries": "passed after final compatibility changes"
+  },
+  "apk": {
+    "archive": "build/outputs/unimusic/UniMusic-20261029-2AY-debug.apk",
+    "sha256": "c259379b733b070a7cfe26a3d86bd90ccfe79272b054e1ebefec96a47bddff63",
+    "installedVersion": "ee5c26c1f592.dirty.10290859",
+    "installation": "adb Success; package version checked; data preserved"
+  },
+  "searchDevice": {
+    "version": "ee5c26c1f592.dirty.10290852",
+    "query": "哭泣少女乐队",
+    "aggregate": "Related bands and their credited songs before arrangements/resource videos",
+    "neteaseSongTab": "Related bands and their credited songs before arrangements",
+    "postCompatibilityInstall": "Version checked; no duplicate full search acceptance"
+  },
+  "audioSample": {
+    "version": "ee5c26c1f592.dirty.10290843",
+    "title": "雑踏、僕らの街",
+    "artist": "トゲナシトゲアリ",
+    "mediaSessionPositionsMs": [
+      2133,
+      4206
+    ],
+    "displayedDuration": "00:20",
+    "acceptance": "Preview segment only; paused after sample, not complete-track acceptance"
+  },
+  "independentMetadataEvidence": {
+    "anonymousPublicCloudsearch": "Public 30-song fixture, no credentials or URLs",
+    "anonymousProductionWEAPI": "50000005, zero rows for both song/artist requests; rejected, not successful recall",
+    "deviceArtistIndex": "Existing signed-in account returned both band entities; no reauthentication"
+  },
+  "recoveredFailures": [
+    "Initial optional diagnostic lacked required commentCheckToken supplier; fixed compile",
+    "CI 40793662272 on 2AX failed 3 historical identity tests; separate implemented adapter from enabled transport, all 3 reproduced tests now pass locally"
+  ],
+  "data": "Room v23 unchanged; retired QQ/YT metadata and source mappings retained; active playback still blocked",
+  "limitations": [
+    "No universal original-recording certification or accuracy/latency benchmark",
+    "1200ms is optional artist-request budget, not measured end-to-end delay",
+    "No full audio acceptance for this song; account returned preview",
+    "Remote CI for this uncommitted stage pending; local targeted checks only",
+    "JDK21 runtime test suite not executed locally; no need to repeat unrelated suites"
+  ]
+}

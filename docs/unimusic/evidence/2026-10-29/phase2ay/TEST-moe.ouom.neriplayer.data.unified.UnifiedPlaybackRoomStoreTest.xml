@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="moe.ouom.neriplayer.data.unified.UnifiedPlaybackRoomStoreTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2026-10-29T01:01:45.751Z" hostname="XUSHAOYANG" time="0.146">
+  <properties/>
+  <testcase name="uuidResolvesExactNativeRecordingAndKeepsPartsSeparate" classname="moe.ouom.neriplayer.data.unified.UnifiedPlaybackRoomStoreTest" time="0.141"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

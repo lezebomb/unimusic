@@ -38,6 +38,7 @@ class AutomaticCatalogChoiceTest {
     @Test fun retiredAdaptersCannotBeResolvedButTheirSavedIdentityStillValidates() {
         for (key in listOf(SongSourceKey("qqmusic", "003OUlho2HcRHC"), SongSourceKey("youtube_music", "abcdefghijk"))) {
             assertTrue(MusicSourceRegistry.validKey(key))
+            assertTrue(MusicSourceRegistry.hasAudioAdapter(key))
             assertFalse(MusicSourceRegistry.isEnabled(key.provider))
             assertFalse(MusicSourceRegistry.canResolveAudio(key))
         }
