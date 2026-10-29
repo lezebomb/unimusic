@@ -4,6 +4,7 @@ import moe.ouom.neriplayer.core.player.runtime.progress.PlaybackProgressPort
 
 import moe.ouom.neriplayer.core.player.host.PlayerDependencies
 import moe.ouom.neriplayer.core.player.PlayerManager
+import moe.ouom.neriplayer.core.player.watchdog.currentPlaybackCandidate
 import moe.ouom.neriplayer.core.player.currentPositionMsOrZero
 import moe.ouom.neriplayer.core.player.durationMsOrZero
 import moe.ouom.neriplayer.core.player.persistence.scheduleStatePersist
@@ -32,6 +33,10 @@ internal object PlayerManagerPlaybackProgressPort : PlaybackProgressPort {
         if (!PlayerManager.isPlayerInitialized()) return null
         return PlayerManager.player.durationMsOrZero
     }
+
+    override fun canBackfillCurrentSongDuration(): Boolean =
+        PlayerManager.currentPlaybackCandidate()?.isPreviewClip != true &&
+            PlayerManager.currentPlaybackAudioInfoFlow.value?.isPreviewClip != true
 
     override fun updateQueuedDurationIfUnknown(song: SongItem, durationMs: Long): Boolean =
         PlayerManager.updateQueuedSong(song) { queued ->

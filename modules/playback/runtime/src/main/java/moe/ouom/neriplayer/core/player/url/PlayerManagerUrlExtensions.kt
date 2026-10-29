@@ -1121,7 +1121,8 @@ private suspend fun PlayerManager.handleRefreshResult(
             val gate = refreshSideEffectGate(request, song)
             if (!action.updateDuration ||
                 !RefreshResultSideEffects(gate).updateDuration {
-                    maybeUpdateSongDuration(song, result.durationMs ?: 0L)
+                    maybeUpdateSongDuration(song, result.durationMs ?: 0L,
+                        allowMetadataBackfill = !result.isPreviewClip && result.audioInfo?.isPreviewClip != true)
                 }
             ) return
             withContext(Dispatchers.Main) {

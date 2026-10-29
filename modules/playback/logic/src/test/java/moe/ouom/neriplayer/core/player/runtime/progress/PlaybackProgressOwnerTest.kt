@@ -51,6 +51,38 @@ class PlaybackProgressOwnerTest {
         assertEquals(1, port.immediatePersists)
     }
 
+    @Test fun previewDurationUpdatesTransportWithoutInventingUnknownRecordingMetadata() {
+        val unknown = song(1, 0)
+        val port = RecordingPort().apply { current = unknown; playerDuration = 20_000; mayBackfill = false }
+        val owner = PlaybackProgressOwner(port, { a, b -> a.id == b?.id }) { 0 }
+        owner.maybeUpdateSongDuration(unknown, 20_000, allowMetadataBackfill = false)
+        owner.maybeBackfillCurrentSongDurationFromPlayer()
+        assertEquals(20_000L, owner.duration.value)
+        assertEquals(0L, port.current?.durationMs)
+        assertEquals(0, port.queueUpdates)
+        assertEquals(0, port.immediatePersists)
+    }
+
+    @Test fun previewToFullTransitionBackfillsRealDurationWhileOrdinaryShortSongsRemainValid() {
+        val unknown = song(1, 0)
+        val port = RecordingPort().apply { current = unknown; mayBackfill = false }
+        val owner = PlaybackProgressOwner(port, { a, b -> a.id == b?.id }) { 0 }
+        owner.maybeUpdateSongDuration(unknown, 20_000, allowMetadataBackfill = false)
+        // The explicit new full result is authoritative even while the previous candidate was a preview.
+        owner.maybeUpdateSongDuration(unknown, 224_000, allowMetadataBackfill = true)
+        assertEquals(224_000L, port.current?.durationMs)
+        assertEquals(224_000L, owner.duration.value)
+        assertEquals(1, port.immediatePersists)
+        owner.maybeUpdateSongDuration(unknown, 20_000, allowMetadataBackfill = false)
+        assertEquals(224_000L, port.current?.durationMs)
+        assertEquals(20_000L, owner.duration.value)
+        assertEquals(1, port.queueUpdates)
+        val shortPort = RecordingPort().apply { current = song(2, 0); playerDuration = 20_000 }
+        PlaybackProgressOwner(shortPort, { a, b -> a.id == b?.id }) { 0 }.maybeBackfillCurrentSongDurationFromPlayer()
+        assertEquals(20_000L, shortPort.current?.durationMs)
+        assertEquals(1, shortPort.immediatePersists)
+    }
+
     @Test
     fun `pending seek masks transient player position and clears on arrival`() {
         val owner = PlaybackProgressOwner(RecordingPort(), { first, second -> first.id == second?.id }) { 0L }
@@ -178,6 +210,7 @@ class PlaybackProgressOwnerTest {
         var current: SongItem? = null
         var reportedPosition = 0L
         var playerDuration: Long? = null
+        var mayBackfill = true
         var remembered = 0L
         var rememberEnabled = true
         var queuedChanged = true
@@ -195,6 +228,7 @@ class PlaybackProgressOwnerTest {
         override fun reportedPositionMs(): Long = reportedPosition
         override fun playerPositionMs(): Long? = reportedPosition
         override fun playerDurationMs(): Long? = playerDuration
+        override fun canBackfillCurrentSongDuration(): Boolean = mayBackfill
         override fun updateQueuedDurationIfUnknown(song: SongItem, durationMs: Long): Boolean {
             queueUpdates++
             return queuedChanged

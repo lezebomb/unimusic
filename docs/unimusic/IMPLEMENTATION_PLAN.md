@@ -63,6 +63,8 @@
 
 ## Phase 2：统一搜索与高精度匹配
 
+2BE区分当前传输时长与逻辑录音时长，明确试听不回填未知歌曲元数据，完整短歌/后续完整来源仍可回填；3 JVM/Debug/边界通过，见[2BE](PHASE_2BE_PREVIEW_RECORDING_DURATION.md)。无设备/完整音频验收。
+
 2BD将原账号会话覆盖整个主源质量/备用/保留试听过程，并组合原播放请求gate；新2/共3 JVM、Debug/边界通过，见[2BD](PHASE_2BD_PRIMARY_ACCOUNT_CONTEXT.md)。未执行真实账号切换或音频验收。
 
 2BC将网易云新原生/B站备用家族并行，保持已记住/本地优先、录音权限门槛及8秒总预算；隔离子任务播放器回调，胜出后再核对会话/网络/开关。新2/共3 JVM及最终Debug通过，见[2BC](PHASE_2BC_PARALLEL_FRESH_SOURCE_FAMILIES.md)，无真机速度结论。

@@ -1,0 +1,29 @@
+{
+  "phase": "2BE",
+  "date": "2026-10-30",
+  "uniqueUnitTests": 3,
+  "newTestMethods": 2,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "build": "phase2be-preview-recording-duration.log: BUILD SUCCESSFUL in 48s",
+  "moduleBoundaries": "passed",
+  "apk": {
+    "archive": "build/outputs/unimusic/UniMusic-20261030-2BE-debug.apk",
+    "version": "a52fdf29b858.dirty.10300540",
+    "sha256": "0b8b135ad3bbd415e392f9be3557d182596f39a9ea7d982772a99f09d1fa9174",
+    "installedThisPhase": false
+  },
+  "implementation": [
+    "Preview results update current transport duration without backfilling unknown logical recording/queue duration",
+    "Foreground playback and URL refresh explicitly pass preview eligibility; timeline backfill rechecks candidate/audio-info preview flags",
+    "A later full recording may backfill real metadata; known metadata and full short songs retain original behavior"
+  ],
+  "data": "Room v23 and schemas unchanged; no old duration heuristically erased, no account/playlist/history clearing",
+  "ci": "Added only PlaybackProgressOwnerTest.preview* to existing logic suite; workflow routing conservatively requires its Android migration check once. Confirm that CI before pushing another source stage; no redundant local migration run.",
+  "unexecuted": [
+    "No device installation or preview/full-source transition acceptance",
+    "No full audio or actual matching-speed improvement measured",
+    "No local fixed-JDK21 runtime tests"
+  ]
+}

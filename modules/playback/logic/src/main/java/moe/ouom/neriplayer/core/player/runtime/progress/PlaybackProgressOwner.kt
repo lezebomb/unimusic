@@ -17,6 +17,7 @@ interface PlaybackProgressPort {
     fun reportedPositionMs(): Long
     fun playerPositionMs(): Long?
     fun playerDurationMs(): Long?
+    fun canBackfillCurrentSongDuration(): Boolean = true
     fun updateQueuedDurationIfUnknown(song: SongItem, durationMs: Long): Boolean
     fun replaceCurrentSong(song: SongItem)
     fun scheduleImmediateStatePersist()
@@ -120,16 +121,16 @@ class PlaybackProgressOwner(
         persistLongFormProgress(song, positionMs, durationMs)
     }
 
-    fun maybeUpdateSongDuration(song: SongItem, durationMs: Long) {
+    fun maybeUpdateSongDuration(song: SongItem, durationMs: Long, allowMetadataBackfill: Boolean = true) {
         val resolved = durationMs.takeIf { it > 0L } ?: return
-        val queuedChanged = port.updateQueuedDurationIfUnknown(song, resolved)
-        val currentChanged = updateMatchingCurrentSongDuration(song, resolved)
+        val queuedChanged = allowMetadataBackfill && port.updateQueuedDurationIfUnknown(song, resolved)
+        val currentChanged = updateMatchingCurrentSongDuration(song, resolved, allowMetadataBackfill)
         if (queuedChanged || currentChanged) port.scheduleImmediateStatePersist()
     }
 
-    private fun updateMatchingCurrentSongDuration(song: SongItem, durationMs: Long): Boolean {
+    private fun updateMatchingCurrentSongDuration(song: SongItem, durationMs: Long, allowMetadataBackfill: Boolean): Boolean {
         val current = port.currentSong()?.takeIf { sameSong(it, song) } ?: return false
-        val changed = current.durationMs <= 0L
+        val changed = allowMetadataBackfill && current.durationMs <= 0L
         if (changed) port.replaceCurrentSong(current.copy(durationMs = durationMs))
         setDuration(durationMs)
         return changed
@@ -139,7 +140,7 @@ class PlaybackProgressOwner(
         val song = port.currentSong() ?: return
         val playerDuration = port.playerDurationMs()?.takeIf { it > 0L } ?: return
         setDuration(playerDuration)
-        maybeUpdateSongDuration(song, playerDuration)
+        maybeUpdateSongDuration(song, playerDuration, allowMetadataBackfill = port.canBackfillCurrentSongDuration())
     }
 
     fun pendingSeekPositionOrNull(): Long? = pendingSeekPositionMs.takeIf { it != C.TIME_UNSET }

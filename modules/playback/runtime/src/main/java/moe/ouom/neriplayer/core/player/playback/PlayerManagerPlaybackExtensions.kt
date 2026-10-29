@@ -722,7 +722,8 @@ internal fun PlayerManager.playAtIndex(
                             postPlayerEvent(PlayerEvent.ShowNotice(message))
                         }
                     }
-                    maybeUpdateSongDuration(song, result.durationMs ?: 0L)
+                    maybeUpdateSongDuration(song, result.durationMs ?: 0L,
+                        allowMetadataBackfill = !result.isPreviewClip && result.audioInfo?.isPreviewClip != true)
                     val cacheKey = result.cacheKeyOverride ?: computeCacheKey(song)
                     replacePlaybackDemandCacheKey(
                         cacheKey = cacheKey.takeUnless {

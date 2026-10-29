@@ -1305,8 +1305,8 @@ object PlayerManager {
         return _currentSongFlow.value?.sameIdentityAs(song) == true
     }
 
-    internal fun maybeUpdateSongDuration(song: SongItem, durationMs: Long) {
-        playbackProgressOwner.maybeUpdateSongDuration(song, durationMs)
+    internal fun maybeUpdateSongDuration(song: SongItem, durationMs: Long, allowMetadataBackfill: Boolean = true) {
+        playbackProgressOwner.maybeUpdateSongDuration(song, durationMs, allowMetadataBackfill)
     }
 
     internal fun maybeBackfillCurrentSongDurationFromPlayer() {
