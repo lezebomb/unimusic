@@ -3,6 +3,8 @@ package moe.ouom.neriplayer.ui.viewmodel.tab.search
 import moe.ouom.neriplayer.data.model.SongItem
 import moe.ouom.neriplayer.data.model.unified.RecordingMatchPolicy
 import moe.ouom.neriplayer.data.model.unified.RecordingMetadata
+import moe.ouom.neriplayer.data.model.unified.MusicSourceRegistry
+import moe.ouom.neriplayer.data.model.unified.SongSourceKey
 import moe.ouom.neriplayer.ui.viewmodel.tab.ExploreSearchResult
 import moe.ouom.neriplayer.ui.viewmodel.tab.NeteaseSearchArtistResult
 
@@ -39,8 +41,8 @@ internal fun inferSearchArtistIntent(query: String, providerSongs: List<SongItem
     val valid = artists.distinctBy { it.artist.id }.filter { it.artist.id > 0 && it.artist.name.isNotBlank() }
     fun inferred(entities: List<NeteaseSearchArtistResult>): SearchArtistIntent {
         val ids = entities.map { it.artist.id }.toSet()
-        val recordings = providerSongs.asSequence().filter { song -> song.channelId == "netease" &&
-            song.neteaseArtists.orEmpty().any { it.id in ids } }.take(64)
+        val recordings = providerSongs.asSequence().filter { song -> neteaseArtistEvidenceKey(song) != null &&
+            song.neteaseArtists.orEmpty().any { it.id in ids } }.distinctBy(::neteaseArtistEvidenceKey).take(64)
             .map { RecordingMetadata(it.name, it.artist, it.durationMs, versionContext = it.album) }.toList()
         return SearchArtistIntent(entities, recordings)
     }
@@ -51,13 +53,21 @@ internal fun inferSearchArtistIntent(query: String, providerSongs: List<SongItem
     if (exact.size == 1) return inferred(exact)
     if (exact.isNotEmpty() || valid.size !in 1..3 ||
         RecordingMatchPolicy.versions(RecordingMetadata(query, "", 0)).isNotEmpty()) return null
-    val sample = providerSongs.take(6)
+    // Repeated rows are one recording, not independent support from the song index.
+    val sample = providerSongs.take(6).filter { neteaseArtistEvidenceKey(it) != null }
+        .distinctBy(::neteaseArtistEvidenceKey)
     if (sample.size < 4) return null
     val ids = valid.map { it.artist.id }.toSet()
     val hits = sample.count { song -> song.neteaseArtists.orEmpty().any { it.id in ids } }
     if (hits < 4 || hits * 3 < sample.size * 2) return null
     val supported = valid.filter { entity -> sample.any { song -> song.neteaseArtists.orEmpty().any { it.id == entity.artist.id } } }
     return supported.takeIf { it.isNotEmpty() }?.let(::inferred)
+}
+
+private fun neteaseArtistEvidenceKey(song: SongItem): String? {
+    if (song.channelId != "netease") return null
+    val id = song.audioId ?: song.id.toString()
+    return id.takeIf { MusicSourceRegistry.validKey(SongSourceKey("netease", it)) }
 }
 
 private val resourcePromotion = Regex("""(?i)(网盘|资源分享|全集下载|\d+集全|磁力链接|下载链接)""")

@@ -1,0 +1,28 @@
+{
+  "phase": "2BF",
+  "date": "2026-10-30",
+  "uniqueUnitTests": 3,
+  "newTestMethods": 2,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "build": "phase2bf-independent-artist-evidence.log: BUILD SUCCESSFUL in 1m42s",
+  "moduleBoundaries": "passed",
+  "apk": {
+    "archive": "build/outputs/unimusic/UniMusic-20261030-2BF-debug.apk",
+    "version": "643b8a793bb0.dirty.10300545",
+    "sha256": "100f4aca81ee080b91f96ef73ee8970e29f23a22f8697290d48e45070e1458b0",
+    "installedThisPhase": false
+  },
+  "implementation": [
+    "Consensus uses distinct valid NetEase resource IDs within the same original top-six window",
+    "Duplicate legacy IDs sharing one audioId never count as independent support",
+    "Invalid or foreign-channel song rows do not count; exact unique aliases retain their strong-evidence path",
+    "Catalog recording anchors likewise deduplicate real native resource IDs"
+  ],
+  "data": "No matching threshold relaxation, new network request, source reenablement or Room change",
+  "unexecuted": [
+    "No new device search, original-recording accuracy or timing benchmark"
+  ],
+  "ci": "Existing artist intent selector covers new cases; commit locally now, push only after required 2BE workflow/migration CI finishes to avoid cancelling it"
+}

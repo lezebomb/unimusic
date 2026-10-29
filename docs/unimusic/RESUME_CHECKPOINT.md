@@ -4,6 +4,12 @@
 
 **当前优先级：按最新用户要求弃用QQ音乐和YouTube音源，完善其余来源、搜索与推荐。** 保留已登录的Google/网易云及既有两份共5首导入，不重新登录/收验证码或重导全部歌单。YouTube实际音频仍未接通，其他来源/实际播放范围看2L/2M/2P报告，不扩大结论。
 
+## 当前2BF：搜索歌手共识去重
+
+歌手作品共识按原始前6条窗口内独立合法网易云audioId计数，旧本地ID变化不重复计票，外channel/坏ID不伪造支持，录音锚点也去重；原4首/2/3及精确别名/版本门槛保持。新2/共3 JVM、Debug1m42s、边界通过，见[2BF](PHASE_2BF_INDEPENDENT_ARTIST_EVIDENCE.md)。APK build/outputs/unimusic/UniMusic-20261030-2BF-debug.apk，未装机或做新速度/准确率验收。
+
+本阶段将先本地commit；等待2BE 643b8a79对应CI40960266466的必要工作流/Android迁移检查完成后才push，不能因下一阶段推送把它取消。2BD a52fdf29的CI已被2BE替代取消，最新完整行为集包含新账号边界用例，待XML确认。继续检查明确试听与长音频书签/恢复位置的隔离，保留所有用户书签，不批量重置历史。
+
 ## 当前2BE：试听不回填未知逻辑时长
 
 明确试听只更新当前播放时长，初播/刷新/时间线均避免把20秒写成未知歌曲的整曲时长，保留严格自动匹配的真实依据；正常完整短歌和后续完整来源回填保持。新2/共3 JVM、模块边界及Debug48s通过，见[2BE](PHASE_2BE_PREVIEW_RECORDING_DURATION.md)。最新包build/outputs/unimusic/UniMusic-20261030-2BE-debug.apk，版本/哈希见报告。未装机或真实完整切换、音频/速度验收，Room v23不变。

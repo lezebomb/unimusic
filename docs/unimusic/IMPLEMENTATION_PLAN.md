@@ -63,6 +63,8 @@
 
 ## Phase 2：统一搜索与高精度匹配
 
+2BF以原始前6条中的合法独立网易云资源统计作品歌手共识，排除重复/外源/坏ID，保留唯一别名与原版本门槛；3 JVM/Debug/边界通过，见[2BF](PHASE_2BF_INDEPENDENT_ARTIST_EVIDENCE.md)。
+
 2BE区分当前传输时长与逻辑录音时长，明确试听不回填未知歌曲元数据，完整短歌/后续完整来源仍可回填；3 JVM/Debug/边界通过，见[2BE](PHASE_2BE_PREVIEW_RECORDING_DURATION.md)。无设备/完整音频验收。
 
 2BD将原账号会话覆盖整个主源质量/备用/保留试听过程，并组合原播放请求gate；新2/共3 JVM、Debug/边界通过，见[2BD](PHASE_2BD_PRIMARY_ACCOUNT_CONTEXT.md)。未执行真实账号切换或音频验收。

@@ -73,6 +73,25 @@ class ExploreSearchArtistIntentTest {
         assertTrue(released)
     }
 
+    @Test fun independentNativeResourcesAreRequiredForTheWorkArtistConsensus() {
+        val credited = searchSongItems(songs()).filter { it.neteaseArtists.orEmpty().any { a -> a.id in setOf(57020536L, 62046853L) } }
+            .distinctBy { it.audioId }.take(4)
+        assertEquals(4, credited.size)
+        val duplicateRows = List(6) { credited.first().copy(id = 7_000L + it) }
+        assertNull(inferSearchArtistIntent(query, duplicateRows, artists()))
+        val realEvidence = credited + listOf(credited.first(), credited.last())
+        assertNotNull(inferSearchArtistIntent(query, realEvidence, artists()))
+    }
+
+    @Test fun invalidOrForeignSourceRowsCannotImpersonateIndependentNeteaseCredits() {
+        val credited = searchSongItems(songs()).filter { it.neteaseArtists.orEmpty().any { a -> a.id in setOf(57020536L, 62046853L) } }.take(6)
+        assertNull(inferSearchArtistIntent(query, credited.map { it.copy(channelId = "bilibili") }, artists()))
+        assertNull(inferSearchArtistIntent(query, credited.map { it.copy(audioId = "not-a-resource") }, artists()))
+        assertNull(inferSearchArtistIntent(query, credited.map { it.copy(audioId = "0") }, artists()))
+        // A unique exact entity alias remains strong evidence even without a large song sample.
+        assertNotNull(inferSearchArtistIntent("无刺有刺", credited.take(1), artists()))
+    }
+
     @Test fun verifiedCatalogDjVariantCannotOutrankAnArtistsUnmodifiedRecording() {
         val artist = NeteaseArtistSummary(1, "Adele")
         val entity = NeteaseSearchArtistResult(artist, null, 1, 1)

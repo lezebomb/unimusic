@@ -2,6 +2,8 @@
 
 [当前搜索规则与边界](SEARCH_BEHAVIOR.md)：歌手/作品意图、跨源录音证据、版本和可播状态、列表锚定及实际验收。
 
+最新：[2BF独立歌手证据](PHASE_2BF_INDEPENDENT_ARTIST_EVIDENCE.md)：重复资源不冒充多首共识，保留精确别名及原版本门槛；3 JVM/Debug通过。
+
 最新：[2BE试听时长隔离](PHASE_2BE_PREVIEW_RECORDING_DURATION.md)：未知逻辑歌曲时长不再被试听片段回填；完整短歌保留，3 JVM/Debug通过。
 
 最新：[2BD主源账号边界](PHASE_2BD_PRIMARY_ACCOUNT_CONTEXT.md)：质量循环/备用清理后的旧试听与错误都按原账号上下文丢弃；3 JVM/Debug通过，未做真实账号切换。
