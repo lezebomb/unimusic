@@ -1,0 +1,8 @@
+<testsuite name="moe.ouom.neriplayer.ui.viewmodel.tab.search.ExploreSearchArtistIntentTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-10-29T22:30:22.916Z" hostname="local" time="0.307">
+  <properties />
+  <testcase name="exactArtistNamesPreserveOrderedBoundariesUnlessTheProviderSuppliesAnAlias" classname="moe.ouom.neriplayer.ui.viewmodel.tab.search.ExploreSearchArtistIntentTest" time="0.182" />
+  <testcase name="workQueryRestoresCreditedBandSongsAheadOfLiteralCoversAndResourcePromotions" classname="moe.ouom.neriplayer.ui.viewmodel.tab.search.ExploreSearchArtistIntentTest" time="0.117" />
+  <testcase name="exactAliasesWorkWhileSongTitleAmbiguityWeakConsensusAndCoverRequestsDoNotInventIntent" classname="moe.ouom.neriplayer.ui.viewmodel.tab.search.ExploreSearchArtistIntentTest" time="0.005" />
+  <system-out />
+  <system-err />
+</testsuite>

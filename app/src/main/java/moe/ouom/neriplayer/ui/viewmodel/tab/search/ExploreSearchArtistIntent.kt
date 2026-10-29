@@ -50,10 +50,14 @@ internal fun inferSearchArtistIntent(query: String, providerSongs: List<SongItem
     }
     // A literal song-title interpretation remains ambiguous; keep its songs ahead of an inferred entity.
     if (providerSongs.take(6).any { RecordingMatchPolicy.canonicalTitle(it.name) == key }) return null
+    // Entity names retain ordered credit boundaries: AC/DC is neither ACDC nor DC/AC.
+    // Explicit native aliases may establish another spelling; punctuation flattening may not.
+    val queryCredits = RecordingMatchPolicy.artistCredits(query)
+    if (queryCredits.any(String::isEmpty)) return null
     val exact = valid.filter { entity -> (listOf(entity.artist.name) + entity.aliases)
-        .any { RecordingMatchPolicy.canonicalText(it) == key } }
+        .any { RecordingMatchPolicy.artistCredits(it) == queryCredits } }
     if (exact.size == 1) return inferred(exact)
-    if (exact.isNotEmpty() || valid.size !in 1..3 ||
+    if (exact.isNotEmpty() || queryCredits.size > 1 || valid.size !in 1..3 ||
         RecordingMatchPolicy.versions(RecordingMetadata(query, "", 0)).isNotEmpty()) return null
     // Repeated rows are one recording, not independent support from the song index.
     val sample = providerSongs.take(6).filter { neteaseArtistEvidenceKey(it) != null }

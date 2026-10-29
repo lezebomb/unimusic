@@ -1,0 +1,16 @@
+{
+  "stage": "2BK",
+  "localTests": {
+    "class": "ExploreSearchArtistIntentTest",
+    "tests": 3,
+    "failures": 0
+  },
+  "moduleBoundaries": "passed",
+  "build": "BUILD SUCCESSFUL in 44s",
+  "apk": "build/outputs/unimusic/UniMusic-20261030-2BK-debug.apk",
+  "versionName": "e72358fc5812.dirty.10300630",
+  "sha256": "63d5606ae42d93537abea282d9bb41dce1c2c7145f24079d5474d8dc234951d6",
+  "deviceValidation": "not run",
+  "actualSearchAccuracyLatencyAudioValidation": "not run",
+  "remoteCI": "covered by existing ArtistIntent selector; await 2BI required workflow before next push"
+}

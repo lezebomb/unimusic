@@ -27,6 +27,23 @@ class ExploreSearchArtistIntentTest {
         {"id":62046853,"name":"ダイヤモンドダスト","alias":["DIAMOND DUST"],"transNames":["钻石星尘"]}
     ]}}"""), NeteaseExploreSearchType.ARTIST).items.filterIsInstance<ExploreSearchResult.Artist>().map { it.result }
 
+    @Test fun exactArtistNamesPreserveOrderedBoundariesUnlessTheProviderSuppliesAnAlias() {
+        val seed = artists().first()
+        fun entity(name: String, aliases: List<String> = emptyList()) =
+            seed.copy(artist = seed.artist.copy(name = name), aliases = aliases)
+        val evidence = searchSongItems(songs()).distinctBy { it.audioId }.take(4).map {
+            it.copy(neteaseArtists = listOf(seed.artist), name = "Recording ${it.id}")
+        }
+        assertEquals(4, evidence.size)
+        assertNull(inferSearchArtistIntent("AC/DC", evidence, listOf(entity("ACDC"))))
+        assertNull(inferSearchArtistIntent("DC/AC", evidence, listOf(entity("AC/DC"))))
+        assertNull(inferSearchArtistIntent("A /", evidence, listOf(entity("A"))))
+        assertNotNull(inferSearchArtistIntent("ac / dc", emptyList(), listOf(entity("AC/DC"))))
+        assertNotNull(inferSearchArtistIntent("ACDC", emptyList(), listOf(entity("AC/DC", listOf("ACDC")))))
+        assertNull(inferSearchArtistIntent("ACDC", emptyList(), listOf(entity("AC/DC"),
+            entity("Other").copy(artist = seed.artist.copy(id = 123, name = "Other")))))
+    }
+
     @Test fun placeholderArtistCardsCannotBecomeExactSearchIntent() {
         val seed = artists().first()
         for (name in listOf("未知艺术家", "Unknown Artist", "缺少歌手信息")) {
