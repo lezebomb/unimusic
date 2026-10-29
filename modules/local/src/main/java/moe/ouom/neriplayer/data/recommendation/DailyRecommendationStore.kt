@@ -33,17 +33,31 @@ class DailyRecommendationStore internal constructor(
         val context = currentCoroutineContext()
         mutex.withLock {
             context.ensureActive()
+            var retained: LocalRecommendations? = null
+            var depletedModes = emptySet<DailyRecommendationMode>()
             if (!forceRefresh) {
                 val cached = memory?.takeIf { it.matches(nowMillis, evidenceContext) }
                     ?: readSnapshot()?.takeIf { it.matches(nowMillis, evidenceContext) }?.also {
                         memory = it
                         memoryStatisticsAvailable = true
                     }
-                if (cached != null) return@withLock restore(cached, candidates, memoryStatisticsAvailable) { context.ensureActive() }
+                if (cached != null) {
+                    val restored = restore(cached, candidates, memoryStatisticsAvailable) { context.ensureActive() }
+                    if (restored.depletedModes.isEmpty()) return@withLock restored.recommendations
+                    retained = restored.recommendations
+                    depletedModes = restored.depletedModes
+                }
             }
             if (candidates.isEmpty() && !forceRefresh) return@withLock LocalRecommendations()
-            val fresh = build()
+            val generated = build()
             context.ensureActive()
+            // Refresh only a wholly depleted mode; partially valid daily lists keep their order/reasons.
+            val fresh = generated.copy(
+                items = retained?.items?.takeUnless { DailyRecommendationMode.LIBRARY in depletedModes } ?: generated.items,
+                localFileItems = retained?.localFileItems?.takeUnless { DailyRecommendationMode.LOCAL_FILES in depletedModes }
+                    ?: generated.localFileItems,
+                statisticsAvailable = generated.statisticsAvailable && (retained?.statisticsAvailable ?: true)
+            )
             val ids = (fresh.items + fresh.localFileItems).map { it.identityKey }.distinct().associateWith { key ->
                 context.ensureActive()
                 try { lookupSongUuid(key).also { context.ensureActive() } } catch (failure: Exception) {
@@ -71,7 +85,7 @@ class DailyRecommendationStore internal constructor(
                     if (failure is CancellationException) throw failure
                 }
             }
-            restore(snapshot, candidates, fresh.statisticsAvailable) { context.ensureActive() }
+            restore(snapshot, candidates, fresh.statisticsAvailable) { context.ensureActive() }.recommendations
         }
     }
 
@@ -95,12 +109,17 @@ class DailyRecommendationStore internal constructor(
         null
     }
 
+    private data class RestoredRecommendations(
+        val recommendations: LocalRecommendations,
+        val depletedModes: Set<DailyRecommendationMode>
+    )
+
     private fun restore(
         snapshot: DailyRecommendationSnapshot,
         candidates: List<LocalRecommendationCandidate>,
         statisticsAvailable: Boolean,
         checkCancellation: () -> Unit
-    ): LocalRecommendations {
+    ): RestoredRecommendations {
         val byDigest = LocalRecommendationRanker.canonicalCandidates(candidates, checkCancellation)
             .associateBy { checkCancellation(); recommendationIdentityDigest(it.identityKey) }
         fun items(mode: DailyRecommendationMode): List<LocalRecommendation> = snapshot.modes.getValue(mode).mapNotNull { entry ->
@@ -112,7 +131,14 @@ class DailyRecommendationStore internal constructor(
             // Resolve current metadata/playback references; removed songs never return from cached payloads.
             LocalRecommendation(candidate.song, candidate.identityKey, entry.reason, candidate.source, entry.songUuid)
         }
-        return LocalRecommendations(items(DailyRecommendationMode.LIBRARY), items(DailyRecommendationMode.LOCAL_FILES), statisticsAvailable)
+        val restored = LocalRecommendations(items(DailyRecommendationMode.LIBRARY), items(DailyRecommendationMode.LOCAL_FILES), statisticsAvailable)
+        val depleted = buildSet {
+            if (restored.items.isEmpty() && byDigest.isNotEmpty()) add(DailyRecommendationMode.LIBRARY)
+            if (restored.localFileItems.isEmpty() && byDigest.values.any { checkCancellation(); it.source == LocalRecommendationSource.LOCAL_FILE }) {
+                add(DailyRecommendationMode.LOCAL_FILES)
+            }
+        }
+        return RestoredRecommendations(restored, depleted)
     }
 
     private fun LocalRecommendation.toSnapshotEntry(uuid: String?) = DailyRecommendationEntry(

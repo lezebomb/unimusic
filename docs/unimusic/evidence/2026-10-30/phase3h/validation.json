@@ -1,0 +1,30 @@
+{
+  "phase": "3H",
+  "date": "2026-10-30",
+  "uniqueUnitTests": 3,
+  "newTestMethods": 2,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "validation": {
+    "selectedTestsAndDebug": "phase3h-depleted-recommendation-modes.log: BUILD SUCCESSFUL in 1m10s",
+    "moduleBoundaries": "passed"
+  },
+  "apk": {
+    "archive": "build/outputs/unimusic/UniMusic-20261030-3H-debug.apk",
+    "version": "4d8d57e7b814.dirty.10300054",
+    "sha256": "1bcf12f8e64b6184ca4fdeb593563b7fba266c9f3c46f28182c84a172bf2e611",
+    "installedThisPhase": false
+  },
+  "implementation": {
+    "refill": "Wholly empty library/offline mode with eligible current candidates only",
+    "retain": "Partially valid mode order/reasons/metadata retained; active other mode not reshuffled",
+    "noLoop": "Empty or retired-only candidates never trigger a refill",
+    "compatibility": "Room v23, ranking v4 and daily cache schema v1 unchanged"
+  },
+  "unexecuted": [
+    "No device import/download/remove-to-empty UI check",
+    "No new audio/account/full-song or actual timing acceptance"
+  ],
+  "ci": "pending commit/push; earlier runs can be cancelled by concurrency; latest normal behavior suite includes the new store tests and prior search ArtistIntentTest"
+}

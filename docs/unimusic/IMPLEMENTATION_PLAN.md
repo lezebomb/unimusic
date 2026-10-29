@@ -145,6 +145,8 @@
 
 ## Phase 3：本地推荐与同步
 
+3H补同日完全空掉的推荐/离线栏目恢复，保留另一栏目和部分有效列表顺序；新2/共3 JVM、Debug/边界通过，见[3H](PHASE_3H_DEPLETED_DAILY_RECOMMENDATIONS.md)。无真实导入/下载UI验收。
+
 3G补候选收集、去重、评分、多样性/恢复循环取消及快照发布前复核；新2/共3 JVM和最终Debug通过，见[3G](PHASE_3G_CANCELLABLE_RECOMMENDATIONS.md)。未做真实大库性能验收。
 
 3F补日推荐缓存与统计/播放反馈清除代次、开关和健康状态一致；旧v1兼容、正常磁盘快照保留，4相关JVM/Debug/边界通过，设备未验收，见[3F](PHASE_3F_RECOMMENDATION_CACHE_CONTEXT.md)。

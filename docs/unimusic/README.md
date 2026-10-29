@@ -2,6 +2,8 @@
 
 [当前搜索规则与边界](SEARCH_BEHAVIOR.md)：歌手/作品意图、跨源录音证据、版本和可播状态、列表锚定及实际验收。
 
+最新：[3H空推荐栏目恢复](PHASE_3H_DEPLETED_DAILY_RECOMMENDATIONS.md)：当天新入库/本地文件可重建完全空掉的栏目，其余日顺序保留；3 JVM/Debug通过。
+
 最新：[3G推荐取消响应](PHASE_3G_CANCELLABLE_RECOMMENDATIONS.md)：候选/排名/缓存恢复协作取消，UUID捕获取消不替换正常快照；3 JVM/最终Debug通过，无性能声明。
 
 最新：[3F推荐缓存上下文](PHASE_3F_RECOMMENDATION_CACHE_CONTEXT.md)：日缓存核对清除代次/反馈开关和健康状态；4 JVM/Debug通过，保留用户记录与旧缓存兼容。

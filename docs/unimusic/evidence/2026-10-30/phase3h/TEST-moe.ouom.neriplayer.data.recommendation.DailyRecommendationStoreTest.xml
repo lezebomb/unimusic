@@ -1,0 +1,8 @@
+<testsuite name="moe.ouom.neriplayer.data.recommendation.DailyRecommendationStoreTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-10-29T16:54:37.784Z" hostname="local" time="0.312">
+  <properties />
+  <testcase name="reopen keeps daily order and real UUIDs but restores only current library metadata" classname="moe.ouom.neriplayer.data.recommendation.DailyRecommendationStoreTest" time="0.225" />
+  <testcase name="new local files fill an empty offline mode without reshuffling valid library recommendations" classname="moe.ouom.neriplayer.data.recommendation.DailyRecommendationStoreTest" time="0.029" />
+  <testcase name="empty or fully removed daily recommendations refill only when eligible library items exist" classname="moe.ouom.neriplayer.data.recommendation.DailyRecommendationStoreTest" time="0.056" />
+  <system-out />
+  <system-err />
+</testsuite>

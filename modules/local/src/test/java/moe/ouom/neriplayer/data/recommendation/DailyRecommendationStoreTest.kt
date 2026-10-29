@@ -175,6 +175,40 @@ class DailyRecommendationStoreTest {
             .getOrCreate(library, now + 3) { error("Healthy disk must remain") })
     }
 
+    @Test fun `empty or fully removed daily recommendations refill only when eligible library items exist`() = runTest {
+        val file = File(temporary.root, "depleted.json")
+        val store = DailyRecommendationStore(file, lookupSongUuid = { null })
+        store.getOrCreate(emptyList(), now, forceRefresh = true) { LocalRecommendations() }
+        val first = listOf(candidate("a", "First"))
+        val populated = store.getOrCreate(first, now + 1) { recommendations(first) }
+        assertEquals(listOf("a"), populated.items.map { it.identityKey })
+        val replacement = listOf(candidate("b", "Replacement"))
+        val refilled = store.getOrCreate(replacement, now + 2) { recommendations(replacement) }
+        assertEquals(listOf("b"), refilled.items.map { it.identityKey })
+        assertEquals(refilled, DailyRecommendationStore(file, lookupSongUuid = { null })
+            .getOrCreate(replacement, now + 3) { error("Refilled cache stays stable after reopening") })
+        val retired = candidate("retired", "Retired").let { it.copy(song = it.song.copy(channelId = "qqmusic")) }
+        val empty = store.getOrCreate(listOf(retired), now + 4) { error("Retired-only input must not cause a refill loop") }
+        assertTrue(empty.items.isEmpty())
+    }
+
+    @Test fun `new local files fill an empty offline mode without reshuffling valid library recommendations`() = runTest {
+        val file = File(temporary.root, "offline-mode.json")
+        val remote = candidate("remote", "Remote")
+        val local = candidate("local", "Local", local = true)
+        val store = DailyRecommendationStore(file, lookupSongUuid = { null })
+        val original = store.getOrCreate(listOf(remote), now) { recommendations(listOf(remote)) }
+        val updated = store.getOrCreate(listOf(local, remote), now + 1) { recommendations(listOf(local, remote)) }
+        assertEquals(original.items, updated.items)
+        assertEquals(listOf("local"), updated.localFileItems.map { it.identityKey })
+        val reopened = DailyRecommendationStore(file, lookupSongUuid = { null })
+        assertEquals(updated, reopened.getOrCreate(listOf(remote, local), now + 2) { error("Both modes now populated") })
+        val nextLocal = candidate("next-local", "Replacement local", local = true)
+        val replaced = reopened.getOrCreate(listOf(remote, nextLocal), now + 3) { recommendations(listOf(nextLocal, remote)) }
+        assertEquals(original.items, replaced.items)
+        assertEquals(listOf("next-local"), replaced.localFileItems.map { it.identityKey })
+    }
+
     private fun candidate(key: String, title: String, local: Boolean = false): LocalRecommendationCandidate = LocalRecommendationCandidate(
         SongItem(key.hashCode().toLong(), title, "Artist", "album", 0, 180_000, "https://private.invalid/cover",
             localFilePath = if (local) "/private/music.flac" else null,
