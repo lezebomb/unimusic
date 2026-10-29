@@ -63,6 +63,8 @@
 
 ## Phase 2：统一搜索与高精度匹配
 
+2AZ把试听证据持续显示并随缓存保留，停用来源明确DISABLED；3本地相关JVM/Debug/装机及20/30秒片段提示通过，runtime 3项待远端JDK21，见[2AZ](PHASE_2AZ_PERSISTENT_PREVIEW_NOTICE.md)。
+
 2AY已修歌手/作品意图、别名、相关歌手卡片及录音版优先，默认聚合/网易云实机乐队结果在前；8相关JVM/边界/Debug通过，旧QQ/YT身份保持可读且在线仍停用。选中样本仅20秒试听，不作完整版或全局原唱保证，见[2AY](PHASE_2AY_ARTIST_AND_WORK_SEARCH.md)。
 
 2AF修复发现歌单重复触发/常规Cookie重载，合并同键请求、会话/分类隔离，可取消网络/8秒预算/后台解析；新2/共5 JVM、平台0违规及Debug通过，见[2AF](PHASE_2AF_PLAYLIST_REQUEST_LIFECYCLE.md)。未测实际请求/速度前后差异。

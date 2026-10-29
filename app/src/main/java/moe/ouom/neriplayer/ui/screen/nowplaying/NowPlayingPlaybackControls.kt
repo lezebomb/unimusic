@@ -64,13 +64,14 @@ import kotlin.math.roundToInt
 
 internal data class NowPlayingProgressInfoSegment(
     val label: String,
-    val highlighted: Boolean = false
+    val highlighted: Boolean = false,
+    val isAccessNotice: Boolean = false
 )
 
 internal fun nowPlayingVisibleProgressInfoSegments(
     segments: List<NowPlayingProgressInfoSegment>,
     phoneLandscape: Boolean
-): List<NowPlayingProgressInfoSegment> = if (phoneLandscape) emptyList() else segments
+): List<NowPlayingProgressInfoSegment> = if (phoneLandscape) segments.filter { it.isAccessNotice } else segments
 
 internal class NowPlayingProgressOwner(initialPositionMs: Long) {
     private var seekActions: NowPlayingSeekActionOwner? = null
@@ -194,10 +195,13 @@ internal fun buildNowPlayingProgressInfoSegments(
     showQualitySwitch: Boolean,
     showAudioCodec: Boolean,
     showAudioSpec: Boolean,
-    playbackSpeed: Float
+    playbackSpeed: Float,
+    previewLabel: String = ""
 ): List<NowPlayingProgressInfoSegment> {
     if (audioInfo == null) return emptyList()
     return listOfNotNull(
+        previewLabel.takeIf { audioInfo.isPreviewClip && it.isNotBlank() }
+            ?.let { NowPlayingProgressInfoSegment(it, highlighted = true, isAccessNotice = true) },
         progressQualityBadge(audioInfo, showQualitySwitch),
         progressSpeedBadge(playbackSpeed),
         progressCodecBadge(audioInfo, showAudioCodec),

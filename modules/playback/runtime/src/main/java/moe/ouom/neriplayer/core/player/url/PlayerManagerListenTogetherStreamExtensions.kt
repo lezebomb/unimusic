@@ -536,7 +536,7 @@ internal fun resolvePlaybackAudioInfoForListenTogetherStreamCandidate(
     ) {
         return selectedAudioInfo
     }
-    return selectedAudioInfo ?: existingAudioInfo
+    return selectedAudioInfo ?: existingAudioInfo?.copy(isPreviewClip = candidate.isPreviewClip)
 }
 
 internal fun listenTogetherStreamCacheKey(stableKey: String, streamUrl: String): String {

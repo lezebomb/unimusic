@@ -19,6 +19,16 @@ import org.junit.Test
 
 class NowPlayingPlaybackControlsTest {
     @Test
+    fun `preview access notice survives hidden audio settings and phone landscape`() {
+        val info = PlaybackAudioInfo(source = PlaybackAudioSource.NETEASE, qualityLabel = "Standard", isPreviewClip = true)
+        val segments = buildNowPlayingProgressInfoSegments(info, false, false, false, 1f, "Preview only")
+        assertEquals(listOf(NowPlayingProgressInfoSegment("Preview only", highlighted = true, isAccessNotice = true)), segments)
+        assertEquals(segments, nowPlayingVisibleProgressInfoSegments(segments, phoneLandscape = true))
+        assertSame(segments, nowPlayingVisibleProgressInfoSegments(segments, phoneLandscape = false))
+        assertTrue(buildNowPlayingProgressInfoSegments(info.copy(isPreviewClip = false), false, false, false, 1f, "Preview only").isEmpty())
+    }
+
+    @Test
     fun `only phone landscape hides audio badges and rotating back restores the original information`() {
         val segments = listOf(
             NowPlayingProgressInfoSegment("高清环绕声", highlighted = true),

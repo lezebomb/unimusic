@@ -133,6 +133,7 @@ internal fun buildNeteasePlaybackAudioInfo(
     )
     return PlaybackAudioInfo(
         source = PlaybackAudioSource.NETEASE,
+        isPreviewClip = parsed.notice == NeteasePlaybackResponseParser.Notice.PREVIEW_CLIP,
         qualityKey = actualQualityKey,
         qualityLabel = qualityLabelForNetease(actualQualityKey, getLocalizedString),
         qualityOptions = buildNeteaseQualityOptions(getLocalizedString),

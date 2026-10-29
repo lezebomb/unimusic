@@ -1,0 +1,30 @@
+{
+  "run": 40798661454,
+  "head": "a4f4f35c3c29831dc942c0ac901dfaea26cbc137",
+  "conclusion": "failure",
+  "selectedReports": [
+    {
+      "name": "moe.ouom.neriplayer.data.unified.SourceMatchRoomStoreTest",
+      "tests": "8",
+      "failures": "0",
+      "skipped": "0",
+      "failedCases": []
+    },
+    {
+      "name": "moe.ouom.neriplayer.data.unified.UnifiedPlaybackRoomStoreTest",
+      "tests": "2",
+      "failures": "0",
+      "skipped": "0",
+      "failedCases": []
+    },
+    {
+      "name": "moe.ouom.neriplayer.core.player.policy.source.SourceAvailabilityCheckerTest",
+      "tests": "5",
+      "failures": "1",
+      "skipped": "0",
+      "failedCases": [
+        "capabilityIdentityAndRecordingGatesNeverResolveAnAudioUrl"
+      ]
+    }
+  ]
+}

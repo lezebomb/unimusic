@@ -45,7 +45,11 @@ class SourceAvailabilityCheckerTest {
             }.status)
         }
         assertTrue(MusicSourceRegistry.canResolveAudio(SongSourceKey("kuwo", "42")))
-        assertTrue(MusicSourceRegistry.canResolveAudio(SongSourceKey("qqmusic", "003OUlho2HcRHC")))
+        for (key in listOf(SongSourceKey("qqmusic", "003OUlho2HcRHC"), SongSourceKey("youtube_music", "abcdefghijk"))) {
+            assertTrue(MusicSourceRegistry.hasAudioAdapter(key))
+            assertFalse(MusicSourceRegistry.canResolveAudio(key))
+            refused(candidate.copy(key = key), SourceCheckStatus.DISABLED)
+        }
         refused(candidate.copy(key = SongSourceKey("other", "42")), SourceCheckStatus.UNSUPPORTED)
         refused(candidate.copy(key = SongSourceKey("bilibili", "10")), SourceCheckStatus.UNSUPPORTED)
         refused(candidate.copy(metadata = candidate.metadata.copy(title = "晴天（Ｌｉｖｅ）")), SourceCheckStatus.METADATA_MISMATCH)

@@ -1,0 +1,32 @@
+{
+  "installedVersion": "a4f4f35c3c29.dirty.10290921",
+  "query": "哭泣少女乐队",
+  "initialPlayerSnapshot": {
+    "title": "雑踏、僕らの街",
+    "artist": "トゲナシトゲアリ",
+    "displayedDuration": "00:20",
+    "persistentPreviewNoticeVisible": true
+  },
+  "laterProgressSamples": [
+    {
+      "state": 3,
+      "positionMs": 10242,
+      "speed": 1.0
+    },
+    {
+      "state": 3,
+      "positionMs": 12020,
+      "speed": 1.0
+    }
+  ],
+  "laterSnapshot": {
+    "title": "Cycle Of Sorrow",
+    "artist": "ダイヤモンドダスト",
+    "displayedDuration": "00:30",
+    "displayedPosition": "00:15",
+    "persistentPreviewNoticeVisible": true,
+    "playButtonVisibleAfterPause": true
+  },
+  "timeline": "First 20-second preview advanced to the next 30-second preview before the later snapshot. Numeric samples were not atomically captured with track metadata, so they are not attributed to the first song. Paused after sampling.",
+  "acceptance": "Visible preview notices and segment playback only; neither song accepted as full-length audio"
+}

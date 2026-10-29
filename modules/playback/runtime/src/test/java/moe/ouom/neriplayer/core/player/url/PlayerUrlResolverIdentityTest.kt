@@ -92,10 +92,12 @@ class PlayerUrlResolverIdentityTest {
         assertEquals("https://m701.music.126.net/clip.mp3", preview.url)
         assertEquals("res:${CoreCommonR.string.player_netease_preview_only}", preview.noticeMessage)
         assertTrue(preview.isPreviewClip)
+        assertTrue(preview.audioInfo?.isPreviewClip == true)
         assertEquals("audio/mpeg", preview.mimeType)
         assertEquals("https://m701.music.126.net/full.flac", full.url)
         assertNull(full.noticeMessage)
         assertFalse(full.isPreviewClip)
+        assertFalse(full.audioInfo?.isPreviewClip == true)
         assertEquals("lossless", full.audioInfo?.qualityKey)
     }
 

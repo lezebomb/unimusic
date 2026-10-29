@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="moe.ouom.neriplayer.core.player.policy.source.SourceAvailabilityCheckerTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2026-10-29T01:21:33.312Z" hostname="XUSHAOYANG" time="0.391">
+  <properties/>
+  <testcase name="capabilityIdentityAndRecordingGatesNeverResolveAnAudioUrl" classname="moe.ouom.neriplayer.core.player.policy.source.SourceAvailabilityCheckerTest" time="0.387"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

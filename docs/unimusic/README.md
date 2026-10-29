@@ -1,5 +1,7 @@
 # UniMusic 开发记录
 
+最新：[2AZ持续试听标识](PHASE_2AZ_PERSISTENT_PREVIEW_NOTICE.md)：播放器持续显示试听状态，保留缓存证据；Mate60两段试听实际可见提示，完整版未验收。
+
 最新：[2AY歌手/作品搜索意图](PHASE_2AY_ARTIST_AND_WORK_SEARCH.md)：乐队查询优先相关歌手及署名歌曲，聚合/网易云实机通过；样本仅20秒试听，完整版未验收。
 
 最新：[2AX可用来源与推荐v4](PHASE_2AX_ACTIVE_SOURCES_AND_RECOMMENDATION_CREDITS.md)：QQ/YT按用户要求停用，保留数据；推荐合唱成员偏好与多样性。乐队查询翻唱排序已在2AY修正。

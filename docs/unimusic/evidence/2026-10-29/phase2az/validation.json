@@ -1,0 +1,53 @@
+{
+  "phase": "2AZ",
+  "date": "2026-10-29",
+  "positiveLocalUnitTests": 3,
+  "counts": {
+    "previewAndExistingPortraitLandscapePolicy": 2,
+    "disabledSourcePolicy": 1
+  },
+  "newLocalTestMethods": 1,
+  "newRuntimeTestMethodsAwaitingJdk21": 1,
+  "failures": 0,
+  "errors": 0,
+  "validation": {
+    "appSelectedTestsAndAPK": "phase2az-preview-app-validation.log: BUILD SUCCESSFUL in 3m6s",
+    "finalPolicyTestAndAPK": "phase2az-final-apk.log: BUILD SUCCESSFUL in 57s",
+    "platformDomainViolations": 0,
+    "moduleBoundaries": "passed",
+    "workflowYAML": "parsed"
+  },
+  "apk": {
+    "archive": "build/outputs/unimusic/UniMusic-20261029-2AZ-debug.apk",
+    "sha256": "221f9d96ce5a3d86e810f1738a3e24bef4b97cf99b1b1ff1443d1298c6dcc882",
+    "installedVersion": "a4f4f35c3c29.dirty.10290921",
+    "installation": "adb Success and package version checked; data preserved"
+  },
+  "runtimeTests": {
+    "local": "Not run; module requires JDK21, local JDK17 reused",
+    "ciJdk21Cases": [
+      "CachedPlaybackDescriptorTest.preview cache metadata stays distinct while old complete v2 metadata still opens",
+      "PlayerUrlResolverIdentityTest.netease success upgrades http and flags preview clips",
+      "ListenTogetherStreamResolutionTest.shared stream candidate preserves prior audio quality metadata"
+    ],
+    "launcherSetupAttempts": "First invocation-local init attempt did not guard included build; corrected attempt still resolved fixed JDK21 launcher. Both failed before tests. No JDK download or project launcher change."
+  },
+  "previousCI": {
+    "run": 40798661454,
+    "head": "a4f4f35c",
+    "conclusion": "failure",
+    "historicalSourceMatchRoomCases": 8,
+    "historicalSourceMatchRoomFailures": 0,
+    "unifiedPlaybackRoomCases": 2,
+    "unifiedPlaybackRoomFailures": 0,
+    "remainingFailure": "Old SourceAvailabilityChecker assertion expected QQ enabled; current product disables QQ/YT. Corrected policy asserts DISABLED and proves no resolver call; selected local case now passed."
+  },
+  "data": "Room v23 unchanged; cache v2 complete-media fingerprint stays compatible, preview flag adds distinct fingerprint; no data clearing, migration, reauthentication or network changes",
+  "limitations": [
+    "No complete audio acceptance from either 20s/30s preview",
+    "Numeric playback positions and track metadata were not sampled atomically; do not attribute later samples to first song",
+    "Portrait notice physically verified; landscape/settings filtering covered by a pure JVM case, not device rotation",
+    "Runtime cache roundtrip and shared-stream assertions await remote JDK21 CI",
+    "No actual latency or general original-recording accuracy benchmark"
+  ]
+}

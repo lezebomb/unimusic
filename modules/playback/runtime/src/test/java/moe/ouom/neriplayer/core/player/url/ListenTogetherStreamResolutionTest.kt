@@ -240,6 +240,14 @@ class ListenTogetherStreamResolutionTest {
                 existingAudioInfo = priorAudioInfo
             )
         )
+        assertEquals(
+            priorAudioInfo,
+            resolvePlaybackAudioInfoForListenTogetherStreamCandidate(
+                candidate = sharedCandidate,
+                resolvedAudioInfo = null,
+                existingAudioInfo = priorAudioInfo.copy(isPreviewClip = true)
+            )
+        )
         assertNull(
             resolvePlaybackAudioInfoForListenTogetherStreamCandidate(
                 candidate = PlaybackUrlCandidate(url = "https://example.com/audio.mp3"),

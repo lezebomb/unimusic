@@ -24,8 +24,8 @@ class SourceAvailabilityChecker(private val now: () -> Long = System::currentTim
         val status = when {
             !MusicSourceRegistry.validKey(candidate.key) -> SourceCheckStatus.UNSUPPORTED
             MusicSourceRegistry.capabilities(candidate.key.provider).audio == SourceAudioSupport.METADATA_ONLY -> SourceCheckStatus.METADATA_ONLY
-            !MusicSourceRegistry.canResolveAudio(candidate.key) -> SourceCheckStatus.UNSUPPORTED
-            !enabled -> SourceCheckStatus.DISABLED
+            !MusicSourceRegistry.hasAudioAdapter(candidate.key) -> SourceCheckStatus.UNSUPPORTED
+            !MusicSourceRegistry.isEnabled(candidate.key.provider) || !enabled -> SourceCheckStatus.DISABLED
             rejected -> SourceCheckStatus.USER_REJECTED
             candidate.key.provider != "local" && !online -> SourceCheckStatus.OFFLINE
             else -> checkRecording(expected, candidate, stillCurrent, budgetMs, resolve)

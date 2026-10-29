@@ -46,7 +46,8 @@ internal data class CachedPlaybackDescriptor(
     val qualityOptionKeys: List<String>,
     val expectedContentLength: Long?,
     val representationIdentity: String?,
-    val representationFingerprint: String
+    val representationFingerprint: String,
+    val isPreviewClip: Boolean = false
 )
 
 internal fun cachedPlaybackDescriptorFromAudioInfo(
@@ -69,6 +70,7 @@ internal fun cachedPlaybackDescriptorFromAudioInfo(
             .distinct(),
         expectedContentLength = expectedContentLength?.takeIf { it > 0L },
         representationIdentity = representationIdentity.normalizedDescriptorValue(),
+        isPreviewClip = audioInfo.isPreviewClip,
         representationFingerprint = ""
     )
     return descriptor.copy(representationFingerprint = descriptor.fingerprint())
@@ -91,7 +93,8 @@ private fun CachedPlaybackDescriptor.fingerprint(): String {
         qualityOptionKeys.joinToString(separator = ","),
         expectedContentLength?.toString().orEmpty(),
         representationIdentity.orEmpty()
-    ).joinToString(separator = "|")
+    // Keep the existing v2 fingerprint for complete media; previews carry a distinct identity.
+    ).let { if (isPreviewClip) it + "preview" else it }.joinToString(separator = "|")
     return MessageDigest.getInstance("SHA-256")
         .digest(canonical.toByteArray(Charsets.UTF_8))
         .joinToString(separator = "") { byte -> "%02x".format(byte) }
@@ -117,6 +120,7 @@ internal fun CachedPlaybackDescriptor.matches(
         sampleRateHz == expected.sampleRateHz &&
         bitDepth == expected.bitDepth &&
         channelCount == expected.channelCount &&
+        isPreviewClip == expected.isPreviewClip &&
         this.representationIdentity == expected.representationIdentity &&
         (
             this.expectedContentLength == null ||
@@ -146,6 +150,7 @@ internal fun CachedPlaybackDescriptor.toPlaybackAudioInfo(
     }
     return PlaybackAudioInfo(
         source = source,
+        isPreviewClip = isPreviewClip,
         qualityKey = qualityKey,
         qualityLabel = qualityKey?.let {
             qualityLabelForCachedSource(source, it, getLocalizedString)
@@ -179,6 +184,7 @@ internal fun encodeCachedPlaybackDescriptor(
     return JSONObject().apply {
         put("version", descriptor.version)
         put("source", descriptor.source.name)
+        put("isPreviewClip", descriptor.isPreviewClip)
         putNullable("qualityKey", descriptor.qualityKey)
         putNullable("mimeType", descriptor.mimeType)
         putNullable("codecLabel", descriptor.codecLabel)
@@ -217,7 +223,10 @@ internal fun decodeCachedPlaybackDescriptor(raw: String?): CachedPlaybackDescrip
             qualityOptionKeys = qualityOptionKeys,
             expectedContentLength = json.optNullableLong("expectedContentLength"),
             representationIdentity = json.optNullableString("representationIdentity"),
-            representationFingerprint = json.optString("representationFingerprint")
+            representationFingerprint = json.optString("representationFingerprint"),
+            isPreviewClip = if (json.has("isPreviewClip")) {
+                json.get("isPreviewClip") as? Boolean ?: error("Invalid preview flag")
+            } else false
         )
     }.getOrNull()
 }

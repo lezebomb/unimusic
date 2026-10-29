@@ -25,7 +25,9 @@ data class PlaybackAudioInfo(
     val bitrateKbps: Int? = null,
     val sampleRateHz: Int? = null,
     val bitDepth: Int? = null,
-    val channelCount: Int? = null
+    val channelCount: Int? = null,
+    /** Explicit provider evidence; short songs alone do not imply a preview. */
+    val isPreviewClip: Boolean = false
 ) {
     val specLabel: String?
         get() = buildPlaybackSpecLabel(

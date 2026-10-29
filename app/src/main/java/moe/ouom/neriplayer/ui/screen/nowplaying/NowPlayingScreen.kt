@@ -1082,8 +1082,10 @@ fun NowPlayingScreen(
         amllTtmlDefaultOffsetMs = amllTtmlLyricDefaultOffsetMs,
         preferredLyricSource = loadedPreferredLyricSource,
     )
+    val previewLabel = stringResource(CoreCommonR.string.unimusic_search_audio_preview)
     val progressInfoSegments = remember(
         currentPlaybackAudioInfo,
+        previewLabel,
         showProgressQualitySwitch,
         showProgressAudioCodec,
         showProgressAudioSpec,
@@ -1094,7 +1096,8 @@ fun NowPlayingScreen(
             showQualitySwitch = showProgressQualitySwitch,
             showAudioCodec = showProgressAudioCodec,
             showAudioSpec = showProgressAudioSpec,
-            playbackSpeed = playbackSoundState.speed
+            playbackSpeed = playbackSoundState.speed,
+            previewLabel = previewLabel
         )
     }
 

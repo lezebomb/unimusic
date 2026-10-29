@@ -346,6 +346,7 @@ internal suspend fun PlayerManager.resolveSongUrlFromLegacySource(
             url = "$OFFLINE_CACHE_URL_PREFIX$cacheKey",
             durationMs = song.durationMs.takeIf { it > 0L },
             audioInfo = cachedAudioInfo,
+            isPreviewClip = cachedAudioInfo.isPreviewClip,
             mimeType = cachedAudioInfo.mimeType,
             expectedContentLength = cachedDescriptor.expectedContentLength,
             representationIdentity = cachedDescriptor.representationIdentity,
@@ -443,6 +444,7 @@ internal suspend fun PlayerManager.resolveSongUrlFromLegacySource(
         SongUrlResult.Success(
             url = "$OFFLINE_CACHE_URL_PREFIX$cacheKey",
             audioInfo = fallbackAudioInfo,
+            isPreviewClip = fallbackAudioInfo?.isPreviewClip == true,
             mimeType = fallbackAudioInfo?.mimeType,
             expectedContentLength = fallbackDescriptor?.expectedContentLength,
             representationIdentity = fallbackDescriptor?.representationIdentity,

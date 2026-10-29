@@ -30,6 +30,20 @@ import org.mockito.Mockito.`when`
 
 class CachedPlaybackDescriptorTest {
 
+    @Test
+    fun `preview cache metadata stays distinct while old complete v2 metadata still opens`() {
+        val info = PlaybackAudioInfo(source = PlaybackAudioSource.NETEASE, qualityKey = "standard", isPreviewClip = true)
+        val descriptor = cachedPlaybackDescriptorFromAudioInfo(info, 123L, "same-recording")
+        val encoded = encodeCachedPlaybackDescriptor(descriptor)
+        val restored = decodeCachedPlaybackDescriptor(encoded)!!.toPlaybackAudioInfo { it.toString() }!!
+        assertTrue(restored.isPreviewClip)
+        assertFalse(descriptor.matches(info.copy(isPreviewClip = false), 123L, "same-recording"))
+        assertNull(decodeCachedPlaybackDescriptor(encoded.replace("\"isPreviewClip\":true", "\"isPreviewClip\":false"))?.toPlaybackAudioInfo { it.toString() })
+        val full = cachedPlaybackDescriptorFromAudioInfo(info.copy(isPreviewClip = false), 123L, "same-recording")
+        val oldV2 = org.json.JSONObject(encodeCachedPlaybackDescriptor(full)).apply { remove("isPreviewClip") }.toString()
+        assertFalse(decodeCachedPlaybackDescriptor(oldV2)!!.toPlaybackAudioInfo { it.toString() }!!.isPreviewClip)
+    }
+
     @After
     fun clearCacheReference() {
         PlayerManager.cache = null

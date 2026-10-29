@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="moe.ouom.neriplayer.ui.screen.NowPlayingPlaybackControlsTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-10-29T01:18:56.137Z" hostname="XUSHAOYANG" time="0.118">
+  <properties/>
+  <testcase name="preview access notice survives hidden audio settings and phone landscape" classname="moe.ouom.neriplayer.ui.screen.NowPlayingPlaybackControlsTest" time="0.106"/>
+  <testcase name="only phone landscape hides audio badges and rotating back restores the original information" classname="moe.ouom.neriplayer.ui.screen.NowPlayingPlaybackControlsTest" time="0.008"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
