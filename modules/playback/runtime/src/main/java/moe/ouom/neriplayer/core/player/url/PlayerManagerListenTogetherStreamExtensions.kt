@@ -103,6 +103,7 @@ internal fun resolveListenTogetherPublishedStreamAudioInfo(
 
 internal fun PlayerManager.listenTogetherPlaybackSource(song: SongItem): PlaybackAudioSource {
     return when {
+        song.channelId == "kuwo" -> PlaybackAudioSource.KUWO
         song.channelId == ListenTogetherChannels.YOUTUBE_MUSIC || isYouTubeMusicTrack(song) ->
             PlaybackAudioSource.YOUTUBE_MUSIC
         song.channelId == ListenTogetherChannels.BILIBILI || isBiliTrack(song) ->
@@ -199,7 +200,7 @@ internal fun listenTogetherQualityRank(
         PlaybackAudioSource.NETEASE -> NETEASE_LISTEN_TOGETHER_QUALITY_ORDER
         PlaybackAudioSource.BILIBILI -> BILI_LISTEN_TOGETHER_QUALITY_ORDER
         PlaybackAudioSource.YOUTUBE_MUSIC -> YOUTUBE_LISTEN_TOGETHER_QUALITY_ORDER
-        PlaybackAudioSource.LOCAL -> emptyList()
+        PlaybackAudioSource.LOCAL, PlaybackAudioSource.KUWO -> emptyList()
     }.indexOf(normalized).takeIf { it >= 0 }
 }
 
@@ -228,7 +229,7 @@ private fun normalizeListenTogetherQualityKey(
         PlaybackAudioSource.YOUTUBE_MUSIC -> normalized.takeIf {
             it in YOUTUBE_LISTEN_TOGETHER_QUALITY_ORDER
         }
-        PlaybackAudioSource.LOCAL -> null
+        PlaybackAudioSource.LOCAL, PlaybackAudioSource.KUWO -> null
     }
 }
 
@@ -238,6 +239,7 @@ private fun listenTogetherSourceKey(source: PlaybackAudioSource): String {
         PlaybackAudioSource.BILIBILI -> "bili"
         PlaybackAudioSource.YOUTUBE_MUSIC -> "youtube"
         PlaybackAudioSource.LOCAL -> "local"
+        PlaybackAudioSource.KUWO -> "kuwo"
     }
 }
 
@@ -343,7 +345,7 @@ internal fun PlayerManager.listenTogetherFallbackResult(song: SongItem): SongUrl
         PlaybackAudioSource.NETEASE -> effectiveNeteaseQuality()
         PlaybackAudioSource.BILIBILI -> effectiveBiliQuality()
         PlaybackAudioSource.YOUTUBE_MUSIC -> effectiveYouTubeQuality()
-        PlaybackAudioSource.LOCAL -> ""
+        PlaybackAudioSource.LOCAL, PlaybackAudioSource.KUWO -> ""
     }
     val legacyAudioInfo = listenTogetherFallbackAudioInfo(song)
     val candidates = orderListenTogetherStreamUrlsForPreference(
@@ -378,7 +380,7 @@ internal fun PlayerManager.listenTogetherPreferredQualityKey(song: SongItem): St
         PlaybackAudioSource.NETEASE -> effectiveNeteaseQuality()
         PlaybackAudioSource.BILIBILI -> effectiveBiliQuality()
         PlaybackAudioSource.YOUTUBE_MUSIC -> effectiveYouTubeQuality()
-        PlaybackAudioSource.LOCAL -> null
+        PlaybackAudioSource.LOCAL, PlaybackAudioSource.KUWO -> null
     }
 }
 
@@ -389,6 +391,7 @@ private fun PlayerManager.listenTogetherFallbackAudioInfo(song: SongItem): Playb
     if (currentAudioInfo != null) return currentAudioInfo
 
     return when {
+        song.channelId == "kuwo" -> PlaybackAudioInfo(source = PlaybackAudioSource.KUWO)
         isYouTubeMusicTrack(song) -> buildListenTogetherFallbackAudioInfo(
             source = PlaybackAudioSource.YOUTUBE_MUSIC,
             preferredQualityKey = effectiveYouTubeQuality(),
@@ -433,6 +436,7 @@ internal fun buildListenTogetherFallbackAudioInfo(
             )
         }
         PlaybackAudioSource.LOCAL -> PlaybackAudioInfo(source = PlaybackAudioSource.LOCAL)
+        PlaybackAudioSource.KUWO -> PlaybackAudioInfo(source = PlaybackAudioSource.KUWO)
     }
 }
 

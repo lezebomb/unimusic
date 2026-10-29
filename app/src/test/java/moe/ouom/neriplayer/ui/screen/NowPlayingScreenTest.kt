@@ -87,6 +87,20 @@ import kotlin.math.pow
 class NowPlayingScreenTest {
 
     @Test
+    fun `resolved Kuwo source overrides logical Netease attribution while local copies remain local`() {
+        fun source(local: Boolean, fallback: Boolean = false) = resolveNowPlayingPlaybackSourceType(
+            isLocalSong = local, isYouTubeMusicSong = false,
+            isFromNeteaseTag = true, isFromBiliTag = false,
+            currentMediaUrl = null, playbackAudioSource = PlaybackAudioSource.KUWO,
+            isNeteaseLocalFallback = fallback
+        )
+        assertEquals(PlaybackSourceType.KUWO, source(local = false))
+        assertEquals(PlaybackSourceType.LOCAL, source(local = true))
+        assertEquals(PlaybackSourceType.LOCAL, source(local = false, fallback = true))
+    }
+
+
+    @Test
     fun `download presence only accepts a published catalog entry`() {
         val song = SongItem(
             id = 40L,

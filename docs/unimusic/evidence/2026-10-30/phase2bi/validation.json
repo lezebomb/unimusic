@@ -1,0 +1,23 @@
+{
+  "stage": "2BI",
+  "localTests": [
+    {
+      "class": "PlaybackQualityOwnerTest",
+      "tests": 2,
+      "failures": 0
+    },
+    {
+      "class": "NowPlayingScreenTest",
+      "tests": 1,
+      "failures": 0
+    }
+  ],
+  "build": "BUILD SUCCESSFUL in 1m 22s",
+  "apk": "build/outputs/unimusic/UniMusic-20261030-2BI-debug.apk",
+  "versionName": "f5b6d4f7cac2.dirty.10300620",
+  "sha256": "d56504f8305109ab89ae63f742fdfe5cc8cd8e4ce894890388ae5e330f65cb71",
+  "moduleBoundaries": "passed",
+  "deviceValidation": "not run; owned phone unavailable at initial inventory",
+  "audioValidation": "no new full-track audio or fallback timing validation",
+  "remoteCI": "pending cumulative run; previous required workflow CI still running"
+}

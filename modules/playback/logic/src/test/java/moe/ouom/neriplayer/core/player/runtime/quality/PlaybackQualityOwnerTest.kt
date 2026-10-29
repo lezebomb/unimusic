@@ -12,6 +12,20 @@ import org.junit.Test
 @OptIn(ExperimentalCoroutinesApi::class)
 class PlaybackQualityOwnerTest {
     @Test
+    fun `Kuwo transport has no quality preference persistence or refresh`() = runTest {
+        val port = RecordingPort(PlaybackAudioSource.KUWO)
+        val owner = PlaybackQualityOwner(backgroundScope, port)
+        val original = owner.preferredKeys.value
+        owner.setPreferredQuality(PlaybackAudioSource.KUWO, "lossless")
+        owner.changeCurrentPlaybackQuality("lossless")
+        owner.scheduleRefresh(PlaybackAudioSource.KUWO, "unsupported")
+        runCurrent()
+        assertEquals(original, owner.preferredKeys.value)
+        assertTrue(port.persisted.isEmpty())
+        assertTrue(port.refreshed.isEmpty())
+    }
+
+    @Test
     fun `quality picker compares preference rather than measured stream`() = runTest {
         val port = RecordingPort(PlaybackAudioSource.NETEASE)
         val owner = PlaybackQualityOwner(backgroundScope, port)

@@ -382,6 +382,7 @@ internal fun resolveNowPlayingPlaybackSourceType(
     if (isLocalSong || isNeteaseLocalFallback) return PlaybackSourceType.LOCAL
 
     when (playbackAudioSource) {
+        PlaybackAudioSource.KUWO -> return PlaybackSourceType.KUWO
         PlaybackAudioSource.NETEASE -> return PlaybackSourceType.NETEASE
         PlaybackAudioSource.BILIBILI -> return PlaybackSourceType.BILIBILI
         PlaybackAudioSource.YOUTUBE_MUSIC -> return PlaybackSourceType.YOUTUBE_MUSIC

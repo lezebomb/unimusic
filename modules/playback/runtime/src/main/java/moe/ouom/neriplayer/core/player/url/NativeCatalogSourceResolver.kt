@@ -15,6 +15,8 @@ import moe.ouom.neriplayer.core.player.resolver.netease.recordingMetadata
 import moe.ouom.neriplayer.core.player.runtime.refresh.RefreshResolverSideEffects
 import moe.ouom.neriplayer.data.identity.stableKey
 import moe.ouom.neriplayer.data.model.SongItem
+import moe.ouom.neriplayer.data.model.playback.PlaybackAudioInfo
+import moe.ouom.neriplayer.data.model.playback.PlaybackAudioSource
 import moe.ouom.neriplayer.data.model.playback.SongUrlResult
 import moe.ouom.neriplayer.data.model.playback.streamOnlyPlaybackUrl
 import moe.ouom.neriplayer.data.model.unified.*
@@ -61,7 +63,11 @@ internal suspend fun PlayerManager.resolveNativeCatalogSource(subject: SongItem,
         })
     }
     return SourceAttempt.Ready(SongUrlResult.Success(streamOnlyPlaybackUrl(url), durationMs = metadata.durationMs,
-        mimeType = "audio/mpeg", cacheKeyOverride = "catalogstream-${source.provider}-${source.resourceId}"))
+        mimeType = "audio/mpeg", cacheKeyOverride = "catalogstream-${source.provider}-${source.resourceId}",
+        // Transport provenance belongs to the resolved provider, not the logical song's catalog.
+        audioInfo = if (source.provider == "kuwo") PlaybackAudioInfo(
+            source = PlaybackAudioSource.KUWO, mimeType = "audio/mpeg"
+        ) else null))
 }
 
 internal suspend fun PlayerManager.resolveNativeCatalogPlayback(song: SongItem, candidate: RecordingSourceCandidate,

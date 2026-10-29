@@ -47,7 +47,8 @@ enum class PlaybackSourceType {
     NETEASE,
     BILIBILI,
     YOUTUBE_MUSIC,
-    LOCAL
+    LOCAL,
+    KUWO
 }
 
 @Composable
@@ -103,6 +104,14 @@ fun PlaybackSourceBadge(
                 )
                 Text(
                     text = stringResource(CoreCommonR.string.nowplaying_youtube_music),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            }
+
+            PlaybackSourceType.KUWO -> {
+                Text(
+                    text = stringResource(CoreCommonR.string.explore_catalog_kuwo),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurface
                 )

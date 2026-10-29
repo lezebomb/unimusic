@@ -14,13 +14,14 @@
 | --- | --- | --- |
 | [2BD主源账号上下文](PHASE_2BD_PRIMARY_ACCOUNT_CONTEXT.md) | 2新/共3 JVM、边界、Debug3m2s；原账号变化后不返回旧试听/错误 | a52fdf29已推；CI被后续2BE替代 |
 | [2BE试听逻辑时长](PHASE_2BE_PREVIEW_RECORDING_DURATION.md) | 2新/共3 JVM、边界、Debug48s；试听不回填未知整曲元数据 | 643b8a79已推，CI40960266466含Android迁移SUCCESS |
-| [2BF独立歌手证据](PHASE_2BF_INDEPENDENT_ARTIST_EVIDENCE.md) | 2新/共3 JVM、边界、Debug1m42s；重复/外源/坏ID不充当多首共识 | ae82d472已commit，随本阶段统一push |
-| [2BG试听书签/恢复](PHASE_2BG_PREVIEW_BOOKMARK_ISOLATION.md) | 2新/共3 JVM、边界、Debug44s；保留整曲书签及片段内有效位置 | f436541b已commit，随本阶段统一push |
-| [2BH日志隐私](PHASE_2BH_PRIVATE_PLAYBACK_LOGS.md) | 3新/共5 JVM、边界、Debug53s；日志/异常两通道前脱敏 | 本检查点所在提交，统一push |
+| [2BF独立歌手证据](PHASE_2BF_INDEPENDENT_ARTIST_EVIDENCE.md) | 2新/共3 JVM、边界、Debug1m42s；重复/外源/坏ID不充当多首共识 | ae82d472已push |
+| [2BG试听书签/恢复](PHASE_2BG_PREVIEW_BOOKMARK_ISOLATION.md) | 2新/共3 JVM、边界、Debug44s；保留整曲书签及片段内有效位置 | f436541b已push |
+| [2BH日志隐私](PHASE_2BH_PRIVATE_PLAYBACK_LOGS.md) | 3新/共5 JVM、边界、Debug53s；日志/异常两通道前脱敏 | f5b6d4f7已push，CI40964014292运行中 |
+| [2BI酷我实际来源](PHASE_2BI_KUWO_PLAYBACK_PROVENANCE.md) | 2新/共3 JVM、边界、Debug1m22s；真实来源徽标及无效音质操作保护 | 本检查点所在提交，先本地保存等2BH必要CI |
 
 2BE的CI40960266466已整体SUCCESS，Android迁移步骤也成功；实际XML SourceResolver17、preview进度2、增量迁移1和升级保护3项均0失败，见evidence/2026-10-30/ci-40960266466.json。必要配置验证已完成，可以一起push 2BF/2BG/2BH的独立提交。2BH又增加logging路径/选择器，最新工作流CI需再核对，没新增Room迁移，勿额外跑本机迁移集。
 
-最新构建：`build/outputs/unimusic/UniMusic-20261030-2BH-debug.apk`，版本`f436541bc901.dirty.10300605`，SHA-256 `01f679bfacdbd2f3a010634031f8c9498fec42b3014d33f6d52f846acbeff875`。当前无本地Gradle或旧CI监视进程运行；先核对最新状态再启动。无本次设备安装或真实账号切换/书签/完整音频/速度验收。
+最新构建：`build/outputs/unimusic/UniMusic-20261030-2BI-debug.apk`，版本`f5b6d4f7cac2.dirty.10300620`，SHA-256 `d56504f8305109ab89ae63f742fdfe5cc8cd8e4ce894890388ae5e330f65cb71`。无本地Gradle运行；CI40964014292仍在运行，推送前先核对，避免取消必要Android步骤。无本次设备安装、真实账号切换/书签/新完整音频/速度验收。
 
 ## 此前已完成，不重做
 
@@ -47,7 +48,7 @@
 ## 接下来
 
 1. 核对最新2BH工作流CI与XML，保存状态；已完成本地提交此次统一push，后续以git/Actions为准。
-2. 继续检查下载路径是否正确拒绝把明确试听当作完整歌曲交付；正常NPLogger入口脱敏已由2BH完成，勿读取或导出真实秘密验证。
+2. 下载路径已查到明确试听拒绝及现有回归，不重做。继续修复“未知艺术家”被当真实署名的跨源匹配/推荐问题；NPLogger已脱敏，勿导出真实秘密验证。
 3. 设备重新在线后仅做必要、保留数据的本地验收，明确试听与完整版差别；不为测试修改真实账号/清除用户书签或偏好。
 4. 继续高价值来源/匹配/推荐后台，按实际结果更新此短检查点，每阶段commit/push。
 

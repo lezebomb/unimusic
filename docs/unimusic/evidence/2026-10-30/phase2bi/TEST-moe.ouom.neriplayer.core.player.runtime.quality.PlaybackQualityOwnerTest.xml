@@ -1,0 +1,7 @@
+<testsuite name="moe.ouom.neriplayer.core.player.runtime.quality.PlaybackQualityOwnerTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-10-29T22:20:47.426Z" hostname="local" time="0.36">
+  <properties />
+  <testcase name="Kuwo transport has no quality preference persistence or refresh" classname="moe.ouom.neriplayer.core.player.runtime.quality.PlaybackQualityOwnerTest" time="0.351" />
+  <testcase name="quality picker compares preference rather than measured stream" classname="moe.ouom.neriplayer.core.player.runtime.quality.PlaybackQualityOwnerTest" time="0.004" />
+  <system-out />
+  <system-err />
+</testsuite>

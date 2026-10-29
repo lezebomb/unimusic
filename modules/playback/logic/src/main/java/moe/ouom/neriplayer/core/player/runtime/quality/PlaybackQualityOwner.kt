@@ -39,7 +39,7 @@ class PlaybackQualityOwner(
             PlaybackAudioSource.NETEASE -> current.copy(netease = key)
             PlaybackAudioSource.YOUTUBE_MUSIC -> current.copy(youtube = key)
             PlaybackAudioSource.BILIBILI -> current.copy(bili = key)
-            PlaybackAudioSource.LOCAL -> current
+            PlaybackAudioSource.LOCAL, PlaybackAudioSource.KUWO -> current
         }
     }
 
@@ -47,12 +47,13 @@ class PlaybackQualityOwner(
         val key = optionKey.trim().lowercase()
         if (key.isBlank()) return
         val source = port.currentAudioSource() ?: return
-        if (key == mutablePreferredKeys.value.forSource(source)) return
+        val preferred = mutablePreferredKeys.value.forSource(source) ?: return
+        if (key == preferred) return
         scope.launch { port.persistPreferredQuality(source, key) }
     }
 
     fun scheduleRefresh(source: PlaybackAudioSource, reason: String) {
-        if (source == PlaybackAudioSource.LOCAL) return
+        if (mutablePreferredKeys.value.forSource(source) == null) return
         refreshJobs.remove(source)?.cancel()
         refreshJobs[source] = scope.launch { port.refreshCurrentSong(source, reason) }
     }

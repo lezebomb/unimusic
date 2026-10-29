@@ -1,0 +1,6 @@
+<testsuite name="moe.ouom.neriplayer.ui.screen.NowPlayingScreenTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2026-10-29T22:21:36.008Z" hostname="local" time="0.028">
+  <properties />
+  <testcase name="resolved Kuwo source overrides logical Netease attribution while local copies remain local" classname="moe.ouom.neriplayer.ui.screen.NowPlayingScreenTest" time="0.024" />
+  <system-out />
+  <system-err />
+</testsuite>
