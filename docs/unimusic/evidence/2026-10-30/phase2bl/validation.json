@@ -1,0 +1,23 @@
+{
+  "stage": "2BL",
+  "localTests": [
+    {
+      "class": "RecordingMatchPolicyTest",
+      "tests": 1,
+      "failures": 0
+    },
+    {
+      "class": "ExploreSearchArtistIntentTest",
+      "tests": 2,
+      "failures": 0
+    }
+  ],
+  "moduleBoundaries": "passed",
+  "build": "BUILD SUCCESSFUL in 49s",
+  "apk": "build/outputs/unimusic/UniMusic-20261030-2BL-debug.apk",
+  "versionName": "e5cca5d2fe38.dirty.10300639",
+  "sha256": "170d68d90da2fa4db374fbe60937a91d4f3a71c5e422d9bcd2c1bd607d49d464",
+  "remoteCI": "existing RecordingMatch/ArtistIntent selectors include new cases; cumulative CI40967228048 for preceding stages running",
+  "deviceValidation": "not run",
+  "fullAudioAccuracyTimingValidation": "not run"
+}

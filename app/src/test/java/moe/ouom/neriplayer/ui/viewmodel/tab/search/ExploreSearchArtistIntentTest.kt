@@ -27,6 +27,26 @@ class ExploreSearchArtistIntentTest {
         {"id":62046853,"name":"ダイヤモンドダスト","alias":["DIAMOND DUST"],"transNames":["钻石星尘"]}
     ]}}"""), NeteaseExploreSearchType.ARTIST).items.filterIsInstance<ExploreSearchResult.Artist>().map { it.result }
 
+    @Test fun resolvedAddressesCannotPromoteJapanesePerformanceVariantsAboveTheRecording() {
+        val artist = NeteaseArtistSummary(1, "Original Band")
+        val entity = NeteaseSearchArtistResult(artist, null, 1, 1)
+        val original = ExploreSearchResult.Song(SongItem(2, "青い未来", artist.name, "Studio Album", 0, 180_000, null,
+            channelId = "netease", audioId = "2", neteaseArtists = listOf(artist)))
+        val variants = listOf("歌ってみた", "弾き語り", "カラオケ", "Off Vocal").mapIndexed { i, label ->
+            ExploreSearchResult.Catalog(moe.ouom.neriplayer.data.model.unified.CatalogTrack(
+                moe.ouom.neriplayer.data.model.unified.SongSourceKey("kuwo", (100 + i).toString()),
+                moe.ouom.neriplayer.data.model.unified.UnifiedSongMetadata(original.song.name, artist.name, label, original.song.durationMs), null))
+        }
+        val checks = variants.associate { it.track.source to moe.ouom.neriplayer.data.model.unified.SourceCheckResult(
+            moe.ouom.neriplayer.data.model.unified.SourceCheckStatus.ADDRESS_RESOLVED, 1) }
+        val ranker = ExploreSearchRankingSession(artist.name).apply {
+            artistIntent = inferSearchArtistIntent(artist.name, listOf(original.song), listOf(entity))
+        }
+        val ranked = ranker.rank(variants + original, checks).filterNot { it is ExploreSearchResult.Artist }
+        assertEquals(original, ranked.first())
+        assertEquals(variants.size + 1, ranked.size)
+    }
+
     @Test fun exactArtistNamesPreserveOrderedBoundariesUnlessTheProviderSuppliesAnAlias() {
         val seed = artists().first()
         fun entity(name: String, aliases: List<String> = emptyList()) =

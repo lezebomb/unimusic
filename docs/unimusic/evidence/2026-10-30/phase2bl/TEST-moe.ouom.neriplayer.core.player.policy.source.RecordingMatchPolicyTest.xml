@@ -1,0 +1,6 @@
+<testsuite name="moe.ouom.neriplayer.core.player.policy.source.RecordingMatchPolicyTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2026-10-29T22:39:37.127Z" hostname="local" time="0.196">
+  <properties />
+  <testcase name="japaneseAndTraditionalPerformanceLabelsCannotHideInAlbumMetadata" classname="moe.ouom.neriplayer.core.player.policy.source.RecordingMatchPolicyTest" time="0.191" />
+  <system-out />
+  <system-err />
+</testsuite>

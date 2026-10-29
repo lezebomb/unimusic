@@ -6,6 +6,19 @@ import org.junit.Test
 class RecordingMatchPolicyTest {
     private val studio = RecordingMetadata("晴天", "周杰伦", 269_000)
 
+    @Test fun japaneseAndTraditionalPerformanceLabelsCannotHideInAlbumMetadata() {
+        val original = RecordingMetadata("青い未来", "Original Band", 180_000)
+        for (tag in listOf("カバー", "歌ってみた", "弾いてみた", "弾き語り", "弹唱", "彈唱", "翻彈", "清唱",
+            "カラオケ", "オフボーカル", "インストゥルメンタル", "Off Vocal", "off-vocals")) {
+            val alternate = original.copy(versionContext = tag)
+            assertEquals(tag, RecordingMismatch.VERSION, RecordingMatchPolicy.assess(original, alternate).reason)
+            assertTrue(tag, RecordingMatchPolicy.assess(alternate, alternate).accepted)
+            assertEquals(tag, RecordingMatchPolicy.canonicalTitle(original.title),
+                RecordingMatchPolicy.canonicalTitle("${original.title} ($tag)"))
+        }
+        assertTrue(RecordingMatchPolicy.versions(original.copy(title = "弾ける未来", artist = "カバーメーカー")).isEmpty())
+    }
+
     @Test fun placeholderCreditsCannotProveTheSameRecordingEvenWhenTitleAndDurationAgree() {
         for (credit in listOf("未知艺术家", "未知歌手", "Unknown Artist", "[Unknown Artist]", "ＵＮＫＮＯＷＮ ＡＲＴＩＳＴ", "Artist information missing", "A / Unknown Artist")) {
             val unresolved = studio.copy(artist = credit)

@@ -31,8 +31,8 @@ object RecordingMatchPolicy {
     )
     private val markers = linkedMapOf(
         RecordingVersion.LIVE to Regex("现场|演唱会|" + englishVersion("live"), RegexOption.IGNORE_CASE),
-        RecordingVersion.COVER to Regex("翻唱|翻弹|翻奏|" + englishVersion("cover(?:ed)?"), RegexOption.IGNORE_CASE),
-        RecordingVersion.INSTRUMENTAL to Regex("伴奏|纯音乐|无人声|" + englishVersion("instrumental|karaoke|backing track"), RegexOption.IGNORE_CASE),
+        RecordingVersion.COVER to Regex("翻唱|翻弹|翻奏|翻彈|弹唱|彈唱|清唱|カバー|歌ってみた|弾いてみた|弾き語り|" + englishVersion("cover(?:ed)?"), RegexOption.IGNORE_CASE),
+        RecordingVersion.INSTRUMENTAL to Regex("伴奏|纯音乐|无人声|カラオケ|オフボーカル|インストゥルメンタル|" + englishVersion("instrumental|karaoke|backing track|off[\\s_-]*vocals?"), RegexOption.IGNORE_CASE),
         RecordingVersion.REMIX to Regex("混音|DJ\\s*版|" + englishVersion("remix(?:ed)?"), RegexOption.IGNORE_CASE),
         RecordingVersion.EDIT to Regex("剪辑|片段|串烧|混剪|教学|教程|讲解|乐理分析|" + englishVersion("edit|snippet|medley|mash[\\s_-]*up|short ver(?:sion)?|tutorial|lesson|reaction|how to play"), RegexOption.IGNORE_CASE),
         RecordingVersion.SPEED_ALTERED to Regex("加速|减速|变速|升调|降调|倍速|" + englishVersion("sped up|speed up|slowed|nightcore|pitch(?:ed)?"), RegexOption.IGNORE_CASE),
