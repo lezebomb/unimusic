@@ -52,13 +52,25 @@ def classify(paths):
             "migration_required": any(migration_path(p) for p in code), "changed_paths": len(paths)}
 
 
-def read_changes(base, head):
+def read_changes(base, head, fetch_missing_base=False):
     if not all(value and re.fullmatch(r"(?:[0-9a-f]{40}|[0-9a-f]{64})", value) and set(value) != {"0"}
                for value in (base, head)):
         return None
-    args = ["git", "-c", "safe.directory=" + str(ROOT), "diff", "--name-only", "--no-renames", "-z", base, head, "--"]
+    git = ["git", "-c", "safe.directory=" + str(ROOT)]
+    diff = ["diff", "--name-only", "--no-renames", "-z", base, head, "--"]
     try:
-        result = subprocess.run(args, cwd=ROOT, capture_output=True, timeout=20)
+        result = subprocess.run(git + diff, cwd=ROOT, capture_output=True, timeout=20)
+        if result.returncode and fetch_missing_base:
+            # Batched pushes can put event.before outside checkout's depth=2 history.
+            # Fetch only that validated object from the configured origin, never reset/deepen HEAD.
+            head_known = subprocess.run(git + ["cat-file", "-e", head + "^{commit}"], cwd=ROOT, capture_output=True, timeout=20)
+            base_known = subprocess.run(git + ["cat-file", "-e", base + "^{commit}"], cwd=ROOT, capture_output=True, timeout=20)
+            if head_known.returncode or not base_known.returncode:
+                return None
+            fetched = subprocess.run(git + ["fetch", "--no-tags", "--depth=1", "origin", base], cwd=ROOT, capture_output=True, timeout=30)
+            if fetched.returncode:
+                return None
+            result = subprocess.run(git + diff, cwd=ROOT, capture_output=True, timeout=20)
         if result.returncode:
             return None
         return [p for p in result.stdout.decode("utf-8", errors="strict").split("\0") if p]
@@ -71,8 +83,9 @@ def main():
     parser.add_argument("--base")
     parser.add_argument("--head")
     parser.add_argument("--json", action="store_true")
+    parser.add_argument("--fetch-missing-base", action="store_true", help="CI-only: fetch a missing validated base SHA from origin")
     args = parser.parse_args()
-    paths = read_changes(args.base, args.head)
+    paths = read_changes(args.base, args.head, fetch_missing_base=args.fetch_missing_base)
     result = classify(paths) if paths is not None else {"identity_only": False, "migration_required": True, "changed_paths": 0}
     if args.json:
         print(json.dumps(result))

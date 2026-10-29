@@ -43,7 +43,7 @@ on:
       - 'app/src/test/java/moe/ouom/neriplayer/ui/viewmodel/tab/NeteaseSearchSongParserTest.kt'
       - 'app/src/test/java/moe/ouom/neriplayer/ui/screen/tab/Explore*.kt'
       - 'tools_pub/quality/module_boundaries.py'
-      - 'tools_pub/unimusic/ci_scope.py'
+      - 'tools_pub/unimusic/*ci_scope*.py'
       - 'config/quality/domain-dependencies.json'
       - 'app/src/main/java/moe/ouom/neriplayer/NeriPlayerApplication.kt'
       - 'app/src/main/java/moe/ouom/neriplayer/core/di/AppContainer.kt'
@@ -71,7 +71,9 @@ jobs:
         env:
           SCOPE_BASE: ${{ github.event.before }}
           SCOPE_HEAD: ${{ github.sha }}
-        run: python3 tools_pub/unimusic/ci_scope.py --base "$SCOPE_BASE" --head "$SCOPE_HEAD" >> "$GITHUB_OUTPUT"
+        run: |
+          python3 -B -m unittest discover -s tools_pub/unimusic -p test_ci_scope.py
+          python3 tools_pub/unimusic/ci_scope.py --fetch-missing-base --base "$SCOPE_BASE" --head "$SCOPE_HEAD" >> "$GITHUB_OUTPUT"
       - uses: actions/setup-java@v4
         with:
           distribution: temurin

@@ -22,8 +22,9 @@
 | [2BK名称边界](PHASE_2BK_ARTIST_NAME_BOUNDARIES.md) | 1新/共3 JVM、边界、Debug44s；名称有序边界、明确别名及作品共识 | e2ac4ec7已push |
 | [3J正向歌手亲和度](PHASE_3J_POSITIVE_ARTIST_AFFINITY.md) | 1新/共4 JVM、边界、Debug51s；累计试听统计不再间接加分喜好，算法v6 | e5cca5d2已push，CI40967228048含Android SUCCESS |
 | [2BL跨语言版本](PHASE_2BL_PERFORMANCE_VERSION_LABELS.md) | 2新/共3 JVM、边界、Debug49s；日文/繁体演绎、Off Vocal版本证据 | 47d54c19已commit，随2BM一起push |
-| [2BM流凭据边界](PHASE_2BM_BILI_STREAM_CREDENTIAL_BOUNDARIES.md) | 4不同JVM最终均通过（含1次测试桩修复）、边界、Debug成功；HTTPS/严格域名与重定向去凭据 | 67338ee3已push；CI依赖检查失败，分层恢复已本地通过 |
-| [3K稳定跳过采样](PHASE_3K_STABLE_SKIP_EVIDENCE.md) | 1新/共3 JVM、边界、Debug39s；暂停/恢复2秒内不推断不喜欢，含累计包设备观察 | 本检查点所在提交，待连同CI修复一起push |
+| [2BM流凭据边界](PHASE_2BM_BILI_STREAM_CREDENTIAL_BOUNDARIES.md) | 4不同JVM最终均通过（含1次测试桩修复）、边界、Debug成功；HTTPS/严格域名与重定向去凭据 | 67338ee3已push；分层恢复96415c15已本地通过并commit |
+| [3K稳定跳过采样](PHASE_3K_STABLE_SKIP_EVIDENCE.md) | 1新/共3 JVM、边界、Debug39s；暂停/恢复2秒内不推断不喜欢，含累计包设备观察 | 78f785e9已commit，随本阶段一起push |
+| [2BN浅克隆CI](PHASE_2BN_CI_SHALLOW_BASE.md) | 3 Python/4.077s与YAML解析通过；精确补base，失败保守回退；无重复APK构建 | 本检查点所在提交，连同分层恢复/3K一起push |
 
 此前必要CI均已SUCCESS。最新已核实CI40967228048（e5cca5d2，含2BJ/2BK/3J）整体及Android无损迁移SUCCESS；实际XML ArtistIntent11、RecordingMatch10、Ranker9、DailyStore8、增量迁移1/升级3均0失败/跳过。摘要见evidence/2026-10-30/ci-40967228048.json。2BL/2BM已push；CI40969263368在平台依赖检查失败，迁移跳过。分层恢复已本地3 JVM+平台依赖0违规+Debug通过，待新累计CI。
 
@@ -54,11 +55,11 @@
 
 ## 接下来
 
-1. 提交2BM分层恢复，再保存3K与CI浅克隆修复的独立提交，一起push并核对必要CI；此前2BJ/2BK/3J已远端通过。
+1. 核对本阶段push后的最新累计CI，特别是2BM移动网络层后的单测/依赖0违规及必要Android迁移；下载实际XML，准确记录失败/恢复。
 2. 下载路径已查到明确试听拒绝及现有回归，不重做。2BJ已修复未知署名、2BK已补名称边界、3J已隔离统计与亲和度；2BL已补跨语言版本；2BM已补流凭据边界；可接着优化CI浅克隆缺base导致的不必要全量迁移检查（保守fallback不能去掉）；NPLogger已脱敏，勿导出真实秘密验证。
 3. 设备重新在线后仅做必要、保留数据的本地验收，明确试听与完整版差别；不为测试修改真实账号/清除用户书签或偏好。
 4. 继续高价值来源/匹配/推荐后台，按实际结果更新此短检查点，每阶段commit/push。
 
 `unimusic-10-30-05-30`已在正确日期触发并删除，无剩余UniMusic定时计划；不新建每日循环。
 
-当前未提交：2BN ci_scope可选精确base抓取及3 Python用例已通过，工作流入口暂保留原指令，待独立阶段恢复接线；3K随本检查点独立commit。保留这些内容，不覆盖。
+2BM分层恢复96415c15、3K采样78f785e9与2BN工具分为独立提交，本阶段一并push。工作流和scope为安全输入，新的累计CI必须完成实际单测/依赖检查及Android迁移，勿提前取消。纯CI阶段没有重建或重装APK。

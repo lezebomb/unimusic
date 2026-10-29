@@ -1,0 +1,14 @@
+{
+  "stage": "2BN",
+  "pythonTests": 3,
+  "result": "OK",
+  "elapsedSeconds": 4.077,
+  "tests": "Actual shallow local Git fixture plus invalid/failing fetch fallback and migration safety input routing",
+  "externalServiceRequestsInTests": false,
+  "headAndWorkingTreePreservedInFixture": true,
+  "workflowYaml": "parsed",
+  "androidBuild": "not repeated; CI-only change",
+  "lastAppArtifact": "UniMusic-20261030-2BM-network-layer-debug.apk",
+  "remoteCI": "Must complete next workflow including required migration; current failed run not treated as success",
+  "safety": "Only opt-in validated missing base fetch from configured origin; missing head, failed fetch, invalid/unknown ranges retain full conservative baseline"
+}
