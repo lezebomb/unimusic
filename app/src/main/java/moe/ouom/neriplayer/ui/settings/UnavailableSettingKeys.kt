@@ -18,7 +18,9 @@ internal fun resolveUnavailableSettingKeys(statusBarLyricsSupported: Boolean): S
 }
 
 /** 已下线入口的设置项：保留存储值兼容旧配置，但界面与搜索都不再展示。 */
-internal val retiredSettingKeys: Set<String> = setOf("always_use_new_tab_style")
+internal val retiredSettingKeys: Set<String> = setOf("always_use_new_tab_style") +
+    moe.ouom.neriplayer.data.settings.generated.AutoSettingsMetadata.settings
+        .filter { it.keyName.contains("youtube", ignoreCase = true) }.map { it.keyName }
 
 /** 当前设备上不提供入口的设置项；设备能力不会在运行期改变，解析一次即可。 */
 internal val unavailableSettingKeys: Set<String> =

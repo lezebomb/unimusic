@@ -89,11 +89,14 @@ object RecordingMatchPolicy {
 
     /** Preserve credit boundaries: A/B is not AB. Unknown aliases/band spellings require manual choice. */
     fun canonicalArtist(value: String): String {
-        val credits = Normalizer.normalize(value, Normalizer.Form.NFKC)
-            .split(artistCreditSeparators).map(::canonicalText)
+        val credits = artistCredits(value)
         if (credits.any(String::isEmpty)) return ""
         return credits.sorted().joinToString("|") { "${it.length}:$it" }
     }
+
+    /** Canonical individual credits; callers decide whether to retain duplicates or reject empty evidence. */
+    fun artistCredits(value: String): List<String> = Normalizer.normalize(value, Normalizer.Form.NFKC)
+        .split(artistCreditSeparators).map(::canonicalText)
 
     fun canonicalText(value: String): String = Normalizer.normalize(value, Normalizer.Form.NFKC)
         .lowercase(Locale.ROOT).replace(Regex("[^\\p{L}\\p{N}]"), "")

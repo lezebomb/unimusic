@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="moe.ouom.neriplayer.data.recommendation.LocalRecommendationRankerTest" tests="6" skipped="0" failures="0" errors="0" timestamp="2026-10-28T15:56:21.299Z" hostname="XUSHAOYANG" time="0.076">
+  <properties/>
+  <testcase name="ranking deduplicates identities and keeps distinct recordings with the same title" classname="moe.ouom.neriplayer.data.recommendation.LocalRecommendationRankerTest" time="0.062"/>
+  <testcase name="retiredOnlineSourcesLeaveRecommendationsWhilePlayableLocalCopiesRemain" classname="moe.ouom.neriplayer.data.recommendation.LocalRecommendationRankerTest" time="0.0"/>
+  <testcase name="explicit playback evidence affects only the supplied exact identity" classname="moe.ouom.neriplayer.data.recommendation.LocalRecommendationRankerTest" time="0.002"/>
+  <testcase name="familiar artist affinity does not fill the first recommendations with one artist" classname="moe.ouom.neriplayer.data.recommendation.LocalRecommendationRankerTest" time="0.005"/>
+  <testcase name="recent listening is lowered while older listening earns a rediscovery reason" classname="moe.ouom.neriplayer.data.recommendation.LocalRecommendationRankerTest" time="0.0"/>
+  <testcase name="collaborativeCreditsShareAffinityAndDiversityWithoutMergingSingleArtistNames" classname="moe.ouom.neriplayer.data.recommendation.LocalRecommendationRankerTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

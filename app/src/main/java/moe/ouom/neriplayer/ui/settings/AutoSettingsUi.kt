@@ -79,6 +79,7 @@ fun AutoSettingsListItem(
     onHighlightFinished: (() -> Unit)? = null,
     onClick: (() -> Unit)? = null
 ) {
+    if (setting.keyName in unavailableSettingKeys) return
     val title = autoSettingsString(setting.titleRes) ?: setting.keyName
     val description = autoSettingsString(setting.descriptionRes)
     val highlightedModifier = modifier.settingsHighlightTarget(

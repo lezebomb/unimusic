@@ -21,6 +21,9 @@ object MusicSourceRegistry {
 
     fun capabilities(provider: String) = providers[provider] ?: unknown
 
+    /** Product availability is separate from historical identity and implemented adapter metadata. */
+    fun isEnabled(provider: String): Boolean = provider in providers && provider !in setOf("qqmusic", "youtube_music")
+
     fun validKey(key: SongSourceKey): Boolean = key.recordingContext.isEmpty() && when (key.provider) {
         "netease", "kuwo", "gdstudio_netease" -> positiveId(key.resourceId) && key.subResourceId.isEmpty()
         "qqmusic" -> key.resourceId.matches(Regex("[A-Za-z0-9]{14}")) && key.subResourceId.isEmpty()
@@ -30,7 +33,7 @@ object MusicSourceRegistry {
         else -> false
     }
 
-    fun canResolveAudio(key: SongSourceKey): Boolean = validKey(key) &&
+    fun canResolveAudio(key: SongSourceKey): Boolean = isEnabled(key.provider) && validKey(key) &&
         capabilities(key.provider).audio in setOf(SourceAudioSupport.LOCAL_FILE, SourceAudioSupport.PLATFORM_API)
 
     /** Canonical public metadata pages only; source identity grants no audio entitlement. */

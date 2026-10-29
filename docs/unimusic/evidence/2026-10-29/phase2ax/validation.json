@@ -1,0 +1,51 @@
+{
+  "phase": "2AX",
+  "date": "2026-10-29",
+  "uniqueUnitTests": 10,
+  "newUnitTestMethods": 3,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "validation": {
+    "selectedTestsLog": "build/unimusic-toolchain/phase2ax-final-validation.log",
+    "selectedTestsAndBuild": "BUILD SUCCESSFUL in 4m36s",
+    "platformDomainViolations": 0,
+    "moduleBoundaries": "passed",
+    "finalProductBuild": "BUILD SUCCESSFUL in 1m2s",
+    "finalProductLog": "build/unimusic-toolchain/phase2ax-installed-apk-build.log"
+  },
+  "recoveredFailures": [
+    "Initial collaboration affinity test failed because evidence was divided twice; distribute history once and sum bounded candidate affinity",
+    "Provider list filter changed Kotlin inference; explicit FederatedSearchProvider<ExploreSearchResult> list type fixed compile",
+    "Automatic approval review credit error rejected last resource/build command before execution; after user continued the same approval flow succeeded; no reset credit used"
+  ],
+  "apk": {
+    "archive": "build/outputs/unimusic/UniMusic-20261029-2AX-debug.apk",
+    "sha256": "0e93d1f586d12b4f4317c1ad9b6ba5d2668abf68ab18dfeb82cb3ea540395280",
+    "installedVersion": "33ae1a1fcb46.dirty.10290814",
+    "installation": "adb Success and package version; data preserved"
+  },
+  "deviceSearch": {
+    "query": "Canon",
+    "aggregateStatus": [
+      "本地文件 0 · 网易云 60 · 哔哩哔哩 0 · 酷我 40"
+    ],
+    "youtubeTabVisible": false,
+    "retiredInSourceStatus": false
+  },
+  "deviceAccounts": {
+    "neteaseAccountCardVisible": true,
+    "bilibiliAccountCardVisible": true,
+    "youtubeAccountCardVisible": false,
+    "qqAccountCardVisible": false
+  },
+  "recommendationAlgorithmVersion": 4,
+  "data": "Room v23; historical QQ/YouTube identities and stored credentials kept; local copies allowed",
+  "limitations": [
+    "No new audio decode acceptance on 2AX; prior four-source evidence remains historical",
+    "No recommendation relevance/user-study/accuracy claim",
+    "Search retained scroll/paging, so displayed counts are not first-page latency evidence",
+    "Settings overview description still mentions YouTube; actual account cards removed, copy correction queued with next search build",
+    "Oct29 00:10 and05:12 single-run schedules configured; configuration is not proof of a successful invocation"
+  ]
+}

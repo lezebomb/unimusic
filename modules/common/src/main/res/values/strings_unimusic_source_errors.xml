@@ -9,4 +9,5 @@
     <string name="unimusic_source_external_player">This source requires its official player.</string>
     <string name="unimusic_source_url_expired">The audio address expired. Please retry.</string>
     <string name="unimusic_source_unavailable">This audio source is unavailable. Retry later or select another source.</string>
+    <string name="unimusic_source_removed">This audio source has been retired. Select another source from Sources.</string>
 </resources>

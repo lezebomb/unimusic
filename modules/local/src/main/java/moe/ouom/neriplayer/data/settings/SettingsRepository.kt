@@ -691,7 +691,9 @@ class SettingsRepository(private val context: Context) {
         dataStoreSettingFlow { it[SettingsKeys.INTERNATIONALIZATION_ENABLED] ?: defaultInternationalization }
 
     val youtubeEnabledFlow: Flow<Boolean> =
-        settingFlow(AutoSettingsSchema.general.youtubeEnabled)
+        settingFlow(AutoSettingsSchema.general.youtubeEnabled).map {
+            it && moe.ouom.neriplayer.data.model.unified.MusicSourceRegistry.isEnabled("youtube_music")
+        }
 
     suspend fun setUiStyle(value: UiStyle) {
         context.dataStore.edit { it[SettingsKeys.UI_STYLE] = value.storageValue }

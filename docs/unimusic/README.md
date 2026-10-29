@@ -1,5 +1,7 @@
 # UniMusic 开发记录
 
+最新：[2AX可用来源与推荐v4](PHASE_2AX_ACTIVE_SOURCES_AND_RECOMMENDATION_CREDITS.md)：QQ/YT按用户要求停用，保留数据；推荐合唱成员偏好与多样性。乐队查询翻唱问题待修。
+
 最新：[2AW网易云搜索可播性](PHASE_2AW_NETEASE_SEARCH_AUDIO_CHECKS.md)：限量后台校验/同版本排序，手机点击地址已校验结果已实际播放；账号歌单保留。
 
 最新：[2AV服务失败与四路实播](PHASE_2AV_SOURCE_SERVICE_ERRORS_AND_DEVICE_AUDIO.md)：换网后网易云/酷我/B站/GD样本解码，服务失败单独处理；QQ和YouTube仍未实播。

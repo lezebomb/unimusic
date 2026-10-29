@@ -68,6 +68,32 @@ class LocalRecommendationRankerTest {
             feedback = mapOf("a" to LocalPlaybackSignal(repeats = 2.0))).first().identityKey)
     }
 
+    @Test fun collaborativeCreditsShareAffinityAndDiversityWithoutMergingSingleArtistNames() {
+        val collab = candidate("collab", "Alpha / Beta")
+        val swapped = candidate("swapped", "Beta & Alpha")
+        val fused = candidate("fused", "AlphaBeta")
+        val history = stat(candidate("history", "Beta / Alpha"), now - 30 * day, 9_000_000, 50)
+        val ranked = LocalRecommendationRanker.rank(listOf(fused, collab, swapped), listOf(history), now)
+        assertEquals(LocalRecommendationReason.FAMILIAR_ARTIST, ranked.first().reason)
+        assertEquals(LocalRecommendationReason.EXPLORE_LIBRARY, ranked.single { it.identityKey == "fused" }.reason)
+        assertEquals(setOf("collab", "swapped", "fused"), ranked.map { it.identityKey }.toSet())
+        val alternatives = listOf(collab, candidate("ac", "Alpha / Gamma"), candidate("ad", "Alpha / Delta"), candidate("fresh", "Other"))
+        val top = LocalRecommendationRanker.rank(alternatives, listOf(history), now, limit = 2)
+        assertTrue(top.any { it.identityKey == "fresh" })
+        assertEquals(top, LocalRecommendationRanker.rank(alternatives.reversed(), listOf(history), now, limit = 2))
+    }
+
+    @Test fun retiredOnlineSourcesLeaveRecommendationsWhilePlayableLocalCopiesRemain() {
+        val qq = candidate("qq", "Artist").let { it.copy(song = it.song.copy(channelId = "qqmusic")) }
+        val yt = candidate("yt", "Artist", LocalRecommendationSource.YOUTUBE_MUSIC)
+        val local = yt.copy(identityKey = "downloaded", source = LocalRecommendationSource.LOCAL_FILE,
+            song = yt.song.copy(channelId = "youtubeMusic", localFilePath = "/music/owned.mp3"))
+        val active = candidate("active", "Artist", LocalRecommendationSource.NETEASE)
+        val input = listOf(qq, yt, local, active)
+        assertEquals(setOf("downloaded", "active"), LocalRecommendationRanker.rank(input, emptyList(), now).map { it.identityKey }.toSet())
+        assertEquals(setOf("downloaded", "active"), LocalRecommendationRanker.canonicalCandidates(input).map { it.identityKey }.toSet())
+    }
+
     private fun candidate(key: String, artist: String, source: LocalRecommendationSource = LocalRecommendationSource.LIBRARY) =
         LocalRecommendationCandidate(
             SongItem(key.hashCode().toLong(), "Same title", artist, "album", 0, 180_000, null), key, source

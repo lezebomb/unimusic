@@ -595,7 +595,8 @@ object AppContainer {
     private fun primeProxySetting() {
         val initialBootstrapSettings = readBootstrapSettingsSnapshotSync(application)
         DynamicProxySelector.bypassProxy = initialBootstrapSettings.bypassProxy
-        YouTubeFeatureGate.update(initialBootstrapSettings.youtubeEnabled)
+        YouTubeFeatureGate.update(initialBootstrapSettings.youtubeEnabled &&
+            moe.ouom.neriplayer.data.model.unified.MusicSourceRegistry.isEnabled("youtube_music"))
         ManagedDownloadStorage.primeSettings(
             directoryUri = initialBootstrapSettings.downloadDirectoryUri,
             directoryLabel = initialBootstrapSettings.downloadDirectoryLabel,

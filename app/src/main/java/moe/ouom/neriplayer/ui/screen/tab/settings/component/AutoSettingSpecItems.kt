@@ -91,6 +91,7 @@ internal fun <T> AutoSettingSpecListItem(
     onHighlightFinished: (() -> Unit)? = null,
     onClick: (() -> Unit)? = null
 ) {
+    if (setting.key in moe.ouom.neriplayer.ui.settings.unavailableSettingKeys) return
     val title = autoSettingSpecString(setting.titleRes) ?: setting.key
     val description = autoSettingSpecString(setting.descriptionRes)
     val highlightedModifier = modifier.settingsHighlightTarget(

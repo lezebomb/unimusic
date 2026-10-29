@@ -1,0 +1,23 @@
+[
+  {
+    "tests": 6,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "class": "moe.ouom.neriplayer.data.recommendation.LocalRecommendationRankerTest"
+  },
+  {
+    "tests": 2,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "class": "moe.ouom.neriplayer.core.player.policy.source.AutomaticCatalogChoiceTest"
+  },
+  {
+    "tests": 2,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "class": "moe.ouom.neriplayer.ui.screen.tab.ExploreScreenYouTubeGateTest"
+  }
+]

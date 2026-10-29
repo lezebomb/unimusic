@@ -65,7 +65,8 @@ internal fun buildSettingsSearchEntries(context: Context): List<SettingsSearchEn
             )
         }
 
-    return pageEntries + settingEntries + manualSettingsSearchEntries(context)
+    return (pageEntries + settingEntries + manualSettingsSearchEntries(context))
+        .filterNot { it.id.contains("youtube", ignoreCase = true) || it.id.contains("qqmusic", ignoreCase = true) }
 }
 
 internal fun searchSettingsEntries(

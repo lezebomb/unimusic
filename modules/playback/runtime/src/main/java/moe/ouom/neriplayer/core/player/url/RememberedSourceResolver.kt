@@ -72,9 +72,10 @@ private suspend fun PlayerManager.tryResolveStoredSource(song: SongItem, sideEff
     try {
         val backend = SourceMatchBackend(application)
         val automatic = unifiedSongId == null
-        val stored = if (automatic) backend.automaticMatches(song).filter {
+        val stored = (if (automatic) backend.automaticMatches(song).filter {
             it.candidate.key.provider in allowedAutomaticProviders && automaticSourceEnabled(it.candidate.key.provider) }
-            else backend.matches(requireNotNull(unifiedSongId), song).filter { it.current && it.decision == SourceMatchDecision.CONFIRMED }
+            else backend.matches(requireNotNull(unifiedSongId), song).filter { it.current && it.decision == SourceMatchDecision.CONFIRMED })
+            .filter { moe.ouom.neriplayer.data.model.unified.MusicSourceRegistry.isEnabled(it.candidate.key.provider) }
         if (automatic) stored.forEach { coolAutomaticBili(song, it) }
         val matches = if (automatic) stored.filterNot { RememberedSourceState.cooldown.cooling(song.stableKey(), it.id) }.take(2)
             else stored

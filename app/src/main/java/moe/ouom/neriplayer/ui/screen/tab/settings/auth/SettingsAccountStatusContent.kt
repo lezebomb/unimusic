@@ -103,7 +103,7 @@ internal fun SettingsLoginExpandedContent(
     LaunchedEffect(biliVm, youtubeVm, neteaseVm) {
         biliVm.refreshAuthHealth()
         neteaseVm.refreshAuthHealth()
-        youtubeVm.refreshAuthHealth()
+        if (YouTubeFeatureGate.isEnabled()) youtubeVm.refreshAuthHealth()
     }
 
     SettingsAccountCardsContent(
@@ -133,7 +133,7 @@ internal fun SettingsLoginExpandedContent(
                 profileLoading = youtubeProfile.loading
             ),
             qqAccount
-        ),
+        ).filter { it.platform !in setOf(SettingsAccountPlatform.YouTube, SettingsAccountPlatform.QqMusic) },
         onLogin = { if (it == SettingsAccountPlatform.QqMusic) qqActions.login() else controller.actions.openPlatformLogin(it) },
         onManageSaved = { if (it == SettingsAccountPlatform.QqMusic) qqActions.manage() else controller.actions.openPlatformSavedAuthorization(it) },
         highlightTargetId = highlightTargetId,

@@ -612,7 +612,7 @@ class ExploreViewModel(application: Application) : AndroidViewModel(application)
         })
         val accountContext = neteaseClient.searchSessionIdentity()
         aggregateRanker = ExploreSearchRankingSession(_uiState.value.searchDisplayQuery)
-        aggregateEngine = FederatedSearchEngine<ExploreSearchResult>(listOf(
+        aggregateEngine = FederatedSearchEngine<ExploreSearchResult>(listOf<FederatedSearchProvider<ExploreSearchResult>>(
             FederatedSearchProvider("local") { query, cursor -> localSearch.page(query, cursor) },
             FederatedSearchProvider("netease") { query, cursor ->
                 if (!isNeteaseSearchAllowed() || accountContext !== neteaseClient.searchSessionIdentity()) {
@@ -656,7 +656,9 @@ class ExploreViewModel(application: Application) : AndroidViewModel(application)
                     SearchPage(page.tracks.map(ExploreSearchResult::Catalog), page.nextCursor)
                 }
             }
-        ), identity = { it.stableKey }, parallelism = 5, localProviderIds = setOf("local"))
+        ).filter { moe.ouom.neriplayer.data.model.unified.MusicSourceRegistry.isEnabled(
+            if (it.id == "youtube") "youtube_music" else it.id) },
+            identity = { it.stableKey }, parallelism = 3, localProviderIds = setOf("local"))
         searchJob = launchAggregateSearch(keyword, requestVersion, null)
     }
 
@@ -701,7 +703,7 @@ class ExploreViewModel(application: Application) : AndroidViewModel(application)
 
     /** Three providers run independently, at most three candidates / 4.5s each, stopping at a full address. */
     private fun probeSearchSources(items: List<ExploreSearchResult>, requestVersion: Long, ranker: ExploreSearchRankingSession) {
-        for (provider in listOf("netease", "qqmusic", "kuwo")) {
+        for (provider in listOf("netease", "kuwo")) {
             if (nativeProbes.isClaimed(provider)) continue
             val candidates = items.mapNotNull { item ->
                 val candidate = searchAvailabilityCandidate(item)?.takeIf { it.key.provider == provider } ?: return@mapNotNull null

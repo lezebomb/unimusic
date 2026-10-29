@@ -30,6 +30,7 @@ internal fun YouTubePlaybackSourceSetting(
     highlightPulse: Int = 0,
     onHighlightFinished: (() -> Unit)? = null
 ) {
+    if (!moe.ouom.neriplayer.data.model.unified.MusicSourceRegistry.isEnabled("youtube_music")) return
     val scope = rememberCoroutineScope()
     val source by repository.youtubePlaybackSourceFlow.collectAsState(
         initial = YouTubePlaybackSourcePreference.Automatic

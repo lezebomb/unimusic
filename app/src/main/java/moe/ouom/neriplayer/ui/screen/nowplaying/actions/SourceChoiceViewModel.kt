@@ -97,7 +97,9 @@ internal class SourceChoiceViewModel(application: Application) : AndroidViewMode
             checking = null, checks = emptyMap())
         work = viewModelScope.launch {
             try {
-                val matches = backend.matches(song)
+                val matches = backend.matches(song).filter {
+                    moe.ouom.neriplayer.data.model.unified.MusicSourceRegistry.isEnabled(it.candidate.key.provider)
+                }
                 if (!isCurrent(token, session)) return@launch
                 _state.value = _state.value.copy(matches = matches)
                 val result = discoverSourceChoices(getApplication(), song, session.youtubeEnabled)
@@ -171,7 +173,9 @@ internal class SourceChoiceViewModel(application: Application) : AndroidViewMode
                 if (!isCurrent(token, session)) return@launch
                 if (decision == null) backend.clear(song, candidate.key)
                 else backend.decide(song, candidate, decision)
-                val matches = backend.matches(song)
+                val matches = backend.matches(song).filter {
+                    moe.ouom.neriplayer.data.model.unified.MusicSourceRegistry.isEnabled(it.candidate.key.provider)
+                }
                 if (isCurrent(token, session)) _state.value = _state.value.copy(matches = matches,
                     saving = false, notice = if (decision == null) SourceChoiceNotice.CLEARED else SourceChoiceNotice.SAVED)
             } catch (cancelled: CancellationException) {

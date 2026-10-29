@@ -2,7 +2,7 @@ package moe.ouom.neriplayer.data.recommendation
 
 import moe.ouom.neriplayer.data.model.SongItem
 import moe.ouom.neriplayer.data.model.stats.TrackStat
-import java.util.Locale
+import moe.ouom.neriplayer.data.model.unified.RecordingMatchPolicy
 import kotlin.math.ln
 
 enum class LocalRecommendationReason { EXPLORE_LIBRARY, RECENTLY_ADDED, FAMILIAR_ARTIST, REDISCOVER, LESS_PLAYED }
@@ -30,7 +30,7 @@ data class LocalRecommendation(
  * Identity keys are supplied by the existing repository adapter; titles never merge recordings.
  */
 object LocalRecommendationRanker {
-    const val ALGORITHM_VERSION = 3
+    const val ALGORITHM_VERSION = 4
     private const val DAY_MS = 86_400_000L
 
     fun rank(
@@ -43,34 +43,41 @@ object LocalRecommendationRanker {
         if (limit <= 0) return emptyList()
         val today = BeijingRecommendationDay.startMillis(nowMillis)
         val stats = statistics.associateBy { it.identityKey }
-        val artistAffinity = statistics.filter { artistKey(it.customArtist ?: it.artist).isNotBlank() }
-            .groupBy { artistKey(it.customArtist ?: it.artist) }
-            .mapValues { (_, tracks) -> tracks.sumOf { track ->
-                val age = ageDays(today, track.lastPlayedAt)
-                ln(1.0 + track.totalListenMs.coerceAtLeast(0L) / 180_000.0) / (1.0 + age / 30.0)
-            } }
+        val artistAffinity = mutableMapOf<String, Double>()
+        statistics.forEach { track ->
+            val credits = artistKeys(track.customArtist ?: track.artist)
+            if (credits.isNotEmpty()) {
+                val weight = ln(1.0 + track.totalListenMs.coerceAtLeast(0L) / 180_000.0) /
+                    (1.0 + ageDays(today, track.lastPlayedAt) / 30.0) / credits.size
+                credits.forEach { artist -> artistAffinity[artist] = artistAffinity.getOrDefault(artist, 0.0) + weight }
+            }
+        }
         val ranked = canonicalCandidates(candidates)
             .map { candidate -> score(candidate, stats[candidate.identityKey], artistAffinity, today, feedback[candidate.identityKey]) }
             .toMutableList()
         val selected = ArrayList<LocalRecommendation>(limit.coerceAtMost(ranked.size))
         val artistCounts = mutableMapOf<String, Int>()
         while (selected.size < limit && ranked.isNotEmpty()) {
-            // A greedy diversity penalty also separates adjacent tracks by the same credited artist.
+            // Normalize previous credits once per selection, not once per comparator invocation.
+            val previousArtists = selected.lastOrNull()?.song?.let { artistKeys(it.customArtist ?: it.artist) }.orEmpty()
+            // A greedy diversity penalty also separates adjacent tracks sharing any credited artist.
             val best = ranked.maxWithOrNull(compareBy<Scored> {
-                it.score - artistCounts.getOrDefault(it.artist, 0) * 22.0 -
-                    if (it.artist.isNotBlank() && selected.lastOrNull()?.song?.let { song ->
-                            artistKey(song.customArtist ?: song.artist)
-                        } == it.artist) 12.0 else 0.0
+                it.score - (it.artists.maxOfOrNull { artist -> artistCounts.getOrDefault(artist, 0) } ?: 0) * 22.0 -
+                    if (it.artists.any { artist -> artist in previousArtists }) 12.0 else 0.0
             }.thenByDescending { it.candidate.identityKey }) ?: break
             ranked.remove(best)
-            if (best.artist.isNotBlank()) artistCounts[best.artist] = artistCounts.getOrDefault(best.artist, 0) + 1
+            best.artists.forEach { artist -> artistCounts[artist] = artistCounts.getOrDefault(artist, 0) + 1 }
             selected += LocalRecommendation(best.candidate.song, best.candidate.identityKey, best.reason, best.candidate.source)
         }
         return selected
     }
 
     internal fun canonicalCandidates(candidates: List<LocalRecommendationCandidate>): List<LocalRecommendationCandidate> =
-        candidates.groupBy { it.identityKey }.values.map { duplicates ->
+        candidates.filter { candidate ->
+            candidate.source == LocalRecommendationSource.LOCAL_FILE ||
+                (candidate.source != LocalRecommendationSource.YOUTUBE_MUSIC &&
+                    candidate.song.channelId?.lowercase() !in setOf("qqmusic", "qq", "youtube", "youtubemusic", "youtube_music"))
+        }.groupBy { it.identityKey }.values.map { duplicates ->
             duplicates.minWith(compareBy<LocalRecommendationCandidate>(
                 { it.source != LocalRecommendationSource.LOCAL_FILE }, { it.source.ordinal }, { !it.favorite },
                 { it.song.customName ?: it.song.name }, { it.song.customArtist ?: it.song.artist },
@@ -82,7 +89,7 @@ object LocalRecommendationRanker {
     private data class Scored(
         val candidate: LocalRecommendationCandidate,
         val score: Double,
-        val artist: String,
+        val artists: Set<String>,
         val reason: LocalRecommendationReason
     )
 
@@ -93,12 +100,13 @@ object LocalRecommendationRanker {
         today: Long,
         feedback: LocalPlaybackSignal?
     ): Scored {
-        val artist = artistKey(candidate.song.customArtist ?: candidate.song.artist)
+        val artists = artistKeys(candidate.song.customArtist ?: candidate.song.artist)
         val age = stat?.takeIf { it.lastPlayedAt > 0L }?.let { ageDays(today, it.lastPlayedAt) }
         val listens = stat?.totalListenMs?.coerceAtLeast(0L) ?: 0L
         val plays = stat?.playCount?.coerceAtLeast(0) ?: 0
         val knownListening = stat != null && (listens > 0L || plays > 0)
-        val artistScore = (affinity[artist] ?: 0.0).coerceAtMost(4.0) * 6.0
+        val artistScore = artists.sumOf { affinity[it] ?: 0.0 }
+            .coerceAtMost(4.0) * 6.0
         val addedAt = candidate.song.membershipAddedAtMs?.takeIf { it > 0L } ?: candidate.song.addedAt
         val recentlyAdded = addedAt in 1..(today + DAY_MS) && ageDays(today, addedAt) <= 14.0
         val repeatPenalty = when {
@@ -124,10 +132,11 @@ object LocalRecommendationRanker {
                 LocalRecommendationReason.LESS_PLAYED
             else -> LocalRecommendationReason.EXPLORE_LIBRARY
         }
-        return Scored(candidate, score, artist, reason)
+        return Scored(candidate, score, artists, reason)
     }
 
-    private fun artistKey(value: String): String = value.trim().lowercase(Locale.ROOT)
+    private fun artistKeys(value: String): Set<String> = RecordingMatchPolicy.artistCredits(value)
+        .takeIf { it.none(String::isEmpty) }?.toSet().orEmpty()
     private fun ageDays(today: Long, timestamp: Long): Double =
         (today - timestamp.coerceAtLeast(0L)).coerceAtLeast(0L) / DAY_MS.toDouble()
 }

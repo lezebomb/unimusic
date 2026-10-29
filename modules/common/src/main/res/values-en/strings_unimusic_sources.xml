@@ -2,7 +2,7 @@
 <resources>
     <string name="unimusic_sources_title">Choose audio source</string>
     <string name="unimusic_sources_description">Remember a preferred source for the next playback resolution. Current playback continues. Sources may require login or membership or have regional restrictions; confirming grants no additional playback rights.</string>
-    <string name="unimusic_sources_discovery_scope">Find candidates in local files, QQ Music, Kuwo, Bilibili, signed-in NetEase and enabled YouTube Music. Eligible recordings with verified audio addresses rank first. Conflicting versions, artists or durations prevent automatic selection. GD Studio remains a manual choice.</string>
+    <string name="unimusic_sources_discovery_scope">Find candidates in local files, Kuwo, Bilibili and signed-in NetEase. Eligible recordings with verified audio addresses rank first. Conflicting versions, artists or durations prevent automatic selection. GD Studio remains a manual choice.</string>
     <string name="unimusic_sources_youtube_disabled">YouTube Music is disabled, so no search requests are sent to it. Existing choices can be cleared or rejected.</string>
     <string name="unimusic_sources_provider_local">Local files</string>
     <string name="unimusic_sources_provider_bilibili">Bilibili</string>

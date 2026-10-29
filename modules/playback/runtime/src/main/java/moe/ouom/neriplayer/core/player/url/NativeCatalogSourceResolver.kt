@@ -116,7 +116,8 @@ internal suspend fun PlayerManager.resolveNativeCatalogPlayback(song: SongItem, 
         }
     }
     recentNativePrimaryFailures.clear(requestKey, sourceKey, primarySession)
-    val message = when ((primary as? SourceAttempt.Rejected)?.reason) {
+    val message = if (!MusicSourceRegistry.isEnabled(candidate.key.provider)) CoreCommonR.string.unimusic_source_removed
+        else when ((primary as? SourceAttempt.Rejected)?.reason) {
         SourceFailure.NETWORK -> CoreCommonR.string.player_playback_network_error
         SourceFailure.TIMEOUT -> CoreCommonR.string.unimusic_source_request_timeout
         SourceFailure.AUTH_REQUIRED -> if (candidate.key.provider == "qqmusic")

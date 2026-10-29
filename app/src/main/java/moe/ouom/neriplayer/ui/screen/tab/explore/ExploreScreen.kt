@@ -202,7 +202,7 @@ internal fun exploreSearchSourceDisplayOrder(
     isInternational: Boolean,
     youtubeEnabled: Boolean
 ): List<SearchSource> {
-    return if (!youtubeEnabled) {
+    return if (!youtubeEnabled || !moe.ouom.neriplayer.data.model.unified.MusicSourceRegistry.isEnabled("youtube_music")) {
         listOf(SearchSource.ALL, SearchSource.NETEASE, SearchSource.BILIBILI, SearchSource.LINK_RECOGNITION)
     } else if (isInternational) {
         listOf(

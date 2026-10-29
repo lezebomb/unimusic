@@ -37,14 +37,15 @@ class ExploreScreenYouTubeGateTest {
     }
 
     @Test
-    fun `aggregate search leads while international platform order keeps YouTube first`() {
+    fun `retired YouTube stays absent even with a saved enabled preference`() {
         val sources = exploreSearchSourceDisplayOrder(
             isInternational = true,
             youtubeEnabled = true
         )
 
         assertEquals(SearchSource.ALL, sources.first())
-        assertEquals(SearchSource.YOUTUBE_MUSIC, sources[1])
+        assertEquals(SearchSource.NETEASE, sources[1])
+        assertFalse(SearchSource.YOUTUBE_MUSIC in sources)
         assertEquals(SearchSource.LINK_RECOGNITION, sources.last())
     }
 

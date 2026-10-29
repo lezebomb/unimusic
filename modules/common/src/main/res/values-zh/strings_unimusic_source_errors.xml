@@ -9,4 +9,5 @@
     <string name="unimusic_source_external_player">此音源需要使用平台官方播放器。</string>
     <string name="unimusic_source_url_expired">播放地址已失效，请重试。</string>
     <string name="unimusic_source_unavailable">音源暂不可用，请稍后重试或在来源菜单选择其他音源。</string>
+    <string name="unimusic_source_removed">此音源已停用，请在来源菜单选择其他音源。</string>
 </resources>

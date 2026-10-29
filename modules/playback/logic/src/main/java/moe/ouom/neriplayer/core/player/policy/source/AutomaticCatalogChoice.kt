@@ -16,12 +16,9 @@ fun automaticCatalogChoice(expected: RecordingMetadata, tracks: List<CatalogTrac
     return RecordingSourceCandidate(track.source, track.metadata)
 }
 
-/** Keep two independent alternatives and avoid re-searching the native platform that just failed. */
-fun nativeAlternateProviderIds(originalProvider: String?): List<String> = when (originalProvider) {
-    "qqmusic" -> listOf("netease", "kuwo")
-    "kuwo" -> listOf("netease", "qqmusic")
-    else -> listOf("qqmusic", "kuwo")
-}
+/** Search only active native platforms and never re-search the platform that just failed. */
+fun nativeAlternateProviderIds(originalProvider: String?): List<String> =
+    listOf("netease", "kuwo").filter { it != originalProvider && MusicSourceRegistry.isEnabled(it) }
 
 /** Only a failed, actually selected anonymous Kuwo stream can reorder recovery. Never parse signed URLs. */
 fun isKuwoPrimaryMediaFailure(source: SongSourceKey, activeCacheKey: String?, reason: String): Boolean =

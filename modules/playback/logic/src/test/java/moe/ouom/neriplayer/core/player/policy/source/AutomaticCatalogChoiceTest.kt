@@ -24,14 +24,25 @@ class AutomaticCatalogChoiceTest {
             "catalogstream-qqmusic-003OUlho2HcRHC", "playback_error_ERROR_CODE_IO"))
     }
 
-    @Test fun nativeFailuresChooseTwoOtherPlatformsIncludingNeteaseWithoutSearchingItself() {
+    @Test fun nativeFailuresUseOnlyActivePlatformsAndKeepRetiredIdentitiesReadable() {
         assertEquals(listOf("netease", "kuwo"), nativeAlternateProviderIds("qqmusic"))
-        assertEquals(listOf("netease", "qqmusic"), nativeAlternateProviderIds("kuwo"))
-        assertEquals(listOf("qqmusic", "kuwo"), nativeAlternateProviderIds("netease"))
+        assertEquals(listOf("netease"), nativeAlternateProviderIds("kuwo"))
+        assertEquals(listOf("kuwo"), nativeAlternateProviderIds("netease"))
         for (original in listOf("qqmusic", "kuwo", "netease", "bilibili", null)) {
             val ids = nativeAlternateProviderIds(original)
-            assertEquals(2, ids.distinct().size);assertFalse(original in ids)
+            assertEquals(ids.size, ids.distinct().size);assertTrue(ids.size in 1..2);assertFalse(original in ids)
+            assertFalse("qqmusic" in ids);assertFalse("youtube_music" in ids)
         }
+    }
+
+    @Test fun retiredAdaptersCannotBeResolvedButTheirSavedIdentityStillValidates() {
+        for (key in listOf(SongSourceKey("qqmusic", "003OUlho2HcRHC"), SongSourceKey("youtube_music", "abcdefghijk"))) {
+            assertTrue(MusicSourceRegistry.validKey(key))
+            assertFalse(MusicSourceRegistry.isEnabled(key.provider))
+            assertFalse(MusicSourceRegistry.canResolveAudio(key))
+        }
+        assertTrue(MusicSourceRegistry.canResolveAudio(SongSourceKey("kuwo", "42")))
+        assertTrue(MusicSourceRegistry.canResolveAudio(SongSourceKey("netease", "42")))
     }
 
     @Test fun wrongRecordingNeverWinsAndDuplicateEvidenceNeedsDisambiguation() {

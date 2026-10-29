@@ -78,7 +78,8 @@ internal fun SettingsAccountCardsContent(
         modifier = modifier.fillMaxWidth().testTag("settingsAccountCards"),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        accounts.forEachIndexed { index, account ->
+        accounts.filter { it.platform !in setOf(SettingsAccountPlatform.YouTube, SettingsAccountPlatform.QqMusic) }
+            .forEachIndexed { index, account ->
             SettingsAccountCard(
                 account = account,
                 onLogin = { onLogin(account.platform) },

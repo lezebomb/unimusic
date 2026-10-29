@@ -62,10 +62,10 @@ internal suspend fun discoverSourceChoices(
             else boundedCandidates("netease") { discoverNeteaseChoices(song) }
         }
         val youtube = async {
-            if (offline || !youtubeEnabled) SourceChoiceDiscoveryResult(emptyList())
+            if (offline || !youtubeEnabled || !moe.ouom.neriplayer.data.model.unified.MusicSourceRegistry.isEnabled("youtube_music")) SourceChoiceDiscoveryResult(emptyList())
             else boundedCandidates("youtube_music") { discoverYouTubeChoices(song) }
         }
-        val qq = async { if (offline) SourceChoiceDiscoveryResult(emptyList()) else boundedCandidates("qqmusic") {
+        val qq = async { if (offline || !moe.ouom.neriplayer.data.model.unified.MusicSourceRegistry.isEnabled("qqmusic")) SourceChoiceDiscoveryResult(emptyList()) else boundedCandidates("qqmusic") {
             val page = AppContainer.qqMusicAudioClient.search(song.recordingMetadata().title, null, 12)
             SourceChoiceDiscoveryResult(page.tracks.map { RecordingSourceCandidate(it.source, it.metadata) }) } }
         val kuwo = async { if (offline) SourceChoiceDiscoveryResult(emptyList()) else boundedCandidates("kuwo") {

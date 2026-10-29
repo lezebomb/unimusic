@@ -171,6 +171,12 @@ internal suspend fun PlayerManager.resolveSongUrlFromLegacySource(
     shouldApplyCacheMutation: () -> Boolean = { true },
     unifiedSongId: String? = null
 ): SongUrlResult {
+    if (!isLocalSong(song) && isYouTubeMusicTrack(song) &&
+        !moe.ouom.neriplayer.data.model.unified.MusicSourceRegistry.isEnabled("youtube_music")) {
+        sideEffects.emitError { postPlayerEvent(PlayerEvent.ShowError(getLocalizedString(CoreCommonR.string.unimusic_source_removed))) }
+        return SongUrlResult.Failure
+    }
+
     NPLogger.d(
         "NERI-PlayerManager",
         "resolveSongUrl: id=${song.id}, source=${song.channelId}, forceRefresh=$forceRefresh, hasSuppliedUrl=${!song.streamUrl.isNullOrBlank()}"
