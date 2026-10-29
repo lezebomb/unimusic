@@ -1,0 +1,6 @@
+<testsuite name="moe.ouom.neriplayer.ui.viewmodel.tab.search.ExploreSearchArtistIntentTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2026-10-29T22:27:03.851Z" hostname="local" time="0.12">
+  <properties />
+  <testcase name="placeholderArtistCardsCannotBecomeExactSearchIntent" classname="moe.ouom.neriplayer.ui.viewmodel.tab.search.ExploreSearchArtistIntentTest" time="0.118" />
+  <system-out />
+  <system-err />
+</testsuite>

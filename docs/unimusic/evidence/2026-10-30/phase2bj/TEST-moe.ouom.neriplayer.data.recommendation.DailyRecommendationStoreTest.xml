@@ -1,0 +1,6 @@
+<testsuite name="moe.ouom.neriplayer.data.recommendation.DailyRecommendationStoreTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2026-10-29T22:26:51.160Z" hostname="local" time="0.292">
+  <properties />
+  <testcase name="corrupt unknown or oversized caches rebuild and failed IO still returns recommendations" classname="moe.ouom.neriplayer.data.recommendation.DailyRecommendationStoreTest" time="0.29" />
+  <system-out />
+  <system-err />
+</testsuite>

@@ -38,7 +38,9 @@ internal fun inferSearchArtistIntent(query: String, providerSongs: List<SongItem
     artists: List<NeteaseSearchArtistResult>): SearchArtistIntent? {
     val key = RecordingMatchPolicy.canonicalText(query)
     if (key.length < 2 || artists.isEmpty()) return null
-    val valid = artists.distinctBy { it.artist.id }.filter { it.artist.id > 0 && it.artist.name.isNotBlank() }
+    val valid = artists.distinctBy { it.artist.id }.filter {
+        it.artist.id > 0 && RecordingMatchPolicy.canonicalArtist(it.artist.name).isNotEmpty()
+    }
     fun inferred(entities: List<NeteaseSearchArtistResult>): SearchArtistIntent {
         val ids = entities.map { it.artist.id }.toSet()
         val recordings = providerSongs.asSequence().filter { song -> neteaseArtistEvidenceKey(song) != null &&

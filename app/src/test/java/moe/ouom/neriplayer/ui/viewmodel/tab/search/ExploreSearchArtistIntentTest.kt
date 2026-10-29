@@ -27,6 +27,16 @@ class ExploreSearchArtistIntentTest {
         {"id":62046853,"name":"ダイヤモンドダスト","alias":["DIAMOND DUST"],"transNames":["钻石星尘"]}
     ]}}"""), NeteaseExploreSearchType.ARTIST).items.filterIsInstance<ExploreSearchResult.Artist>().map { it.result }
 
+    @Test fun placeholderArtistCardsCannotBecomeExactSearchIntent() {
+        val seed = artists().first()
+        for (name in listOf("未知艺术家", "Unknown Artist", "缺少歌手信息")) {
+            val placeholder = seed.copy(artist = seed.artist.copy(name = name), aliases = emptyList())
+            assertNull(inferSearchArtistIntent(name, emptyList(), listOf(placeholder)))
+        }
+        val real = seed.copy(artist = seed.artist.copy(name = "Unknown Mortal Orchestra"), aliases = emptyList())
+        assertNotNull(inferSearchArtistIntent(real.artist.name, emptyList(), listOf(real)))
+    }
+
     @Test fun optionalArtistLookupOverlapsSongsAndReusesItsSingleResult() = runTest {
         var calls = 0
         val lookup = launchOptionalSearchLookup(1_200, { true }) { calls++; delay(600); "artist" }

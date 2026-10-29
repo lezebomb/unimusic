@@ -1,0 +1,7 @@
+<testsuite name="moe.ouom.neriplayer.core.player.policy.source.RecordingMatchPolicyTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-10-29T22:26:01.109Z" hostname="local" time="0.186">
+  <properties />
+  <testcase name="placeholderCreditsCannotProveTheSameRecordingEvenWhenTitleAndDurationAgree" classname="moe.ouom.neriplayer.core.player.policy.source.RecordingMatchPolicyTest" time="0.179" />
+  <testcase name="collaborativeArtistCreditsCannotCollapseIntoADifferentPerformer" classname="moe.ouom.neriplayer.core.player.policy.source.RecordingMatchPolicyTest" time="0.001" />
+  <system-out />
+  <system-err />
+</testsuite>

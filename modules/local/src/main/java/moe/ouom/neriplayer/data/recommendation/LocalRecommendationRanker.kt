@@ -30,7 +30,7 @@ data class LocalRecommendation(
  * Identity keys are supplied by the existing repository adapter; titles never merge recordings.
  */
 object LocalRecommendationRanker {
-    const val ALGORITHM_VERSION = 4
+    const val ALGORITHM_VERSION = 5
     private const val DAY_MS = 86_400_000L
 
     fun rank(

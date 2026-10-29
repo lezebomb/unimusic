@@ -1,0 +1,50 @@
+{
+  "runId": 40964014292,
+  "head": "f5b6d4f7cac28687faf169811e9fd08039313ff1",
+  "conclusion": "success",
+  "androidAdditiveMigration": "success",
+  "actualXmlSummary": {
+    "DatabaseUpgradeInstrumentedTest": {
+      "tests": 3,
+      "failures": 0,
+      "skipped": 0
+    },
+    "ExploreSearchArtistIntentTest": {
+      "tests": 9,
+      "failures": 0,
+      "skipped": 0
+    },
+    "NPLogPrivacyTest": {
+      "tests": 2,
+      "failures": 0,
+      "skipped": 0
+    },
+    "NPLoggerBuildLevelTest": {
+      "tests": 4,
+      "failures": 0,
+      "skipped": 0
+    },
+    "NPLoggerOutputTest": {
+      "tests": 5,
+      "failures": 0,
+      "skipped": 0
+    },
+    "PlaybackProgressOwnerTest": {
+      "tests": 4,
+      "failures": 0,
+      "skipped": 0
+    },
+    "PlaybackSourceResolverTest": {
+      "tests": 17,
+      "failures": 0,
+      "skipped": 0
+    },
+    "UnifiedLibraryMigrationTest": {
+      "tests": 1,
+      "failures": 0,
+      "skipped": 0
+    }
+  },
+  "deduplication": "test class and name; preserved Android first-run copies counted once",
+  "limits": "CI unit/migration evidence only, no new physical device or full audio validation"
+}

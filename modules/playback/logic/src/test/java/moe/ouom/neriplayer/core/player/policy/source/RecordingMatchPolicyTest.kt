@@ -6,6 +6,20 @@ import org.junit.Test
 class RecordingMatchPolicyTest {
     private val studio = RecordingMetadata("晴天", "周杰伦", 269_000)
 
+    @Test fun placeholderCreditsCannotProveTheSameRecordingEvenWhenTitleAndDurationAgree() {
+        for (credit in listOf("未知艺术家", "未知歌手", "Unknown Artist", "[Unknown Artist]", "ＵＮＫＮＯＷＮ ＡＲＴＩＳＴ", "Artist information missing", "A / Unknown Artist")) {
+            val unresolved = studio.copy(artist = credit)
+            assertEquals(credit, RecordingMismatch.MISSING_METADATA, RecordingMatchPolicy.assess(unresolved, unresolved).reason)
+            assertEquals(credit, RecordingMismatch.MISSING_METADATA, RecordingMatchPolicy.assess(studio, unresolved).reason)
+            assertEquals(credit, RecordingMismatch.MISSING_METADATA, RecordingMatchPolicy.assess(unresolved, studio).reason)
+        }
+        for (credit in listOf("Unknown Mortal Orchestra", "Unknown Artist Collective", "未知领域", "A / B")) {
+            val known = studio.copy(artist = credit)
+            assertTrue(credit, RecordingMatchPolicy.assess(known, known).accepted)
+        }
+    }
+
+
     @Test fun djVariantLabelsNeverBecomeStudioByKeepingTheOriginalArtistCredit() {
         val original = RecordingMetadata("Hello", "Adele", 258_000)
         for (label in listOf("Teddy Cream x Louis Quinn Booty", "Producer A Bootleg", "Producer B Rework", "DJ版")) {

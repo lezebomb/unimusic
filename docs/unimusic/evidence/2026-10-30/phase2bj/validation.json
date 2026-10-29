@@ -1,0 +1,35 @@
+{
+  "stage": "2BJ",
+  "localTests": [
+    {
+      "class": "RecordingMatchPolicyTest",
+      "tests": 2,
+      "failures": 0
+    },
+    {
+      "class": "DailyRecommendationStoreTest",
+      "tests": 1,
+      "failures": 0
+    },
+    {
+      "class": "LocalRecommendationRankerTest",
+      "tests": 1,
+      "failures": 0
+    },
+    {
+      "class": "ExploreSearchArtistIntentTest",
+      "tests": 1,
+      "failures": 0
+    }
+  ],
+  "moduleBoundaries": "passed",
+  "build": "BUILD SUCCESSFUL in 1m 38s",
+  "apk": "build/outputs/unimusic/UniMusic-20261030-2BJ-debug.apk",
+  "versionName": "8cc7990b8643.dirty.10300625",
+  "sha256": "d6827201071237fbb2e74c188536838974003a854df79708afdf4bf2e1a05d07",
+  "recommendationAlgorithmVersion": 5,
+  "roomVersion": 23,
+  "deviceValidation": "not run",
+  "fullAudioAccuracyOrTimingValidation": "not run",
+  "remoteCI": "new cases included by existing selectors; await 2BI workflow CI40965533755 before next push"
+}

@@ -13,6 +13,23 @@ class LocalRecommendationRankerTest {
     private val day = 86_400_000L
     private val now = 1_000 * day
 
+    @Test fun placeholderArtistsDoNotCreateFamiliarityWhileRealNamesAndExactEvidenceRemain() {
+        for (artist in listOf("未知艺术家", "Unknown Artist", "A / Unknown Artist")) {
+            val input = listOf(candidate("unrelated-a", artist), candidate("unrelated-b", artist))
+            val history = stat(candidate("history", artist), now - 30 * day, 9_000_000, 50)
+            val baseline = LocalRecommendationRanker.rank(input, emptyList(), now)
+            assertEquals(baseline, LocalRecommendationRanker.rank(input, listOf(history), now))
+            assertTrue(baseline.all { it.reason == LocalRecommendationReason.EXPLORE_LIBRARY })
+            assertEquals("unrelated-b", LocalRecommendationRanker.rank(input, listOf(history), now,
+                feedback = mapOf("unrelated-b" to LocalPlaybackSignal(repeats = 2.0))).first().identityKey)
+        }
+        val real = candidate("real", "Unknown Mortal Orchestra")
+        val history = stat(candidate("history-real", real.song.artist), now - 30 * day, 9_000_000, 50)
+        assertEquals(LocalRecommendationReason.FAMILIAR_ARTIST,
+            LocalRecommendationRanker.rank(listOf(real), listOf(history), now).single().reason)
+    }
+
+
     @Test
     fun `ranking deduplicates identities and keeps distinct recordings with the same title`() {
         val remote = candidate("recording-a", "Artist A", LocalRecommendationSource.NETEASE)

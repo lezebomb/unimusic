@@ -1,0 +1,6 @@
+<testsuite name="moe.ouom.neriplayer.data.recommendation.LocalRecommendationRankerTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2026-10-29T22:26:51.458Z" hostname="local" time="0.015">
+  <properties />
+  <testcase name="placeholderArtistsDoNotCreateFamiliarityWhileRealNamesAndExactEvidenceRemain" classname="moe.ouom.neriplayer.data.recommendation.LocalRecommendationRankerTest" time="0.015" />
+  <system-out />
+  <system-err />
+</testsuite>
