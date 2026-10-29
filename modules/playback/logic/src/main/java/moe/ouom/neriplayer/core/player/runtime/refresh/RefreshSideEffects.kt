@@ -40,6 +40,12 @@ class RefreshSideEffectGate(
 class RefreshResolverSideEffects(
     private val gate: RefreshSideEffectGate? = null
 ) {
+    /** Add a session constraint without dropping an existing playback-request gate. */
+    fun guardedBy(isCurrent: () -> Boolean): RefreshResolverSideEffects =
+        RefreshResolverSideEffects(RefreshSideEffectGate {
+            isCurrent() && (gate?.runMutation {} ?: true)
+        })
+
     fun updateDuration(update: () -> Unit): Boolean {
         return gate?.runMutation(update) ?: run {
             update()

@@ -11,6 +11,7 @@ import moe.ouom.neriplayer.core.player.PlayerManager
 import moe.ouom.neriplayer.core.player.network.isPlaybackNetworkUsable
 import moe.ouom.neriplayer.core.player.quality.effectiveNeteaseQuality
 import moe.ouom.neriplayer.core.player.policy.source.sourceStageBudgetMs
+import moe.ouom.neriplayer.core.player.policy.source.withCurrentSourceResult
 import moe.ouom.neriplayer.core.player.policy.source.raceFreshPlaybackSources
 import moe.ouom.neriplayer.core.player.resolver.netease.tryResolveNeteaseAutoBiliSource
 import moe.ouom.neriplayer.core.player.resolver.netease.tryResolveNeteaseMatchedLocalSource
@@ -27,7 +28,25 @@ internal suspend fun PlayerManager.getNeteaseSongUrl(
     allowLocalFallback: Boolean = true,
     allowPreviewFallback: Boolean = true,
     allowAutoBiliFallback: Boolean = true
+): SongUrlResult {
+    val requestSession = neteaseClient.searchSessionIdentity()
+    fun current() = requestSession === neteaseClient.searchSessionIdentity()
+    return withCurrentSourceResult<SongUrlResult>(::current, SongUrlResult.Failure) {
+        resolveNeteaseForSession(song, suppressError, sideEffects.guardedBy(::current),
+            allowLocalFallback, allowPreviewFallback, allowAutoBiliFallback, ::current)
+    }
+}
+
+private suspend fun PlayerManager.resolveNeteaseForSession(
+    song: SongItem,
+    suppressError: Boolean,
+    sideEffects: RefreshResolverSideEffects,
+    allowLocalFallback: Boolean,
+    allowPreviewFallback: Boolean,
+    allowAutoBiliFallback: Boolean,
+    isCurrent: () -> Boolean
 ): SongUrlResult = withContext(Dispatchers.IO) {
+    if (!isCurrent()) return@withContext SongUrlResult.Failure
     try {
         val effectiveQuality = effectiveNeteaseQuality()
         val qualityCandidates = buildNeteaseQualityCandidates(effectiveQuality)
@@ -40,11 +59,13 @@ internal suspend fun PlayerManager.getNeteaseSongUrl(
         val deadline = SystemClock.elapsedRealtime() + primaryBudget
 
         for ((index, quality) in qualityCandidates.withIndex()) {
+            if (!isCurrent()) return@withContext SongUrlResult.Failure
             val remainingMs = deadline - SystemClock.elapsedRealtime()
             if (remainingMs <= 0L) { primaryTimedOut = true; break }
             val resp = withTimeoutOrNull(minOf(sourceStageBudgetMs(1_500, 3_000), remainingMs)) {
                 neteaseClient.getSongDownloadUrlCancellable(song.id, level = quality)
             }
+            if (!isCurrent()) return@withContext SongUrlResult.Failure
             if (resp == null) { primaryTimedOut = true; break }
             NPLogger.d("NERI-PlayerManager", "Netease URL response: id=${song.id}, requestedQuality=$quality")
 
@@ -119,6 +140,7 @@ internal suspend fun PlayerManager.getNeteaseSongUrl(
             }
         }
 
+        if (!isCurrent()) return@withContext SongUrlResult.Failure
         // These are independent local/opt-in sources, not retries that bypass Netease access checks.
         resolveNeteaseAlternates(song, sideEffects, allowLocalFallback, allowAutoBiliFallback)?.let {
             return@withContext it
@@ -147,6 +169,7 @@ internal suspend fun PlayerManager.getNeteaseSongUrl(
         SongUrlResult.Failure
     } catch (e: Exception) {
         if (e is CancellationException) throw e
+        if (!isCurrent()) return@withContext SongUrlResult.Failure
         resolveNeteaseAlternates(song, sideEffects, allowLocalFallback, allowAutoBiliFallback)?.let {
             return@withContext it
         }

@@ -63,6 +63,8 @@
 
 ## Phase 2：统一搜索与高精度匹配
 
+2BD将原账号会话覆盖整个主源质量/备用/保留试听过程，并组合原播放请求gate；新2/共3 JVM、Debug/边界通过，见[2BD](PHASE_2BD_PRIMARY_ACCOUNT_CONTEXT.md)。未执行真实账号切换或音频验收。
+
 2BC将网易云新原生/B站备用家族并行，保持已记住/本地优先、录音权限门槛及8秒总预算；隔离子任务播放器回调，胜出后再核对会话/网络/开关。新2/共3 JVM及最终Debug通过，见[2BC](PHASE_2BC_PARALLEL_FRESH_SOURCE_FAMILIES.md)，无真机速度结论。
 
 2BB将可选歌手索引与歌曲首页并行，单次1200ms预算、查询/账号取消及录音门槛保持；4相关JVM/Debug/边界通过，设备离线未测真实速度，见[2BB](PHASE_2BB_PARALLEL_ARTIST_LOOKUP.md)。3E远端40823070110已成功。

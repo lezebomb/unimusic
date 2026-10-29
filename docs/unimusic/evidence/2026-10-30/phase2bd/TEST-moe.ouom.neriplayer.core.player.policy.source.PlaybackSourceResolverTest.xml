@@ -1,0 +1,7 @@
+<testsuite name="moe.ouom.neriplayer.core.player.policy.source.PlaybackSourceResolverTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-10-29T21:36:05.871Z" hostname="local" time="0.372">
+  <properties />
+  <testcase name="sourceContextGuardKeepsCallerGatesAndCancellationInsteadOfPublishingLateAudio" classname="moe.ouom.neriplayer.core.player.policy.source.PlaybackSourceResolverTest" time="0.344" />
+  <testcase name="stalePrimaryPreviewCannotEscapeAfterAlternateCleanupChangesTheAccount" classname="moe.ouom.neriplayer.core.player.policy.source.PlaybackSourceResolverTest" time="0.021" />
+  <system-out />
+  <system-err />
+</testsuite>

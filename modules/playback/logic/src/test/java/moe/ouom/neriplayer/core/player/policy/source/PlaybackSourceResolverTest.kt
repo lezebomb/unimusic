@@ -112,6 +112,52 @@ class PlaybackSourceResolverTest {
         assertTrue(cooldown.cooling("song", "inner-timeout"))
     }
 
+    @Test fun stalePrimaryPreviewCannotEscapeAfterAlternateCleanupChangesTheAccount() = runTest {
+        var session = Any()
+        val captured = session
+        fun current() = captured === session
+        val mutations = mutableListOf<String>()
+        val effects = moe.ouom.neriplayer.core.player.runtime.refresh.RefreshResolverSideEffects().guardedBy(::current)
+        val result = withCurrentSourceResult<String?>(::current, null) {
+            val retainedPreview = "preview from old account"
+            val alternate = raceFreshPlaybackSources<String>(listOf(
+                { _ -> try { delay(900); "slow" } finally { session = Any() } },
+                { _ -> delay(10); "ready before logout" }
+            ), ::current) { effects.updateDuration { mutations += it } }
+            effects.emitError { mutations += "old account error" }
+            alternate ?: retainedPreview
+        }
+        assertNull(result)
+        assertTrue(mutations.isEmpty())
+        assertEquals(10L, testScheduler.currentTime)
+    }
+
+    @Test fun sourceContextGuardKeepsCallerGatesAndCancellationInsteadOfPublishingLateAudio() = runTest {
+        var accountCurrent = true
+        var requestCurrent = false
+        val mutations = mutableListOf<String>()
+        val effects = moe.ouom.neriplayer.core.player.runtime.refresh.RefreshResolverSideEffects(
+            moe.ouom.neriplayer.core.player.runtime.refresh.RefreshSideEffectGate { requestCurrent }
+        ).guardedBy { accountCurrent }
+        effects.updateDuration { mutations += "stale request" }
+        requestCurrent = true
+        accountCurrent = false
+        effects.emitError { mutations += "stale account" }
+        effects.scanLocalFiles { mutations += "stale scan" }
+        assertTrue(mutations.isEmpty())
+        var calls = 0
+        assertNull(withCurrentSourceResult<String?>({ accountCurrent }, null) { calls++; "must not run" })
+        assertEquals(0, calls)
+        accountCurrent = true
+        assertEquals("current preview", withCurrentSourceResult({ accountCurrent }, null) { "current preview" })
+        assertNull(withCurrentSourceResult<String?>({ accountCurrent }, null) { delay(5); accountCurrent = false; "late full audio" })
+        var cancelled = false
+        try {
+            withTimeout(5) { withCurrentSourceResult({ true }, null) { delay(100); "late" } }
+        } catch (_: CancellationException) { cancelled = true }
+        assertTrue(cancelled)
+    }
+
     @Test fun freshSourceFamiliesRaceWithoutPublishingLoserEffects() = runTest {
         val updates = mutableListOf<String>()
         var loserStopped = false

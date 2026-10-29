@@ -1,0 +1,6 @@
+<testsuite name="moe.ouom.neriplayer.core.player.policy.source.SourceResolutionBudgetTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2026-10-29T21:36:06.254Z" hostname="local" time="0.049">
+  <properties />
+  <testcase name="primaryAndFallbackShareOneDeadlineAndDoNotAddIndependentWaits" classname="moe.ouom.neriplayer.core.player.policy.source.SourceResolutionBudgetTest" time="0.049" />
+  <system-out />
+  <system-err />
+</testsuite>

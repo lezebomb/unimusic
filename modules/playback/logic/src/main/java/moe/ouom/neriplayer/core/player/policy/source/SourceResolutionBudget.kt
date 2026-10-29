@@ -3,6 +3,7 @@ package moe.ouom.neriplayer.core.player.policy.source
 import kotlin.coroutines.AbstractCoroutineContextElement
 import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 
@@ -33,4 +34,17 @@ suspend fun <T> withSourceResolutionBudget(durationMs: Long = 8_000, block: susp
     return withContext(budget) {
         withTimeoutOrNull(budget.remainingMs().coerceAtMost(durationMs)) { block() }
     }
+}
+
+/** A retained preview or late primary result must belong to the same current account/context. */
+suspend fun <T> withCurrentSourceResult(
+    isCurrent: () -> Boolean,
+    staleResult: T,
+    resolve: suspend () -> T
+): T {
+    currentCoroutineContext().ensureActive()
+    if (!isCurrent()) return staleResult
+    val result = resolve()
+    currentCoroutineContext().ensureActive()
+    return if (isCurrent()) result else staleResult
 }
