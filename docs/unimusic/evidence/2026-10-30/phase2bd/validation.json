@@ -28,5 +28,13 @@
     "No local fixed-JDK21 runtime test execution; existing CI includes the new logic tests"
   ],
   "automation": "unimusic-10-30-05-30 triggered at correct local date and deleted successfully; no replacement schedule",
-  "ci": "pending commit/push"
+  "ci": {
+    "runId": 40960266466,
+    "sourceCommit": "643b8a793bb030f740f2b3a7186ff259e55403f5",
+    "conclusion": "success",
+    "url": "https://github.com/lezebomb/unimusic/actions/runs/40960266466",
+    "verifiedXmlSummary": "../ci-40960266466.json",
+    "androidMigration": "success; additive 1 and upgrade 3 checked"
+  },
+  "ciHistory": "pending commit/push"
 }

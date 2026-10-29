@@ -2,6 +2,8 @@
 
 [当前搜索规则与边界](SEARCH_BEHAVIOR.md)：歌手/作品意图、跨源录音证据、版本和可播状态、列表锚定及实际验收。
 
+最新：[2BH日志隐私](PHASE_2BH_PRIVATE_PLAYBACK_LOGS.md)：正常日志入口在logcat/文件队列前脱敏认证、联系方式、媒体URL及异常文本；5 JVM/Debug通过，未触碰历史日志。
+
 最新：[2BG试听书签隔离](PHASE_2BG_PREVIEW_BOOKMARK_ISOLATION.md)：试听不覆盖整曲长音频进度，片段外恢复位置归零、片段内拖动保留；3 JVM/Debug通过。
 
 最新：[2BF独立歌手证据](PHASE_2BF_INDEPENDENT_ARTIST_EVIDENCE.md)：重复资源不冒充多首共识，保留精确别名及原版本门槛；3 JVM/Debug通过。

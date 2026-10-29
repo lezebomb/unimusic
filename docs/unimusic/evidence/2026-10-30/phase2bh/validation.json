@@ -1,0 +1,37 @@
+{
+  "phase": "2BH",
+  "date": "2026-10-30",
+  "uniqueUnitTests": 5,
+  "newTestMethods": 3,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "build": "phase2bh-private-playback-logs.log: BUILD SUCCESSFUL in 53s",
+  "moduleBoundaries": "passed",
+  "apk": {
+    "archive": "build/outputs/unimusic/UniMusic-20261030-2BH-debug.apk",
+    "version": "f436541bc901.dirty.10300605",
+    "sha256": "01f679bfacdbd2f3a010634031f8c9498fec42b3014d33f6d52f846acbeff875",
+    "installedThisPhase": false
+  },
+  "implementation": [
+    "NPLogger sanitizes formatted message, tag and throwable text before logcat or async file queue",
+    "No raw Throwable is sent to either normal log sink; file formatting also sanitizes direct internal entries",
+    "HTTP/file/content URLs, common auth/contact fields, Cookie/Authorization payloads, Bearer/JWT and verification-like codes covered",
+    "Opaque/encoded sensitive payloads are dropped conservatively; bounded 32768-character input and linear quoted-value scanning",
+    "Seek diagnostic now logs URL presence instead of the full URL",
+    "No request data, credentials or media payloads mutated; all tests use fictional values"
+  ],
+  "limitations": [
+    "Forward-only normal NPLogger logging protection; no claim of automatically sanitizing arbitrary unlabeled secrets or third-party direct Log calls",
+    "Historical log files not read, exported, rewritten or cleared",
+    "No new device log inspection or installation"
+  ],
+  "ci": "Added logging path trigger and logger test selectors; conservative workflow routing requires Android migration validation once for this configuration change",
+  "priorRequiredCi": {
+    "runId": 40960266466,
+    "conclusion": "success",
+    "summary": "../ci-40960266466.json"
+  },
+  "data": "Room v23 and user accounts/library/bookmarks unchanged"
+}

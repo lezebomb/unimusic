@@ -1,0 +1,7 @@
+<testsuite name="moe.ouom.neriplayer.common.logging.NPLogPrivacyTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-10-29T22:05:28.955Z" hostname="local" time="0.169">
+  <properties />
+  <testcase name="boundedSanitizationHandlesTruncatedQuotedValuesWithoutChangingNormalDiagnostics" classname="moe.ouom.neriplayer.common.logging.NPLogPrivacyTest" time="0.144" />
+  <testcase name="credentialsContactsAndSignedResourcesAreAbsentFromDiagnosticText" classname="moe.ouom.neriplayer.common.logging.NPLogPrivacyTest" time="0.02" />
+  <system-out />
+  <system-err />
+</testsuite>

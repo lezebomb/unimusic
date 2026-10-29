@@ -1,0 +1,7 @@
+<testsuite name="moe.ouom.neriplayer.common.logging.NPLoggerOutputTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-10-29T22:05:30.719Z" hostname="local" time="0.05">
+  <properties />
+  <testcase name="messages are formatted by type under the application tag" classname="moe.ouom.neriplayer.common.logging.NPLoggerOutputTest" time="0.043" />
+  <testcase name="sensitive messages and throwable text are sanitized before both log sinks" classname="moe.ouom.neriplayer.common.logging.NPLoggerOutputTest" time="0.007" />
+  <system-out />
+  <system-err />
+</testsuite>

@@ -149,17 +149,23 @@ object NPLogger {
         log(level, tag, message, tr, debugBuild = BuildConfig.DEBUG)
 
     internal fun log(level: Int, tag: String?, message: Any?, tr: Throwable?, debugBuild: Boolean) {
-        val finalTag = qualifiedTag(tag)
+        val finalTag = NPLogPrivacy.sanitize(qualifiedTag(tag))
         // Release 构建中不输出 DEBUG/VERBOSE 级别日志到 logcat，防止敏感信息泄露
         if (!debugBuild && (level == Log.DEBUG || level == Log.VERBOSE)) {
-            if (isFileLoggingEnabled && level == Log.DEBUG) writeToFile(level, finalTag, formatMessage(message), tr)
+            if (isFileLoggingEnabled && level == Log.DEBUG) writeToFile(level, finalTag, safeMessage(message, tr), null)
             return
         }
-        val finalMessage = formatMessage(message)
-        writeToLogcat(level, ensureLogTag(finalTag), finalMessage, tr)
+        val finalMessage = safeMessage(message, tr)
+        writeToLogcat(level, ensureLogTag(finalTag), finalMessage, null)
         if (isFileLoggingEnabled && level != Log.VERBOSE) {
-            writeToFile(level, finalTag, finalMessage, tr)
+            writeToFile(level, finalTag, finalMessage, null)
         }
+    }
+
+    private fun safeMessage(message: Any?, throwable: Throwable?): String {
+        val formatted = formatMessage(message)
+        val trace = throwable?.stackTraceToString()
+        return NPLogPrivacy.sanitize(if (trace == null) formatted else "$formatted\n$trace")
     }
 
     private fun qualifiedTag(tag: String?): String = if (tag != null && tag != appTag) "$appTag: $tag" else appTag
@@ -255,12 +261,12 @@ object NPLogger {
             append(' ')
             append(levelChar)
             append('/')
-            append(entry.tag)
+            append(NPLogPrivacy.sanitize(entry.tag))
             append(": ")
-            append(entry.message)
+            append(NPLogPrivacy.sanitize(entry.message))
             append('\n')
             entry.throwable?.let {
-                append(Log.getStackTraceString(it))
+                append(NPLogPrivacy.sanitize(Log.getStackTraceString(it).orEmpty()))
                 append('\n')
             }
         }

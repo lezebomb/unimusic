@@ -13,13 +13,14 @@
 | 阶段 | 实际结果 | 提交/推送 |
 | --- | --- | --- |
 | [2BD主源账号上下文](PHASE_2BD_PRIMARY_ACCOUNT_CONTEXT.md) | 2新/共3 JVM、边界、Debug3m2s；原账号变化后不返回旧试听/错误 | a52fdf29已推；CI被后续2BE替代 |
-| [2BE试听逻辑时长](PHASE_2BE_PREVIEW_RECORDING_DURATION.md) | 2新/共3 JVM、边界、Debug48s；试听不回填未知整曲元数据 | 643b8a79已推；CI40960266466正在验证Android迁移 |
-| [2BF独立歌手证据](PHASE_2BF_INDEPENDENT_ARTIST_EVIDENCE.md) | 2新/共3 JVM、边界、Debug1m42s；重复/外源/坏ID不充当多首共识 | ae82d472已本地commit，等待必要CI后push |
-| [2BG试听书签/恢复](PHASE_2BG_PREVIEW_BOOKMARK_ISOLATION.md) | 2新/共3 JVM、边界、Debug44s；保留整曲书签及片段内有效位置 | 本检查点所在提交，先本地commit |
+| [2BE试听逻辑时长](PHASE_2BE_PREVIEW_RECORDING_DURATION.md) | 2新/共3 JVM、边界、Debug48s；试听不回填未知整曲元数据 | 643b8a79已推，CI40960266466含Android迁移SUCCESS |
+| [2BF独立歌手证据](PHASE_2BF_INDEPENDENT_ARTIST_EVIDENCE.md) | 2新/共3 JVM、边界、Debug1m42s；重复/外源/坏ID不充当多首共识 | ae82d472已commit，随本阶段统一push |
+| [2BG试听书签/恢复](PHASE_2BG_PREVIEW_BOOKMARK_ISOLATION.md) | 2新/共3 JVM、边界、Debug44s；保留整曲书签及片段内有效位置 | f436541b已commit，随本阶段统一push |
+| [2BH日志隐私](PHASE_2BH_PRIVATE_PLAYBACK_LOGS.md) | 3新/共5 JVM、边界、Debug53s；日志/异常两通道前脱敏 | 本检查点所在提交，统一push |
 
-**先让2BE的CI40960266466完成再推下一源代码阶段。** 它因工作流新增两项preview选择器，按既有保守路由需要一次Android迁移检查，不能被下次push取消。没有新增Room迁移，勿重复本机迁移套件。2BF/2BG新用例会被后续普通行为集覆盖；最终状态/推送以git/Actions为准。
+2BE的CI40960266466已整体SUCCESS，Android迁移步骤也成功；实际XML SourceResolver17、preview进度2、增量迁移1和升级保护3项均0失败，见evidence/2026-10-30/ci-40960266466.json。必要配置验证已完成，可以一起push 2BF/2BG/2BH的独立提交。2BH又增加logging路径/选择器，最新工作流CI需再核对，没新增Room迁移，勿额外跑本机迁移集。
 
-最新构建：`build/outputs/unimusic/UniMusic-20261030-2BG-debug.apk`，版本`ae82d4722eff.dirty.10300552`，SHA-256 `e41a636550c0afde1d1798f75a6bb3ecf975b153703c17d1b30ea6d2e1770491`。当前无本地Gradle构建运行，CI监视可能仍在运行，先查进程/日志再启动。无本次设备安装或真实账号切换/书签/完整音频/速度验收。
+最新构建：`build/outputs/unimusic/UniMusic-20261030-2BH-debug.apk`，版本`f436541bc901.dirty.10300605`，SHA-256 `01f679bfacdbd2f3a010634031f8c9498fec42b3014d33f6d52f846acbeff875`。当前无本地Gradle或旧CI监视进程运行；先核对最新状态再启动。无本次设备安装或真实账号切换/书签/完整音频/速度验收。
 
 ## 此前已完成，不重做
 
@@ -45,8 +46,8 @@
 
 ## 接下来
 
-1. 核对2BE必要CI与XML，保存状态，然后推送已完成本地提交。
-2. 已确认NPLogger没有统一脱敏，而seek日志会拼接当前媒体URL；继续补正常日志入口的凭据/联系方式/签名URL保护，覆盖logcat和文件队列，全部使用虚构测试值，不读取或导出真实秘密。
+1. 核对最新2BH工作流CI与XML，保存状态；已完成本地提交此次统一push，后续以git/Actions为准。
+2. 继续检查下载路径是否正确拒绝把明确试听当作完整歌曲交付；正常NPLogger入口脱敏已由2BH完成，勿读取或导出真实秘密验证。
 3. 设备重新在线后仅做必要、保留数据的本地验收，明确试听与完整版差别；不为测试修改真实账号/清除用户书签或偏好。
 4. 继续高价值来源/匹配/推荐后台，按实际结果更新此短检查点，每阶段commit/push。
 

@@ -8,6 +8,10 @@ import org.json.JSONArray
 import org.json.JSONObject
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.mockito.ArgumentCaptor
+import org.mockito.ArgumentMatchers.eq
+import org.mockito.ArgumentMatchers.isNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Rule
@@ -48,7 +52,26 @@ class NPLoggerOutputTest {
             log.verify { Log.e("Neri: Net", "[\n    1,\n    \"two\"\n]", null) }
             log.verify { Log.v("Neri: Net", "[1, 2]", null) }
             log.verify { Log.i("Neri", "[a, b]", null) }
-            log.verify { Log.e("Neri", "built", failure) }
+            val rendered = ArgumentCaptor.forClass(String::class.java)
+            log.verify { Log.e(eq("Neri"), rendered.capture(), isNull()) }
+            assertTrue(rendered.value.contains("java.lang.IllegalStateException: boom"))
+        }
+    }
+
+    @Test fun `sensitive messages and throwable text are sanitized before both log sinks`() {
+        NPLogger.init(context(null, temporary.newFolder("privacy")), defaultTag = "Neri", enableFileLogging = false)
+        val text = "failure url=https://media.invalid/private?token=fixture-url for person@example.invalid"
+        val failure = IllegalStateException("phone=13900000000 token=fixture-throwable")
+        mockStatic(Log::class.java).use { log ->
+            NPLogger.log(Log.WARN, "Net", text, failure, debugBuild = true)
+            val rendered = ArgumentCaptor.forClass(String::class.java)
+            log.verify { Log.w(eq("Neri: Net"), rendered.capture(), isNull()) }
+            val output = rendered.value
+            listOf("fixture-url", "person@example.invalid", "13900000000", "fixture-throwable").forEach { assertFalse(output.contains(it)) }
+            assertTrue(output.contains("IllegalStateException"))
+            log.`when`<String> { Log.getStackTraceString(failure) }.thenReturn(failure.stackTraceToString())
+            val entry = NPLogger.formatFileLogEntry(NPLogger.LogFileEntry(temporary.newFile(), 0, Log.ERROR, "Neri", text, failure))
+            listOf("fixture-url", "person@example.invalid", "13900000000", "fixture-throwable").forEach { assertFalse(entry.contains(it)) }
         }
     }
 

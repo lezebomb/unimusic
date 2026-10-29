@@ -63,6 +63,8 @@
 
 ## Phase 2：统一搜索与高精度匹配
 
+2BH补正常NPLogger日志两通道的认证/联系方式/媒体URL及异常文本脱敏，5 JVM/Debug/边界通过，见[2BH](PHASE_2BH_PRIVATE_PLAYBACK_LOGS.md)。不修改请求或历史日志。
+
 2BG补明确试听与长书签/恢复位置隔离，保留整曲书签和片段内有效拖动，3 JVM/Debug/边界通过，见[2BG](PHASE_2BG_PREVIEW_BOOKMARK_ISOLATION.md)。
 
 2BF以原始前6条中的合法独立网易云资源统计作品歌手共识，排除重复/外源/坏ID，保留唯一别名与原版本门槛；3 JVM/Debug/边界通过，见[2BF](PHASE_2BF_INDEPENDENT_ARTIST_EVIDENCE.md)。

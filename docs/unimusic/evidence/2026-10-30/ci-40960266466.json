@@ -1,0 +1,73 @@
+{
+  "runId": 40960266466,
+  "sourceCommit": "643b8a793bb030f740f2b3a7186ff259e55403f5",
+  "conclusion": "success",
+  "url": "https://github.com/lezebomb/unimusic/actions/runs/40960266466",
+  "verifiedXml": {
+    "PlaybackSourceResolverTest": {
+      "counts": {
+        "tests": 17,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "testNames": [
+        "aSelfCancelledParallelSourceCannotLeaveTheReceiverWaitingForItsMissingResult",
+        "anAdaptersOwnTimeoutOrExceptionAdvancesToTheNextCandidate",
+        "cachedParallelSourcesReturnTheFastSuccessWithoutCoolingTheCancelledLoser",
+        "firstSuccessStopsDiscoveryAndSkipsIneligibleAudio",
+        "freshSourceFamiliesRaceWithoutPublishingLoserEffects",
+        "freshSourceRaceRechecksContextAfterLoserCleanupAndHonorsParentDeadline",
+        "parallelCandidatesStillEnforceEligibilityAndCoolOnlyAnActualTransientFailure",
+        "parallelRaceStillPropagatesCallerCancellationAndStopsEveryChild",
+        "parentCancellationPropagatesAndDoesNotBlacklistTheSource",
+        "permissionAndMetadataFailuresInvalidateEvidenceWithoutCoolingANewLogin",
+        "recentPrimaryHintsExpireWithoutSlidingAndCannotCrossAccountsOrSources",
+        "sharedParallelDeadlineAndCallerCancellationDoNotBlacklistUnfinishedSources",
+        "sourceContextGuardKeepsCallerGatesAndCancellationInsteadOfPublishingLateAudio",
+        "staleContextFailuresHaveNoAutomaticMappingOrCooldownSideEffects",
+        "stalePrimaryPreviewCannotEscapeAfterAlternateCleanupChangesTheAccount",
+        "totalBudgetIncludesDiscoveryAndEachSlowCandidate",
+        "transientFailureCoolsDownWithoutPoisoningOtherSongs"
+      ]
+    },
+    "PlaybackProgressOwnerTest": {
+      "counts": {
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "testNames": [
+        "previewDurationUpdatesTransportWithoutInventingUnknownRecordingMetadata",
+        "previewToFullTransitionBackfillsRealDurationWhileOrdinaryShortSongsRemainValid"
+      ]
+    },
+    "UnifiedLibraryMigrationTest": {
+      "counts": {
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "testNames": [
+        "upgradePreservesEveryLegacyFieldInLibraryFavoritesHistoryAndOutbox"
+      ]
+    },
+    "DatabaseUpgradeInstrumentedTest": {
+      "counts": {
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "testNames": [
+        "everyHistoricalUpgradeReachesTheCurrentRoomSchema",
+        "recoveryIndexUpgradeKeepsExistingOperationsAndTheirByteWatermark",
+        "releaseVersion15KeepsCancelledIdentityAndMetadataBeforeDroppingLegacyTables"
+      ]
+    }
+  },
+  "scope": "2BD and 2BE, including configured Android additive migration check; 2BF onward not yet included",
+  "xmlDeduplication": "Android connected results and preserved earlier-run copies deduplicated by class and test name"
+}

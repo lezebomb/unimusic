@@ -1,0 +1,6 @@
+<testsuite name="moe.ouom.neriplayer.common.logging.NPLoggerBuildLevelTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2026-10-29T22:05:29.141Z" hostname="local" time="1.572">
+  <properties />
+  <testcase name="release builds keep debug and verbose messages out of logcat" classname="moe.ouom.neriplayer.common.logging.NPLoggerBuildLevelTest" time="1.572" />
+  <system-out />
+  <system-err />
+</testsuite>

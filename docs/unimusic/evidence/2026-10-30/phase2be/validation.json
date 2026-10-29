@@ -20,10 +20,18 @@
     "A later full recording may backfill real metadata; known metadata and full short songs retain original behavior"
   ],
   "data": "Room v23 and schemas unchanged; no old duration heuristically erased, no account/playlist/history clearing",
-  "ci": "Added only PlaybackProgressOwnerTest.preview* to existing logic suite; workflow routing conservatively requires its Android migration check once. Confirm that CI before pushing another source stage; no redundant local migration run.",
+  "ci": {
+    "runId": 40960266466,
+    "sourceCommit": "643b8a793bb030f740f2b3a7186ff259e55403f5",
+    "conclusion": "success",
+    "url": "https://github.com/lezebomb/unimusic/actions/runs/40960266466",
+    "verifiedXmlSummary": "../ci-40960266466.json",
+    "androidMigration": "success; additive 1 and upgrade 3 checked"
+  },
   "unexecuted": [
     "No device installation or preview/full-source transition acceptance",
     "No full audio or actual matching-speed improvement measured",
     "No local fixed-JDK21 runtime tests"
-  ]
+  ],
+  "ciHistory": "Added only PlaybackProgressOwnerTest.preview* to existing logic suite; workflow routing conservatively requires its Android migration check once. Confirm that CI before pushing another source stage; no redundant local migration run."
 }

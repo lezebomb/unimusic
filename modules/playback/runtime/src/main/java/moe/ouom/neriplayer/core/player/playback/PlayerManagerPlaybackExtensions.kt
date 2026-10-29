@@ -1541,7 +1541,7 @@ internal fun PlayerManager.seekToImpl(
 private fun PlayerManager.logSeekRequested(positionMs: Long, commandSource: PlaybackCommandSource) {
     NPLogger.d(
         "NERI-PlayerManager",
-        "seekTo requested: positionMs=$positionMs, source=$commandSource, currentSong=${_currentSongFlow.value?.name}, currentUrl=${_currentMediaUrl.value}, stack=[${debugStackHint()}]"
+        "seekTo requested: positionMs=$positionMs, source=$commandSource, currentSong=${_currentSongFlow.value?.name}, hasMediaUrl=${!_currentMediaUrl.value.isNullOrBlank()}, stack=[${debugStackHint()}]"
     )
 }
 
