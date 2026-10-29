@@ -25,6 +25,55 @@ import org.junit.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class PlaybackStatsOwnerTest {
+    @Test fun `feedback follows full recordings while previews retain only actual listen statistics`() = runTest {
+        var now = 0L
+        var preview = true
+        val port = RecordingPort()
+        val owner = owner(backgroundScope, port, PlaybackStatsTracker({ it.id.toString() }, nowElapsedMs = { now }),
+            feedback = PlaybackFeedbackTracker({ it.id.toString() }, { now }, { 1_000_000L + now }),
+            feedbackEligible = { !preview })
+        owner.onSongChanged(song(1).copy(durationMs = 20_000), null, true)
+        owner.onEnginePlayingChanged(true, true, true)
+        now = 3000;owner.onUserSkip(true)
+        now = 20_000;owner.onTrackEnded(true)
+        now = 22_500;owner.onProgress(2500, true);owner.onUserSkip(true)
+        owner.onPlayingChanged(false, "pause preview", true)
+        runCurrent()
+        assertTrue(port.feedbackEvents.isEmpty())
+        assertEquals(22_500L, port.records.sumOf { it.listenedMs })
+
+        // An equally short full recording is valid positive evidence; length alone must not gate it.
+        preview = false
+        owner.onSongChanged(song(2).copy(durationMs = 20_000), null, true)
+        owner.onEnginePlayingChanged(true, true, true)
+        now = 40_000;owner.onTrackEnded(true)
+        now = 42_500;owner.onProgress(2500, true)
+        assertEquals(listOf(moe.ouom.neriplayer.data.model.stats.PlaybackFeedbackKind.COMPLETE,
+            moe.ouom.neriplayer.data.model.stats.PlaybackFeedbackKind.REPEAT), port.feedbackEvents.map { it.second.kind })
+        assertTrue(port.feedbackEvents.all { it.first == 2L })
+    }
+
+    @Test fun `feedback follows a fresh cycle after the same song switches between preview and full audio`() = runTest {
+        var now = 0L
+        var preview = false
+        val port = RecordingPort()
+        val owner = owner(backgroundScope, port, PlaybackStatsTracker({ it.id.toString() }, nowElapsedMs = { now }),
+            feedback = PlaybackFeedbackTracker({ it.id.toString() }, { now }, { 1_000_000L + now }),
+            feedbackEligible = { !preview })
+        owner.onSongChanged(song(1).copy(durationMs = 20_000), null, true)
+        owner.onEnginePlayingChanged(true, true, true)
+        now = 18_000;owner.onTrackEnded(true)
+        preview = true;owner.onProgress(0, true)
+        now = 38_000;owner.onTrackEnded(true)
+        preview = false;owner.onProgress(0, true)
+        now = 41_000;owner.onProgress(3000, true);owner.onTrackEnded(true)
+        assertEquals(listOf(moe.ouom.neriplayer.data.model.stats.PlaybackFeedbackKind.COMPLETE),
+            port.feedbackEvents.map { it.second.kind })
+        now = 44_000;owner.onProgress(3000, true);owner.onUserSkip(true)
+        assertEquals(listOf(moe.ouom.neriplayer.data.model.stats.PlaybackFeedbackKind.COMPLETE,
+            moe.ouom.neriplayer.data.model.stats.PlaybackFeedbackKind.SKIP), port.feedbackEvents.map { it.second.kind })
+    }
+
     @Test fun `feedback follows the confirmed owner and never startup waiting`() = runTest {
         var now = 0L
         val port = RecordingPort()
@@ -744,11 +793,12 @@ class PlaybackStatsOwnerTest {
         tracker: PlaybackStatsTracker,
         blockForPersistence: ((Long, suspend () -> Unit) -> Unit)? = null,
         pending: PlaybackStatsPendingWrites = PlaybackStatsPendingWrites(FakePendingStore(), scope),
-        feedback: PlaybackFeedbackTracker? = null
+        feedback: PlaybackFeedbackTracker? = null,
+        feedbackEligible: () -> Boolean = { true }
     ): PlaybackStatsOwner = if (blockForPersistence == null) {
-        PlaybackStatsOwner(scope, writes, tracker, pending, feedback = feedback)
+        PlaybackStatsOwner(scope, writes, tracker, pending, feedback = feedback, feedbackEligible = feedbackEligible)
     } else {
-        PlaybackStatsOwner(scope, writes, tracker, pending, blockForPersistence, feedback)
+        PlaybackStatsOwner(scope, writes, tracker, pending, blockForPersistence, feedback, feedbackEligible)
     }
 
     private class FakePendingStore : PlaybackStatsPendingStore {

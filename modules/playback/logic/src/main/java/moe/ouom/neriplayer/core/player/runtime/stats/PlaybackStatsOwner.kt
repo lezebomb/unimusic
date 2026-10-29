@@ -14,7 +14,8 @@ class PlaybackStatsOwner(
     private val blockForPersistence: (Long, suspend () -> Unit) -> Unit = { timeoutMs, block ->
         blockingIo(timeoutMs, block)
     },
-    private val feedback: PlaybackFeedbackTracker? = null
+    private val feedback: PlaybackFeedbackTracker? = null,
+    private val feedbackEligible: () -> Boolean = { true }
 ) {
     private var currentSong: SongItem? = null
     private var currentPlaylistId: Long? = null
@@ -108,12 +109,13 @@ class PlaybackStatsOwner(
     }
 
     private fun recordFeedback(events: List<moe.ouom.neriplayer.data.model.stats.PlaybackFeedbackEvent>, writesEnabled: Boolean) {
-        if (writesEnabled && events.isNotEmpty()) currentSong?.let { writes.recordFeedback(it, events) }
+        if (writesEnabled && events.isNotEmpty() && feedbackEligible()) currentSong?.let { writes.recordFeedback(it, events) }
     }
 
     private fun canSample(writesEnabled: Boolean): Boolean {
         val allowed = canSampleStatistics(writesEnabled)
-        feedback?.setEnabled(writesEnabled && allowed)
+        // Access-limited previews still contribute real listen time, but never imply taste.
+        feedback?.setEnabled(writesEnabled && allowed && feedbackEligible())
         feedback?.onSongChanged(currentSong)
         feedback?.onPlayingChanged(currentPlaying)
         return allowed

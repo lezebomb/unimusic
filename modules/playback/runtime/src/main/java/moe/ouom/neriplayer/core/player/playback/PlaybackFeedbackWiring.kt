@@ -7,6 +7,7 @@ import moe.ouom.neriplayer.core.player.runtime.stats.PlaybackFeedbackTracker
 import moe.ouom.neriplayer.core.player.runtime.stats.PlaybackStatsOwner
 import moe.ouom.neriplayer.core.player.runtime.stats.PlaybackStatsTracker
 import moe.ouom.neriplayer.core.player.session.AppQueueSongIdentity
+import moe.ouom.neriplayer.core.player.watchdog.currentPlaybackCandidate
 
 internal fun PlayerManager.initializePlaybackStatistics(app: Context) {
     AppPlaybackStatsPendingWrites.bind(app)
@@ -18,6 +19,9 @@ internal fun PlayerManager.initializePlaybackStatistics(app: Context) {
         feedback = PlaybackFeedbackTracker(AppQueueSongIdentity::stableKey, readClearedAt = {
             maxOf(AppPlaybackStatsWritePort.clearedAt(),
                 moe.ouom.neriplayer.data.recommendation.LocalPlaybackFeedbackStore.captureResetEpoch())
-        })
+        }),
+        feedbackEligible = {
+            currentPlaybackCandidate()?.isPreviewClip != true && _currentPlaybackAudioInfo.value?.isPreviewClip != true
+        }
     )
 }

@@ -4,6 +4,14 @@
 
 **当前优先级：按最新用户要求弃用QQ音乐和YouTube音源，完善其余来源、搜索与推荐。** 保留已登录的Google/网易云及既有两份共5首导入，不重新登录/收验证码或重导全部歌单。YouTube实际音频仍未接通，其他来源/实际播放范围看2L/2M/2P报告，不扩大结论。
 
+## 当前3E：试听偏好隔离已构建，实机采样待补
+
+PlaybackStatsOwner新增动态反馈资格；当前候选或音频信息明确试听时停止SKIP/COMPLETE/REPEAT，保留真实收听统计；完整短歌及同曲切换周期有新断言。新增2/共4 JVM、Debug1m10s、模块边界通过。见[3E](PHASE_3E_PREVIEW_FEEDBACK_ISOLATION.md)。当前无Gradle构建运行，只有既有守护进程，不重复检查。
+
+3E包已保留数据安装，实际版本1364e93eaae5.dirty.10291236，APK build/outputs/unimusic/UniMusic-20261029-3E-debug.apk，哈希见报告。装机前反馈开启/事件0；未更改设置/清数据。随后ADB devices为空，真实试听+手动切歌采样在任何播放动作前未能执行，不冒充设备功能验收。手机重新在线才补该项；离线继续独立开发。手动NEXT/PREV入口先调用onUserSkip再playAtIndex，当前候选资格仍可复核。
+
+源代码与证据的提交/推送以git log/status为准；下一步检查3E远端（新用例被现有feedback follows选择器覆盖），再完善其他有价值搜索/推荐工作，不重跑已通过无关集。一次源读取因审批额度错误被拒且未执行，刷新普通用量后同流程重试成功；未使用reset/付费额度。Oct29 00:10与05:12两个单次计划均已触发并删除，不新建每日任务；05:12合并到本轮开发。
+
 ## 当前2BA已验证：版本词、跨源录音与滚动锚点
 
 最新版已完成Bootleg/Rework/制作人合作Booty、中英混合Live版/Cover版/Remix版/DJ版及Mash Up格式识别；AI版本仍严格区分。其他Catalog需与最多64条网易云具体录音的标题/完整署名/时长/版本核对才升入歌手优先层，不能凭同名歌手或地址返回抢前。后台列表采用滚动生命周期跟踪，保持未手动滚动用户的真正顶部，真实手动滑动后保留其锚点。见[2BA](PHASE_2BA_RECORDING_EVIDENCE_AND_SEARCH_ANCHOR.md)。
