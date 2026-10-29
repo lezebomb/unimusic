@@ -26,9 +26,30 @@ class LocalRecommendationRankerTest {
         val real = candidate("real", "Unknown Mortal Orchestra")
         val history = stat(candidate("history-real", real.song.artist), now - 30 * day, 9_000_000, 50)
         assertEquals(LocalRecommendationReason.FAMILIAR_ARTIST,
-            LocalRecommendationRanker.rank(listOf(real), listOf(history), now).single().reason)
+            LocalRecommendationRanker.rank(listOf(real), listOf(history), now,
+                feedback = mapOf("real" to LocalPlaybackSignal(completions = 2.0))).single().reason)
     }
 
+
+    @Test fun aggregatePreviewTimeAndSkipsCannotCreateArtistTasteButPositiveEvidenceCan() {
+        val anchor = candidate("anchor", "Artist A")
+        val related = candidate("related", "Artist A")
+        val other = candidate("other", "Artist B")
+        val input = listOf(anchor, related, other)
+        // The aggregate has no source eligibility evidence, even if its listen total is large.
+        val exposure = stat(candidate("history", "Artist A"), now - 30 * day, 90_000_000, 500)
+        val baseline = LocalRecommendationRanker.rank(input, emptyList(), now)
+        assertEquals(baseline, LocalRecommendationRanker.rank(input, listOf(exposure), now))
+        val skipped = LocalRecommendationRanker.rank(input, listOf(exposure), now,
+            feedback = mapOf("anchor" to LocalPlaybackSignal(skips = 3.0)))
+        assertTrue(skipped.all { it.reason != LocalRecommendationReason.FAMILIAR_ARTIST })
+        val positive = LocalRecommendationRanker.rank(input, listOf(exposure), now,
+            feedback = mapOf("anchor" to LocalPlaybackSignal(completions = 2.0, repeats = 1.0)))
+        assertEquals(LocalRecommendationReason.FAMILIAR_ARTIST, positive.single { it.identityKey == "related" }.reason)
+        assertEquals(LocalRecommendationReason.EXPLORE_LIBRARY, positive.single { it.identityKey == "other" }.reason)
+        assertEquals(positive, LocalRecommendationRanker.rank(input.reversed(), emptyList(), now,
+            feedback = mapOf("anchor" to LocalPlaybackSignal(completions = 2.0, repeats = 1.0))))
+    }
 
     @Test
     fun `ranking deduplicates identities and keeps distinct recordings with the same title`() {
@@ -68,7 +89,8 @@ class LocalRecommendationRankerTest {
         val others = listOf(candidate("other-a", "Artist B"), candidate("other-b", "Artist C"))
         val history = stat(candidate("history", "Familiar Artist"), now - 30 * day, 9_000_000, 50)
 
-        val result = LocalRecommendationRanker.rank(familiar + others, listOf(history), now, limit = 3)
+        val result = LocalRecommendationRanker.rank(familiar + others, listOf(history), now, limit = 3,
+            feedback = mapOf(familiar.first().identityKey to LocalPlaybackSignal(completions = 2.0, repeats = 1.0)))
 
         assertEquals(3, result.map { it.song.artist }.distinct().size)
         assertEquals(LocalRecommendationReason.FAMILIAR_ARTIST, result.first().reason)
@@ -93,14 +115,16 @@ class LocalRecommendationRankerTest {
         val swapped = candidate("swapped", "Beta & Alpha")
         val fused = candidate("fused", "AlphaBeta")
         val history = stat(candidate("history", "Beta / Alpha"), now - 30 * day, 9_000_000, 50)
-        val ranked = LocalRecommendationRanker.rank(listOf(fused, collab, swapped), listOf(history), now)
+        val ranked = LocalRecommendationRanker.rank(listOf(fused, collab, swapped), listOf(history), now,
+            feedback = mapOf("collab" to LocalPlaybackSignal(completions = 2.0, repeats = 1.0)))
         assertEquals(LocalRecommendationReason.FAMILIAR_ARTIST, ranked.first().reason)
         assertEquals(LocalRecommendationReason.EXPLORE_LIBRARY, ranked.single { it.identityKey == "fused" }.reason)
         assertEquals(setOf("collab", "swapped", "fused"), ranked.map { it.identityKey }.toSet())
         val alternatives = listOf(collab, candidate("ac", "Alpha / Gamma"), candidate("ad", "Alpha / Delta"), candidate("fresh", "Other"))
-        val top = LocalRecommendationRanker.rank(alternatives, listOf(history), now, limit = 2)
+        val evidence = mapOf("collab" to LocalPlaybackSignal(completions = 2.0, repeats = 1.0))
+        val top = LocalRecommendationRanker.rank(alternatives, listOf(history), now, limit = 2, feedback = evidence)
         assertTrue(top.any { it.identityKey == "fresh" })
-        assertEquals(top, LocalRecommendationRanker.rank(alternatives.reversed(), listOf(history), now, limit = 2))
+        assertEquals(top, LocalRecommendationRanker.rank(alternatives.reversed(), listOf(history), now, limit = 2, feedback = evidence))
     }
 
     @Test fun retiredOnlineSourcesLeaveRecommendationsWhilePlayableLocalCopiesRemain() {

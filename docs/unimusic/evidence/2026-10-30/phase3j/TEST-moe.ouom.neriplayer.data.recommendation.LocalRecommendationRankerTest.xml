@@ -1,0 +1,9 @@
+<testsuite name="moe.ouom.neriplayer.data.recommendation.LocalRecommendationRankerTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-10-29T22:34:37.542Z" hostname="local" time="0.069">
+  <properties />
+  <testcase name="placeholderArtistsDoNotCreateFamiliarityWhileRealNamesAndExactEvidenceRemain" classname="moe.ouom.neriplayer.data.recommendation.LocalRecommendationRankerTest" time="0.056" />
+  <testcase name="aggregatePreviewTimeAndSkipsCannotCreateArtistTasteButPositiveEvidenceCan" classname="moe.ouom.neriplayer.data.recommendation.LocalRecommendationRankerTest" time="0.001" />
+  <testcase name="familiar artist affinity does not fill the first recommendations with one artist" classname="moe.ouom.neriplayer.data.recommendation.LocalRecommendationRankerTest" time="0.006" />
+  <testcase name="collaborativeCreditsShareAffinityAndDiversityWithoutMergingSingleArtistNames" classname="moe.ouom.neriplayer.data.recommendation.LocalRecommendationRankerTest" time="0.002" />
+  <system-out />
+  <system-err />
+</testsuite>

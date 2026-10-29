@@ -1,0 +1,19 @@
+{
+  "stage": "3J",
+  "localTests": {
+    "class": "LocalRecommendationRankerTest",
+    "tests": 4,
+    "failures": 0
+  },
+  "moduleBoundaries": "passed",
+  "build": "BUILD SUCCESSFUL in 51s",
+  "apk": "build/outputs/unimusic/UniMusic-20261030-3J-debug.apk",
+  "versionName": "e2ac4ec7d2bb.dirty.10300634",
+  "sha256": "33371a8c963cbd73caca7f1bf0155b6b4b285bc193ee9eaf91762ec8cea03c16",
+  "recommendationAlgorithmVersion": 6,
+  "roomVersion": 23,
+  "remoteCI": "2BI required workflow and Android step succeeded; this stage covered by existing ranker selector on next push",
+  "deviceValidation": "not run",
+  "realPositiveFeedbackAndFullAudioValidation": "not run",
+  "historicFeedback": "preserved; pre-3E events cannot be reclassified by provenance"
+}

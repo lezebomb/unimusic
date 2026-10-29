@@ -1,0 +1,45 @@
+{
+  "runId": 40965533755,
+  "head": "8cc7990b8643bd083630aeaee3959ea662bccb54",
+  "conclusion": "success",
+  "androidAdditiveMigration": "success",
+  "actualXmlSummary": {
+    "DatabaseUpgradeInstrumentedTest": {
+      "tests": 3,
+      "failures": 0,
+      "skipped": 0
+    },
+    "ExploreSearchArtistIntentTest": {
+      "tests": 9,
+      "failures": 0,
+      "skipped": 0
+    },
+    "NowPlayingScreenTest": {
+      "tests": 1,
+      "failures": 0,
+      "skipped": 0
+    },
+    "PlaybackProgressOwnerTest": {
+      "tests": 4,
+      "failures": 0,
+      "skipped": 0
+    },
+    "PlaybackQualityOwnerTest": {
+      "tests": 1,
+      "failures": 0,
+      "skipped": 0
+    },
+    "PlaybackSourceResolverTest": {
+      "tests": 17,
+      "failures": 0,
+      "skipped": 0
+    },
+    "UnifiedLibraryMigrationTest": {
+      "tests": 1,
+      "failures": 0,
+      "skipped": 0
+    }
+  },
+  "deduplication": "class and test name; preserved Android copies counted once",
+  "limits": "No real-device/full-audio/timing validation; 2BJ/2BK/3J not in this head"
+}

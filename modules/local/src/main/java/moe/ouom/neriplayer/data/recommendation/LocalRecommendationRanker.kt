@@ -30,7 +30,7 @@ data class LocalRecommendation(
  * Identity keys are supplied by the existing repository adapter; titles never merge recordings.
  */
 object LocalRecommendationRanker {
-    const val ALGORITHM_VERSION = 5
+    const val ALGORITHM_VERSION = 6
     private const val DAY_MS = 86_400_000L
 
     fun rank(
@@ -45,17 +45,23 @@ object LocalRecommendationRanker {
         if (limit <= 0) return emptyList()
         val today = BeijingRecommendationDay.startMillis(nowMillis)
         val stats = statistics.associateBy { checkCancellation(); it.identityKey }
+        val canonical = canonicalCandidates(candidates, checkCancellation)
         val artistAffinity = mutableMapOf<String, Double>()
-        statistics.forEach { track ->
+        canonical.forEach { candidate ->
             checkCancellation()
-            val credits = artistKeys(track.customArtist ?: track.artist)
+            val signal = feedback[candidate.identityKey] ?: return@forEach
+            // Aggregate time includes real previews, so it cannot prove artist preference.
+            // These decayed positive events already pass the runtime's preview/consent gate.
+            val positive = signal.completions.coerceIn(0.0, 2.0) * 0.6 +
+                signal.repeats.coerceIn(0.0, 2.0)
+            if (positive <= 0.0) return@forEach
+            val credits = artistKeys(candidate.song.customArtist ?: candidate.song.artist)
             if (credits.isNotEmpty()) {
-                val weight = ln(1.0 + track.totalListenMs.coerceAtLeast(0L) / 180_000.0) /
-                    (1.0 + ageDays(today, track.lastPlayedAt) / 30.0) / credits.size
+                val weight = positive / credits.size
                 credits.forEach { artist -> artistAffinity[artist] = artistAffinity.getOrDefault(artist, 0.0) + weight }
             }
         }
-        val ranked = canonicalCandidates(candidates, checkCancellation)
+        val ranked = canonical
             .map { candidate -> checkCancellation(); score(candidate, stats[candidate.identityKey], artistAffinity, today, feedback[candidate.identityKey]) }
             .toMutableList()
         val selected = ArrayList<LocalRecommendation>(limit.coerceAtMost(ranked.size))

@@ -9,3 +9,5 @@
 实际完成：1新增+2既有关键回归，共3 JVM全部通过（有序边界、明确别名、标题歧义、原乐队作品查询）；边界检查通过，Debug44s成功。现有ArtistIntent CI选择器包含新用例。APK `build/outputs/unimusic/UniMusic-20261030-2BK-debug.apk`，版本`e72358fc5812.dirty.10300630`，SHA-256 `63d5606ae42d93537abea282d9bb41dce1c2c7145f24079d5474d8dc234951d6`。
 
 没有本阶段装机、真实AC/DC查询/账号、全局原唱准确率或延迟验收。先本地commit，等待2BI必要工作流CI40965533755完成再一起push。
+
+后续状态（2026-10-30）：2BI的8cc7990b已push，CI40965533755整体及Android增量迁移SUCCESS，XML摘要见evidence/2026-10-30/ci-40965533755.json。2BJ/2BK/3J待本阶段一起push；以最新检查点和Git为准。
