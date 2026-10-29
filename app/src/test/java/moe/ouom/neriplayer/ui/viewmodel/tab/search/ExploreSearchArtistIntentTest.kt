@@ -1,6 +1,10 @@
 package moe.ouom.neriplayer.ui.viewmodel.tab.search
 
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.test.currentTime
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.async
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -11,6 +15,7 @@ import org.json.JSONObject
 import org.junit.Assert.*
 import org.junit.Test
 
+@OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
 class ExploreSearchArtistIntentTest {
     private val query = "哭泣少女乐队"
     private fun songs(): List<ExploreSearchResult> {
@@ -21,6 +26,52 @@ class ExploreSearchArtistIntentTest {
         {"id":57020536,"name":"トゲナシトゲアリ","alias":["TOGENASHI TOGEARI"],"transNames":["无刺有刺"]},
         {"id":62046853,"name":"ダイヤモンドダスト","alias":["DIAMOND DUST"],"transNames":["钻石星尘"]}
     ]}}"""), NeteaseExploreSearchType.ARTIST).items.filterIsInstance<ExploreSearchResult.Artist>().map { it.result }
+
+    @Test fun optionalArtistLookupOverlapsSongsAndReusesItsSingleResult() = runTest {
+        var calls = 0
+        val lookup = launchOptionalSearchLookup(1_200, { true }) { calls++; delay(600); "artist" }
+        val songs = async { delay(800); "songs" }
+        assertEquals("songs", songs.await())
+        assertEquals("artist", lookup.await())
+        assertEquals("artist", lookup.await())
+        assertEquals(800L, currentTime)
+        assertEquals(1, calls)
+    }
+
+    @Test fun optionalArtistTimeoutAndProviderFailuresKeepPrimarySongsAvailable() = runTest {
+        var released = false
+        val lookup = launchOptionalSearchLookup(1_200, { true }) {
+            try { delay(5_000); "late" } finally { released = true }
+        }
+        val songs = async { delay(800); "songs" }
+        assertEquals("songs", songs.await())
+        assertEquals(800L, currentTime)
+        assertNull(lookup.await())
+        assertEquals(1_200L, currentTime)
+        assertTrue(released)
+        assertNull(launchOptionalSearchLookup<String>(1_200, { true }) { error("unavailable") }.await())
+        assertNull(launchOptionalSearchLookup<String>(1_200, { true }) { throw CancellationException("provider cancelled") }.await())
+    }
+
+    @Test fun optionalArtistLookupRejectsOldContextAndPropagatesActualCancellation() = runTest {
+        var current = false
+        var calls = 0
+        assertNull(launchOptionalSearchLookup(1_200, { current }) { calls++; "unused" }.await())
+        assertEquals(0, calls)
+        current = true
+        val stale = launchOptionalSearchLookup(1_200, { current }) { delay(100); "old account" }
+        runCurrent()
+        current = false
+        assertNull(stale.await())
+        var released = false
+        val cancelled = launchOptionalSearchLookup(1_200, { true }) {
+            try { delay(500); "late" } finally { released = true }
+        }
+        runCurrent()
+        cancelled.cancel()
+        try { cancelled.await(); fail("lookup cancellation must propagate") } catch (_: CancellationException) { }
+        assertTrue(released)
+    }
 
     @Test fun verifiedCatalogDjVariantCannotOutrankAnArtistsUnmodifiedRecording() {
         val artist = NeteaseArtistSummary(1, "Adele")

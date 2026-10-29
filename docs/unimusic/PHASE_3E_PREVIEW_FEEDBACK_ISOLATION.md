@@ -10,4 +10,4 @@ Mate60保留数据安装成功，核实版本1364e93eaae5.dirty.10291236。装�
 
 Room保持v23，不修改数据库或推荐排序公式，不追溯清除无法区分来源的旧反馈，日快照保持原规则。单条读取曾因自动审批工作区额度错误未执行，刷新用量后按同一审批流程重试已恢复，未使用重置券或付费额度。
 
-APK：`build/outputs/unimusic/UniMusic-20261029-3E-debug.apk`，XML/哈希/未执行项见[evidence](evidence/2026-10-29/phase3e/validation.json)。远端结果待提交后确认；手机在线时可补一次明确试听后的手动下一首，核对事件增量，不能把断连或零事件本身当作采样通过。
+APK：`build/outputs/unimusic/UniMusic-20261029-3E-debug.apk`，XML/哈希/未执行项见[evidence](evidence/2026-10-29/phase3e/validation.json)。源码4b04524f已推送，远端[40823070110](https://github.com/lezebomb/unimusic/actions/runs/40823070110)整体成功；下载XML确认PlaybackStatsOwnerTest共3项、0失败，含两项新增试听用例。手机在线时可补一次明确试听后的手动下一首，核对事件增量，不能把断连或零事件本身当作采样通过。

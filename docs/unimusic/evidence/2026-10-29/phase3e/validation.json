@@ -24,7 +24,21 @@
     "settingsChanges": false
   },
   "data": "Room v23 unchanged; actual listening statistics kept, prior preference events and settings not cleared",
-  "ci": "Existing PlaybackStatsOwnerTest.feedback follows selector covers both new methods; remote result pending commit/push",
+  "ci": {
+    "runId": 40823070110,
+    "sourceCommit": "4b04524fde1c83a059d42741d48282d046ad9a21",
+    "conclusion": "success",
+    "url": "https://github.com/lezebomb/unimusic/actions/runs/40823070110",
+    "verifiedXml": {
+      "PlaybackStatsOwnerTest": {
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "bothNewPreviewMethodsPresent": true
+      }
+    }
+  },
   "recovery": "One source read was rejected by automatic approval due workspace credit error; after fresh ordinary-usage check the same command succeeded under the same approval flow. No reset or paid credit used.",
   "limitations": [
     "Gate applies to explicit preview evidence on current URL candidate or audio info",

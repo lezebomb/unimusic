@@ -24,6 +24,7 @@ package moe.ouom.neriplayer.ui.viewmodel.tab
  */
 
 import moe.ouom.neriplayer.ui.viewmodel.tab.search.ExploreNativeProbeOwner
+import moe.ouom.neriplayer.ui.viewmodel.tab.search.launchOptionalSearchLookup
 import moe.ouom.neriplayer.ui.viewmodel.tab.search.requireExploreSearchNetwork
 import moe.ouom.neriplayer.core.player.persistence.toSongItem
 import android.app.Application
@@ -31,6 +32,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -346,6 +348,7 @@ class ExploreViewModel(application: Application) : AndroidViewModel(application)
     private var aggregateRanker: ExploreSearchRankingSession? = null
     private val nativeProbes = ExploreNativeProbeOwner()
     private var artistIntentJob: Job? = null
+    private var artistIntentLookup: Deferred<SearchPage<ExploreSearchResult>?>? = null
     private var artistIntentPending = false
     private var neteaseSongRanker: ExploreSearchRankingSession? = null
     private var searchAccountContext = neteaseClient.searchSessionIdentity()
@@ -620,6 +623,7 @@ class ExploreViewModel(application: Application) : AndroidViewModel(application)
         })
         val accountContext = neteaseClient.searchSessionIdentity()
         aggregateRanker = ExploreSearchRankingSession(_uiState.value.searchDisplayQuery)
+        prefetchArtistIntent(keyword, requestVersion, SearchSource.ALL)
         aggregateEngine = FederatedSearchEngine<ExploreSearchResult>(listOf<FederatedSearchProvider<ExploreSearchResult>>(
             FederatedSearchProvider("local") { query, cursor -> localSearch.page(query, cursor) },
             FederatedSearchProvider("netease") { query, cursor ->
@@ -712,7 +716,7 @@ class ExploreViewModel(application: Application) : AndroidViewModel(application)
         }
     }
 
-    /** Three providers run independently, at most three candidates / 4.5s each, stopping at a full address. */
+    /** Two providers run independently, at most three candidates / 4.5s each, stopping at a full address. */
     private fun probeSearchSources(items: List<ExploreSearchResult>, requestVersion: Long, ranker: ExploreSearchRankingSession,
         source: SearchSource = SearchSource.ALL) {
         for (provider in listOf("netease", "kuwo")) {
@@ -768,25 +772,38 @@ class ExploreViewModel(application: Application) : AndroidViewModel(application)
         }
     }
 
+    /** Start the one optional artist lookup alongside songs; only publish after song evidence exists. */
+    private fun prefetchArtistIntent(keyword: String, requestVersion: Long, source: SearchSource) {
+        if (artistIntentLookup != null || !isSearchRequestCurrent(requestVersion, source) || !isNeteaseSearchAllowed()) return
+        val session = neteaseClient.searchSessionIdentity()
+        fun current() = isSearchRequestCurrent(requestVersion, source) &&
+            session === neteaseClient.searchSessionIdentity() && isNeteaseSearchAllowed()
+        artistIntentLookup = viewModelScope.launchOptionalSearchLookup(1_200, ::current) {
+            aggregateCache.load("netease_artist_intent", keyword, null) {
+                requireExploreSearchNetwork(app)
+                val raw = neteaseClient.searchSongsCancellable(keyword, limit = 4, type = 100)
+                val page = withContext(Dispatchers.Default) {
+                    val root = JSONObject(raw)
+                    if (root.optInt("code") != 200) throw SearchSourceException(SearchSourceFailure.UNAVAILABLE)
+                    SearchPage(parseNeteaseSearchResults(root, NeteaseExploreSearchType.ARTIST).items)
+                }
+                if (!current()) throw SearchSourceException(SearchSourceFailure.AUTH_REQUIRED)
+                page
+            }
+        }
+    }
+
     private fun startArtistIntent(keyword: String, requestVersion: Long, source: SearchSource,
         ranker: ExploreSearchRankingSession, providerItems: List<ExploreSearchResult>) {
         if (!isSearchRequestCurrent(requestVersion, source) || artistIntentJob != null) return
+        prefetchArtistIntent(keyword, requestVersion, source)
         val session = neteaseClient.searchSessionIdentity()
         artistIntentPending = true
         fun current() = isSearchRequestCurrent(requestVersion, source) &&
             session === neteaseClient.searchSessionIdentity() && isNeteaseSearchAllowed()
         artistIntentJob = viewModelScope.launch {
             try {
-                val page = kotlinx.coroutines.withTimeoutOrNull(1_200) {
-                    aggregateCache.load("netease_artist_intent", keyword, null) {
-                        val raw = neteaseClient.searchSongsCancellable(keyword, limit = 4, type = 100)
-                        withContext(Dispatchers.Default) {
-                            val root = JSONObject(raw)
-                            if (root.optInt("code") != 200) throw SearchSourceException(SearchSourceFailure.UNAVAILABLE)
-                            SearchPage(parseNeteaseSearchResults(root, NeteaseExploreSearchType.ARTIST).items)
-                        }
-                    }
-                }
+                val page = artistIntentLookup?.await()
                 if (!current()) return@launch
                 val intent = withContext(Dispatchers.Default) {
                     moe.ouom.neriplayer.ui.viewmodel.tab.search.inferSearchArtistIntent(keyword,
@@ -926,6 +943,8 @@ class ExploreViewModel(application: Application) : AndroidViewModel(application)
         searchRequestVersion += 1
         artistIntentJob?.cancel()
         artistIntentJob = null
+        artistIntentLookup?.cancel()
+        artistIntentLookup = null
         artistIntentPending = false
         neteaseSongRanker = null
         nativeProbes.reset()
@@ -1024,6 +1043,7 @@ class ExploreViewModel(application: Application) : AndroidViewModel(application)
         val type = _uiState.value.selectedNeteaseSearchType
         val ranker = if (type == NeteaseExploreSearchType.SONG) ExploreSearchRankingSession(matchQuery) else null
         neteaseSongRanker = ranker
+        if (ranker != null) prefetchArtistIntent(keyword, requestVersion, SearchSource.NETEASE)
         searchJob = viewModelScope.launch {
             try {
                 if (!isNeteaseSearchAllowed()) {

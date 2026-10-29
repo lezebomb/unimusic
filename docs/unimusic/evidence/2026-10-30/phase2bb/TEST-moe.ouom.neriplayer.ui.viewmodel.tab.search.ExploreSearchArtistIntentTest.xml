@@ -1,0 +1,9 @@
+<testsuite name="moe.ouom.neriplayer.ui.viewmodel.tab.search.ExploreSearchArtistIntentTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-10-29T16:38:55.495Z" hostname="local" time="0.507">
+  <properties />
+  <testcase name="optionalArtistLookupOverlapsSongsAndReusesItsSingleResult" classname="moe.ouom.neriplayer.ui.viewmodel.tab.search.ExploreSearchArtistIntentTest" time="0.318" />
+  <testcase name="optionalArtistLookupRejectsOldContextAndPropagatesActualCancellation" classname="moe.ouom.neriplayer.ui.viewmodel.tab.search.ExploreSearchArtistIntentTest" time="0.019" />
+  <testcase name="optionalArtistTimeoutAndProviderFailuresKeepPrimarySongsAvailable" classname="moe.ouom.neriplayer.ui.viewmodel.tab.search.ExploreSearchArtistIntentTest" time="0.024" />
+  <testcase name="exactAliasesWorkWhileSongTitleAmbiguityWeakConsensusAndCoverRequestsDoNotInventIntent" classname="moe.ouom.neriplayer.ui.viewmodel.tab.search.ExploreSearchArtistIntentTest" time="0.142" />
+  <system-out />
+  <system-err />
+</testsuite>

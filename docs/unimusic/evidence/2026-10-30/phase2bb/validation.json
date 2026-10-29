@@ -1,0 +1,42 @@
+{
+  "phase": "2BB",
+  "date": "2026-10-30",
+  "tests": {
+    "tests": 4,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "newTests": 3,
+  "testNames": [
+    "optionalArtistLookupOverlapsSongsAndReusesItsSingleResult",
+    "optionalArtistLookupRejectsOldContextAndPropagatesActualCancellation",
+    "optionalArtistTimeoutAndProviderFailuresKeepPrimarySongsAvailable",
+    "exactAliasesWorkWhileSongTitleAmbiguityWeakConsensusAndCoverRequestsDoNotInventIntent"
+  ],
+  "build": "phase2bb-parallel-artist-validation.log: BUILD SUCCESSFUL in 4m 2s",
+  "moduleBoundaries": "passed",
+  "apk": {
+    "archive": "build/outputs/unimusic/UniMusic-20261030-2BB-debug.apk",
+    "version": "5e9562748a30.dirty.10300036",
+    "sha256": "6799d4159d9e3b7b870605c44681989c06c214d9026c07d142c37ff1c9ef945a"
+  },
+  "device": {
+    "connectedOwnedMate60": 0,
+    "installedThisPhase": false,
+    "timingOrAudioAcceptance": false
+  },
+  "implementation": {
+    "optionalArtistRequestsPerQuery": 1,
+    "artistBudgetMillis": 1200,
+    "artistAndSongRequests": "concurrent; ALL or NetEase SONG only",
+    "queryAndAccountGuards": "before lookup, before caching, after lookup and before publication",
+    "freshLookupKnownOffline": "not started; metadata cache still usable"
+  },
+  "limitations": [
+    "Virtual-time scheduling tests are not network latency benchmarks",
+    "No device/account-switch/audio verification in this phase",
+    "Recording, version and authorization thresholds unchanged; Room v23 unchanged"
+  ],
+  "ci": "pending commit/push; existing artist intent test selector covers new cases"
+}

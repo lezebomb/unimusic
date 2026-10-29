@@ -63,6 +63,8 @@
 
 ## Phase 2：统一搜索与高精度匹配
 
+2BB将可选歌手索引与歌曲首页并行，单次1200ms预算、查询/账号取消及录音门槛保持；4相关JVM/Debug/边界通过，设备离线未测真实速度，见[2BB](PHASE_2BB_PARALLEL_ARTIST_LOOKUP.md)。3E远端40823070110已成功。
+
 2BA补DJ/中英版本边界、跨源具体录音核对与滚动生命周期锚定；8相关本地检查/最终Debug/保留数据装机通过，原词后台完成后顶部仍正确，见[2BA](PHASE_2BA_RECORDING_EVIDENCE_AND_SEARCH_ANCHOR.md)。2AZ远端40800774427已成功。
 
 2AZ把试听证据持续显示并随缓存保留，停用来源明确DISABLED；3本地相关JVM/Debug/装机及20/30秒片段提示通过，runtime 3项待远端JDK21，见[2AZ](PHASE_2AZ_PERSISTENT_PREVIEW_NOTICE.md)。
