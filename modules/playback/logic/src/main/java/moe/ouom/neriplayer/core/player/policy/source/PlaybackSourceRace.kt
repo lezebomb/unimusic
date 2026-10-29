@@ -6,6 +6,8 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
+import moe.ouom.neriplayer.core.player.runtime.refresh.RefreshResolverSideEffects
+import moe.ouom.neriplayer.core.player.runtime.refresh.RefreshSideEffectGate
 
 /** Every child signals completion, even if an adapter cancels itself. The caller owns the total budget. */
 suspend fun <T : Any> racePlaybackSources(tasks: List<suspend () -> T?>): T? = coroutineScope {
@@ -25,4 +27,20 @@ suspend fun <T : Any> racePlaybackSources(tasks: List<suspend () -> T?>): T? = c
         jobs.forEach { it.cancel() }
         completed.close()
     }
+}
+
+/** Race gated fresh discoveries with duration/error notifications suppressed until selection. */
+suspend fun <T : Any> raceFreshPlaybackSources(
+    tasks: List<suspend (RefreshResolverSideEffects) -> T?>,
+    isCurrent: () -> Boolean,
+    applyWinner: (T) -> Unit
+): T? {
+    if (!isCurrent()) return null
+    val isolated = RefreshResolverSideEffects(RefreshSideEffectGate { false })
+    val winner = racePlaybackSources(tasks.map { resolve -> suspend { resolve(isolated) } }) ?: return null
+    currentCoroutineContext().ensureActive()
+    // Cancelling/awaiting a losing request may suspend; consent and sessions must still match afterwards.
+    if (!isCurrent()) return null
+    applyWinner(winner)
+    return winner
 }

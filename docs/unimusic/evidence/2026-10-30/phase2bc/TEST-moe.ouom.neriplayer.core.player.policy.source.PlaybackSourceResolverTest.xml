@@ -1,0 +1,7 @@
+<testsuite name="moe.ouom.neriplayer.core.player.policy.source.PlaybackSourceResolverTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-10-29T17:08:15.351Z" hostname="local" time="0.405">
+  <properties />
+  <testcase name="freshSourceRaceRechecksContextAfterLoserCleanupAndHonorsParentDeadline" classname="moe.ouom.neriplayer.core.player.policy.source.PlaybackSourceResolverTest" time="0.39" />
+  <testcase name="freshSourceFamiliesRaceWithoutPublishingLoserEffects" classname="moe.ouom.neriplayer.core.player.policy.source.PlaybackSourceResolverTest" time="0.009" />
+  <system-out />
+  <system-err />
+</testsuite>

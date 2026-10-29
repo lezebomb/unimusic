@@ -1,0 +1,36 @@
+{
+  "phase": "2BC",
+  "date": "2026-10-30",
+  "uniqueUnitTests": 3,
+  "newTestMethods": 2,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "validation": {
+    "firstAttempt": "23s: test generic inference compilation error; explicit String type added",
+    "secondAttempt": "34s: runtime Bili resolver declares SongUrlResult?; explicitly keep Success only; three logic tests already passed",
+    "finalSelectedTestsAndDebug": "phase2bc-parallel-fresh-source-families-pass.log: BUILD SUCCESSFUL in 42s; unchanged selected tests up-to-date from preceding passing execution",
+    "moduleBoundaries": "passed"
+  },
+  "apk": {
+    "archive": "build/outputs/unimusic/UniMusic-20261030-2BC-debug.apk",
+    "version": "9b87ef001ede.dirty.10300110",
+    "sha256": "766861ed747de95c904ba86ec344ea84d10df4b6cbb53796bab70e9ca015ef38",
+    "installedThisPhase": false
+  },
+  "implementation": {
+    "freshNeteaseAlternates": "Kuwo/native and Bilibili discovery families run concurrently after remembered/local attempts",
+    "candidateGates": "Existing strict title, full credited artist, duration, version, permission, preview rejection and user opt-in unchanged",
+    "winner": "First full Success, then post-loser-cleanup account/network/switch check; only winner applies duration",
+    "loser": "Cancelled; passed resolver side-effects cannot emit duration/error/scan actions",
+    "budgets": "Existing shared 8000ms playback resolution deadline and family budgets retained",
+    "tradeoff": "May start a speculative Bilibili request even when native succeeds quickly; at most two fresh families, then losing task cancelled"
+  },
+  "data": "Room v23; accounts, playlists and stored choices preserved; no new source or entitlement bypass",
+  "unexecuted": [
+    "No device installation or actual fallback delay/audio verification",
+    "No new full-song, account-switch or network failure-injection acceptance",
+    "No local runtime unit execution because fixed JDK21 absent; no download/retry of that suite"
+  ],
+  "ci": "pending commit/push; existing PlaybackSourceResolverTest selector includes new cases"
+}

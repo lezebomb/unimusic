@@ -11,6 +11,7 @@ import moe.ouom.neriplayer.core.player.PlayerManager
 import moe.ouom.neriplayer.core.player.network.isPlaybackNetworkUsable
 import moe.ouom.neriplayer.core.player.quality.effectiveNeteaseQuality
 import moe.ouom.neriplayer.core.player.policy.source.sourceStageBudgetMs
+import moe.ouom.neriplayer.core.player.policy.source.raceFreshPlaybackSources
 import moe.ouom.neriplayer.core.player.resolver.netease.tryResolveNeteaseAutoBiliSource
 import moe.ouom.neriplayer.core.player.resolver.netease.tryResolveNeteaseMatchedLocalSource
 import moe.ouom.neriplayer.core.player.runtime.refresh.RefreshResolverSideEffects
@@ -181,8 +182,19 @@ private suspend fun PlayerManager.resolveNeteaseAlternates(
         catch (_: Exception) { NPLogger.w("NERI-PlayerManager", "Local alternate is temporarily unreadable") }
     }
     if (online && isPlaybackNetworkUsable(application)) {
-        tryResolveNativeCatalogAlternate(song, sideEffects)?.let { return it }
-        return tryResolveNeteaseAutoBiliSource(song, sideEffects)
+        val sessions = listOf("netease", "kuwo", "bilibili").associateWith { sourceResolutionSession(it) }
+        fun current() = neteaseAutoSourceSwitchEnabled && isPlaybackNetworkUsable(application) &&
+            sessions.all { (provider, session) -> session == sourceResolutionSession(provider) }
+        return raceFreshPlaybackSources<SongUrlResult.Success>(
+            tasks = listOf(
+                { isolated -> tryResolveNativeCatalogAlternate(song, isolated) },
+                { isolated -> tryResolveNeteaseAutoBiliSource(song, isolated) as? SongUrlResult.Success }
+            ),
+            isCurrent = ::current,
+            applyWinner = { ready -> ready.durationMs?.takeIf { it > 0L }?.let { duration ->
+                sideEffects.updateDuration { maybeUpdateSongDuration(song, duration) }
+            } }
+        )
     }
     return null
 }

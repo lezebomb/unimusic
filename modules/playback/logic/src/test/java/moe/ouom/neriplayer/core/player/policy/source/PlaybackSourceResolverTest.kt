@@ -112,6 +112,49 @@ class PlaybackSourceResolverTest {
         assertTrue(cooldown.cooling("song", "inner-timeout"))
     }
 
+    @Test fun freshSourceFamiliesRaceWithoutPublishingLoserEffects() = runTest {
+        val updates = mutableListOf<String>()
+        var loserStopped = false
+        val result = raceFreshPlaybackSources<String>(listOf(
+            { effects ->
+                try { delay(3_800); "slow native" }
+                finally { loserStopped = true; effects.emitError { updates += "loser error" } }
+            },
+            { effects -> delay(80); effects.updateDuration { updates += "early duration" }; "qualified video" }
+        ), isCurrent = { true }, applyWinner = { updates += it })
+        assertEquals("qualified video", result)
+        assertTrue(loserStopped)
+        assertEquals(listOf("qualified video"), updates)
+        assertEquals(80L, testScheduler.currentTime)
+    }
+
+    @Test fun freshSourceRaceRechecksContextAfterLoserCleanupAndHonorsParentDeadline() = runTest {
+        var current = true
+        var applied = 0
+        val stale = raceFreshPlaybackSources<String>(listOf(
+            { _ -> try { delay(900); "slow" } finally { current = false } },
+            { _ -> delay(10); "ready before logout" }
+        ), isCurrent = { current }, applyWinner = { applied++ })
+        assertNull(stale)
+        assertEquals(0, applied)
+        var stopped = 0
+        val start = testScheduler.currentTime
+        val budget = SourceResolutionBudget(100) { testScheduler.currentTime }
+        val timeout = kotlinx.coroutines.withContext(budget) {
+            withSourceResolutionBudget {
+                raceFreshPlaybackSources<String>(List(2) {
+                    suspend { _: moe.ouom.neriplayer.core.player.runtime.refresh.RefreshResolverSideEffects ->
+                        try { delay(1000); "late" } finally { stopped++ }
+                    }
+                }, isCurrent = { true }, applyWinner = { applied++ })
+            }
+        }
+        assertNull(timeout)
+        assertEquals(2, stopped)
+        assertEquals(0, applied)
+        assertEquals(100L, testScheduler.currentTime - start)
+    }
+
     @Test fun aSelfCancelledParallelSourceCannotLeaveTheReceiverWaitingForItsMissingResult() = runTest {
         val result = racePlaybackSources<String>(listOf(
             { kotlinx.coroutines.currentCoroutineContext()[kotlinx.coroutines.Job]!!.cancel();kotlinx.coroutines.awaitCancellation() },
