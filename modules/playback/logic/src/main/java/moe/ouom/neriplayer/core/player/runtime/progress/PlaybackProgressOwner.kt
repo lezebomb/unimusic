@@ -17,7 +17,8 @@ interface PlaybackProgressPort {
     fun reportedPositionMs(): Long
     fun playerPositionMs(): Long?
     fun playerDurationMs(): Long?
-    fun canBackfillCurrentSongDuration(): Boolean = true
+    fun currentSourceIsPreview(): Boolean = false
+    fun canBackfillCurrentSongDuration(): Boolean = !currentSourceIsPreview()
     fun updateQueuedDurationIfUnknown(song: SongItem, durationMs: Long): Boolean
     fun replaceCurrentSong(song: SongItem)
     fun scheduleImmediateStatePersist()
@@ -93,6 +94,7 @@ class PlaybackProgressOwner(
 
     fun persistLongFormProgress(song: SongItem?, positionMs: Long, durationMs: Long) {
         val current = song ?: return
+        if (port.currentSourceIsPreview() && sameSong(current, port.currentSong())) return
         val effectiveDuration = maxOf(current.durationMs.coerceAtLeast(0L), durationMs.coerceAtLeast(0L))
         val rememberedPosition = resolveLongFormPlaybackPositionForPersistence(
             enabled = port.rememberLongFormEnabled(),

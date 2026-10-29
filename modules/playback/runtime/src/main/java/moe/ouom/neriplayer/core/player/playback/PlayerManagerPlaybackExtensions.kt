@@ -2,6 +2,8 @@
 
 package moe.ouom.neriplayer.core.player.playback
 
+import moe.ouom.neriplayer.core.player.policy.progress.resolvePreviewMediaStartPosition
+
 import moe.ouom.neriplayer.core.player.host.PlayerDependencies
 import moe.ouom.neriplayer.core.player.session.AppQueueSongIdentity
 
@@ -736,6 +738,7 @@ internal fun PlayerManager.playAtIndex(
                         resolvedResumePositionMs,
                         commandSource
                     )
+                    val selectedResumePositionMs = activePlaybackResumePositionMs
                     val selectedCandidate = currentPlaybackCandidate()
                     val selectedUrl = selectedCandidate?.url ?: result.url
                     val selectedAudioInfo = resolvePlaybackAudioInfoForListenTogetherStreamCandidate(
@@ -786,14 +789,14 @@ internal fun PlayerManager.playAtIndex(
                     updateAudioOffloadPreferences("resolved_stream_source")
                     currentMediaUrlResolvedAtMs = SystemClock.elapsedRealtime()
                     scheduleStatePersist(
-                        positionMs = resolvedResumePositionMs,
+                        positionMs = selectedResumePositionMs,
                         shouldResumePlayback = !startPaused
                     )
                     val startPlan = startPlanOverride ?: resolveCurrentPlaybackStartPlan(
                         useTrackTransitionFade = useTrackTransitionFade,
                         useUsbTransitionProtection = useUsbTransitionProtection,
                         forceStartupProtectionFade = forceStartupProtectionFade &&
-                            resolvedResumePositionMs > 0L
+                            selectedResumePositionMs > 0L
                     )
                     preparePlayerForManagedStart(startPlan)
                     resetTrackEndDeduplicationState()
@@ -802,12 +805,14 @@ internal fun PlayerManager.playAtIndex(
                     loadedMediaRequestToken = requestToken
                     pendingMediaLoadActive = false
                     syncExoRepeatMode()
-                    val startPositionMs = pendingSeekPositionOrNull()
-                        ?: resolvedResumePositionMs
-                    if (startPositionMs > 0L) {
-                        player.seekTo(startPositionMs)
-                        _playbackPositionMs.value = startPositionMs
-                    }
+                    val startPositionMs = resolvePreviewMediaStartPosition(
+                        pendingSeekPositionOrNull() ?: selectedResumePositionMs,
+                        selectedCandidate?.isPreviewClip == true || selectedAudioInfo?.isPreviewClip == true,
+                        result.durationMs
+                    )
+                    if (startPositionMs > 0L) player.seekTo(startPositionMs)
+                    _playbackPositionMs.value = startPositionMs
+                    activePlaybackResumePositionMs = startPositionMs
                     resetPlaybackProgressAdvanceBaseline(startPositionMs)
                     clearPendingSeekPosition()
                     player.prepare()

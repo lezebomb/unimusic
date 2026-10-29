@@ -1,0 +1,31 @@
+{
+  "phase": "2BG",
+  "date": "2026-10-30",
+  "uniqueUnitTests": 3,
+  "newTestMethods": 2,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "build": "phase2bg-preview-bookmark-isolation.log: BUILD SUCCESSFUL in 44s",
+  "moduleBoundaries": "passed",
+  "apk": {
+    "archive": "build/outputs/unimusic/UniMusic-20261030-2BG-debug.apk",
+    "version": "ae82d4722eff.dirty.10300552",
+    "sha256": "e41a636550c0afde1d1798f75a6bb3ecf975b153703c17d1b30ea6d2e1770491",
+    "installedThisPhase": false
+  },
+  "implementation": [
+    "Known preview progress cannot overwrite same-song long-form bookmarks from periodic/current/previous-song writes",
+    "Late history resume skips known preview playback",
+    "Initial, refreshed and fallback-candidate loads normalize positions against the preview timeline",
+    "Valid positions inside a known preview duration remain valid; out-of-range or unknown-duration preview restarts from zero",
+    "Full playback resume behavior and existing bookmarks remain intact"
+  ],
+  "limitations": [
+    "A preview fallback candidate without its own duration conservatively restarts at zero",
+    "No device bookmark/preview/refresh/failure injection or full-audio acceptance",
+    "No user bookmarks or old metadata bulk-reset"
+  ],
+  "data": "Room v23 and stored progress schema unchanged",
+  "ci": "New preview-prefixed cases reuse 2BE selector; local commit first, push after required 2BE CI completes"
+}

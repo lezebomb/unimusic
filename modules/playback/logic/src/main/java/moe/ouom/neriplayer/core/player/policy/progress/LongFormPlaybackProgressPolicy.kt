@@ -47,3 +47,11 @@ fun resolveLongFormPlaybackPositionForPersistence(
         it >= LONG_FORM_PLAYBACK_MIN_RESUME_POSITION_MS
     }
 }
+
+/** A full-recording bookmark is outside a preview timeline; retain only proven in-clip positions. */
+fun resolvePreviewMediaStartPosition(requestedPositionMs: Long, isPreview: Boolean, previewDurationMs: Long?): Long {
+    val position = requestedPositionMs.coerceAtLeast(0L)
+    if (!isPreview) return position
+    val duration = previewDurationMs?.takeIf { it > 0L } ?: return 0L
+    return position.takeIf { it < duration } ?: 0L
+}

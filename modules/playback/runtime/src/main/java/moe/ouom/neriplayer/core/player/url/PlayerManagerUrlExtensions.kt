@@ -2,6 +2,8 @@
 
 package moe.ouom.neriplayer.core.player.url
 
+import moe.ouom.neriplayer.core.player.policy.progress.resolvePreviewMediaStartPosition
+
 import moe.ouom.neriplayer.core.player.host.PlayerDependencies
 import moe.ouom.neriplayer.core.player.network.holdPlaybackForNetworkIfOffline
 import moe.ouom.neriplayer.core.player.network.isPlaybackNetworkUsable
@@ -1335,7 +1337,7 @@ private suspend fun PlayerManager.applyResolvedMediaItem(
         if (!gate.runMutation { loadedMediaRequestToken = semantics.requestGeneration }) return@withContext
         if (!gate.runMutation { pendingMediaLoadActive = false }) return@withContext
         if (!gate.runMutation { syncExoRepeatMode() }) return@withContext
-        val startPositionMs = resolveRefreshedMediaStartPosition(
+        val requestedStartPositionMs = resolveRefreshedMediaStartPosition(
             pendingSeekPositionMs = pendingSeekPositionOrNull(),
             requestedResumePositionMs = resumePositionMs,
             observedPlaybackPositionMs = _playbackPositionMs.value,
@@ -1343,13 +1345,14 @@ private suspend fun PlayerManager.applyResolvedMediaItem(
             currentPositionGeneration = playbackPositionGeneration,
             observedPositionBelongsToRequestedMedia = observedPositionBelongsToRequestedMedia
         )
-        if (startPositionMs > 0) {
-            if (!gate.runMutation {
-                    player.seekTo(startPositionMs)
-                    _playbackPositionMs.value = startPositionMs
-                }
-            ) return@withContext
-        }
+        val startPositionMs = resolvePreviewMediaStartPosition(requestedStartPositionMs,
+            selectedCandidate?.isPreviewClip == true || selectedAudioInfo?.isPreviewClip == true, result.durationMs)
+        if (!gate.runMutation {
+                if (startPositionMs > 0) player.seekTo(startPositionMs)
+                _playbackPositionMs.value = startPositionMs
+                activePlaybackResumePositionMs = startPositionMs
+            }
+        ) return@withContext
         if (!gate.runMutation { resetPlaybackProgressAdvanceBaseline(startPositionMs) }) return@withContext
         if (!gate.runMutation { clearPendingSeekPosition() }) return@withContext
         if (!gate.runMutation { player.prepare() }) return@withContext

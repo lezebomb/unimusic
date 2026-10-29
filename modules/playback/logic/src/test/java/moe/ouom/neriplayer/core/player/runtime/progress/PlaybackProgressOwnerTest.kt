@@ -3,6 +3,7 @@ package moe.ouom.neriplayer.core.player.runtime.progress
 
 
 import moe.ouom.neriplayer.data.model.SongItem
+import moe.ouom.neriplayer.core.player.policy.progress.resolvePreviewMediaStartPosition
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
@@ -49,6 +50,36 @@ class PlaybackProgressOwnerTest {
         assertEquals(1_200_000L, port.current?.durationMs)
         assertEquals(1, port.queueUpdates)
         assertEquals(1, port.immediatePersists)
+    }
+
+    @Test fun previewProgressCannotReplaceAFullLongFormBookmark() {
+        val long = song(1, 1_800_000)
+        val port = RecordingPort().apply {
+            current = long; preview = true; playerDuration = 20_000; reportedPosition = 8_000; remembered = 900_000
+        }
+        val owner = PlaybackProgressOwner(port, { a, b -> a.id == b?.id }) { 15_000 }
+        owner.onCurrentSongPublished(long)
+        owner.persistCurrentLongFormProgress()
+        owner.persistPeriodicLongFormProgress(8_000, 5_000)
+        owner.persistPreviousSongProgress(long, song(2, 1_800_000))
+        assertTrue(port.persisted.isEmpty())
+        assertEquals(900_000L, port.remembered)
+        port.preview = false; port.reportedPosition = 901_000; port.playerDuration = 1_800_000
+        owner.persistCurrentLongFormProgress()
+        assertEquals(listOf(long.id to 901_000L), port.persisted)
+        port.preview = true; port.reportedPosition = 8_000
+        owner.persistCurrentLongFormProgress()
+        assertEquals(1, port.persisted.size)
+    }
+
+    @Test fun previewMediaStartRejectsFullBookmarksButPreservesValidClipPositions() {
+        assertEquals(0L, resolvePreviewMediaStartPosition(900_000, true, 20_000))
+        assertEquals(0L, resolvePreviewMediaStartPosition(20_000, true, 20_000))
+        assertEquals(5_000L, resolvePreviewMediaStartPosition(5_000, true, 20_000))
+        assertEquals(0L, resolvePreviewMediaStartPosition(5_000, true, null))
+        assertEquals(0L, resolvePreviewMediaStartPosition(-1, true, 20_000))
+        assertEquals(900_000L, resolvePreviewMediaStartPosition(900_000, false, 20_000))
+        assertEquals(5_000L, resolvePreviewMediaStartPosition(5_000, false, 20_000))
     }
 
     @Test fun previewDurationUpdatesTransportWithoutInventingUnknownRecordingMetadata() {
@@ -211,6 +242,7 @@ class PlaybackProgressOwnerTest {
         var reportedPosition = 0L
         var playerDuration: Long? = null
         var mayBackfill = true
+        var preview = false
         var remembered = 0L
         var rememberEnabled = true
         var queuedChanged = true
@@ -228,7 +260,8 @@ class PlaybackProgressOwnerTest {
         override fun reportedPositionMs(): Long = reportedPosition
         override fun playerPositionMs(): Long? = reportedPosition
         override fun playerDurationMs(): Long? = playerDuration
-        override fun canBackfillCurrentSongDuration(): Boolean = mayBackfill
+        override fun currentSourceIsPreview(): Boolean = preview
+        override fun canBackfillCurrentSongDuration(): Boolean = mayBackfill && !preview
         override fun updateQueuedDurationIfUnknown(song: SongItem, durationMs: Long): Boolean {
             queueUpdates++
             return queuedChanged

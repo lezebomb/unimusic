@@ -33,6 +33,7 @@ internal fun PlayerManager.resumeLongFormWhenHistoryLoads(
     mainScope.launch {
         if (!history.awaitHistoryLoaded()) return@launch
         if (playbackPositionGeneration != positionGeneration) return@launch
+        if (PlayerManagerPlaybackProgressPort.currentSourceIsPreview()) return@launch
         val currentPositionMs = playbackPositionFlow.value
         val rememberedPositionMs = resolveRememberedLongFormPlaybackStartPosition(
             song = song,

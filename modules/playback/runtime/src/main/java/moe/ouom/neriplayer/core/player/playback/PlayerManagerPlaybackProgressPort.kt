@@ -34,9 +34,9 @@ internal object PlayerManagerPlaybackProgressPort : PlaybackProgressPort {
         return PlayerManager.player.durationMsOrZero
     }
 
-    override fun canBackfillCurrentSongDuration(): Boolean =
-        PlayerManager.currentPlaybackCandidate()?.isPreviewClip != true &&
-            PlayerManager.currentPlaybackAudioInfoFlow.value?.isPreviewClip != true
+    override fun currentSourceIsPreview(): Boolean =
+        PlayerManager.currentPlaybackCandidate()?.isPreviewClip == true ||
+            PlayerManager.currentPlaybackAudioInfoFlow.value?.isPreviewClip == true
 
     override fun updateQueuedDurationIfUnknown(song: SongItem, durationMs: Long): Boolean =
         PlayerManager.updateQueuedSong(song) { queued ->

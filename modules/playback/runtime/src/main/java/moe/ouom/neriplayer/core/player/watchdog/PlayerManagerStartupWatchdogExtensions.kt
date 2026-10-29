@@ -22,6 +22,7 @@ import moe.ouom.neriplayer.core.player.playback.startProgressUpdates
 import moe.ouom.neriplayer.data.model.playback.PlaybackCommandSource
 import moe.ouom.neriplayer.core.player.policy.command.resolvePlaybackStartPlan
 import moe.ouom.neriplayer.core.player.policy.progress.hasPlaybackProgressAdvancedSinceBaseline
+import moe.ouom.neriplayer.core.player.policy.progress.resolvePreviewMediaStartPosition
 import moe.ouom.neriplayer.core.player.runtime.refresh.YouTubePlaybackRecoveryStrategy
 import moe.ouom.neriplayer.core.player.url.YOUTUBE_STABLE_RECOVERY_QUALITY
 import moe.ouom.neriplayer.core.player.url.currentPlaybackCacheKeyForRecovery
@@ -43,7 +44,8 @@ internal fun PlayerManager.configureActivePlaybackCandidates(
 ) {
     activePlaybackCandidates = result.playbackCandidates()
     activePlaybackUrlIndex = 0
-    activePlaybackResumePositionMs = resumePositionMs.coerceAtLeast(0L)
+    activePlaybackResumePositionMs = resolvePreviewMediaStartPosition(resumePositionMs,
+        result.isPreviewClip || result.audioInfo?.isPreviewClip == true, result.durationMs)
     activePlaybackCommandSource = commandSource
     if (resetRecoveryAttempts) {
         startupStallRecoveryAttempts = 0
@@ -476,6 +478,9 @@ private suspend fun PlayerManager.applyPlaybackCandidate(
         shouldApplyMutation = { requestToken == playbackRequestToken }
     )
     if (requestToken != playbackRequestToken) return
+    val selectedStartPositionMs = resolvePreviewMediaStartPosition(resumePositionMs,
+        candidate.isPreviewClip || selectedAudioInfo?.isPreviewClip == true, null)
+    activePlaybackResumePositionMs = selectedStartPositionMs
     _currentPlaybackAudioInfo.value = selectedAudioInfo
     updateAudioOffloadPreferences("playback_candidate_source")
     val mediaItem = buildMediaItem(
@@ -492,21 +497,19 @@ private suspend fun PlayerManager.applyPlaybackCandidate(
     loadedMediaRequestToken = requestToken
     pendingMediaLoadActive = false
     syncExoRepeatMode()
-    if (resumePositionMs > 0L) {
-        player.seekTo(resumePositionMs)
-        _playbackPositionMs.value = resumePositionMs
-    }
+    if (selectedStartPositionMs > 0L) player.seekTo(selectedStartPositionMs)
+    _playbackPositionMs.value = selectedStartPositionMs
     if (!recoveryReason.startsWith("runtime_stall")) {
         resetPlaybackRuntimeWatchdog(reason = "candidate_applied")
     }
-    resetPlaybackProgressAdvanceBaseline(resumePositionMs)
+    resetPlaybackProgressAdvanceBaseline(selectedStartPositionMs)
     clearPendingSeekPosition()
     _currentMediaUrl.value = candidate.url
     currentMediaUrlResolvedAtMs = SystemClock.elapsedRealtime()
     player.prepare()
     startPlayerPlaybackWithFade(resolvePlaybackStartPlan(shouldFadeIn = false, fadeDurationMs = 0L))
     startProgressUpdates()
-    scheduleStatePersist(positionMs = resumePositionMs, shouldResumePlayback = true)
+    scheduleStatePersist(positionMs = selectedStartPositionMs, shouldResumePlayback = true)
     schedulePlaybackStartupWatchdog(reason = "candidate_switch")
 }
 
