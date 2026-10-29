@@ -1,0 +1,16 @@
+{
+  "stage": "2BP",
+  "localTests": {
+    "class": "BiliStreamCredentialInterceptorTest",
+    "tests": 2,
+    "failures": 0
+  },
+  "moduleBoundaries": "passed",
+  "build": "BUILD SUCCESSFUL in 45s",
+  "apk": "build/outputs/unimusic/UniMusic-20261030-2BP-debug.apk",
+  "versionName": "7561fcdf112d.dirty.10300741",
+  "sha256": "4e59a43c6525efa0e9d79e1f47c3007d4956669e6f7ac73d142cd01876de17ab",
+  "deviceValidation": "not installed again; current phone observations remain older3K package",
+  "realAccountValidation": "not run; synthetic normal API and redirect requests only",
+  "remoteCI": "Hold commit until prior mandatory 2BO workflow40974329323 finishes; existing interceptor selector covers new case"
+}

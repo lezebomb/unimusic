@@ -26,10 +26,11 @@
 | [3K稳定跳过采样](PHASE_3K_STABLE_SKIP_EVIDENCE.md) | 1新/共3 JVM、边界、Debug39s；暂停/恢复2秒内不推断不喜欢，含累计包设备观察 | 78f785e9已push，CI40972945541含新用例SUCCESS |
 | [2BN浅克隆CI](PHASE_2BN_CI_SHALLOW_BASE.md) | 3 Python/4.077s与YAML解析通过；精确补base，失败保守回退；无重复APK构建 | 281d0b29已push，CI40972945541含Android SUCCESS |
 | [2BO继承请求头](PHASE_2BO_INHERITED_STREAM_CREDENTIALS.md) | 1新/共2 JVM、边界/YAML、Debug1m37s；分段继承B站凭据也按实际目标过滤，补CI路径 | 本检查点所在提交，等待新累计CI |
+| [2BP正常API鉴权](PHASE_2BP_BILI_API_AUTH_BOUNDARY.md) | 1新/共2 JVM、边界、Debug45s；自身HTTPS API正常鉴权与外部去凭据兼容 | 本检查点所在提交，先保存等2BO必要CI |
 
 最新CI40972945541（281d0b29，含分层恢复/3K/2BN）整体、平台依赖及Android无损迁移SUCCESS。实际XML网络防护1、平台域名3/头1、runtime注入2、ArtistIntent12、FeedbackTracker4、增量迁移1/升级3均0失败/跳过，见ci-40972945541.json。此前40969263368失败记录保留，不冒充成功；2BO新子请求及工作流路径修改待下一累计CI，配置安全输入仍须迁移完成。
 
-最新构建：`build/outputs/unimusic/UniMusic-20261030-2BO-debug.apk`，版本`281d0b29afa9.dirty.10300729`，SHA-256 `c01333d29c1b24e241277447c7d3d0c8c855a0f37847c550cf5eaf73e5a0cc64`。2 JVM/边界/YAML及Debug1m37s通过，无本地Gradle。设备仍是此前3K包`67338ee336f5.dirty.10300656`，最终自身state2/75992ms已暂停；未再次安装新拦截器包。
+最新构建：`build/outputs/unimusic/UniMusic-20261030-2BP-debug.apk`，版本`7561fcdf112d.dirty.10300741`，SHA-256 `4e59a43c6525efa0e9d79e1f47c3007d4956669e6f7ac73d142cd01876de17ab`。2 JVM/边界及Debug45s通过，无本地Gradle。2BO的必要CI40974329323仍在运行，先等完成再push。设备仍是前3K包，最终已暂停；未再安装这些头部改动。
 
 ## 此前已完成，不重做
 
@@ -63,4 +64,4 @@
 
 `unimusic-10-30-05-30`已在正确日期触发并删除，无剩余UniMusic定时计划；不新建每日循环。
 
-2BM分层恢复/3K/2BN均已独立commit/push并远端通过。2BO本地源码与验证已完成，本次独立提交；等待新的必需CI，勿因后续推送提前取消。
+2BM分层恢复/3K/2BN均已独立commit/push并远端通过。2BO已push且必要CI40974329323运行中；2BP在共享客户端上补自身API鉴权回归，先独立保存，不取消前一必要CI。

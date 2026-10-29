@@ -11,9 +11,11 @@ class BiliStreamCredentialInterceptor : Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
         val request = chain.request()
         val original = chain.call().request()
-        val biliScoped = isBiliStreamUrl(original.url.toString()) ||
+        val biliScoped = isBiliStreamUrl(original.url.toString()) || isBiliWebHost(original.url.host) ||
             hasBiliCredentialScope(original) || hasBiliCredentialScope(request)
-        if (!biliScoped || (request.url.isHttps && isBiliStreamUrl(request.url.toString()))) {
+        val trustedDestination = request.url.isHttps && request.url.username.isEmpty() && request.url.password.isEmpty() &&
+            (isBiliStreamUrl(request.url.toString()) || isBiliWebHost(request.url.host))
+        if (!biliScoped || trustedDestination) {
             return chain.proceed(request)
         }
         return chain.proceed(request.newBuilder()
@@ -23,9 +25,11 @@ class BiliStreamCredentialInterceptor : Interceptor {
 
 private val BILI_COOKIE_NAMES = setOf("SESSDATA", "bili_jct", "DedeUserID", "DedeUserID__ckMd5", "buvid3", "buvid4")
 
+private fun isBiliWebHost(host: String): Boolean = host == "bilibili.com" || host.endsWith(".bilibili.com")
+
 private fun hasBiliCredentialScope(request: Request): Boolean {
     val refererHost = request.header("Referer")?.toHttpUrlOrNull()?.host.orEmpty()
-    if (refererHost == "bilibili.com" || refererHost.endsWith(".bilibili.com")) return true
+    if (isBiliWebHost(refererHost)) return true
     return listOf("Cookie", "Cookie2").any { header -> request.headers.values(header).any { value ->
         value.split(';').any { it.substringBefore('=').trim() in BILI_COOKIE_NAMES }
     } }

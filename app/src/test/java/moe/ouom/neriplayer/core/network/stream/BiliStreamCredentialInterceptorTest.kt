@@ -22,6 +22,22 @@ class BiliStreamCredentialInterceptorTest {
         assertEquals("synthetic-cookie", sent("https://cloud.example/a", "https://cloud.example/b").header("Cookie"))
     }
 
+    @Test fun normalBiliApiAuthenticationSurvivesTrustedTlsButNotExternalOrCleartextRedirects() {
+        val api = "https://api.bilibili.com/x/web-interface/nav"
+        val headers = mapOf("Cookie" to "SESSDATA=synthetic-session; bili_jct=synthetic-csrf")
+        for (destination in listOf(api, "https://passport.bilibili.com/x/passport-login/web/cookie/info")) {
+            val trusted = sent(api, destination, headers)
+            assertEquals(headers["Cookie"], trusted.header("Cookie"))
+            assertEquals("synthetic-auth", trusted.header("Authorization"))
+        }
+        for (destination in listOf("https://api.bilibili.com.external.example/nav", "http://api.bilibili.com/nav")) {
+            val blocked = sent(api, destination, headers)
+            for (header in listOf("Cookie", "Cookie2", "Authorization")) assertNull(blocked.header(header))
+            // Origin scope also protects an unusual cookie name, before any authenticated session exists.
+            assertNull(sent(api, destination, mapOf("Cookie" to "synthetic-bootstrap=1")).header("Cookie"))
+        }
+    }
+
     @Test fun inheritedSegmentRequestsCannotForwardBiliCookiesToAnotherOrigin() {
         val child = "https://segments.example/audio.ts"
         for (headers in listOf(
