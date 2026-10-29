@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="moe.ouom.neriplayer.core.player.runtime.stats.PlaybackStatsOwnerTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-10-29T04:36:56.297Z" hostname="XUSHAOYANG" time="0.411">
+<testsuite name="moe.ouom.neriplayer.core.player.runtime.stats.PlaybackStatsOwnerTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-10-29T04:36:56.297Z" hostname="local" time="0.411">
   <properties/>
   <testcase name="feedback follows the confirmed owner and never startup waiting" classname="moe.ouom.neriplayer.core.player.runtime.stats.PlaybackStatsOwnerTest" time="0.361"/>
   <testcase name="feedback follows a fresh cycle after the same song switches between preview and full audio" classname="moe.ouom.neriplayer.core.player.runtime.stats.PlaybackStatsOwnerTest" time="0.012"/>
