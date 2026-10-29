@@ -1,0 +1,17 @@
+{
+  "stage": "2BO",
+  "localTests": {
+    "class": "BiliStreamCredentialInterceptorTest",
+    "tests": 2,
+    "failures": 0
+  },
+  "build": "BUILD SUCCESSFUL in 1m 37s",
+  "moduleBoundaries": "passed",
+  "workflowYaml": "parsed",
+  "apk": "build/outputs/unimusic/UniMusic-20261030-2BO-debug.apk",
+  "versionName": "281d0b29afa9.dirty.10300729",
+  "sha256": "c01333d29c1b24e241277447c7d3d0c8c855a0f37847c550cf5eaf73e5a0cc64",
+  "credentialsAndNetwork": "Synthetic intercepted Request fixtures only; no external service or real account credentials used",
+  "deviceValidation": "This exact artifact not installed; prior3K device sample remains paused",
+  "remoteCI": "Previous cumulative40972945541 including migration succeeded; new guard case/path routing pending next workflow"
+}

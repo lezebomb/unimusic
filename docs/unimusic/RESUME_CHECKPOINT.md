@@ -22,13 +22,14 @@
 | [2BK名称边界](PHASE_2BK_ARTIST_NAME_BOUNDARIES.md) | 1新/共3 JVM、边界、Debug44s；名称有序边界、明确别名及作品共识 | e2ac4ec7已push |
 | [3J正向歌手亲和度](PHASE_3J_POSITIVE_ARTIST_AFFINITY.md) | 1新/共4 JVM、边界、Debug51s；累计试听统计不再间接加分喜好，算法v6 | e5cca5d2已push，CI40967228048含Android SUCCESS |
 | [2BL跨语言版本](PHASE_2BL_PERFORMANCE_VERSION_LABELS.md) | 2新/共3 JVM、边界、Debug49s；日文/繁体演绎、Off Vocal版本证据 | 47d54c19已commit，随2BM一起push |
-| [2BM流凭据边界](PHASE_2BM_BILI_STREAM_CREDENTIAL_BOUNDARIES.md) | 4不同JVM最终均通过（含1次测试桩修复）、边界、Debug成功；HTTPS/严格域名与重定向去凭据 | 67338ee3已push；分层恢复96415c15已本地通过并commit |
-| [3K稳定跳过采样](PHASE_3K_STABLE_SKIP_EVIDENCE.md) | 1新/共3 JVM、边界、Debug39s；暂停/恢复2秒内不推断不喜欢，含累计包设备观察 | 78f785e9已commit，随本阶段一起push |
-| [2BN浅克隆CI](PHASE_2BN_CI_SHALLOW_BASE.md) | 3 Python/4.077s与YAML解析通过；精确补base，失败保守回退；无重复APK构建 | 本检查点所在提交，连同分层恢复/3K一起push |
+| [2BM流凭据边界](PHASE_2BM_BILI_STREAM_CREDENTIAL_BOUNDARIES.md) | 4不同JVM最终均通过（含1次测试桩修复）、边界、Debug成功；HTTPS/严格域名与重定向去凭据 | 分层恢复96415c15已push，CI40972945541整体SUCCESS |
+| [3K稳定跳过采样](PHASE_3K_STABLE_SKIP_EVIDENCE.md) | 1新/共3 JVM、边界、Debug39s；暂停/恢复2秒内不推断不喜欢，含累计包设备观察 | 78f785e9已push，CI40972945541含新用例SUCCESS |
+| [2BN浅克隆CI](PHASE_2BN_CI_SHALLOW_BASE.md) | 3 Python/4.077s与YAML解析通过；精确补base，失败保守回退；无重复APK构建 | 281d0b29已push，CI40972945541含Android SUCCESS |
+| [2BO继承请求头](PHASE_2BO_INHERITED_STREAM_CREDENTIALS.md) | 1新/共2 JVM、边界/YAML、Debug1m37s；分段继承B站凭据也按实际目标过滤，补CI路径 | 本检查点所在提交，等待新累计CI |
 
-此前必要CI均已SUCCESS。最新已核实CI40967228048（e5cca5d2，含2BJ/2BK/3J）整体及Android无损迁移SUCCESS；实际XML ArtistIntent11、RecordingMatch10、Ranker9、DailyStore8、增量迁移1/升级3均0失败/跳过。摘要见evidence/2026-10-30/ci-40967228048.json。2BL/2BM已push；CI40969263368在平台依赖检查失败，迁移跳过。分层恢复已本地3 JVM+平台依赖0违规+Debug通过，待新累计CI。
+最新CI40972945541（281d0b29，含分层恢复/3K/2BN）整体、平台依赖及Android无损迁移SUCCESS。实际XML网络防护1、平台域名3/头1、runtime注入2、ArtistIntent12、FeedbackTracker4、增量迁移1/升级3均0失败/跳过，见ci-40972945541.json。此前40969263368失败记录保留，不冒充成功；2BO新子请求及工作流路径修改待下一累计CI，配置安全输入仍须迁移完成。
 
-最新构建：`build/outputs/unimusic/UniMusic-20261030-2BM-network-layer-debug.apk`，版本`67338ee336f5.dirty.10300715`，SHA-256 `62ef789e2c6bd2b85f296bbd7c6f031435fa126bdf74d764ebb41646cf939b10`。平台依赖17域0违规，3 JVM及Debug2m31s通过。无本地Gradle运行。手机已保留数据安装此前3K包`67338ee336f5.dirty.10300656`，最终自身媒体state2/75992ms，已暂停；新分层修复包未再安装。
+最新构建：`build/outputs/unimusic/UniMusic-20261030-2BO-debug.apk`，版本`281d0b29afa9.dirty.10300729`，SHA-256 `c01333d29c1b24e241277447c7d3d0c8c855a0f37847c550cf5eaf73e5a0cc64`。2 JVM/边界/YAML及Debug1m37s通过，无本地Gradle。设备仍是此前3K包`67338ee336f5.dirty.10300656`，最终自身state2/75992ms已暂停；未再次安装新拦截器包。
 
 ## 此前已完成，不重做
 
@@ -55,11 +56,11 @@
 
 ## 接下来
 
-1. 核对本阶段push后的最新累计CI，特别是2BM移动网络层后的单测/依赖0违规及必要Android迁移；下载实际XML，准确记录失败/恢复。
+1. 本阶段push后核对2BO累计CI，新增继承头用例和必要Android迁移均需完成；前一分层恢复、3K和2BN已远端通过。
 2. 下载路径已查到明确试听拒绝及现有回归，不重做。2BJ已修复未知署名、2BK已补名称边界、3J已隔离统计与亲和度；2BL已补跨语言版本；2BM已补流凭据边界；可接着优化CI浅克隆缺base导致的不必要全量迁移检查（保守fallback不能去掉）；NPLogger已脱敏，勿导出真实秘密验证。
 3. 设备重新在线后仅做必要、保留数据的本地验收，明确试听与完整版差别；不为测试修改真实账号/清除用户书签或偏好。
 4. 继续高价值来源/匹配/推荐后台，按实际结果更新此短检查点，每阶段commit/push。
 
 `unimusic-10-30-05-30`已在正确日期触发并删除，无剩余UniMusic定时计划；不新建每日循环。
 
-2BM分层恢复96415c15、3K采样78f785e9与2BN工具分为独立提交，本阶段一并push。工作流和scope为安全输入，新的累计CI必须完成实际单测/依赖检查及Android迁移，勿提前取消。纯CI阶段没有重建或重装APK。
+2BM分层恢复/3K/2BN均已独立commit/push并远端通过。2BO本地源码与验证已完成，本次独立提交；等待新的必需CI，勿因后续推送提前取消。

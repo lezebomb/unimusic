@@ -47,6 +47,8 @@ on:
       - 'config/quality/domain-dependencies.json'
       - 'app/src/main/java/moe/ouom/neriplayer/NeriPlayerApplication.kt'
       - 'app/src/main/java/moe/ouom/neriplayer/core/di/AppContainer.kt'
+      - 'app/src/main/java/moe/ouom/neriplayer/core/network/stream/**'
+      - 'app/src/test/java/moe/ouom/neriplayer/core/network/stream/**'
       - '.github/workflows/unimusic_smoke.yml'
   workflow_dispatch:
 
@@ -72,8 +74,9 @@ jobs:
           SCOPE_BASE: ${{ github.event.before }}
           SCOPE_HEAD: ${{ github.sha }}
         run: |
+          set -o pipefail
           python3 -B -m unittest discover -s tools_pub/unimusic -p test_ci_scope.py
-          python3 tools_pub/unimusic/ci_scope.py --fetch-missing-base --base "$SCOPE_BASE" --head "$SCOPE_HEAD" >> "$GITHUB_OUTPUT"
+          python3 tools_pub/unimusic/ci_scope.py --fetch-missing-base --base "$SCOPE_BASE" --head "$SCOPE_HEAD" | tee -a "$GITHUB_OUTPUT"
       - uses: actions/setup-java@v4
         with:
           distribution: temurin

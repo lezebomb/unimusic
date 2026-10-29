@@ -1,0 +1,51 @@
+{
+  "runId": 40972945541,
+  "head": "281d0b29afa9f08a281e2a2d4d83f307d391ba08",
+  "conclusion": "success",
+  "androidAdditiveMigration": "success",
+  "mandatoryDomainCheck": "success",
+  "actualXmlSummary": {
+    "BiliStreamCredentialInterceptorTest": {
+      "tests": 1,
+      "failures": 0,
+      "skipped": 0
+    },
+    "BiliStreamCredentialPolicyTest": {
+      "tests": 1,
+      "failures": 0,
+      "skipped": 0
+    },
+    "BiliStreamUrlsTest": {
+      "tests": 3,
+      "failures": 0,
+      "skipped": 0
+    },
+    "ConditionalHttpRequestHeaderInjectionTest": {
+      "tests": 2,
+      "failures": 0,
+      "skipped": 0
+    },
+    "DatabaseUpgradeInstrumentedTest": {
+      "tests": 3,
+      "failures": 0,
+      "skipped": 0
+    },
+    "ExploreSearchArtistIntentTest": {
+      "tests": 12,
+      "failures": 0,
+      "skipped": 0
+    },
+    "PlaybackFeedbackTrackerTest": {
+      "tests": 4,
+      "failures": 0,
+      "skipped": 0
+    },
+    "UnifiedLibraryMigrationTest": {
+      "tests": 1,
+      "failures": 0,
+      "skipped": 0
+    }
+  },
+  "deduplication": "Class and test name; Android preserved copies counted once",
+  "limits": "Covers 2BM architecture recovery,3K,2BN; subsequent 2BO excluded; no real Bili credential forwarding test"
+}
