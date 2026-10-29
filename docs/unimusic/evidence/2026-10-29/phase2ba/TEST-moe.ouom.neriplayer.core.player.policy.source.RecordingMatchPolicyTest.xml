@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="moe.ouom.neriplayer.core.player.policy.source.RecordingMatchPolicyTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-10-29T01:50:20.538Z" hostname="XUSHAOYANG" time="0.192">
+  <properties/>
+  <testcase name="explicitSyntheticAliasCanMatchItsOwnVersionButNeverOriginalOrHumanCover" classname="moe.ouom.neriplayer.core.player.policy.source.RecordingMatchPolicyTest" time="0.13"/>
+  <testcase name="versionWordsInsideTheActualTitleCannotHideAnAddedVersionLabel" classname="moe.ouom.neriplayer.core.player.policy.source.RecordingMatchPolicyTest" time="0.046"/>
+  <testcase name="djVariantLabelsNeverBecomeStudioByKeepingTheOriginalArtistCredit" classname="moe.ouom.neriplayer.core.player.policy.source.RecordingMatchPolicyTest" time="0.005"/>
+  <testcase name="explicitSyntheticVocalsCannotPassAsTheOriginalOrAHumanCover" classname="moe.ouom.neriplayer.core.player.policy.source.RecordingMatchPolicyTest" time="0.003"/>
+  <testcase name="sameVersionAndCosmeticDifferencesCanMatch" classname="moe.ouom.neriplayer.core.player.policy.source.RecordingMatchPolicyTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

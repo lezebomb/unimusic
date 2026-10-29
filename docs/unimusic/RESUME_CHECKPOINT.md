@@ -4,11 +4,19 @@
 
 **当前优先级：按最新用户要求弃用QQ音乐和YouTube音源，完善其余来源、搜索与推荐。** 保留已登录的Google/网易云及既有两份共5首导入，不重新登录/收验证码或重导全部歌单。YouTube实际音频仍未接通，其他来源/实际播放范围看2L/2M/2P报告，不扩大结论。
 
+## 当前2BA已验证：版本词、跨源录音与滚动锚点
+
+最新版已完成Bootleg/Rework/制作人合作Booty、中英混合Live版/Cover版/Remix版/DJ版及Mash Up格式识别；AI版本仍严格区分。其他Catalog需与最多64条网易云具体录音的标题/完整署名/时长/版本核对才升入歌手优先层，不能凭同名歌手或地址返回抢前。后台列表采用滚动生命周期跟踪，保持未手动滚动用户的真正顶部，真实手动滑动后保留其锚点。见[2BA](PHASE_2BA_RECORDING_EVIDENCE_AND_SEARCH_ANCHOR.md)。
+
+8项相关本地检查通过：版本/合成人声5、录音/作品排序2、Compose迟到布局/真实swipe1。最终日志phase2ba-final-scroll-owner-pass.log成功3m38s，领域0违规/最终边界/YAML通过。Mate60最终保留数据装机d22ab429bcb3.dirty.10291014；哭泣少女乐队后台完成后两关联乐队/雑踏、僕らの街/Cycle Of Sorrow仍在真正顶部，无手动滚动。Adele稳定结果另存evidence。无新音频，播放器暂停。中间Booty/Mash Up/第12和46行误锚状态明确保留；单次位置捕获未成功，最终滚动所有者已改好。
+
+当前无运行中Gradle。最终APK build/outputs/unimusic/UniMusic-20261029-2BA-debug.apk，哈希见报告，Room v23/账号歌单保留。2AZ d22ab429已推送且远端40800774427整体SUCCESS，3项JDK21用例已读取XML确认；不用重跑/下载。本阶段commit/push和最新CI以git log/Actions实际结果为准，下一步检查2BA远端失败范围并恢复，不把未完成CI写成功。
+
 ## 当前2AZ已验证试听标识
 
 已完成持续“仅提供试听”、缓存状态传递、完整共享流切换时清理旧试听标识；停用QQ/YT检查明确DISABLED。3项相关本地JVM、领域0违规/边界、最终Debug57s通过。Mate60保留数据安装a4f4f35c3c29.dirty.10290921；哭泣少女乐队查询仍有两乐队在前，20秒及随后30秒片段实际显示持续试听提示，最后暂停。不是完整版验收。见[2AZ](PHASE_2AZ_PERSISTENT_PREVIEW_NOTICE.md)。
 
-2AY a4f4f35c已commit/push；远端40798661454的Room 8+2项均通过，但旧QQ启用断言1项失败。2AZ已修并本机通过对应1项，下一步检查2AZ远端结果；3项缓存/解析/共享的JDK21用例只接入CI，本机无JDK21未执行。临时尝试运行纯runtime检查仍被固定21启动器拒绝，勿再重复尝试/下载。当前无运行中Gradle；最终包build/outputs/unimusic/UniMusic-20261029-2AZ-debug.apk，精确哈希见报告。不要把失败CI写成成功。
+2AY a4f4f35c已commit/push；远端40798661454的Room 8+2项均通过，但旧QQ启用断言1项失败。2AZ已修并本机通过对应1项，远端40800774427整体成功，3项缓存/解析/共享已读取XML确认通过；本机无JDK21未执行。临时尝试运行纯runtime检查仍被固定21启动器拒绝，勿再重复尝试/下载。当前无运行中Gradle；最终包build/outputs/unimusic/UniMusic-20261029-2AZ-debug.apk，精确哈希见报告。不要把失败CI写成成功。
 
 ## 当前2AY已验证搜索修复
 
@@ -24,7 +32,8 @@ Mate60最终包ee5c26c1f592.dirty.10290859已保留数据安装并核实版本�
 
 | 最新阶段 | 实际验证与边界 |
 | --- | --- |
-| [2AZ持续试听](PHASE_2AZ_PERSISTENT_PREVIEW_NOTICE.md) | 本地3 JVM/Debug/保留数据安装，20秒与30秒片段持续提示；runtime 3项待远端JDK21，2AY旧QQ启用断言已修 |
+| [2BA录音/重排](PHASE_2BA_RECORDING_EVIDENCE_AND_SEARCH_ANCHOR.md) | 8相关本地检查/Debug/装机，原词稳定顶部；2AZ远端成功，2BA远端待查 |
+| [2AZ持续试听](PHASE_2AZ_PERSISTENT_PREVIEW_NOTICE.md) | 本地3 JVM/Debug/保留数据安装，20秒与30秒片段持续提示；runtime 3项已在40800774427通过，2AY旧QQ启用断言已修 |
 | [2AY歌手/作品意图](PHASE_2AY_ARTIST_AND_WORK_SEARCH.md) | 8相关JVM/领域0违规/边界/Debug/保留数据安装，实际乐队查询结果修正；选中曲仅20秒试听，不是完整版 |
 | [2AX可用来源/推荐合唱](PHASE_2AX_ACTIVE_SOURCES_AND_RECOMMENDATION_CREDITS.md) | 按用户要求停用QQ/YT但保留数据，本地推荐v4合唱偏好/成员多样性；新增3/共10 JVM、领域0违规/边界/Debug/保留数据安装及搜索/账号入口检查；乐队查询翻唱已在2AY修正 |
 | [2AW网易云搜索可播性](PHASE_2AW_NETEASE_SEARCH_AUDIO_CHECKS.md) | 网易云加入限量后台检查/同版本排序/状态标签；新1/共2 JVM、边界/最终Debug/保留数据安装；手机地址已校验结果点击播放4145→6181ms，已暂停；2AV CI成功 |
@@ -75,7 +84,7 @@ Room仍v23，无destructive migration。标识同步是身份/元数据子集，
 
 复用项目JDK17 `.gradle-home/jdks/jdk-17.0.20.1+1`、`.android-sdk`和用户Gradle缓存；API37.0/BuildTools37/NDK27.0.12077973/CMake3.31.6已安装。`tools_pub/unimusic/build_android.ps1 -GradleArgs ... --offline`可构建，不重复下载，不重做Phase0。本机无JDK21；3B延期的两个旧runtime检查已在远端JDK21上通过，不改写本机未执行记录。
 
-Mate60在线；现装2AZ，用户换网后正常样本音频已复验。另有第二部物理设备接入，本地phone_ui.py已按型号固定BRA-AL00，后续ADB命令须明确选设备，不能使用无目标adb install/shell，4G完成2AD包的搜索/重试检查，4E完成3C/3D新增入口检查，真实播放反馈采样、云上传/双设备仍未验收。3C此前三次安装中止属于历史，4E修正流程后以实际版本核实新包已安装。不要清数据、卸载、重登录或盲目重复系统验证。手机密码、联系方式、验证码、Cookie只按原授权本地使用，不能写进日志/文档/Git。
+Mate60在线；现装2BA，用户换网后正常样本音频已复验。另有第二部物理设备接入，本地phone_ui.py已按型号固定BRA-AL00，后续ADB命令须明确选设备，不能使用无目标adb install/shell，4G完成2AD包的搜索/重试检查，4E完成3C/3D新增入口检查，真实播放反馈采样、云上传/双设备仍未验收。3C此前三次安装中止属于历史，4E修正流程后以实际版本核实新包已安装。不要清数据、卸载、重登录或盲目重复系统验证。手机密码、联系方式、验证码、Cookie只按原授权本地使用，不能写进日志/文档/Git。
 
 ## 本轮完成的开发阶段
 

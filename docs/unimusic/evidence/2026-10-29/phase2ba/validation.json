@@ -1,0 +1,55 @@
+{
+  "phase": "2BA",
+  "date": "2026-10-29",
+  "uniqueLocalTests": 8,
+  "newTestMethods": 3,
+  "counts": {
+    "versionAndSyntheticVoicePolicy": 5,
+    "artistWorkAndCrossCatalogRanking": 2,
+    "realComposeReorderingAndSwipe": 1
+  },
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "validation": {
+    "versionTestsAndAPK": "phase2ba-final-version-validation.log: BUILD SUCCESSFUL in 1m31s",
+    "recordingAnchorsAndWorkTests": "phase2ba-final-anchor-validation.log: BUILD SUCCESSFUL in 1m5s",
+    "finalOwnerAndComposeCase": "phase2ba-final-scroll-owner-pass.log: BUILD SUCCESSFUL in 3m38s",
+    "platformDomainViolations": 0,
+    "moduleBoundaries": "passed after final code",
+    "workflowYAML": "parsed"
+  },
+  "apk": {
+    "archive": "build/outputs/unimusic/UniMusic-20261029-2BA-debug.apk",
+    "sha256": "388eff61582639efb4e3ae133019187bcd3fc50e10e0ff6c4129a95082f0c4c3",
+    "installedVersion": "d22ab429bcb3.dirty.10291014",
+    "installation": "adb Success plus package version; data preserved"
+  },
+  "recoveredProblems": [
+    "Observed credited Adele Booty variant outrank unmodified songs after address check",
+    "Next device iteration exposed spaced Mash Up with CJK suffix; normalize English boundaries and spaced/hyphen/underscore form",
+    "Name-only cross-provider artist evidence now requires a matching indexed NetEase recording before priority promotion",
+    "LazyColumn could keep an old key at a low rank after background ordering; eager position capture alone was insufficient. Follow-top now tracks scroll lifecycle, new query context and actual user scrolling separately",
+    "snapshotFlow qualification was missing on one intermediate compile; corrected and final build/test passed"
+  ],
+  "searchEvidence": {
+    "workQuery": "Final package: related bands and credited songs remain visible after background checks without manual scrolling",
+    "additionalArtistQuery": "Final Adele stable snapshot recorded separately; no audio acceptance claimed"
+  },
+  "previousCI": {
+    "head": "d22ab429",
+    "run": 40800774427,
+    "conclusion": "success",
+    "runtimeSelectedTests": 3,
+    "runtimeFailures": 0
+  },
+  "currentRemoteCI": "Pending commit/push; not represented as passed",
+  "data": "Room v23 unchanged; no clearing, migration, account login, playlist import or network setting changes",
+  "limitations": [
+    "Metadata is conservative evidence, not audio fingerprint or universal original-recording certification",
+    "Only matching title/artist/duration/version catalog results gain artist priority; unconfirmed candidates remain available lower down",
+    "No new audio decode/full-length audio acceptance; prior 20s/30s device samples remain previews",
+    "No search latency or quality percentage benchmark",
+    "Intermediate screenshots/labels are preserved explicitly and are not final acceptance"
+  ]
+}

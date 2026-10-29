@@ -30,7 +30,8 @@
       "PlayerUrlResolverIdentityTest.netease success upgrades http and flags preview clips",
       "ListenTogetherStreamResolutionTest.shared stream candidate preserves prior audio quality metadata"
     ],
-    "launcherSetupAttempts": "First invocation-local init attempt did not guard included build; corrected attempt still resolved fixed JDK21 launcher. Both failed before tests. No JDK download or project launcher change."
+    "launcherSetupAttempts": "First invocation-local init attempt did not guard included build; corrected attempt still resolved fixed JDK21 launcher. Both failed before tests. No JDK download or project launcher change.",
+    "remote": "All three selected JDK21 cases passed in successful run 40800774427"
   },
   "previousCI": {
     "run": 40798661454,
@@ -47,7 +48,15 @@
     "No complete audio acceptance from either 20s/30s preview",
     "Numeric playback positions and track metadata were not sampled atomically; do not attribute later samples to first song",
     "Portrait notice physically verified; landscape/settings filtering covered by a pure JVM case, not device rotation",
-    "Runtime cache roundtrip and shared-stream assertions await remote JDK21 CI",
     "No actual latency or general original-recording accuracy benchmark"
-  ]
+  ],
+  "remoteCI": {
+    "run": 40800774427,
+    "head": "d22ab429bcb31de601bf4c87a0d97cc4a3f1c4ae",
+    "conclusion": "success",
+    "runtimeSelectedCases": 3,
+    "runtimeFailures": 0,
+    "searchIntentCases": 3,
+    "searchIntentFailures": 0
+  }
 }

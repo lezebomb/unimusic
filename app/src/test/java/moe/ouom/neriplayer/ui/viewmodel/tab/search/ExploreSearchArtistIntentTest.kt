@@ -22,6 +22,30 @@ class ExploreSearchArtistIntentTest {
         {"id":62046853,"name":"ダイヤモンドダスト","alias":["DIAMOND DUST"],"transNames":["钻石星尘"]}
     ]}}"""), NeteaseExploreSearchType.ARTIST).items.filterIsInstance<ExploreSearchResult.Artist>().map { it.result }
 
+    @Test fun verifiedCatalogDjVariantCannotOutrankAnArtistsUnmodifiedRecording() {
+        val artist = NeteaseArtistSummary(1, "Adele")
+        val entity = NeteaseSearchArtistResult(artist, null, 1, 1)
+        val studio = ExploreSearchResult.Song(SongItem(2, "Easy On Me", "Adele", "30", 0, 224_000, null,
+            channelId = "netease", audioId = "2", neteaseArtists = listOf(artist)))
+        val remix = ExploreSearchResult.Catalog(moe.ouom.neriplayer.data.model.unified.CatalogTrack(
+            moe.ouom.neriplayer.data.model.unified.SongSourceKey("kuwo", "3"),
+            moe.ouom.neriplayer.data.model.unified.UnifiedSongMetadata("Hello (Teddy Cream x Louis Quinn Booty) 1", "Adele", "Hello", 258_000), null))
+        val mashup = remix.copy(track = remix.track.copy(source = remix.track.source.copy(resourceId = "4"),
+            metadata = remix.track.metadata.copy(title = "Rolling In the Deep (Mash Up版)")))
+        val unknownMix = remix.copy(track = remix.track.copy(source = remix.track.source.copy(resourceId = "5"),
+            metadata = remix.track.metadata.copy(title = "Easy On Me (Producer Bounce Mix)", durationMs = studio.song.durationMs)))
+        val sameRecording = remix.copy(track = remix.track.copy(source = remix.track.source.copy(resourceId = "6"),
+            metadata = remix.track.metadata.copy(title = studio.song.name, album = studio.song.album, durationMs = studio.song.durationMs)))
+        val ranker = ExploreSearchRankingSession("Adele").apply {
+            artistIntent = inferSearchArtistIntent("Adele", listOf(studio.song), listOf(entity))
+        }
+        val checks = listOf(remix, mashup, unknownMix, sameRecording).associate { it.track.source to moe.ouom.neriplayer.data.model.unified.SourceCheckResult(
+            moe.ouom.neriplayer.data.model.unified.SourceCheckStatus.ADDRESS_RESOLVED, System.currentTimeMillis()) }
+        val songs = ranker.rank(listOf(remix, mashup, unknownMix, studio, sameRecording), checks).filterNot { it is ExploreSearchResult.Artist }
+        assertEquals(listOf(sameRecording, studio), songs.take(2))
+        assertEquals(5, songs.size)
+    }
+
     @Test fun workQueryRestoresCreditedBandSongsAheadOfLiteralCoversAndResourcePromotions() {
         val raw = songs()
         val baseline = ExploreSearchRankingSession(query).rank(raw)

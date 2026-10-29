@@ -63,6 +63,8 @@
 
 ## Phase 2：统一搜索与高精度匹配
 
+2BA补DJ/中英版本边界、跨源具体录音核对与滚动生命周期锚定；8相关本地检查/最终Debug/保留数据装机通过，原词后台完成后顶部仍正确，见[2BA](PHASE_2BA_RECORDING_EVIDENCE_AND_SEARCH_ANCHOR.md)。2AZ远端40800774427已成功。
+
 2AZ把试听证据持续显示并随缓存保留，停用来源明确DISABLED；3本地相关JVM/Debug/装机及20/30秒片段提示通过，runtime 3项待远端JDK21，见[2AZ](PHASE_2AZ_PERSISTENT_PREVIEW_NOTICE.md)。
 
 2AY已修歌手/作品意图、别名、相关歌手卡片及录音版优先，默认聚合/网易云实机乐队结果在前；8相关JVM/边界/Debug通过，旧QQ/YT身份保持可读且在线仍停用。选中样本仅20秒试听，不作完整版或全局原唱保证，见[2AY](PHASE_2AY_ARTIST_AND_WORK_SEARCH.md)。

@@ -1,0 +1,74 @@
+{
+  "run": 40800774427,
+  "head": "d22ab429bcb31de601bf4c87a0d97cc4a3f1c4ae",
+  "conclusion": "success",
+  "selectedReports": [
+    {
+      "report": "TEST-moe.ouom.neriplayer.ui.screen.NowPlayingPlaybackControlsTest.xml",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        "preview access notice survives hidden audio settings and phone landscape",
+        "only phone landscape hides audio badges and rotating back restores the original information"
+      ]
+    },
+    {
+      "report": "TEST-moe.ouom.neriplayer.ui.viewmodel.tab.search.ExploreSearchArtistIntentTest.xml",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        "workQueryRestoresCreditedBandSongsAheadOfLiteralCoversAndResourcePromotions",
+        "intentArrivingDuringBackgroundRankingIsAppliedBeforePublicationAndOldQueriesStayCancelled",
+        "exactAliasesWorkWhileSongTitleAmbiguityWeakConsensusAndCoverRequestsDoNotInventIntent"
+      ]
+    },
+    {
+      "report": "TEST-moe.ouom.neriplayer.core.player.policy.source.SourceAvailabilityCheckerTest.xml",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        "nativePublicPagesRequireExactPhysicalIdsAndSupportedContexts",
+        "timeoutCancelsTheRequestAndCallerCancellationPropagates",
+        "capabilityIdentityAndRecordingGatesNeverResolveAnAudioUrl",
+        "anAdaptersOwnTimeoutIsACompletedCheckRatherThanACancelledCaller",
+        "resultsAreTransientAndChangedContextWinsOverAnOldSuccess"
+      ]
+    },
+    {
+      "report": "TEST-moe.ouom.neriplayer.core.player.url.CachedPlaybackDescriptorTest.xml",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        "preview cache metadata stays distinct while old complete v2 metadata still opens"
+      ]
+    },
+    {
+      "report": "TEST-moe.ouom.neriplayer.core.player.url.ListenTogetherStreamResolutionTest.xml",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        "shared stream candidate preserves prior audio quality metadata"
+      ]
+    },
+    {
+      "report": "TEST-moe.ouom.neriplayer.core.player.url.PlayerUrlResolverIdentityTest.xml",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        "netease success upgrades http and flags preview clips"
+      ]
+    }
+  ]
+}

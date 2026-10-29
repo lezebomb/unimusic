@@ -293,7 +293,9 @@ internal val ExploreSearchContentMaxWidth = 1040.dp
 internal fun exploreSearchResultsHorizontalPadding(isTabletLayout: Boolean): Dp =
     if (isTabletLayout) 28.dp else 0.dp
 
-private class SearchResultsContentRef(var value: Any? = null)
+private class SearchResultsContentRef(var followTop: Boolean, var context: Any?) {
+    var value: Any? = null
+}
 
 @Composable
 internal fun ExploreSearchResultsList(
@@ -301,17 +303,32 @@ internal fun ExploreSearchResultsList(
     isTabletLayout: Boolean,
     miniPlayerHeight: Dp,
     resultsIdentity: Any? = null,
+    resultsContext: Any? = null,
     content: LazyListScope.() -> Unit
 ) {
-    val previousContent = remember(state) { SearchResultsContentRef() }
-    val followTop by remember(state) { derivedStateOf {
-        state.firstVisibleItemIndex == 0 && state.firstVisibleItemScrollOffset == 0 && !state.isScrollInProgress
-    } }
+    val previousContent = remember(state) { SearchResultsContentRef(
+        state.firstVisibleItemIndex == 0 && state.firstVisibleItemScrollOffset == 0, resultsContext) }
+    if (previousContent.context != resultsContext) {
+        previousContent.context = resultsContext
+        previousContent.followTop = true
+    }
+    LaunchedEffect(state, previousContent) {
+        var scrolling = false
+        androidx.compose.runtime.snapshotFlow { state.isScrollInProgress }.collect { active ->
+            if (active) {
+                scrolling = true
+                previousContent.followTop = false
+            } else if (scrolling) {
+                previousContent.followTop = state.firstVisibleItemIndex == 0 && state.firstVisibleItemScrollOffset == 0
+                scrolling = false
+            }
+        }
+    }
     SideEffect {
         if (previousContent.value !== resultsIdentity) {
             previousContent.value = resultsIdentity
             // Keep the new best result visible at the top; retain the anchor after an actual user scroll.
-            if (resultsIdentity != null && followTop) state.requestScrollToItem(0)
+            if (resultsIdentity != null && previousContent.followTop && !state.isScrollInProgress) state.requestScrollToItem(0)
         }
     }
     val horizontalPadding = exploreSearchResultsHorizontalPadding(isTabletLayout)
@@ -965,7 +982,8 @@ fun ExploreScreen(
                                     state = searchListState,
                                     isTabletLayout = isTabletLayout,
                                     miniPlayerHeight = miniPlayerHeight,
-                                    resultsIdentity = ui.searchItems
+                                    resultsIdentity = ui.searchItems,
+                                    resultsContext = currentSearchScrollContextKey
                                 ) {
                                 itemsIndexed(
                                     items = ui.searchItems,

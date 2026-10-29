@@ -6,6 +6,29 @@ import org.junit.Test
 class RecordingMatchPolicyTest {
     private val studio = RecordingMetadata("晴天", "周杰伦", 269_000)
 
+    @Test fun djVariantLabelsNeverBecomeStudioByKeepingTheOriginalArtistCredit() {
+        val original = RecordingMetadata("Hello", "Adele", 258_000)
+        for (label in listOf("Teddy Cream x Louis Quinn Booty", "Producer A Bootleg", "Producer B Rework", "DJ版")) {
+            val variant = original.copy(title = "Hello ($label)")
+            assertTrue(label, RecordingMatchPolicy.versions(variant).contains(moe.ouom.neriplayer.data.model.unified.RecordingVersion.REMIX))
+            assertEquals(label, RecordingMismatch.VERSION, RecordingMatchPolicy.assess(original, variant).reason)
+            assertTrue(RecordingMatchPolicy.assess(variant, variant).accepted)
+        }
+        assertFalse(RecordingMatchPolicy.assess(original.copy(title = "Hello (Producer A Bootleg)"),
+            original.copy(title = "Hello (Producer B Bootleg)")).accepted)
+        assertTrue(RecordingMatchPolicy.versions(original.copy(title = "Booty")).isEmpty())
+        assertTrue(RecordingMatchPolicy.versions(original.copy(artist = "Producer A x Producer B Booty")).isEmpty())
+        assertTrue(RecordingMatchPolicy.assess(original.copy(title = "Bootleg"), original.copy(title = "Bootleg [Official Audio]")).accepted)
+        assertEquals(RecordingMismatch.VERSION, RecordingMatchPolicy.assess(original.copy(title = "Booty"),
+            original.copy(title = "Booty (Producer A x Producer B Booty)")).reason)
+        for (label in listOf("Mash Up版", "Mash-Up", "Mash_Up", "Live版", "Cover版", "Remix版")) {
+            assertEquals(label, RecordingMismatch.VERSION, RecordingMatchPolicy.assess(original, original.copy(title = "Hello ($label)")).reason)
+        }
+        assertEquals(RecordingMismatch.VERSION, RecordingMatchPolicy.assess(original.copy(title = "Hello (Cover版)"),
+            original.copy(title = "Hello (AI Cover版)")).reason)
+        assertTrue(RecordingMatchPolicy.versions(original.copy(title = "Clover Olive Mashable")).isEmpty())
+    }
+
     @Test fun collaborativeArtistCreditsCannotCollapseIntoADifferentPerformer() {
         val duet = studio.copy(artist = "A / B")
         assertEquals(RecordingMismatch.ARTIST, RecordingMatchPolicy.assess(duet, duet.copy(artist = "AB")).reason)

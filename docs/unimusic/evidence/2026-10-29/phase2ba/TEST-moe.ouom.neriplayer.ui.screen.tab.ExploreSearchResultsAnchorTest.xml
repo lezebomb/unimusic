@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="moe.ouom.neriplayer.ui.screen.tab.ExploreSearchResultsAnchorTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2026-10-29T02:17:18.366Z" hostname="XUSHAOYANG" time="8.453">
+  <properties/>
+  <testcase name="backgroundRankingKeepsTheTopButPreservesAnActualUserScroll" classname="moe.ouom.neriplayer.ui.screen.tab.ExploreSearchResultsAnchorTest" time="7.045"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
