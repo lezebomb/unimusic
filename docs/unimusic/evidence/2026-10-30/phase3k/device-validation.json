@@ -1,0 +1,98 @@
+{
+  "device": "Authorized Mate60 BRA-AL00; no identifier exported",
+  "installedVersion": "67338ee336f5.dirty.10300656",
+  "apkSha256": "485c433ae5606122d63a75758835f1b669f4f45dc6531f0806e05753729c6764",
+  "adbInstallSuccessCaptured": true,
+  "installerUiSuccessAndPackageVersionMatch": true,
+  "dataObserved": "Existing library recommendation, search history and current-track state remain; no reinstall/clear-data/relogin performed",
+  "chargingStayAwake": 7,
+  "chargingSettingChanged": false,
+  "search": {
+    "query": "哭泣少女乐队",
+    "topArtistCards": [
+      "トゲナシトゲアリ",
+      "ダイヤモンドダスト"
+    ],
+    "firstVisibleNativeSongTitles": [
+      "心象的フラクタル (beni-shouga)",
+      "空白とカタルシス"
+    ],
+    "displayedResultCounts": {
+      "local": 0,
+      "netease": 30,
+      "bilibili": 0,
+      "kuwo": 2
+    },
+    "displayedMetadataBatchSeconds": {
+      "local": 0.0,
+      "netease": 0.5,
+      "bilibili": 0.6,
+      "kuwo": 0.4
+    },
+    "measurementLimit": "Single UI batch rounded to 0.1s, includes queue/metadata; not audio checking, fallback/first-sound timing, full query latency, or verified cold-cache benchmark"
+  },
+  "previewUiSample": {
+    "song": "Take Me Hand",
+    "badge": "仅提供试听",
+    "uiDuration": "00:50",
+    "independentProgressAndEndCapture": false
+  },
+  "nonPreviewLabelledSample": {
+    "song": "どうして",
+    "start": {
+      "state": 2,
+      "positionMs": 12232
+    },
+    "after60SecondsBeforePause": {
+      "state": 3,
+      "positionMs": 72006
+    },
+    "afterPause": {
+      "state": 2,
+      "positionMs": 73053
+    },
+    "fullTrackEndNotTested": true,
+    "sourceLabel": "Netease",
+    "uiDuration": "03:01",
+    "uiBitrate": "320 kbps",
+    "previewBadgeAtStart": false
+  },
+  "stableUiControls": {
+    "before": {
+      "state": 2,
+      "positionMs": 73053
+    },
+    "afterUiPlay": {
+      "state": 3,
+      "positionMs": 74220
+    },
+    "afterUiPause": {
+      "state": 2,
+      "positionMs": 75992
+    },
+    "final": {
+      "state": 2,
+      "positionMs": 75992
+    },
+    "fallbackMediaPauseUsed": false,
+    "feedbackEnabledUsingCompatibleDefault": true,
+    "feedbackEvents": 0
+  },
+  "dailySnapshotSchema": 1,
+  "dailyRecommendationAlgorithmVersion": 6,
+  "feedback": {
+    "before": 0,
+    "after": 0,
+    "enabledCompatibleDefault": true,
+    "explicitEnabledFieldAbsent": true,
+    "settingsChanged": false
+  },
+  "limits": [
+    "No full-track endpoint or complete-file validation",
+    "No human listening verification",
+    "No positive completion/repeat control or isolated early paused-full-track skip test",
+    "No actual Kuwo/Bili credential redirect or fresh fallback timing verification",
+    "Moved-interceptor architecture build not installed again",
+    "No complete account-state/old-database-table comparison"
+  ]
+}

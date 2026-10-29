@@ -1,0 +1,17 @@
+{
+  "stage": "3K",
+  "localTests": {
+    "class": "PlaybackFeedbackTrackerTest",
+    "tests": 3,
+    "failures": 0
+  },
+  "moduleBoundaries": "passed",
+  "build": "BUILD SUCCESSFUL in 39s",
+  "apk": "build/outputs/unimusic/UniMusic-20261030-3K-debug.apk",
+  "versionName": "67338ee336f5.dirty.10300656",
+  "sha256": "485c433ae5606122d63a75758835f1b669f4f45dc6531f0806e05753729c6764",
+  "recommendationAlgorithmVersion": 6,
+  "deviceValidation": "Installed with adb Success, system UI and version match; existing library/history visible; search, labelled preview and longer non-preview-labelled playback observed; final own session paused",
+  "actualSkipPositiveAndFullAudioValidation": "UI-labelled 03:01/320kbps sample progressed 12.232s to72.006s; UI control resume/pause confirmed; full endpoint and positive/isolated skip controls not run",
+  "remoteCI": "Existing FeedbackTracker selector covers new case; previous 2BM CI dependency failure repaired locally; cumulative CI pending"
+}

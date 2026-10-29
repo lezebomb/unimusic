@@ -23,10 +23,11 @@
 | [3J正向歌手亲和度](PHASE_3J_POSITIVE_ARTIST_AFFINITY.md) | 1新/共4 JVM、边界、Debug51s；累计试听统计不再间接加分喜好，算法v6 | e5cca5d2已push，CI40967228048含Android SUCCESS |
 | [2BL跨语言版本](PHASE_2BL_PERFORMANCE_VERSION_LABELS.md) | 2新/共3 JVM、边界、Debug49s；日文/繁体演绎、Off Vocal版本证据 | 47d54c19已commit，随2BM一起push |
 | [2BM流凭据边界](PHASE_2BM_BILI_STREAM_CREDENTIAL_BOUNDARIES.md) | 4不同JVM最终均通过（含1次测试桩修复）、边界、Debug成功；HTTPS/严格域名与重定向去凭据 | 67338ee3已push；CI依赖检查失败，分层恢复已本地通过 |
+| [3K稳定跳过采样](PHASE_3K_STABLE_SKIP_EVIDENCE.md) | 1新/共3 JVM、边界、Debug39s；暂停/恢复2秒内不推断不喜欢，含累计包设备观察 | 本检查点所在提交，待连同CI修复一起push |
 
 此前必要CI均已SUCCESS。最新已核实CI40967228048（e5cca5d2，含2BJ/2BK/3J）整体及Android无损迁移SUCCESS；实际XML ArtistIntent11、RecordingMatch10、Ranker9、DailyStore8、增量迁移1/升级3均0失败/跳过。摘要见evidence/2026-10-30/ci-40967228048.json。2BL/2BM已push；CI40969263368在平台依赖检查失败，迁移跳过。分层恢复已本地3 JVM+平台依赖0违规+Debug通过，待新累计CI。
 
-最新构建：`build/outputs/unimusic/UniMusic-20261030-2BM-network-layer-debug.apk`，版本`67338ee336f5.dirty.10300715`，SHA-256 `62ef789e2c6bd2b85f296bbd7c6f031435fa126bdf74d764ebb41646cf939b10`。平台依赖17域0违规，3 JVM及Debug2m31s通过。无本地Gradle运行。手机已保留数据安装此前3K包`67338ee336f5.dirty.10300656`，当前暂停；新分层修复包未再安装。
+最新构建：`build/outputs/unimusic/UniMusic-20261030-2BM-network-layer-debug.apk`，版本`67338ee336f5.dirty.10300715`，SHA-256 `62ef789e2c6bd2b85f296bbd7c6f031435fa126bdf74d764ebb41646cf939b10`。平台依赖17域0违规，3 JVM及Debug2m31s通过。无本地Gradle运行。手机已保留数据安装此前3K包`67338ee336f5.dirty.10300656`，最终自身媒体state2/75992ms，已暂停；新分层修复包未再安装。
 
 ## 此前已完成，不重做
 
@@ -37,10 +38,11 @@
 
 ## 设备与验收边界
 
-- 只操作授权Mate60 BRA-AL00。`adb devices -l`必须按空白split，不能要求制表符；导出只显示数量/型号，不输出设备标识。05:30最初无目标，后续重新检出1台并完成3K包保留数据安装；并非一直离线。
-- 最后真正装机是累计2BC包`9b87ef001ede.dirty.10300110`，系统安装成功/版本匹配、保留数据。充电常亮为7，当时未改设置。
-- 该包实机完整历史词“哭泣少女乐队”顶部两关联乐队及原曲正确；明确20秒试听进度6044→8115ms，反馈开启，手动下一首新增偏好0条。最后自身媒体会话state2/5456ms已暂停；这是历史观察，不当作当前实时状态。
-- 这不是新完整备用来源或切源速度验收；未做新正向完整曲反馈对照、全局准确率、推荐清除/重启/下载/导入UI、真实双设备同步。实际证据在phase2bc/device-validation.json。
+- 只操作授权Mate60 BRA-AL00，ADB按空白split，不输出标识。最初离线，后续重新在线，实际安装累计3K包`67338ee336f5.dirty.10300656`，adb Success/系统成功/版本匹配，保留数据；充电常亮已7，未改。
+- 新包查询“哭泣少女乐队”顶部两关联乐队和原生曲仍正确。单次界面批次显示网易云0.5s、酷我0.4s、B站0.6s；包括排队/元数据，不等于切源/首声或全查询性能，未独立标定缓存。
+- Take Me Hand显示50秒试听，未独立抓其进度/结束。どうして为3:01/320kbps且无试听标记，自身进度12.232→72.006秒；稳定UI播放/暂停2→3→2，最终state2/75992ms。未验证整曲终点、完整文件或人工听音。
+- 推荐快照schema1/算法6；旧schema反馈enabled缺省兼容true，事件0→0。没有新正向完成/重播对照、隔离早期暂停非试听切歌、Kuwo/Bili新取流/跳转或切源计时验收；未清记录/重登录。
+- 新分层修复APK没有再次安装；以上设备结果只对应3K包，见phase3k/device-validation.json。此前2BC的20秒试听/手动下一首证据保留在历史检查点及phase2bc，不冒充当前状态。
 
 ## 工具链与安全
 
@@ -59,4 +61,4 @@
 
 `unimusic-10-30-05-30`已在正确日期触发并删除，无剩余UniMusic定时计划；不新建每日循环。
 
-当前未提交：3K稳定播放后才采样跳过（3 JVM+Debug39s已验证）；2BN ci_scope可选精确base抓取及3 Python用例已通过，工作流入口暂保留原指令，待独立阶段恢复接线。保留这些内容，不覆盖。
+当前未提交：2BN ci_scope可选精确base抓取及3 Python用例已通过，工作流入口暂保留原指令，待独立阶段恢复接线；3K随本检查点独立commit。保留这些内容，不覆盖。

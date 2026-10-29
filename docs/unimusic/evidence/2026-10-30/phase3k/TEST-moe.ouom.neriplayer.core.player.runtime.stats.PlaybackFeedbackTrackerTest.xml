@@ -1,0 +1,8 @@
+<testsuite name="moe.ouom.neriplayer.core.player.runtime.stats.PlaybackFeedbackTrackerTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-10-29T22:56:22.908Z" hostname="local" time="0.049">
+  <properties />
+  <testcase name="pausedAndFreshlyRecoveredPlaybackDoNotBecomeDislikeEvidence" classname="moe.ouom.neriplayer.core.player.runtime.stats.PlaybackFeedbackTrackerTest" time="0.038" />
+  <testcase name="skip requires confirmed listening and a distinct local user command" classname="moe.ouom.neriplayer.core.player.runtime.stats.PlaybackFeedbackTrackerTest" time="0.003" />
+  <testcase name="natural completion and continued replay are counted once per cycle" classname="moe.ouom.neriplayer.core.player.runtime.stats.PlaybackFeedbackTrackerTest" time="0.002" />
+  <system-out />
+  <system-err />
+</testsuite>

@@ -22,6 +22,7 @@ class PlaybackFeedbackTracker(
     private var enabled = false
     private var playing = false
     private var startedAt: Long? = null
+    private var playingSince: Long? = null
     private var heardMs = 0L
     private var sought = false
     private var skipped = false
@@ -54,7 +55,9 @@ class PlaybackFeedbackTracker(
         if (playing == value) return
         collect()
         playing = value
-        startedAt = if (enabled && playing && song != null) nowElapsedMs() else null
+        val now = nowElapsedMs()
+        playingSince = now.takeIf { playing }
+        startedAt = now.takeIf { enabled && playing && song != null }
     }
 
     @Synchronized fun onManualSeek(positionMs: Long) {
@@ -92,7 +95,10 @@ class PlaybackFeedbackTracker(
 
     @Synchronized fun onUserSkip(): List<PlaybackFeedbackEvent> {
         observeClearEpoch()
-        if (!enabled || song == null) return emptyList()
+        if (!enabled || song == null || !playing) return emptyList()
+        // Paused/buffering transitions and immediate recovery skips are not reliable dislike evidence.
+        val stableSince = playingSince ?: return emptyList()
+        if (nowElapsedMs() - stableSince < MIN_SKIP_STABLE_PLAYBACK_MS) return emptyList()
         collect()
         val earlyLimit = minOf(30_000L, duration() / 4L)
         if (sought || skipped || heardMs < 2_000L || heardMs >= earlyLimit) return emptyList()
@@ -135,8 +141,13 @@ class PlaybackFeedbackTracker(
         skipped = false
         repeated = false
         lastPosition = null
-        startedAt = if (enabled && playing && song != null) nowElapsedMs() else null
+        val now = nowElapsedMs()
+        playingSince = now.takeIf { playing }
+        startedAt = now.takeIf { enabled && playing && song != null }
     }
 
-    private companion object { const val MAX_INTERVAL_MS = 7L * 86_400_000L }
+    private companion object {
+        const val MAX_INTERVAL_MS = 7L * 86_400_000L
+        const val MIN_SKIP_STABLE_PLAYBACK_MS = 2_000L
+    }
 }

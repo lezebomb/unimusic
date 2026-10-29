@@ -7,6 +7,25 @@ import org.junit.Assert.*
 import org.junit.Test
 
 class PlaybackFeedbackTrackerTest {
+    @Test fun pausedAndFreshlyRecoveredPlaybackDoNotBecomeDislikeEvidence() {
+        var elapsed = 0L
+        val tracker = PlaybackFeedbackTracker({ it.id.toString() }, { elapsed }, { 1_000_000 + elapsed })
+        tracker.setEnabled(true);tracker.onSongChanged(song());tracker.onPlayingChanged(true)
+        elapsed = 5_000;tracker.onPlayingChanged(false)
+        elapsed = 25_000
+        assertTrue(tracker.onUserSkip().isEmpty())
+        tracker.onPlayingChanged(true)
+        elapsed = 25_500
+        assertTrue(tracker.onUserSkip().isEmpty())
+        tracker.onPlayingChanged(false)
+        elapsed = 27_000;tracker.onPlayingChanged(true)
+        elapsed = 28_999
+        assertTrue(tracker.onUserSkip().isEmpty())
+        elapsed = 29_000
+        assertEquals(PlaybackFeedbackKind.SKIP, tracker.onUserSkip().single().kind)
+        assertTrue(tracker.onUserSkip().isEmpty())
+    }
+
     @Test fun `skip requires confirmed listening and a distinct local user command`() {
         var elapsed = 0L
         val tracker = PlaybackFeedbackTracker({ it.id.toString() }, { elapsed }, { 1_000_000 + elapsed })
