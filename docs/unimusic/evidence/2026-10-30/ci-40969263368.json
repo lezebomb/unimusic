@@ -1,0 +1,28 @@
+{
+  "runId": 40969263368,
+  "head": "67338ee336f54de162a8d9d0968d26619e28008c",
+  "conclusion": "failure",
+  "actualUnitXml": {
+    "BiliStreamCredentialPolicyTest": {
+      "tests": 2,
+      "failures": 0
+    },
+    "BiliStreamUrlsTest": {
+      "tests": 3,
+      "failures": 0
+    },
+    "RecordingMatchPolicyTest": {
+      "tests": 11,
+      "failures": 0
+    }
+  },
+  "notVerifiedFromThisArtifact": [
+    "ConditionalHttpRequestHeaderInjectionTest",
+    "ExploreSearchArtistIntentTest"
+  ],
+  "blockingCheck": "platform:verifyDomainDependencies",
+  "dependencyViolations": 4,
+  "androidMigration": "skipped after failed dependency check",
+  "repair": "Transport interceptor moved to application network integration; platform header/host policy uses existing list/string operations; no allowlist relaxed",
+  "limits": "No complete CI, app/runtime XML or Android migration success claimed for this failed run"
+}

@@ -1,0 +1,32 @@
+{
+  "stage": "2BM architecture repair",
+  "localTests": [
+    {
+      "class": "BiliStreamCredentialPolicyTest",
+      "tests": 1,
+      "failures": 0
+    },
+    {
+      "class": "BiliStreamUrlsTest",
+      "tests": 1,
+      "failures": 0
+    },
+    {
+      "class": "BiliStreamCredentialInterceptorTest",
+      "tests": 1,
+      "failures": 0
+    }
+  ],
+  "moduleBoundaries": "passed",
+  "platformDomainDependencies": {
+    "domains": 17,
+    "errors": 0
+  },
+  "build": "BUILD SUCCESSFUL in 2m 31s",
+  "apk": "build/outputs/unimusic/UniMusic-20261030-2BM-network-layer-debug.apk",
+  "versionName": "67338ee336f5.dirty.10300715",
+  "sha256": "62ef789e2c6bd2b85f296bbd7c6f031435fa126bdf74d764ebb41646cf939b10",
+  "cumulativeSource": "Includes separately validated uncommitted 3K changes; 2BN CI tooling does not affect APK",
+  "deviceValidation": "This exact moved-class build not installed; device observations belong to preceding 3K APK",
+  "remoteCI": "Previous 40969263368 failed dependency check; local repair passed, next cumulative CI/Android migration pending"
+}

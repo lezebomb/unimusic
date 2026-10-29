@@ -18,3 +18,11 @@ isBiliStreamHost原用contains("bilivideo.")，相似主机可能被识别为B�
 - APK `build/outputs/unimusic/UniMusic-20261030-2BM-debug.apk`，版本`47d54c197707.dirty.10300651`，SHA-256 `b79f79f678b1069870bad4f67edaf777d7134b1d0acb1aa3369dcb2f6c833d5e`。
 - 本次CI选择器加入上述platform类与已有bilibili stream runtime集成项，因此工作流配置的必要Android迁移CI仍需完成后再推下一源码阶段。
 - 未执行设备安装、真实B站鉴权/网络跳转、完整歌曲、速度或全局隐私审计；不声称覆盖自建外部客户端或所有第三方库的日志/认证。
+
+## 远端依赖检查失败与恢复
+
+CI40969263368失败在platform:verifyDomainDependencies（4处新依赖），必要Android迁移因此跳过。实际取得XML仅BiliStreamUrls3、CredentialPolicy2和RecordingMatch11，均0失败；未取得本轮app/runtime对应XML，不能宣称这些项或整轮已通过，见ci-40969263368.json。
+
+已把跳转拦截器移到应用网络层，平台仅保留域名/请求头协议，并使用已有列表/字符串操作，不放宽白名单。补跑3项JVM、同一平台依赖检查（17域0违规）和Debug2m31s均成功，新累计CI仍需通过。
+
+修复APK：`build/outputs/unimusic/UniMusic-20261030-2BM-network-layer-debug.apk`，版本`67338ee336f5.dirty.10300715`，SHA-256 `62ef789e2c6bd2b85f296bbd7c6f031435fa126bdf74d764ebb41646cf939b10`。它包含已在本机验证的3K改动，但没有再次安装；实机证据对应此前3K包。

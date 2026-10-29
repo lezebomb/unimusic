@@ -16,7 +16,7 @@ fun isBiliStreamHost(host: String): Boolean {
 
 fun isBiliStreamUrl(url: String): Boolean = runCatching {
     val uri = URI(url)
-    uri.scheme?.lowercase(Locale.ROOT) in setOf("https", "http") &&
+    (uri.scheme.equals("https", ignoreCase = true) || uri.scheme.equals("http", ignoreCase = true)) &&
         uri.rawUserInfo == null && isBiliStreamHost(uri.host.orEmpty())
 }.getOrDefault(false)
 

@@ -306,7 +306,7 @@ object AppContainer {
     val sharedOkHttpClient by lazy {
         val clientBuilder = OkHttpClient.Builder()
             .proxySelector(DynamicProxySelector)
-            .addNetworkInterceptor(moe.ouom.neriplayer.platform.bilibili.api.stream.BiliStreamCredentialInterceptor())
+            .addNetworkInterceptor(moe.ouom.neriplayer.core.network.stream.BiliStreamCredentialInterceptor())
             .addInterceptor { chain ->
                 val request = chain.request()
                 val host = request.url.host.lowercase()
