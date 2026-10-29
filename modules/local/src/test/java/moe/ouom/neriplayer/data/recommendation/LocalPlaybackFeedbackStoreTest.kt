@@ -3,6 +3,8 @@ package moe.ouom.neriplayer.data.recommendation
 import java.io.File
 import java.io.IOException
 import java.util.UUID
+import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.atomic.AtomicInteger
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -75,6 +77,42 @@ class LocalPlaybackFeedbackStoreTest {
         now += 1000
         reopened.record("b", event())
         assertEquals(1, reopened.signals(now, 0).byDigest.size)
+    }
+
+    @Test fun `failed async feedback storage recovers on read without rewriting every healthy read`() = runTest {
+        val file = File(temporary.root, "recovery.json")
+        val writable = AtomicBoolean(true)
+        val attempts = AtomicInteger()
+        val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+        try {
+            val store = LocalPlaybackFeedbackStore(file, now = { now }, writerScope = scope, write = { target, text ->
+                attempts.incrementAndGet()
+                if (!writable.get()) throw IOException("temporarily unavailable")
+                target.writeText(text)
+            })
+            store.record("kept", event())
+            val original = file.readText()
+            writable.set(false)
+            now += 1000
+            withContext(Dispatchers.IO) {
+                store.enqueue("lost-best-effort-event", listOf(event()), 0)
+                store.flush()
+            }
+            assertFalse(store.hasPendingWrites())
+            assertEquals(original, file.readText())
+            val beforeRead = attempts.get()
+            try { store.signals(now, 0);fail("Unavailable storage remains explicit") } catch (_: IOException) { }
+            assertEquals(beforeRead + 1, attempts.get())
+            assertEquals(original, file.readText())
+            writable.set(true)
+            val recovered = store.signals(now, 0)
+            assertTrue(recovered.available)
+            assertEquals(setOf(recommendationIdentityDigest("kept")), recovered.byDigest.keys)
+            val healthyWrites = attempts.get()
+            assertEquals(recovered, store.signals(now, 0))
+            assertEquals(healthyWrites, attempts.get())
+            assertEquals(original, file.readText())
+        } finally { scope.cancel() }
     }
 
     @Test fun `queued writes flush without changing unrelated evidence and failed writes preserve disk`() = runTest {

@@ -1,0 +1,7 @@
+<testsuite name="moe.ouom.neriplayer.data.recommendation.LocalPlaybackFeedbackStoreTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-10-29T16:59:21.455Z" hostname="local" time="0.305">
+  <properties />
+  <testcase name="queued writes flush without changing unrelated evidence and failed writes preserve disk" classname="moe.ouom.neriplayer.data.recommendation.LocalPlaybackFeedbackStoreTest" time="0.279" />
+  <testcase name="failed async feedback storage recovers on read without rewriting every healthy read" classname="moe.ouom.neriplayer.data.recommendation.LocalPlaybackFeedbackStoreTest" time="0.022" />
+  <system-out />
+  <system-err />
+</testsuite>

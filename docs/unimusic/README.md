@@ -2,6 +2,8 @@
 
 [当前搜索规则与边界](SEARCH_BEHAVIOR.md)：歌手/作品意图、跨源录音证据、版本和可播状态、列表锚定及实际验收。
 
+最新：[3I反馈存储恢复](PHASE_3I_FEEDBACK_STORAGE_RECOVERY.md)：异步写失败后可在读取时有界重试，恢复后解除错误，健康读取不重复写；2 JVM/Debug通过。
+
 最新：[3H空推荐栏目恢复](PHASE_3H_DEPLETED_DAILY_RECOMMENDATIONS.md)：当天新入库/本地文件可重建完全空掉的栏目，其余日顺序保留；3 JVM/Debug通过。
 
 最新：[3G推荐取消响应](PHASE_3G_CANCELLABLE_RECOMMENDATIONS.md)：候选/排名/缓存恢复协作取消，UUID捕获取消不替换正常快照；3 JVM/最终Debug通过，无性能声明。

@@ -145,6 +145,8 @@
 
 ## Phase 3：本地推荐与同步
 
+3I补异步播放反馈写故障后的读取重试/健康恢复，保留原文件，正常读取不重复IO；新1/共2 JVM、Debug/边界通过，见[3I](PHASE_3I_FEEDBACK_STORAGE_RECOVERY.md)。仅合成故障，未做设备磁盘满验收。
+
 3H补同日完全空掉的推荐/离线栏目恢复，保留另一栏目和部分有效列表顺序；新2/共3 JVM、Debug/边界通过，见[3H](PHASE_3H_DEPLETED_DAILY_RECOMMENDATIONS.md)。无真实导入/下载UI验收。
 
 3G补候选收集、去重、评分、多样性/恢复循环取消及快照发布前复核；新2/共3 JVM和最终Debug通过，见[3G](PHASE_3G_CANCELLABLE_RECOMMENDATIONS.md)。未做真实大库性能验收。

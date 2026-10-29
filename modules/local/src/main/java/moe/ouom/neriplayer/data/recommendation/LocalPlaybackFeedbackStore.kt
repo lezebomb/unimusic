@@ -184,7 +184,8 @@ class LocalPlaybackFeedbackStore internal constructor(
 
     private fun publish(next: State) {
         val old = memory
-        if (old == next) return
+        // Retry a failed write even when no new evidence arrived; healthy reads remain write-free.
+        if (old == next && !failed) return
         val text = JsonObject().apply {
             addProperty("schemaVersion", 1)
             addProperty("clearedAt", next.clearedAt)
