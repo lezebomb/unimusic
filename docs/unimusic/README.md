@@ -1,5 +1,7 @@
 # UniMusic 开发记录
 
+[当前搜索规则与边界](SEARCH_BEHAVIOR.md)：歌手/作品意图、跨源录音证据、版本和可播状态、列表锚定及实际验收。
+
 最新：[2BA录音核对与搜索锚点](PHASE_2BA_RECORDING_EVIDENCE_AND_SEARCH_ANCHOR.md)：补DJ/混合语言版本标签；跨源同录音核对后再提升，后台重排保持真正顶部，原词实机稳定。
 
 最新：[2AZ持续试听标识](PHASE_2AZ_PERSISTENT_PREVIEW_NOTICE.md)：播放器持续显示试听状态，保留缓存证据；Mate60两段试听实际可见提示，完整版未验收。

@@ -43,7 +43,6 @@
     "runtimeSelectedTests": 3,
     "runtimeFailures": 0
   },
-  "currentRemoteCI": "Pending commit/push; not represented as passed",
   "data": "Room v23 unchanged; no clearing, migration, account login, playlist import or network setting changes",
   "limitations": [
     "Metadata is conservative evidence, not audio fingerprint or universal original-recording certification",
@@ -51,5 +50,76 @@
     "No new audio decode/full-length audio acceptance; prior 20s/30s device samples remain previews",
     "No search latency or quality percentage benchmark",
     "Intermediate screenshots/labels are preserved explicitly and are not final acceptance"
-  ]
+  ],
+  "remoteCI": {
+    "run": 40806378294,
+    "sourceHead": "0c2c4f5d8b33de943796b478f7c89a3cbfe6e4bc",
+    "conclusion": "success",
+    "url": "https://github.com/lezebomb/unimusic/actions/runs/40806378294",
+    "selectedReports": [
+      {
+        "name": "moe.ouom.neriplayer.ui.screen.tab.ExploreSearchResultsAnchorTest",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "cases": [
+          "backgroundRankingKeepsTheTopButPreservesAnActualUserScroll"
+        ]
+      },
+      {
+        "name": "moe.ouom.neriplayer.ui.viewmodel.tab.search.ExploreSearchArtistIntentTest",
+        "tests": 4,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "cases": [
+          "workQueryRestoresCreditedBandSongsAheadOfLiteralCoversAndResourcePromotions",
+          "intentArrivingDuringBackgroundRankingIsAppliedBeforePublicationAndOldQueriesStayCancelled",
+          "exactAliasesWorkWhileSongTitleAmbiguityWeakConsensusAndCoverRequestsDoNotInventIntent",
+          "verifiedCatalogDjVariantCannotOutrankAnArtistsUnmodifiedRecording"
+        ]
+      },
+      {
+        "name": "moe.ouom.neriplayer.data.local.database.UnifiedLibraryMigrationTest",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "cases": [
+          "upgradePreservesEveryLegacyFieldInLibraryFavoritesHistoryAndOutbox"
+        ]
+      },
+      {
+        "name": "moe.ouom.neriplayer.data.local.database.DatabaseUpgradeInstrumentedTest",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "cases": [
+          "releaseVersion15KeepsCancelledIdentityAndMetadataBeforeDroppingLegacyTables",
+          "recoveryIndexUpgradeKeepsExistingOperationsAndTheirByteWatermark",
+          "everyHistoricalUpgradeReachesTheCurrentRoomSchema"
+        ]
+      },
+      {
+        "name": "moe.ouom.neriplayer.core.player.policy.source.RecordingMatchPolicyTest",
+        "tests": 9,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "cases": [
+          "explicitSyntheticAliasCanMatchItsOwnVersionButNeverOriginalOrHumanCover",
+          "versionWordsInsideTheActualTitleCannotHideAnAddedVersionLabel",
+          "djVariantLabelsNeverBecomeStudioByKeepingTheOriginalArtistCredit",
+          "explicitSyntheticVocalsCannotPassAsTheOriginalOrAHumanCover",
+          "titleArtistAndDurationAreIndependentRequirements",
+          "aiNamedArtistsAndTitlesAreNotSyntheticWithoutAnExplicitVoiceSignal",
+          "sameVersionAndCosmeticDifferencesCanMatch",
+          "versionConflictsOverridePerfectTextAndDuration",
+          "collaborativeArtistCreditsCannotCollapseIntoADifferentPerformer"
+        ]
+      }
+    ]
+  }
 }

@@ -10,7 +10,7 @@
 
 8项相关本地检查通过：版本/合成人声5、录音/作品排序2、Compose迟到布局/真实swipe1。最终日志phase2ba-final-scroll-owner-pass.log成功3m38s，领域0违规/最终边界/YAML通过。Mate60最终保留数据装机d22ab429bcb3.dirty.10291014；哭泣少女乐队后台完成后两关联乐队/雑踏、僕らの街/Cycle Of Sorrow仍在真正顶部，无手动滚动。Adele稳定结果另存evidence。无新音频，播放器暂停。中间Booty/Mash Up/第12和46行误锚状态明确保留；单次位置捕获未成功，最终滚动所有者已改好。
 
-当前无运行中Gradle。最终APK build/outputs/unimusic/UniMusic-20261029-2BA-debug.apk，哈希见报告，Room v23/账号歌单保留。2AZ d22ab429已推送且远端40800774427整体SUCCESS，3项JDK21用例已读取XML确认；不用重跑/下载。本阶段commit/push和最新CI以git log/Actions实际结果为准，下一步检查2BA远端失败范围并恢复，不把未完成CI写成功。
+当前无运行中Gradle。最终APK build/outputs/unimusic/UniMusic-20261029-2BA-debug.apk，哈希见报告，Room v23/账号歌单保留。2AZ d22ab429已推送且远端40800774427整体SUCCESS，3项JDK21用例已读取XML确认；不用重跑/下载。2BA 0c2c4f5d已commit/push，远端40806378294整体SUCCESS，已读取核心XML确认版本/意图/滚动用例和迁移保护通过。后续接续当前成果；不重复本轮已通过构建或测试。当前搜索规则详见SEARCH_BEHAVIOR.md。
 
 ## 当前2AZ已验证试听标识
 
@@ -32,7 +32,7 @@ Mate60最终包ee5c26c1f592.dirty.10290859已保留数据安装并核实版本�
 
 | 最新阶段 | 实际验证与边界 |
 | --- | --- |
-| [2BA录音/重排](PHASE_2BA_RECORDING_EVIDENCE_AND_SEARCH_ANCHOR.md) | 8相关本地检查/Debug/装机，原词稳定顶部；2AZ远端成功，2BA远端待查 |
+| [2BA录音/重排](PHASE_2BA_RECORDING_EVIDENCE_AND_SEARCH_ANCHOR.md) | 8相关本地检查/Debug/装机，原词稳定顶部；2AZ及2BA远端40806378294成功，含新增UI/迁移 |
 | [2AZ持续试听](PHASE_2AZ_PERSISTENT_PREVIEW_NOTICE.md) | 本地3 JVM/Debug/保留数据安装，20秒与30秒片段持续提示；runtime 3项已在40800774427通过，2AY旧QQ启用断言已修 |
 | [2AY歌手/作品意图](PHASE_2AY_ARTIST_AND_WORK_SEARCH.md) | 8相关JVM/领域0违规/边界/Debug/保留数据安装，实际乐队查询结果修正；选中曲仅20秒试听，不是完整版 |
 | [2AX可用来源/推荐合唱](PHASE_2AX_ACTIVE_SOURCES_AND_RECOMMENDATION_CREDITS.md) | 按用户要求停用QQ/YT但保留数据，本地推荐v4合唱偏好/成员多样性；新增3/共10 JVM、领域0违规/边界/Debug/保留数据安装及搜索/账号入口检查；乐队查询翻唱已在2AY修正 |
