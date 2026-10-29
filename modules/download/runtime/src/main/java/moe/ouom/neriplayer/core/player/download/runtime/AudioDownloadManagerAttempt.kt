@@ -446,12 +446,9 @@ internal suspend fun AudioDownloadManager.prepareDownloadAttempt(
         val cookieHeader = cookieMap.entries.joinToString("; ") { (key, value) ->
             "$key=$value"
         }
-        requestBuilder
-            .header("User-Agent", BILI_UA)
-            .header("Referer", BILI_REFERER)
-            .apply {
-                if (cookieHeader.isNotBlank()) header("Cookie", cookieHeader)
-            }
+        moe.ouom.neriplayer.platform.bilibili.api.stream.buildBiliStreamRequestHeaders(
+            url, emptyMap(), cookieHeader
+        ).forEach { (name, value) -> requestBuilder.header(name, value) }
     } else if (isYouTubeMusicSong(song)) {
         val auth = DownloadHosts.credentials.youtubeAuth().normalized()
         auth.buildYouTubeStreamRequestHeaders(

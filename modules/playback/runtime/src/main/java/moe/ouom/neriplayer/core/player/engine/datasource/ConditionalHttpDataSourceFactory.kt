@@ -37,7 +37,7 @@ import moe.ouom.neriplayer.platform.bilibili.auth.BiliCookieRepository
 import moe.ouom.neriplayer.data.model.youtube.auth.YouTubeAuthBundle
 import moe.ouom.neriplayer.platform.youtube.auth.YouTubeAuthRepository
 import moe.ouom.neriplayer.data.model.youtube.auth.YOUTUBE_MUSIC_ORIGIN
-import moe.ouom.neriplayer.platform.bilibili.api.stream.isBiliStreamHost
+import moe.ouom.neriplayer.platform.bilibili.api.stream.buildBiliStreamRequestHeaders
 import moe.ouom.neriplayer.platform.bilibili.api.stream.isBiliStreamUrl
 import moe.ouom.neriplayer.platform.youtube.api.transport.buildYouTubeStreamRequestHeaders
 import moe.ouom.neriplayer.platform.youtube.api.transport.isYouTubeGoogleVideoHost
@@ -66,12 +66,6 @@ class ConditionalHttpDataSourceFactory(
     private val trafficStatsRepository: TrafficStatsRepository? = null
 ) : HttpDataSource.Factory {
 
-    companion object {
-        private const val BILI_USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) " +
-                "AppleWebKit/537.36 (KHTML, like Gecko) " +
-                "Chrome/124.0.0.0 Safari/537.36"
-    }
-
     @Volatile
     private var latestCookieHeader: String = ""
     @Volatile
@@ -97,7 +91,9 @@ class ConditionalHttpDataSourceFactory(
             transformDataSpec = { dataSpec ->
                 when {
                     shouldInjectBiliHeaders(dataSpec.uri) -> {
-                        val headers = buildBiliHeaders(dataSpec.httpRequestHeaders)
+                        val headers = buildBiliStreamRequestHeaders(
+                            dataSpec.uri.toString(), dataSpec.httpRequestHeaders, latestCookieHeader
+                        )
                         dataSpec.buildUpon()
                             .setHttpRequestHeaders(headers)
                             .build()
@@ -132,10 +128,7 @@ class ConditionalHttpDataSourceFactory(
     /**
      * 是否需要为该 URI 注入 B 站拉流所需的请求头
      */
-    private fun shouldInjectBiliHeaders(uri: Uri): Boolean {
-        val host = uri.host.orEmpty()
-        return isBiliStreamHost(host) || isBiliStreamUrl(uri.toString())
-    }
+    private fun shouldInjectBiliHeaders(uri: Uri): Boolean = isBiliStreamUrl(uri.toString())
 
     private fun shouldInjectYouTubeHeaders(uri: Uri): Boolean {
         val host = uri.host?.lowercase() ?: return false
@@ -147,17 +140,6 @@ class ConditionalHttpDataSourceFactory(
             path.contains("/playlist/index.m3u8") ||
             path.contains("/file/seg.ts") ||
             rawUrl.contains("/videoplayback")
-    }
-
-    /**
-     * 基于原始请求头构建 B 站拉流所需的头部 (Referer/UA/Cookie)
-     */
-    private fun buildBiliHeaders(original: Map<String, String>): Map<String, String> {
-        val newHeaders = LinkedHashMap<String, String>(original)
-        newHeaders["Referer"] = "https://www.bilibili.com"
-        newHeaders["User-Agent"] = BILI_USER_AGENT
-        if (latestCookieHeader.isNotBlank()) newHeaders["Cookie"] = latestCookieHeader
-        return newHeaders
     }
 
     private fun buildYouTubeHeaders(

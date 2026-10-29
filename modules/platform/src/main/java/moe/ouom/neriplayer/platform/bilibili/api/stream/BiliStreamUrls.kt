@@ -1,23 +1,30 @@
 package moe.ouom.neriplayer.platform.bilibili.api.stream
 
 import java.net.URI
+import java.util.Locale
 
-fun isBiliStreamHost(host: String): Boolean {
-    val normalized = host.trim().lowercase()
-    if (normalized.isBlank()) return false
-    return normalized.contains("bilivideo.") || normalized.endsWith(".mountaintoys.cn")
+private val BILI_VIDEO_DOMAINS = listOf("bilivideo.com", "bilivideo.cn")
+
+private fun isBiliVideoHost(host: String): Boolean = BILI_VIDEO_DOMAINS.any {
+    host == it || host.endsWith(".$it")
 }
 
-fun isBiliStreamUrl(url: String): Boolean =
-    runCatching { URI(url).host.orEmpty() }
-        .getOrNull()
-        ?.let(::isBiliStreamHost) == true
+fun isBiliStreamHost(host: String): Boolean {
+    val normalized = host.trim().lowercase(Locale.ROOT).removeSuffix(".")
+    return isBiliVideoHost(normalized) || normalized.endsWith(".mountaintoys.cn")
+}
+
+fun isBiliStreamUrl(url: String): Boolean = runCatching {
+    val uri = URI(url)
+    uri.scheme?.lowercase(Locale.ROOT) in setOf("https", "http") &&
+        uri.rawUserInfo == null && isBiliStreamHost(uri.host.orEmpty())
+}.getOrDefault(false)
 
 private fun scoreBiliStreamUrl(url: String): Int {
     val host = runCatching { URI(url).host.orEmpty().lowercase() }.getOrDefault("")
     return when {
-        host.startsWith("upos-") && host.contains("bilivideo.") -> 3
-        host.contains("bilivideo.") -> 2
+        host.startsWith("upos-") && isBiliVideoHost(host) -> 3
+        isBiliVideoHost(host) -> 2
         host.endsWith(".mountaintoys.cn") -> 1
         else -> 0
     }

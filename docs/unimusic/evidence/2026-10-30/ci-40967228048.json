@@ -1,0 +1,40 @@
+{
+  "runId": 40967228048,
+  "head": "e5cca5d2fe383cafee6623bd4a8a7ab33b874e46",
+  "conclusion": "success",
+  "androidAdditiveMigration": "success",
+  "actualXmlSummary": {
+    "DailyRecommendationStoreTest": {
+      "tests": 8,
+      "failures": 0,
+      "skipped": 0
+    },
+    "DatabaseUpgradeInstrumentedTest": {
+      "tests": 3,
+      "failures": 0,
+      "skipped": 0
+    },
+    "ExploreSearchArtistIntentTest": {
+      "tests": 11,
+      "failures": 0,
+      "skipped": 0
+    },
+    "LocalRecommendationRankerTest": {
+      "tests": 9,
+      "failures": 0,
+      "skipped": 0
+    },
+    "RecordingMatchPolicyTest": {
+      "tests": 10,
+      "failures": 0,
+      "skipped": 0
+    },
+    "UnifiedLibraryMigrationTest": {
+      "tests": 1,
+      "failures": 0,
+      "skipped": 0
+    }
+  },
+  "deduplication": "class and test name; duplicate Android preserved reports counted once",
+  "limits": "Covers 2BJ,2BK,3J; not subsequent 2BL or 2BM; no actual device/full audio/timing claim"
+}

@@ -20,12 +20,13 @@
 | [2BI酷我实际来源](PHASE_2BI_KUWO_PLAYBACK_PROVENANCE.md) | 2新/共3 JVM、边界、Debug1m22s；真实来源徽标及无效音质操作保护 | 8cc7990b已push，CI40965533755含Android SUCCESS |
 | [2BJ未知署名](PHASE_2BJ_UNKNOWN_ARTIST_EVIDENCE.md) | 3新/共5 JVM、边界、Debug1m38s；跨源/卡片/推荐不利用占位署名，算法v5 | e72358fc已push |
 | [2BK名称边界](PHASE_2BK_ARTIST_NAME_BOUNDARIES.md) | 1新/共3 JVM、边界、Debug44s；名称有序边界、明确别名及作品共识 | e2ac4ec7已push |
-| [3J正向歌手亲和度](PHASE_3J_POSITIVE_ARTIST_AFFINITY.md) | 1新/共4 JVM、边界、Debug51s；累计试听统计不再间接加分喜好，算法v6 | e5cca5d2已push，累计CI40967228048运行中 |
-| [2BL跨语言版本](PHASE_2BL_PERFORMANCE_VERSION_LABELS.md) | 2新/共3 JVM、边界、Debug49s；日文/繁体演绎、Off Vocal版本证据 | 本检查点所在提交，待下一阶段统一push |
+| [3J正向歌手亲和度](PHASE_3J_POSITIVE_ARTIST_AFFINITY.md) | 1新/共4 JVM、边界、Debug51s；累计试听统计不再间接加分喜好，算法v6 | e5cca5d2已push，CI40967228048含Android SUCCESS |
+| [2BL跨语言版本](PHASE_2BL_PERFORMANCE_VERSION_LABELS.md) | 2新/共3 JVM、边界、Debug49s；日文/繁体演绎、Off Vocal版本证据 | 47d54c19已commit，随2BM一起push |
+| [2BM流凭据边界](PHASE_2BM_BILI_STREAM_CREDENTIAL_BOUNDARIES.md) | 4不同JVM最终均通过（含1次测试桩修复）、边界、Debug成功；HTTPS/严格域名与重定向去凭据 | 本检查点所在提交，连同2BL一起push |
 
-2BE CI40960266466、2BH CI40964014292和2BI CI40965533755均整体SUCCESS，必要Android无损迁移步骤通过。2BI实际XML新音质/来源各1、旧ArtistIntent9、SourceResolver17、preview进度4、增量迁移1/升级3均0失败/跳过；摘要见evidence/2026-10-30/ci-40965533755.json。本轮2BJ/2BK/3J已验证并push，CI40967228048运行中，随后核对实际XML；不重跑已完成历史检查。
+此前必要CI均已SUCCESS。最新已核实CI40967228048（e5cca5d2，含2BJ/2BK/3J）整体及Android无损迁移SUCCESS；实际XML ArtistIntent11、RecordingMatch10、Ranker9、DailyStore8、增量迁移1/升级3均0失败/跳过。摘要见evidence/2026-10-30/ci-40967228048.json。2BL/2BM本地已验证，将一起push；2BM改动工作流选择器，必须等待它的必要迁移步骤完成，勿被后续push取消。
 
-最新构建：`build/outputs/unimusic/UniMusic-20261030-2BL-debug.apk`，版本`e5cca5d2fe38.dirty.10300639`，SHA-256 `170d68d90da2fa4db374fbe60937a91d4f3a71c5e422d9bcd2c1bd607d49d464`。无本地Gradle运行；CI40967228048监视中。无本次设备安装、真实账号切换/书签/新完整音频/速度验收。
+最新构建：`build/outputs/unimusic/UniMusic-20261030-2BM-debug.apk`，版本`47d54c197707.dirty.10300651`，SHA-256 `b79f79f678b1069870bad4f67edaf777d7134b1d0acb1aa3369dcb2f6c833d5e`。无本地Gradle或旧CI监视进程运行。无本次设备安装、真实账号/网络跳转/新完整音频/速度验收。
 
 ## 此前已完成，不重做
 
@@ -51,8 +52,8 @@
 
 ## 接下来
 
-1. 本阶段push后核对最新累计CI（2BJ/2BK/3J），保存实际XML结果；已有必要工作流CI均完成。
-2. 下载路径已查到明确试听拒绝及现有回归，不重做。2BJ已修复未知署名、2BK已补名称边界、3J已隔离统计与亲和度；2BL已补跨语言版本；接续B站CDN严格域名/重定向请求头边界；NPLogger已脱敏，勿导出真实秘密验证。
+1. 本阶段push后核对2BM累计CI及必要Android迁移，保存XML；此前2BJ/2BK/3J已完整远端通过。
+2. 下载路径已查到明确试听拒绝及现有回归，不重做。2BJ已修复未知署名、2BK已补名称边界、3J已隔离统计与亲和度；2BL已补跨语言版本；2BM已补流凭据边界；可接着优化CI浅克隆缺base导致的不必要全量迁移检查（保守fallback不能去掉）；NPLogger已脱敏，勿导出真实秘密验证。
 3. 设备重新在线后仅做必要、保留数据的本地验收，明确试听与完整版差别；不为测试修改真实账号/清除用户书签或偏好。
 4. 继续高价值来源/匹配/推荐后台，按实际结果更新此短检查点，每阶段commit/push。
 
