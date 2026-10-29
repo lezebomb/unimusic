@@ -6,6 +6,6 @@
 
 3项新增加1项既有歧义保护共4项JVM、模块边界和Debug构建通过；构建4m2s。虚拟时序中的600ms索引与800ms歌曲在800ms同时可用，索引超时仍在1200ms释放，验证的是调度与取消，并非真实网络加速百分比。没有放宽匹配门槛换速度。
 
-APK：`build/outputs/unimusic/UniMusic-20261030-2BB-debug.apk`，版本5e9562748a30.dirty.10300036，SHA-256 `6799d4159d9e3b7b870605c44681989c06c214d9026c07d142c37ff1c9ef945a`。本轮目标Mate60未连接，未安装此包、未做实际搜索延迟/账号切换/新音频验收。原账号、歌单、历史和Room v23保留。关键XML与实际结果见[evidence](evidence/2026-10-30/phase2bb/validation.json)。现有CI已选择整个ArtistIntent测试类，不新增测试套件；后续源码9b87ef00的[CI40917256200](https://github.com/lezebomb/unimusic/actions/runs/40917256200)整体成功，下载XML确认ArtistIntentTest 7项0失败，含本阶段新增3项。
+APK：`build/outputs/unimusic/UniMusic-20261030-2BB-debug.apk`，版本5e9562748a30.dirty.10300036，SHA-256 `6799d4159d9e3b7b870605c44681989c06c214d9026c07d142c37ff1c9ef945a`。最初设备统计脚本误用了制表符分隔，0结果不能证明设备当时离线。本阶段未安装此中间包；后续2BC使用正确目标选择安装累计代码，并实际确认乐队查询及原曲在前，见[设备证据](evidence/2026-10-30/phase2bc/device-validation.json)。没有真实搜索延迟或账号切换验收。原账号、歌单、历史和Room v23保留。关键XML与实际结果见[evidence](evidence/2026-10-30/phase2bb/validation.json)。现有CI已选择整个ArtistIntent测试类，不新增测试套件；后续源码9b87ef00的[CI40917256200](https://github.com/lezebomb/unimusic/actions/runs/40917256200)整体成功，下载XML确认ArtistIntentTest 7项0失败，含本阶段新增3项。
 
 上一阶段3E已推送，远端40823070110成功，并下载XML确认两项新增试听反馈用例确实执行。Oct29两条一次性计划已删除；本轮按用户要求配置2026-10-30 05:30（Asia/Shanghai）单次续跑，触发后删除，不创建每日循环。

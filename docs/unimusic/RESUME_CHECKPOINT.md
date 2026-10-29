@@ -4,13 +4,23 @@
 
 **当前优先级：按最新用户要求弃用QQ音乐和YouTube音源，完善其余来源、搜索与推荐。** 保留已登录的Google/网易云及既有两份共5首导入，不重新登录/收验证码或重导全部歌单。YouTube实际音频仍未接通，其他来源/实际播放范围看2L/2M/2P报告，不扩大结论。
 
+## Oct30最终设备/CI补证据
+
+2BC源码8cec801f已推送，远端40918996595整体SUCCESS；XML确认SourceResolver 15、预算3、NeteaseAutoSourceSwitch 3、NeteaseLocalFallback 14项均0失败，两新并行用例实际执行。9b87ef00的40917256200此前也整体成功，覆盖2BB与3F～3I。证据摘要均在evidence/2026-10-30，不重跑本地已通过集或无关迁移。
+
+Mate60当前已安装累计2BC包，版本9b87ef001ede.dirty.10300110；安装页面成功/包版本匹配、保留数据覆盖安装，初次ADB安装stdout未留存不虚称捕获Success。设备原本的充电常亮7仍在，不改设置。先前脚本用制表符匹配devices -l导致0计数不可靠，后来正确空白/型号核对找到1台授权设备；不要把该误判当作离线证据。
+
+完整历史查询“哭泣少女乐队”实机顶部仍为トゲナシトゲアリ、ダイヤモンドダスト及雑踏、僕らの街/Cycle Of Sorrow。选中样本进度6044→8115ms、总长20秒且明确仅试听；反馈开启、手动下一首新增偏好0条，补上3E真实采样。最终自身媒体会话state2/5456ms已暂停。不是新完整备用音频或切源速度验收。Adele输入停在A和华为拼音组合区，未当成Adele搜索验收，不修改键盘/账号/反馈开关。
+
+最新APK build/outputs/unimusic/UniMusic-20261030-2BC-debug.apk，哈希见报告；设备数据见phase2bc/device-validation.json。未测真实备用失败注入/切换耗时、完整音频、推荐清除/重启/入库/下载界面及全局准确率。当前无本地Gradle或CI监视进程运行，接续其他有价值后台，或手机在线时补必要验收。Oct30 05:30单次计划仍保留，到点删除并接续，不重做本轮或开重复构建。
+
 ## 当前2BC：网易云新酷我/B站备用并行
 
 已记住来源与本地优先保留，新原生(网易云原曲当前为酷我)/B站两家族从串行改并行；首个完整合格Success胜出，取消落选任务。子任务时长/错误/扫描回调隔离，等待清理后再复核NE/酷我/B站会话、网络、自动开关，只有胜出更新时长。录音/版本/权限/试听门槛及统一8秒总预算不变；增加有限推测请求的取舍见[2BC](PHASE_2BC_PARALLEL_FRESH_SOURCE_FAMILIES.md)。
 
 新2/共3纯逻辑JVM通过，最终Debug42s及边界通过；首两次编译泛型/返回类型问题已修，原通过用例未无意义重跑。最新APK build/outputs/unimusic/UniMusic-20261030-2BC-debug.apk，精确版本/哈希见报告；未装机、测真实速度/新音频。固定JDK21 runtime套件本机未执行，不要重复下载/尝试。
 
-3I已commit/push 9b87ef00，CI40917256200整体SUCCESS；已下载XML确认ArtistIntent 7、DailyStore 8、PlaybackFeedbackStore 4、LocalRanker 7项均0失败，覆盖2BB与3F～3I。2BC已commit/push 8cec801f，其CI40918996595最后观察in_progress，需接续最终结果。前面被后续提交替代的任务不标记成功；最新普通行为集包含这些搜索/推荐与SourceResolver用例。当前无运行中本地Gradle；接续CI失败修复或其他有价值后台，少量定向验证，不重复这批已通过构建。唯一UniMusic定时计划Oct30 05:30仍保留，触发后删除并接续本检查点，别重做2BB/3F～3I/2BC或同时启动构建。
+3I已commit/push 9b87ef00，CI40917256200整体SUCCESS；已下载XML确认ArtistIntent 7、DailyStore 8、PlaybackFeedbackStore 4、LocalRanker 7项均0失败，覆盖2BB与3F～3I。2BC已commit/push 8cec801f，其CI40918996595已确认SUCCESS并读取XML。前面被后续提交替代的任务不标记成功；最新普通行为集包含这些搜索/推荐与SourceResolver用例。当前无运行中本地Gradle；接续CI失败修复或其他有价值后台，少量定向验证，不重复这批已通过构建。唯一UniMusic定时计划Oct30 05:30仍保留，触发后删除并接续本检查点，别重做2BB/3F～3I/2BC或同时启动构建。
 
 ## 当前3I：异步播放反馈存储恢复
 
@@ -40,7 +50,7 @@ Oct29两个UniMusic单次计划已删除，唯一当前UniMusic计划unimusic-10
 
 ## 当前2BB：歌曲与可选歌手索引并行
 
-聚合/网易云歌曲页在查询开始并行预取一次歌手索引，1200ms独立预算；歌曲原始证据返回后才发布意图，不重复分类/分页请求。取消旧查询/账号复核/已知离线保护保留；3新增+1既有共4 JVM、模块边界及Debug4m2s通过。见[2BB](PHASE_2BB_PARALLEL_ARTIST_LOOKUP.md)。APK build/outputs/unimusic/UniMusic-20261030-2BB-debug.apk，精确版本/哈希见报告。Mate60未连接，未安装本阶段包或测实际速度/音频，不虚构性能结果。当前无运行中本地Gradle，接续下一阶段。
+聚合/网易云歌曲页在查询开始并行预取一次歌手索引，1200ms独立预算；歌曲原始证据返回后才发布意图，不重复分类/分页请求。取消旧查询/账号复核/已知离线保护保留；3新增+1既有共4 JVM、模块边界及Debug4m2s通过。见[2BB](PHASE_2BB_PARALLEL_ARTIST_LOOKUP.md)。APK build/outputs/unimusic/UniMusic-20261030-2BB-debug.apk，精确版本/哈希见报告。初始设备计数不可靠，后经正确选择发现在线；本阶段中间包未单独装机，累计包验收见顶部，不虚构实际速度。当前无运行中本地Gradle，接续下一阶段。
 
 3E远端40823070110成功，已下载XML确认PlaybackStatsOwnerTest共3项含两新增试听用例，0失败。Oct29 00:10/05:12两个单次计划已删除；按最新用户要求设置Oct30 05:30（Asia/Shanghai）单次计划unimusic-10-30-05-30，触发后删除；若本聊天仍在开发合并接续，不启动重复工作。下一步检查2BB远端，再完善有价值的搜索/推荐后台；只跑直接相关少量关键测试。
 

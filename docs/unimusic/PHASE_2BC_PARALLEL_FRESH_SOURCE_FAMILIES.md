@@ -10,4 +10,6 @@
 
 首次23s遇测试泛型推断编译错误，显式类型已修；第二次34s发现B站接口声明返回SongUrlResult?，已明确只接受Success。三项纯逻辑已通过，最终相同选择器复用已通过结果，Debug42s成功；不重复无变化的用例。模块边界通过。runtime单元固定JDK21本机没有，未重试或下载，主代码由APK编译覆盖，远端沿用现有SourceResolver选择器。
 
-APK `build/outputs/unimusic/UniMusic-20261030-2BC-debug.apk`，版本9b87ef001ede.dirty.10300110，SHA-256 `766861ed747de95c904ba86ec344ea84d10df4b6cbb53796bab70e9ca015ef38`。没有真机安装、实际切源速度、账号变化或新音频验收，不宣称全部免费/完整可播。XML和实际边界见[evidence](evidence/2026-10-30/phase2bc/validation.json)。Room v23及用户账号/歌单/来源选择保留。
+APK `build/outputs/unimusic/UniMusic-20261030-2BC-debug.apk`，版本9b87ef001ede.dirty.10300110，SHA-256 `766861ed747de95c904ba86ec344ea84d10df4b6cbb53796bab70e9ca015ef38`。后续Mate60已保留数据安装，系统显示安装成功且包版本一致。完整历史词“哭泣少女乐队”实机显示两关联乐队及雑踏、僕らの街/Cycle Of Sorrow在前；样本进度6044→8115ms，但总长20秒且明确显示“仅提供试听”。反馈开关开启时手动下一首新增偏好事件0，最后自身媒体会话state2已暂停。该样本不能证明新原生/B站备用取流成功，也不是完整版或速度验收。细节见[设备证据](evidence/2026-10-30/phase2bc/device-validation.json)。XML和实际边界见[evidence](evidence/2026-10-30/phase2bc/validation.json)。Room v23及用户账号/歌单/来源选择保留。
+
+远端源码8cec801f的[CI40918996595](https://github.com/lezebomb/unimusic/actions/runs/40918996595)整体SUCCESS；已下载XML确认SourceResolver 15、共享预算3、NeteaseAutoSourceSwitch 3、NeteaseLocalFallback 14项均0失败，两新增并行用例确实执行。

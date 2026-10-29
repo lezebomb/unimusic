@@ -16,7 +16,7 @@
     "archive": "build/outputs/unimusic/UniMusic-20261030-2BC-debug.apk",
     "version": "9b87ef001ede.dirty.10300110",
     "sha256": "766861ed747de95c904ba86ec344ea84d10df4b6cbb53796bab70e9ca015ef38",
-    "installedThisPhase": false
+    "installedThisPhase": true
   },
   "implementation": {
     "freshNeteaseAlternates": "Kuwo/native and Bilibili discovery families run concurrently after remembered/local attempts",
@@ -28,9 +28,25 @@
   },
   "data": "Room v23; accounts, playlists and stored choices preserved; no new source or entitlement bypass",
   "unexecuted": [
-    "No device installation or actual fallback delay/audio verification",
-    "No new full-song, account-switch or network failure-injection acceptance",
-    "No local runtime unit execution because fixed JDK21 absent; no download/retry of that suite"
+    "Actual fresh alternate failure-injection timing and full native/video success",
+    "Recommendation clear/restart/import/download UI paths",
+    "New positive full-recording feedback control and global original-recording accuracy",
+    "No local fixed-JDK21 runtime unit execution; selected runtime cases passed remotely"
   ],
-  "ci": "pending commit/push; existing PlaybackSourceResolverTest selector includes new cases"
+  "ci": {
+    "runId": 40918996595,
+    "sourceCommit": "8cec801f2e3161ddd8a636b5963568474cedf1b3",
+    "conclusion": "success",
+    "url": "https://github.com/lezebomb/unimusic/actions/runs/40918996595",
+    "verifiedXmlSummary": "../ci-40918996595.json",
+    "counts": {
+      "PlaybackSourceResolverTest": 15,
+      "SourceResolutionBudgetTest": 3,
+      "PlayerManagerNeteaseAutoSourceSwitchTest": 3,
+      "PlayerManagerNeteaseLocalFallbackTest": 14
+    },
+    "allVerifiedClassesZeroFailures": true,
+    "bothNewRaceMethodsExecuted": true
+  },
+  "deviceEvidence": "device-validation.json"
 }

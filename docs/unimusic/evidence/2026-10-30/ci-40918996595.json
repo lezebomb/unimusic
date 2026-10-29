@@ -1,0 +1,75 @@
+{
+  "runId": 40918996595,
+  "sourceCommit": "8cec801f2e3161ddd8a636b5963568474cedf1b3",
+  "conclusion": "success",
+  "url": "https://github.com/lezebomb/unimusic/actions/runs/40918996595",
+  "verifiedTestClasses": {
+    "PlaybackSourceResolverTest": {
+      "tests": 15,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "testNames": [
+        "sharedParallelDeadlineAndCallerCancellationDoNotBlacklistUnfinishedSources",
+        "anAdaptersOwnTimeoutOrExceptionAdvancesToTheNextCandidate",
+        "permissionAndMetadataFailuresInvalidateEvidenceWithoutCoolingANewLogin",
+        "recentPrimaryHintsExpireWithoutSlidingAndCannotCrossAccountsOrSources",
+        "totalBudgetIncludesDiscoveryAndEachSlowCandidate",
+        "parallelCandidatesStillEnforceEligibilityAndCoolOnlyAnActualTransientFailure",
+        "staleContextFailuresHaveNoAutomaticMappingOrCooldownSideEffects",
+        "firstSuccessStopsDiscoveryAndSkipsIneligibleAudio",
+        "parentCancellationPropagatesAndDoesNotBlacklistTheSource",
+        "aSelfCancelledParallelSourceCannotLeaveTheReceiverWaitingForItsMissingResult",
+        "parallelRaceStillPropagatesCallerCancellationAndStopsEveryChild",
+        "freshSourceRaceRechecksContextAfterLoserCleanupAndHonorsParentDeadline",
+        "freshSourceFamiliesRaceWithoutPublishingLoserEffects",
+        "transientFailureCoolsDownWithoutPoisoningOtherSongs",
+        "cachedParallelSourcesReturnTheFastSuccessWithoutCoolingTheCancelledLoser"
+      ]
+    },
+    "SourceResolutionBudgetTest": {
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "testNames": [
+        "explicitYoutubeCanPrepareCipherWithoutExtendingAnAutomaticFallbackDeadline",
+        "nestedRecoveryCannotResetTheDeadlineAndStandaloneChecksKeepTheirBudget",
+        "primaryAndFallbackShareOneDeadlineAndDoNotAddIndependentWaits"
+      ]
+    },
+    "PlayerManagerNeteaseAutoSourceSwitchTest": {
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "testNames": [
+        "buildNeteaseAutoBiliCacheKey_isStableForSameStream",
+        "buildNeteaseAutoBiliCacheKey_separatesDifferentStreams",
+        "buildNeteaseAutoBiliCacheKey_usesBiliAutoNamespace"
+      ]
+    },
+    "PlayerManagerNeteaseLocalFallbackTest": {
+      "tests": 14,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "testNames": [
+        "metadataMatch_rejectsDurationOutsideTolerance",
+        "select_acceptsMetadataOnlyLocalSongAsRestrictedFallback",
+        "metadataMatch_rejectsUnknownDurations",
+        "select_ignoresNonLocalSongsEvenWhenMatched",
+        "lyricMatchCannotAuthorizeDifferentRecordingOrUnknownDuration",
+        "select_rejectsExactMatchedSongIdWhenDurationIsTooFarOff",
+        "select_deduplicatesSameLocalFileAcrossPlaylists",
+        "select_sortsExactMatchesByDurationCloseness",
+        "metadataMatch_rejectsDifferentArtist",
+        "metadataMatch_usesCustomOverrideFromManualMatch",
+        "metadataMatch_prefersOriginalMetadataOfRenamedNeteaseSong",
+        "select_qqMatchedIdIsNotAnExactMatchButCanMatchByMetadata",
+        "metadataMatch_normalizesCaseWhitespaceAndPunctuation",
+        "select_prefersExactMatchedSongIdOverFuzzyMetadata"
+      ]
+    }
+  }
+}

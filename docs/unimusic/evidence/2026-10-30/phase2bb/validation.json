@@ -22,9 +22,11 @@
     "sha256": "6799d4159d9e3b7b870605c44681989c06c214d9026c07d142c37ff1c9ef945a"
   },
   "device": {
-    "connectedOwnedMate60": 0,
+    "connectedOwnedMate60": null,
     "installedThisPhase": false,
-    "timingOrAudioAcceptance": false
+    "timingOrAudioAcceptance": false,
+    "initialDetectorReliable": false,
+    "correction": "Initial zero used a tab-specific status parser and does not establish disconnection. Later correct owned-model detection found the device; combined code installed and artist ordering checked in phase2bc/device-validation.json."
   },
   "implementation": {
     "optionalArtistRequestsPerQuery": 1,

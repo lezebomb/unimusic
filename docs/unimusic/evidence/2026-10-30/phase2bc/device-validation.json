@@ -1,0 +1,46 @@
+{
+  "date": "2026-10-30",
+  "device": "authorized Mate60 BRA-AL00; identifier omitted",
+  "installedVersion": "9b87ef001ede.dirty.10300110",
+  "installation": "Huawei installer displayed installation success and installed package version matched; adb install -r preserved data; initial subprocess stdout was not retained after pending result",
+  "deviceDetectionCorrection": "Initial script required a tab before device and falsely counted zero; correct whitespace parsing and owned-model validation found one authorized device. Earlier offline inference from that script is not valid. No credential or device identifier saved.",
+  "search": {
+    "query": "哭泣少女乐队",
+    "queryVerifiedInField": true,
+    "visibleOrder": [
+      "トゲナシトゲアリ",
+      "ダイヤモンドダスト",
+      "雑踏、僕らの街",
+      "Cycle Of Sorrow"
+    ],
+    "delayBenchmark": false
+  },
+  "inputNote": "Attempted Adele input remained as A plus uncommitted Huawei pinyin composition; that attempt is not an Adele search acceptance. Existing complete history query used instead; no keyboard configuration change.",
+  "previewFeedback": {
+    "selectedPublicTitle": "雑踏、僕らの街",
+    "explicitNotice": "仅提供试听",
+    "visibleTotalMs": 20000,
+    "playingState": 3,
+    "progressSamplesMs": [
+      6044,
+      8115
+    ],
+    "feedbackEnabled": true,
+    "eventsBefore": 0,
+    "manualNextExecuted": true,
+    "newEventsAfterPreviewNext": 0,
+    "acceptance": "Device evidence for preview/manual-next preference isolation; not full-song or fresh alternate success"
+  },
+  "finalPlayback": {
+    "state": 2,
+    "positionMs": 5456,
+    "pauseMethod": "media pause key after UI exposed only Play label; own media session verified paused"
+  },
+  "stayAwakeWhilePluggedValue": 7,
+  "settingsChanged": false,
+  "unexecuted": [
+    "Actual fallback request/failure-injection timing and complete native/video success",
+    "Recommendation clear/restart/import/download UI paths",
+    "Global original-recording accuracy and full-song acceptance"
+  ]
+}

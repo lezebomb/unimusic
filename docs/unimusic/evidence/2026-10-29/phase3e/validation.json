@@ -19,9 +19,24 @@
   "device": {
     "feedbackEnabledBeforeInstall": true,
     "feedbackEventsBeforeInstall": 0,
-    "livePreviewSkipCheck": "Not executed; owned-target helper failed before actions, subsequent adb devices returned no connected devices",
+    "livePreviewSkipCheck": {
+      "followupDate": "2026-10-30",
+      "installedVersion": "9b87ef001ede.dirty.10300110",
+      "evidence": "../../2026-10-30/phase2bc/device-validation.json",
+      "explicitPreview": true,
+      "visibleTotalMs": 20000,
+      "progressSamplesMs": [
+        6044,
+        8115
+      ],
+      "feedbackEnabled": true,
+      "manualNext": true,
+      "newEventsAfterNext": 0,
+      "finalPlaybackState": 2
+    },
     "newAudioAcceptance": false,
-    "settingsChanges": false
+    "settingsChanges": false,
+    "historicalLivePreviewSkipCheck": "Not executed; owned-target helper failed before actions, subsequent adb devices returned no connected devices"
   },
   "data": "Room v23 unchanged; actual listening statistics kept, prior preference events and settings not cleared",
   "ci": {
@@ -42,8 +57,8 @@
   "recovery": "One source read was rejected by automatic approval due workspace credit error; after fresh ordinary-usage check the same command succeeded under the same approval flow. No reset or paid credit used.",
   "limitations": [
     "Gate applies to explicit preview evidence on current URL candidate or audio info",
-    "Device preview/manual-next preference sampling unexecuted after disconnection",
     "No full-song audio or recommendation accuracy acceptance",
-    "Existing historical events are not retroactively deleted; daily recommendation snapshot policy stays unchanged"
+    "Existing historical events are not retroactively deleted; daily recommendation snapshot policy stays unchanged",
+    "Device follow-up covers an explicit preview skip only; no new positive full-recording feedback control or full-track acceptance"
   ]
 }

@@ -2,7 +2,7 @@
 
 [当前搜索规则与边界](SEARCH_BEHAVIOR.md)：歌手/作品意图、跨源录音证据、版本和可播状态、列表锚定及实际验收。
 
-最新：[2BC新备用并行](PHASE_2BC_PARALLEL_FRESH_SOURCE_FAMILIES.md)：网易云新酷我/B站备用并行、胜出后复核会话并隔离落选播放器回调；3 JVM/最终Debug通过，无实测切源速度。
+最新：[2BC新备用并行](PHASE_2BC_PARALLEL_FRESH_SOURCE_FAMILIES.md)：网易云新酷我/B站备用并行、胜出后复核会话并隔离落选播放器回调；3 JVM/最终Debug及远端CI通过，Mate60装机与原词搜索通过；新样本仍20秒试听，无实测切源速度。
 
 最新：[3I反馈存储恢复](PHASE_3I_FEEDBACK_STORAGE_RECOVERY.md)：异步写失败后可在读取时有界重试，恢复后解除错误，健康读取不重复写；2 JVM/Debug通过。
 
@@ -14,7 +14,7 @@
 
 最新：[2BB并行歌手索引](PHASE_2BB_PARALLEL_ARTIST_LOOKUP.md)：歌曲与歌手索引并行，保留取消/权限/录音门槛；4 JVM/Debug通过，无真机速度声明。
 
-最新：[3E试听偏好隔离](PHASE_3E_PREVIEW_FEEDBACK_ISOLATION.md)：明确试听不产生跳过/听完/重播偏好，实际收听统计保留；4 JVM/构建/装机通过，断连后设备采样待补。
+最新：[3E试听偏好隔离](PHASE_3E_PREVIEW_FEEDBACK_ISOLATION.md)：明确试听不产生跳过/听完/重播偏好，实际收听统计保留；4 JVM/构建/装机通过，Oct30累计包已补明确试听/手动切歌0新增偏好采样。
 
 最新：[2BA录音核对与搜索锚点](PHASE_2BA_RECORDING_EVIDENCE_AND_SEARCH_ANCHOR.md)：补DJ/混合语言版本标签；跨源同录音核对后再提升，后台重排保持真正顶部，原词实机稳定。
 
