@@ -1,0 +1,354 @@
+{
+  "build": "BUILD SUCCESSFUL in 1m 2s",
+  "moduleBoundaries": "passed",
+  "newJvmTests": 0,
+  "install": {
+    "apk": "build/outputs/unimusic/UniMusic-20261030-2BU-debug.apk",
+    "sha256": "e0688023263c86804cd2ef91b2c37e0fefce5a78f8e9c27aa5fa108fae07a7c2",
+    "version": "e68b8c68edf0.dirty.10301538",
+    "installedVersionMatches": true,
+    "installs": [
+      {
+        "kind": "product",
+        "success": true,
+        "exitCode": 0,
+        "verification": "verification_sent"
+      },
+      {
+        "kind": "probe",
+        "success": true,
+        "exitCode": 0,
+        "verification": "verification_sent"
+      }
+    ]
+  },
+  "deviceProbes": [
+    {
+      "requestedTitle": "雑踏、僕らの街",
+      "instrumentationCompleted": true,
+      "reports": [
+        {
+          "automaticFallbackEnabled": true,
+          "primaryFound": true,
+          "title": "雑踏、僕らの街",
+          "artist": "トゲナシトゲアリ",
+          "durationMs": 184243,
+          "discoveryMs": 1296,
+          "failures": {},
+          "candidates": [
+            {
+              "provider": "netease",
+              "title": "雑踏、僕らの街",
+              "artist": "トゲナシトゲアリ",
+              "durationMs": 184253,
+              "match": "ACCEPTED"
+            },
+            {
+              "provider": "netease",
+              "title": "雑踏、僕らの街",
+              "artist": "トゲナシトゲアリ",
+              "durationMs": 184253,
+              "match": "ACCEPTED"
+            },
+            {
+              "provider": "bilibili",
+              "title": "伴奏( 含节奏吉他、Bonus吉他)",
+              "artist": "",
+              "durationMs": 93000,
+              "match": "VERSION"
+            },
+            {
+              "provider": "bilibili",
+              "title": "原曲",
+              "artist": "",
+              "durationMs": 93000,
+              "match": "VERSION"
+            },
+            {
+              "provider": "bilibili",
+              "title": "纯伴奏(不含节奏吉他、Bonus吉他)",
+              "artist": "",
+              "durationMs": 93000,
+              "match": "VERSION"
+            },
+            {
+              "provider": "bilibili",
+              "title": "主音吉他分轨(含部分Bonus吉他残留)",
+              "artist": "",
+              "durationMs": 93000,
+              "match": "VERSION"
+            },
+            {
+              "provider": "bilibili",
+              "title": "节奏吉他+Bonus吉他分轨_缩混",
+              "artist": "",
+              "durationMs": 93000,
+              "match": "VERSION"
+            },
+            {
+              "provider": "bilibili",
+              "title": "原唱",
+              "artist": "トゲナシトゲアリ",
+              "durationMs": 191000,
+              "match": "TITLE"
+            },
+            {
+              "provider": "bilibili",
+              "title": "伴奏",
+              "artist": "トゲナシトゲアリ",
+              "durationMs": 191000,
+              "match": "VERSION"
+            },
+            {
+              "provider": "bilibili",
+              "title": "【cover用伴奏】  - 雑踏、僕らの街 哭泣少女乐队OP (电吉他)",
+              "artist": "トゲナシトゲアリ",
+              "durationMs": 184000,
+              "match": "VERSION"
+            },
+            {
+              "provider": "netease",
+              "title": "雑踏、僕らの街",
+              "artist": "トゲナシトゲアリ",
+              "durationMs": 184253,
+              "match": "VERSION"
+            },
+            {
+              "provider": "netease",
+              "title": "雑踏、僕らの街 (OP)",
+              "artist": "トゲナシトゲアリ",
+              "durationMs": 92973,
+              "match": "TITLE"
+            },
+            {
+              "provider": "netease",
+              "title": "雑踏、僕らの街 (Cover) [アニメ『ガールズバンドクライ』より] [オリジナル歌手：トゲナシトゲアリ]",
+              "artist": "Mobile Melody Series",
+              "durationMs": 39547,
+              "match": "VERSION"
+            },
+            {
+              "provider": "netease",
+              "title": "雑踏、僕らの街 (Cover) [アニメ『ガールズバンドクライ』より] [オリジナル歌手：トゲナシトゲアリ]",
+              "artist": "Mobile Melody Series",
+              "durationMs": 39483,
+              "match": "VERSION"
+            },
+            {
+              "provider": "netease",
+              "title": "雑踏、僕らの街 (Cover) [アニメ『ガールズバンドクライ』より] [オリジナル歌手：トゲナシトゲアリ]",
+              "artist": "Mobile Melody Series",
+              "durationMs": 39769,
+              "match": "VERSION"
+            },
+            {
+              "provider": "netease",
+              "title": "トゲナシトゲアリ - 雑踏、僕らの街 (Ecalims Bootleg)",
+              "artist": "Once He Existed.",
+              "durationMs": 185268,
+              "match": "VERSION"
+            },
+            {
+              "provider": "kuwo",
+              "title": "雑踏、僕らの街 (哭泣少女乐队 / 闺泣 Girls Band Cry OP)(哭泣少女乐队 Girls Band Cry OP)",
+              "artist": "Kyle Xian",
+              "durationMs": 129000,
+              "match": "TITLE"
+            },
+            {
+              "provider": "kuwo",
+              "title": "雑踏、僕らの街 (18秒电吉他版片段)",
+              "artist": "後藤三玖",
+              "durationMs": 18000,
+              "match": "VERSION"
+            }
+          ],
+          "checks": [
+            {
+              "provider": "netease",
+              "primary": true,
+              "title": "雑踏、僕らの街",
+              "status": "PREVIEW_ONLY",
+              "elapsedMs": 724
+            },
+            {
+              "provider": "netease",
+              "primary": false,
+              "title": "雑踏、僕らの街",
+              "status": "PREVIEW_ONLY",
+              "elapsedMs": 433
+            }
+          ],
+          "stage": "COMPLETE",
+          "elapsedMs": 3848
+        }
+      ]
+    },
+    {
+      "requestedTitle": "空の箱",
+      "instrumentationCompleted": true,
+      "reports": [
+        {
+          "automaticFallbackEnabled": true,
+          "primaryFound": false,
+          "stage": "COMPLETE",
+          "elapsedMs": 1406
+        }
+      ]
+    },
+    {
+      "requestedTitle": "誰にもなれない私だから",
+      "instrumentationCompleted": true,
+      "reports": [
+        {
+          "automaticFallbackEnabled": true,
+          "primaryFound": true,
+          "title": "誰にもなれない私だから",
+          "artist": "トゲナシトゲアリ",
+          "durationMs": 189816,
+          "discoveryMs": 1229,
+          "failures": {},
+          "candidates": [
+            {
+              "provider": "netease",
+              "title": "誰にもなれない私だから",
+              "artist": "トゲナシトゲアリ",
+              "durationMs": 190146,
+              "match": "ACCEPTED"
+            },
+            {
+              "provider": "bilibili",
+              "title": "On Vocal",
+              "artist": "トゲナシトゲアリ",
+              "durationMs": 191000,
+              "match": "TITLE"
+            },
+            {
+              "provider": "bilibili",
+              "title": "Off Vocal",
+              "artist": "トゲナシトゲアリ",
+              "durationMs": 191000,
+              "match": "VERSION"
+            },
+            {
+              "provider": "bilibili",
+              "title": "[官谱] 誰にもなれない私だから Girls Band Cry ED 乐队总谱 TAB",
+              "artist": "",
+              "durationMs": 191000,
+              "match": "MISSING_METADATA"
+            },
+            {
+              "provider": "bilibili",
+              "title": "【纯k投屏/自用】誰にもなれない私だから —— ",
+              "artist": "トゲナシトゲアリ",
+              "durationMs": 195000,
+              "match": "TITLE"
+            },
+            {
+              "provider": "bilibili",
+              "title": " 武道馆live一周年纪念|弹唱cover「誰にもなれない私だから」",
+              "artist": "トゲナシトゲアリ",
+              "durationMs": 285000,
+              "match": "VERSION"
+            },
+            {
+              "provider": "bilibili",
+              "title": "誰にもなれない私だから_(Instrumental)",
+              "artist": "",
+              "durationMs": 191000,
+              "match": "VERSION"
+            },
+            {
+              "provider": "bilibili",
+              "title": "誰にもなれない私だから_(Vocals)",
+              "artist": "",
+              "durationMs": 191000,
+              "match": "VERSION"
+            },
+            {
+              "provider": "bilibili",
+              "title": "誰にもなれない私だから_(Guitar)",
+              "artist": "",
+              "durationMs": 191000,
+              "match": "VERSION"
+            },
+            {
+              "provider": "netease",
+              "title": "誰にもなれない私だから (ED Long Intro ver.)",
+              "artist": "トゲナシトゲアリ",
+              "durationMs": 115306,
+              "match": "TITLE"
+            },
+            {
+              "provider": "netease",
+              "title": "誰にもなれない私だから (ED)",
+              "artist": "トゲナシトゲアリ",
+              "durationMs": 91613,
+              "match": "TITLE"
+            },
+            {
+              "provider": "netease",
+              "title": "崖の際に立ち、遥か彼方に霞む彼岸を見つめながら、迷うことなく、ただ跳ぶ、愛を信じるこの心だけは、いつまでも変わらず、たとえ何が起ころうとも、信じ続けることをやめない、身を投げ出すその瞬間、君が必ず受け止めてくれるのだと、疑いさえ抱かぬまま——そうして二人、あらゆるすべてを超え、高く、高く、どこまでも舞い上がり、他の誰も知らぬ、私たちだけの場所へと、ただ二人きりで辿り着く",
+              "artist": "t e l e p a t h テレパシー能力者",
+              "durationMs": 954000,
+              "match": "TITLE"
+            },
+            {
+              "provider": "netease",
+              "title": "誰にもなれない私だから",
+              "artist": "トゲナシトゲアリ",
+              "durationMs": 189816,
+              "match": "VERSION"
+            },
+            {
+              "provider": "netease",
+              "title": "崖の際に立ち、遥か彼方に霞む彼岸を見つめながら、迷うことなく、ただ跳ぶ、愛を信じるこの心だけは、いつまでも変わらず、たとえ何が起ころうとも、信じ続けることをやめない、身を投げ出すその瞬間、君が必ず受け止めてくれるのだと、疑いさえ抱かぬまま——そうして二人、あらゆるすべてを超え、高く、高く、どこまでも舞い上がり、他の誰も知らぬ、私たちだけの場所へと、ただ二人きりで辿り着く",
+              "artist": "t e l e p a t h テレパシー能力者",
+              "durationMs": 954044,
+              "match": "TITLE"
+            },
+            {
+              "provider": "netease",
+              "title": "崖の際に立ち、遥か彼方に霞む彼岸を見つめながら、迷うことなく、ただ跳ぶ、愛を信じるこの心だけは、いつまでも変わらず、たとえ何が起ころうとも、信じ続けることをやめない、身を投げ出すその瞬間、君が必ず受け止めてくれるのだと、疑いさえ抱かぬまま——そうして二人、あらゆるすべてを超え、高く、高く、どこまでも舞い上がり、他の誰も知らぬ、私たちだけの場所へと、ただ二人きりで辿り着く",
+              "artist": "",
+              "durationMs": 954000,
+              "match": "MISSING_METADATA"
+            },
+            {
+              "provider": "netease",
+              "title": "誰にもなれない私だから（翻唱热播）",
+              "artist": "原始之音",
+              "durationMs": 189815,
+              "match": "VERSION"
+            }
+          ],
+          "checks": [
+            {
+              "provider": "netease",
+              "primary": true,
+              "title": "誰にもなれない私だから",
+              "status": "PREVIEW_ONLY",
+              "elapsedMs": 471
+            },
+            {
+              "provider": "netease",
+              "primary": false,
+              "title": "誰にもなれない私だから",
+              "status": "PREVIEW_ONLY",
+              "elapsedMs": 562
+            }
+          ],
+          "stage": "COMPLETE",
+          "elapsedMs": 3804
+        }
+      ]
+    }
+  ],
+  "scope": "Read-only metadata discovery and full-recording address checks; no playback/full-file verification",
+  "limits": [
+    "空の箱 exact studio credit/version not found within this bounded 12-row query; not a catalog-wide absence claim",
+    "Two representative studio recordings and their selected alternate NetEase IDs returned PREVIEW_ONLY",
+    "Discovery elapsed times are not switching/first-sound timings",
+    "No live account switching or in-flight opt-out fault injection in this stage"
+  ]
+}

@@ -183,11 +183,9 @@ internal suspend fun PlayerManager.resolveSourceCandidate(subject: SongItem, can
                 ?.takeIf { RecordingMatchPolicy.assess(subject.recordingMetadata(), it.second).accepted }
                 ?: return SourceAttempt.Rejected(SourceFailure.NO_MATCH)
             val item = fresh.first
-            when (val response = getNeteaseSongUrl(item, suppressError = true, sideEffects = sideEffects, allowLocalFallback = false,
-                allowAutoBiliFallback = false)) {
-                is SongUrlResult.Success -> response.copy(cacheKeyOverride = computeCacheKey(item))
-                is SongUrlResult.RequiresLogin -> return SourceAttempt.Rejected(SourceFailure.AUTH_REQUIRED)
-                else -> return SourceAttempt.Rejected(SourceFailure.UNAVAILABLE)
+            when (val response = getNeteaseSourceAttempt(item, sideEffects)) {
+                is SourceAttempt.Ready -> response.value.copy(cacheKeyOverride = computeCacheKey(item))
+                is SourceAttempt.Rejected -> return response
             }
         }
         "youtube_music" -> {

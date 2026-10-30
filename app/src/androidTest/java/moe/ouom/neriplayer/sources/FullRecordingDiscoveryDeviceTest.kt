@@ -13,8 +13,11 @@ import kotlinx.coroutines.withTimeout
 import moe.ouom.neriplayer.core.di.AppContainer
 import moe.ouom.neriplayer.core.player.PlayerManager
 import moe.ouom.neriplayer.core.player.url.checkSourceAvailability
+import moe.ouom.neriplayer.core.player.resolver.netease.recordingMetadata
 import moe.ouom.neriplayer.core.startup.player.PlayerPreloadedInitializer
 import moe.ouom.neriplayer.data.model.unified.RecordingMatchPolicy
+import moe.ouom.neriplayer.data.model.unified.RecordingMetadata
+import moe.ouom.neriplayer.data.unified.sourceCandidateForSong
 import moe.ouom.neriplayer.platform.netease.mapping.parseNeteaseSearchSongs
 import moe.ouom.neriplayer.ui.screen.nowplaying.actions.assessSourceChoice
 import moe.ouom.neriplayer.ui.screen.nowplaying.actions.discoverSourceChoices
@@ -42,13 +45,15 @@ class FullRecordingDiscoveryDeviceTest {
                 report.put("automaticFallbackEnabled", AppContainer.settingsRepo.neteaseAutoSourceSwitchFlow.first())
                 val title = args.getString("unimusicProbeTitle") ?: "雑踏、僕らの街"
                 val artist = "トゲナシトゲアリ"
+                val requested = RecordingMetadata(title, artist, 0)
                 stage = "PRIMARY_METADATA"
                 val raw = withTimeout(8_000) {
                     AppContainer.neteaseClient.searchSongsCancellable("$title $artist", limit = 12)
                 }
                 val song = parseNeteaseSearchSongs(raw).firstOrNull {
                     RecordingMatchPolicy.canonicalTitle(it.name) == RecordingMatchPolicy.canonicalTitle(title) &&
-                        RecordingMatchPolicy.canonicalArtist(it.artist) == RecordingMatchPolicy.canonicalArtist(artist)
+                        RecordingMatchPolicy.canonicalArtist(it.artist) == RecordingMatchPolicy.canonicalArtist(artist) &&
+                        !RecordingMatchPolicy.hasVersionConflict(requested, it.recordingMetadata())
                 }
                 report.put("primaryFound", song != null)
                 if (song != null) {
@@ -69,7 +74,8 @@ class FullRecordingDiscoveryDeviceTest {
                     })
                     stage = "ADDRESS_CHECK"
                     // At most two eligible candidates per automatic online provider, never GD or retired sources.
-                    val checks = result.candidates.filter {
+                    val primary = sourceCandidateForSong(song)
+                    val checks = (listOfNotNull(primary) + result.candidates).distinctBy { it.key }.filter {
                         it.key.provider in setOf("netease", "kuwo", "bilibili") && assessSourceChoice(song, it).accepted
                     }.groupBy { it.key.provider }.values.flatMap { it.take(2) }
                     report.put("checks", JSONArray().apply {
@@ -77,6 +83,7 @@ class FullRecordingDiscoveryDeviceTest {
                             val checkStarted = SystemClock.elapsedRealtime()
                             val checked = PlayerManager.checkSourceAvailability(song, candidate)
                             put(JSONObject().put("provider", candidate.key.provider)
+                                .put("primary", candidate.key == primary?.key)
                                 .put("title", candidate.metadata.title).put("status", checked.status.name)
                                 .put("elapsedMs", SystemClock.elapsedRealtime() - checkStarted))
                         }

@@ -13,6 +13,8 @@ import moe.ouom.neriplayer.core.player.quality.effectiveNeteaseQuality
 import moe.ouom.neriplayer.core.player.policy.source.sourceStageBudgetMs
 import moe.ouom.neriplayer.core.player.policy.source.withCurrentSourceResult
 import moe.ouom.neriplayer.core.player.policy.source.raceFreshPlaybackSources
+import moe.ouom.neriplayer.core.player.policy.source.SourceAttempt
+import moe.ouom.neriplayer.core.player.policy.source.SourceFailure
 import moe.ouom.neriplayer.core.player.resolver.netease.tryResolveNeteaseAutoBiliSource
 import moe.ouom.neriplayer.core.player.resolver.netease.tryResolveNeteaseMatchedLocalSource
 import moe.ouom.neriplayer.core.player.runtime.refresh.RefreshResolverSideEffects
@@ -27,10 +29,34 @@ internal suspend fun PlayerManager.getNeteaseSongUrl(
     sideEffects: RefreshResolverSideEffects = RefreshResolverSideEffects(),
     allowLocalFallback: Boolean = true,
     allowAutoBiliFallback: Boolean = true
-): SongUrlResult {
+): SongUrlResult = resolveNeteaseRecording(
+    song, suppressError, sideEffects, allowLocalFallback, allowAutoBiliFallback
+).result
+
+/** Candidate checks must keep rights/preview failures instead of cooling them as transport errors. */
+internal suspend fun PlayerManager.getNeteaseSourceAttempt(
+    song: SongItem, sideEffects: RefreshResolverSideEffects
+): SourceAttempt<SongUrlResult.Success> {
+    val resolved = resolveNeteaseRecording(song, true, sideEffects, false, false)
+    return when (val result = resolved.result) {
+        is SongUrlResult.Success -> SourceAttempt.Ready(result)
+        SongUrlResult.RequiresLogin -> SourceAttempt.Rejected(SourceFailure.AUTH_REQUIRED)
+        else -> SourceAttempt.Rejected(resolved.failure ?: SourceFailure.UNAVAILABLE)
+    }
+}
+
+private data class NeteaseRecordingResolution(val result: SongUrlResult, val failure: SourceFailure? = null)
+
+private fun neteaseRecordingFailure(reason: SourceFailure) =
+    NeteaseRecordingResolution(SongUrlResult.Failure, reason)
+
+private suspend fun PlayerManager.resolveNeteaseRecording(
+    song: SongItem, suppressError: Boolean, sideEffects: RefreshResolverSideEffects,
+    allowLocalFallback: Boolean, allowAutoBiliFallback: Boolean
+): NeteaseRecordingResolution {
     val requestSession = neteaseClient.searchSessionIdentity()
     fun current() = requestSession === neteaseClient.searchSessionIdentity()
-    return withCurrentSourceResult<SongUrlResult>(::current, SongUrlResult.Failure) {
+    return withCurrentSourceResult(::current, neteaseRecordingFailure(SourceFailure.AUTH_REQUIRED)) {
         resolveNeteaseForSession(song, suppressError, sideEffects.guardedBy(::current),
             allowLocalFallback, allowAutoBiliFallback, ::current)
     }
@@ -43,8 +69,8 @@ private suspend fun PlayerManager.resolveNeteaseForSession(
     allowLocalFallback: Boolean,
     allowAutoBiliFallback: Boolean,
     isCurrent: () -> Boolean
-): SongUrlResult = withContext(Dispatchers.IO) {
-    if (!isCurrent()) return@withContext SongUrlResult.Failure
+): NeteaseRecordingResolution = withContext(Dispatchers.IO) {
+    if (!isCurrent()) return@withContext neteaseRecordingFailure(SourceFailure.AUTH_REQUIRED)
     try {
         val effectiveQuality = effectiveNeteaseQuality()
         val qualityCandidates = buildNeteaseQualityCandidates(effectiveQuality)
@@ -53,19 +79,19 @@ private suspend fun PlayerManager.resolveNeteaseForSession(
         var requiresLogin = false
         var primaryTimedOut = false
         val primaryBudget = sourceStageBudgetMs(2_500, 8_000)
-        if (primaryBudget <= 0) return@withContext SongUrlResult.Failure
+        if (primaryBudget <= 0) return@withContext neteaseRecordingFailure(SourceFailure.TIMEOUT)
         val deadline = SystemClock.elapsedRealtime() + primaryBudget
 
         for ((index, quality) in qualityCandidates.withIndex()) {
             // A preview at a premium level needs only the standard-level full-stream check.
             if (previewSeen && quality != "standard") continue
-            if (!isCurrent()) return@withContext SongUrlResult.Failure
+            if (!isCurrent()) return@withContext neteaseRecordingFailure(SourceFailure.AUTH_REQUIRED)
             val remainingMs = deadline - SystemClock.elapsedRealtime()
             if (remainingMs <= 0L) { primaryTimedOut = true; break }
             val resp = withTimeoutOrNull(minOf(sourceStageBudgetMs(1_500, 3_000), remainingMs)) {
                 neteaseClient.getSongDownloadUrlCancellable(song.id, level = quality)
             }
-            if (!isCurrent()) return@withContext SongUrlResult.Failure
+            if (!isCurrent()) return@withContext neteaseRecordingFailure(SourceFailure.AUTH_REQUIRED)
             if (resp == null) { primaryTimedOut = true; break }
             NPLogger.d("NERI-PlayerManager", "Netease URL response: id=${song.id}, requestedQuality=$quality")
 
@@ -101,7 +127,7 @@ private suspend fun PlayerManager.resolveNeteaseForSession(
                     if (quality != effectiveQuality) {
                         NPLogger.d("NERI-PlayerManager", "Full stream available at lower quality: level=$quality")
                     }
-                    return@withContext success
+                    return@withContext NeteaseRecordingResolution(success)
                 }
 
                 is NeteasePlaybackResponseParser.PlaybackResult.Failure -> {
@@ -120,14 +146,14 @@ private suspend fun PlayerManager.resolveNeteaseForSession(
             }
         }
 
-        if (!isCurrent()) return@withContext SongUrlResult.Failure
+        if (!isCurrent()) return@withContext neteaseRecordingFailure(SourceFailure.AUTH_REQUIRED)
         // These are independent local/opt-in sources, not retries that bypass Netease access checks.
         resolveNeteaseAlternates(song, sideEffects, allowLocalFallback, allowAutoBiliFallback)?.let {
-            return@withContext it
+            return@withContext NeteaseRecordingResolution(it)
         }
 
         if (requiresLogin && !primaryTimedOut && !previewSeen) {
-            return@withContext SongUrlResult.RequiresLogin
+            return@withContext NeteaseRecordingResolution(SongUrlResult.RequiresLogin, SourceFailure.AUTH_REQUIRED)
         }
 
         if (!suppressError) {
@@ -143,12 +169,17 @@ private suspend fun PlayerManager.resolveNeteaseForSession(
                 postPlayerEvent(PlayerEvent.ShowError(getLocalizedString(messageRes)))
             }
         }
-        SongUrlResult.Failure
+        neteaseRecordingFailure(when {
+            previewSeen -> SourceFailure.PREVIEW_ONLY
+            primaryTimedOut -> SourceFailure.TIMEOUT
+            lastFailureReason == NeteasePlaybackResponseParser.FailureReason.NO_PERMISSION -> SourceFailure.NO_PERMISSION
+            else -> SourceFailure.UNAVAILABLE
+        })
     } catch (e: Exception) {
         if (e is CancellationException) throw e
-        if (!isCurrent()) return@withContext SongUrlResult.Failure
+        if (!isCurrent()) return@withContext neteaseRecordingFailure(SourceFailure.AUTH_REQUIRED)
         resolveNeteaseAlternates(song, sideEffects, allowLocalFallback, allowAutoBiliFallback)?.let {
-            return@withContext it
+            return@withContext NeteaseRecordingResolution(it)
         }
         NPLogger.w("NERI-PlayerManager", "Netease URL resolution failed: type=${e.javaClass.simpleName}")
         if (!suppressError && isPlaybackNetworkUsable(application)) {
@@ -164,7 +195,11 @@ private suspend fun PlayerManager.resolveNeteaseForSession(
                 )
             }
         }
-        SongUrlResult.Failure
+        neteaseRecordingFailure(when (e) {
+            is java.net.SocketTimeoutException -> SourceFailure.TIMEOUT
+            is java.io.IOException -> SourceFailure.NETWORK
+            else -> SourceFailure.UNAVAILABLE
+        })
     }
 }
 
