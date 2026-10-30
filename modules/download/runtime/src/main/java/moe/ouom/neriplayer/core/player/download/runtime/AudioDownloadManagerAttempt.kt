@@ -396,7 +396,8 @@ internal suspend fun AudioDownloadManager.resolveDownloadSourceForAttempt(
             )
             else -> resolveNetease(
                 songId = song.id,
-                preferredQuality = downloadAudioQuality.neteaseQuality
+                preferredQuality = downloadAudioQuality.neteaseQuality,
+                originalDurationMs = song.durationMs
             )
         }
     }

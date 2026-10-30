@@ -55,20 +55,23 @@ internal object AudioDownloadSourceResolver {
 
     internal suspend fun resolveNetease(
         songId: Long,
-        preferredQuality: String
+        preferredQuality: String,
+        originalDurationMs: Long = 0L
     ): AudioDownloadManager.ResolvedDownloadSource? = resolveNeteaseWithLookups(
         songId = songId,
         preferredQuality = preferredQuality,
         eapiLookup = { id, level ->
             parseNeteaseDownloadLookup(
                 DownloadHosts.sources.neteaseClient.getSongDownloadUrl(id, level = level),
-                expectedSongId = id
+                expectedSongId = id,
+                originalDurationMs = originalDurationMs
             )
         },
         weapiLookup = { id, bitrate ->
             parseNeteaseDownloadLookup(
                 DownloadHosts.sources.neteaseClient.getSongUrl(id, bitrate = bitrate),
-                expectedSongId = id
+                expectedSongId = id,
+                originalDurationMs = originalDurationMs
             )
         }
     )
@@ -134,12 +137,13 @@ internal object AudioDownloadSourceResolver {
 
     internal fun parseNeteaseDownloadLookup(
         rawResponse: String,
-        expectedSongId: Long? = null
+        expectedSongId: Long? = null,
+        originalDurationMs: Long = 0L
     ): NeteaseDownloadLookup {
         return when (
             val parsed = NeteasePlaybackResponseParser.parsePlayback(
                 rawResponse = rawResponse,
-                originalDurationMs = 0L
+                originalDurationMs = originalDurationMs
             )
         ) {
             is NeteasePlaybackResponseParser.PlaybackResult.Success -> {

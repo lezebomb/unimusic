@@ -1687,10 +1687,12 @@ object AudioDownloadManager {
     // 解析网易云直链
     internal suspend fun resolveNetease(
         songId: Long,
-        preferredQuality: String
+        preferredQuality: String,
+        originalDurationMs: Long = 0L
     ): ResolvedDownloadSource? = AudioDownloadSourceResolver.resolveNetease(
         songId = songId,
-        preferredQuality = preferredQuality
+        preferredQuality = preferredQuality,
+        originalDurationMs = originalDurationMs
     )
 
     internal suspend fun resolveYouTubeMusic(

@@ -1,0 +1,14 @@
+{
+  "build": "BUILD SUCCESSFUL in 57s",
+  "checks": {
+    "name": "moe.ouom.neriplayer.core.player.download.source.AudioDownloadSourceResolverQualityTest",
+    "tests": "2",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  "moduleBoundaries": "passed",
+  "initialFailure": "Short-song fixture lacked type; JVM Android Uri stub returned null. Added representative mp3 type; production Android URI code unchanged",
+  "deviceDownloadTest": "not run; no download files modified",
+  "apkInstalled": "not separately installed; cumulative with next source identity stage"
+}

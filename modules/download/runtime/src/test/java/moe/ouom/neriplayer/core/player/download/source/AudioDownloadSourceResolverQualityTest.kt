@@ -10,6 +10,17 @@ import org.junit.Test
 
 class AudioDownloadSourceResolverQualityTest {
     @Test
+    fun `netease download checks original duration without rejecting a true short song`() {
+        val raw = """{"code":200,"data":[{"id":42,"url":"https://example.com/audio.mp3","type":"mp3","time":30000}]}"""
+        assertEquals(AudioDownloadSourceResolver.NeteaseDownloadLookup.PreviewOnly,
+            AudioDownloadSourceResolver.parseNeteaseDownloadLookup(raw, 42L, originalDurationMs = 180_000L))
+        assertTrue(AudioDownloadSourceResolver.parseNeteaseDownloadLookup(raw, 42L,
+            originalDurationMs = 30_000L) is AudioDownloadSourceResolver.NeteaseDownloadLookup.Resolved)
+        assertEquals(AudioDownloadSourceResolver.NeteaseDownloadLookup.Missing,
+            AudioDownloadSourceResolver.parseNeteaseDownloadLookup(raw, 43L, originalDurationMs = 180_000L))
+    }
+
+    @Test
     fun `netease download tries lower quality before declaring source unavailable`() = runBlocking {
         val requested = mutableListOf<String>()
         val source = AudioDownloadManager.ResolvedDownloadSource(url = "https://example.com/song.mp3")
