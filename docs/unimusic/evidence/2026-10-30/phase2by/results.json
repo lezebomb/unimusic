@@ -1,0 +1,59 @@
+{
+  "install": {
+    "apk": "build/outputs/unimusic/UniMusic-20261030-2BY-debug.apk",
+    "sha256": "cc04f9e66486e3b3a51cea2fad1027c553f2ba3cccd884aae8e2829284a56af5",
+    "version": "d4bf289d5102.dirty.10301655",
+    "installedVersionMatches": true,
+    "success": true,
+    "build": "1m45s",
+    "tests": [
+      {
+        "name": "moe.ouom.neriplayer.platform.netease.api.playback.parser.NeteasePlaybackResponseParserTest",
+        "tests": "2",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0"
+      },
+      {
+        "name": "moe.ouom.neriplayer.core.player.download.source.AudioDownloadSourceResolverQualityTest",
+        "tests": "1",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0"
+      }
+    ],
+    "cumulativeIncludes": "2BX download duration, 4R outgoing subscriptions, 2BW duration rejection"
+  },
+  "moduleBoundaries": "passed",
+  "device": {
+    "diagnosticCompleted": true,
+    "reports": [
+      {
+        "title": "雑踏、僕らの街",
+        "artist": "トゲナシトゲアリ",
+        "durationMs": 184243,
+        "automaticFallbackEnabled": true,
+        "stage": "COMPLETE",
+        "checks": [
+          {
+            "provider": "netease",
+            "primary": true,
+            "title": "雑踏、僕らの街",
+            "status": "PREVIEW_ONLY",
+            "elapsedMs": 512
+          },
+          {
+            "provider": "netease",
+            "primary": false,
+            "title": "雑踏、僕らの街",
+            "status": "PREVIEW_ONLY",
+            "elapsedMs": 455
+          }
+        ]
+      }
+    ],
+    "scope": "Address checks only; no new full-audio decode/playback result"
+  },
+  "runtimeLocalJvm": "not run; JDK21 unavailable",
+  "downloadFilesModified": false
+}

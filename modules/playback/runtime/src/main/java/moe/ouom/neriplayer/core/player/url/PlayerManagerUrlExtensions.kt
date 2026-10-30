@@ -530,7 +530,7 @@ private suspend fun PlayerManager.resolveNeteaseListenTogetherShareableStreams(
             val response = runCatching {
                 neteaseClient.getSongDownloadUrl(song.id, level = requestedQuality)
             }.getOrNull() ?: continue
-            when (val parsed = NeteasePlaybackResponseParser.parsePlayback(response, song.durationMs)) {
+            when (val parsed = NeteasePlaybackResponseParser.parsePlayback(response, song.durationMs, expectedSongId = song.id)) {
                 is NeteasePlaybackResponseParser.PlaybackResult.Success -> {
                     if (parsed.notice == NeteasePlaybackResponseParser.Notice.PREVIEW_CLIP) {
                         previewOnly = true

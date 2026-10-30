@@ -8,6 +8,24 @@ import org.junit.Test
 class NeteasePlaybackResponseParserTest {
 
     @Test
+    fun parsePlayback_requiresTheRequestedNativeIdentityWhenProvided() {
+        for (id in listOf("43", "42.5", "null")) {
+            val raw = """{"code":200,"data":[{"id":$id,"url":"https://example.com/audio.mp3","time":180000}]}"""
+            assertTrue(NeteasePlaybackResponseParser.parsePlayback(raw, 180_000L, 42L)
+                is NeteasePlaybackResponseParser.PlaybackResult.Failure)
+        }
+        val missing = """{"code":200,"data":[{"url":"https://example.com/audio.mp3","time":180000}]}"""
+        assertTrue(NeteasePlaybackResponseParser.parsePlayback(missing, 180_000L, 42L)
+            is NeteasePlaybackResponseParser.PlaybackResult.Failure)
+        // Context-free metadata consumers retain the old two-argument API.
+        assertTrue(NeteasePlaybackResponseParser.parsePlayback(missing, 180_000L)
+            is NeteasePlaybackResponseParser.PlaybackResult.Success)
+        val matching = """{"code":200,"data":[{"id":42,"url":"https://example.com/audio.mp3","time":180000}]}"""
+        assertEquals(42L, (NeteasePlaybackResponseParser.parsePlayback(matching, 180_000L, 42L)
+            as NeteasePlaybackResponseParser.PlaybackResult.Success).songId)
+    }
+
+    @Test
     fun parsePlayback_marksUnlabelledTruncatedResponseAsPreview() {
         val raw = """{"code":200,"data":[{"url":"https://example.com/audio.mp3","time":60000}]}"""
         val result = NeteasePlaybackResponseParser.parsePlayback(raw, 184_243L)

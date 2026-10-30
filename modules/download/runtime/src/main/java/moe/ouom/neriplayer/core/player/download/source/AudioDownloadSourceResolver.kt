@@ -143,7 +143,8 @@ internal object AudioDownloadSourceResolver {
         return when (
             val parsed = NeteasePlaybackResponseParser.parsePlayback(
                 rawResponse = rawResponse,
-                originalDurationMs = originalDurationMs
+                originalDurationMs = originalDurationMs,
+                expectedSongId = expectedSongId
             )
         ) {
             is NeteasePlaybackResponseParser.PlaybackResult.Success -> {

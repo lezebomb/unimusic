@@ -42,7 +42,10 @@ object NeteasePlaybackResponseParser {
         val contentLength: Long? = null
     )
 
-    fun parsePlayback(rawResponse: String, originalDurationMs: Long): PlaybackResult {
+    fun parsePlayback(rawResponse: String, originalDurationMs: Long): PlaybackResult =
+        parsePlayback(rawResponse, originalDurationMs, expectedSongId = null)
+
+    fun parsePlayback(rawResponse: String, originalDurationMs: Long, expectedSongId: Long?): PlaybackResult {
         val root = runCatching { JSONObject(rawResponse) }.getOrElse {
             return PlaybackResult.Failure(FailureReason.UNKNOWN)
         }
@@ -54,6 +57,12 @@ object NeteasePlaybackResponseParser {
                     ?: return PlaybackResult.Failure(FailureReason.NO_PLAY_URL)
                 val url = data.optCleanString("url")
                     ?: return PlaybackResult.Failure(classifyFailure(data))
+                // A playable URL must belong to the requested native identity. Do not truncate
+                // fractional IDs or infer an identity from response order/missing metadata.
+                if (expectedSongId != null && (expectedSongId <= 0L ||
+                        data.opt("id")?.toString() != expectedSongId.toString())) {
+                    return PlaybackResult.Failure(FailureReason.UNKNOWN)
+                }
                 val notice = if (isPreviewClip(data, originalDurationMs)) {
                     Notice.PREVIEW_CLIP
                 } else {

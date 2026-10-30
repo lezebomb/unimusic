@@ -95,7 +95,7 @@ private suspend fun PlayerManager.resolveNeteaseForSession(
             if (resp == null) { primaryTimedOut = true; break }
             NPLogger.d("NERI-PlayerManager", "Netease URL response: id=${song.id}, requestedQuality=$quality")
 
-            when (val parsed = NeteasePlaybackResponseParser.parsePlayback(resp, song.durationMs)) {
+            when (val parsed = NeteasePlaybackResponseParser.parsePlayback(resp, song.durationMs, expectedSongId = song.id)) {
                 is NeteasePlaybackResponseParser.PlaybackResult.RequiresLogin -> {
                     requiresLogin = true
                     if (shouldRetryNeteaseWithLowerQualityAfterLogin(
