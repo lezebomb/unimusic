@@ -376,7 +376,9 @@ internal fun MainTabLayerHost(
                             shouldBlockMainTabSceneInput(scene.phase, transitionState.offsetFractionFor(scene))
                         }
                     }
-                    RetainedMainTabScene(active = sceneVisible) {
+                    // Keep incoming preparation live, but retain the outgoing frame while it
+                    // animates: late list responses must not rebuild both scenes during motion.
+                    RetainedMainTabScene(active = sceneVisible && scene.phase != MainTabLayerScenePhase.Exiting) {
                         Box(
                             modifier = Modifier
                                 .mainTabSceneVisibility(sceneVisible)
