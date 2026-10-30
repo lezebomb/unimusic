@@ -1,0 +1,6 @@
+<testsuite name="moe.ouom.neriplayer.ui.viewmodel.tab.LibraryNeteaseRefreshOwnerTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2026-10-30T02:18:15.632Z" hostname="local" time="0.4">
+  <properties />
+  <testcase name="unchanged session avoids reload while manual refresh account changes and logout still work" classname="moe.ouom.neriplayer.ui.viewmodel.tab.LibraryNeteaseRefreshOwnerTest" time="0.395" />
+  <system-out />
+  <system-err />
+</testsuite>

@@ -133,24 +133,8 @@ class LibraryViewModel(application: Application) : AndroidViewModel(application)
 
         // 网易云歌单和专辑共用一次刷新，避免各自提前结束 loading
         viewModelScope.launch {
-            var observedSession: String? = null
             neteaseCookieRepo.cookieFlow.collect { cookies ->
-                val nextSession = cookies["MUSIC_U"]?.takeIf { it.isNotBlank() }
-                if (nextSession != observedSession || nextSession == null) {
-                    neteaseRefreshOwner.cancel()
-                }
-                observedSession = nextSession
-                if (nextSession != null) {
-                    refreshNeteaseLibrary()
-                } else {
-                    _uiState.update {
-                        it.copy(
-                            neteasePlaylists = emptyList(),
-                            neteaseAlbums = emptyList(),
-                            neteaseError = null
-                        )
-                    }
-                }
+                neteaseRefreshOwner.onSessionChanged(cookies["MUSIC_U"])
             }
         }
 
@@ -369,6 +353,19 @@ internal class LibraryNeteaseRefreshOwner(
     private val loadAlbums: suspend (Long) -> List<AlbumSummary>
 ) {
     private var refreshJob: Job? = null
+    private var hasObservedSession = false
+    private var observedSession: String? = null
+
+    /** Cookie maintenance must not refetch the entire library when its principal is unchanged. */
+    fun onSessionChanged(value: String?) {
+        val session = value?.takeIf(String::isNotBlank)
+        if (hasObservedSession && session == observedSession) return
+        hasObservedSession = true
+        observedSession = session
+        cancel()
+        if (session != null) refresh()
+        else state.update { it.copy(neteasePlaylists = emptyList(), neteaseAlbums = emptyList(), neteaseError = null) }
+    }
 
     fun refresh() {
         if (refreshJob?.isActive == true || !scope.isActive) return

@@ -14,6 +14,33 @@ import java.io.IOException
 @OptIn(ExperimentalCoroutinesApi::class)
 class LibraryNeteaseRefreshOwnerTest {
     @Test
+    fun `unchanged session avoids reload while manual refresh account changes and logout still work`() = runTest {
+        val state = MutableStateFlow(LibraryUiState())
+        var loads = 0
+        val owner = LibraryNeteaseRefreshOwner(backgroundScope, state,
+            loadUserId = { ++loads; 7L }, loadPlaylists = { listOf(playlist(loads.toLong())) },
+            loadAlbums = { listOf(album(loads.toLong())) })
+        owner.onSessionChanged("synthetic-session-one")
+        testScheduler.runCurrent()
+        owner.onSessionChanged("synthetic-session-one")
+        testScheduler.runCurrent()
+        assertEquals(1, loads)
+        assertFalse(state.value.neteaseRefreshing)
+        owner.refresh()
+        testScheduler.runCurrent()
+        assertEquals(2, loads)
+        owner.onSessionChanged("synthetic-session-two")
+        testScheduler.runCurrent()
+        assertEquals(3, loads)
+        owner.onSessionChanged(null)
+        owner.onSessionChanged(" ")
+        testScheduler.runCurrent()
+        assertEquals(3, loads)
+        assertTrue(state.value.neteasePlaylists.isEmpty())
+        assertTrue(state.value.neteaseAlbums.isEmpty())
+    }
+
+    @Test
     fun `refresh stays active until albums finish after playlists`() = runTest {
         val state = MutableStateFlow(LibraryUiState())
         val albums = CompletableDeferred<List<AlbumSummary>>()

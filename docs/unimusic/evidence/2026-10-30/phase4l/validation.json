@@ -1,0 +1,15 @@
+{
+  "stage": "4L",
+  "localTests": {
+    "class": "LibraryNeteaseRefreshOwnerTest",
+    "tests": 1,
+    "failures": 0
+  },
+  "moduleBoundaries": "passed",
+  "build": "BUILD SUCCESSFUL in1m17s; app Kotlin compile, no new APK",
+  "change": "Automatic NetEase library refresh only on real principal changes; manual refresh and logout preserved",
+  "bilibili": "Full-cookie mid-confirmation guard unchanged; not blindly deduplicated by session alone",
+  "deviceValidation": "Not run; existing4I tab check and4K APK kept separate",
+  "realLatencyBenchmark": "not run",
+  "remoteCI": "Next cumulative CI will include exact new refresh case and watch path"
+}
