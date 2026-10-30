@@ -1357,11 +1357,10 @@ class BiliClient(
 
     private fun PlayInfo.shouldRetryEmptyAudioFetch(): Boolean {
         val hasDashVideo = dashVideo.isNotEmpty()
-        val hasMp4Fallback = durl.isNotEmpty()
         return dashAudio.isEmpty() &&
             dolby?.audios.isNullOrEmpty() &&
             flac?.audio == null &&
-            (hasDashVideo || hasMp4Fallback)
+            hasDashVideo
     }
 
     private fun bitrateKbpsFromBandwidth(bandwidth: Long): Int =

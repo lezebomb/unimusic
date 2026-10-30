@@ -1,0 +1,20 @@
+{
+  "date": "2026-10-30",
+  "phase": "2CA",
+  "focusedJvmTests": 1,
+  "focusedJvmFailures": 0,
+  "focusedJvmErrors": 0,
+  "test": "BiliClientPlayUrlTest.progressive only response is not offered as audio",
+  "appCompilationPassed": true,
+  "elapsed": "51s",
+  "moduleBoundariesPassed": true,
+  "whitespaceCheckPassed": true,
+  "progressiveOnlyRequestCount": 1,
+  "progressiveOnlyRetryDelayMs": 0,
+  "additionalApkBuilt": false,
+  "additionalDeviceInstallation": false,
+  "previousStageCi": {"runId": 41043564791, "conclusion": "success"},
+  "deviceFailoverLatencyMeasured": false,
+  "automaticPublisherTrustEnabled": false,
+  "userDataCleared": false
+}

@@ -191,7 +191,8 @@ class BiliClientPlayUrlTest {
     ) { http, client ->
         val streams = client.getAllAudioStreams("BV1xx411c7mD", 1001L)
 
-        assertEquals(3, http.requestsTo(PLAY_URL_PATH).size)
+        assertEquals(1, http.requestsTo(PLAY_URL_PATH).size)
+        assertEquals(0L, testScheduler.currentTime)
         assertTrue(http.requestsTo(PLAY_URL_PATH).none { it.url.queryParameter("platform") == "html5" })
         assertTrue(streams.isEmpty())
     }
