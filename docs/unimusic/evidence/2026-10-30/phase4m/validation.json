@@ -1,0 +1,18 @@
+{
+  "stage": "4M",
+  "localTests": {
+    "class": "ExploreSearchArtistIntentTest",
+    "tests": 1,
+    "failures": 0,
+    "case": "Existing in-flight ranking/current-intent publication regression"
+  },
+  "moduleBoundaries": "passed",
+  "build": "BUILD SUCCESSFUL in52s; cumulative APK includes4L/4K/4J/3L",
+  "apk": "build/outputs/unimusic/UniMusic-20261030-4M-debug.apk",
+  "versionName": "165fef4ebebb.dirty.10301022",
+  "sha256": "53ffd46b015c4690505a206b3d17b3185898638311123ae56556cd5db900fd74",
+  "change": "Reuse artist tiers inside existing2048-entry per-query score cache; invalidate on changed metadata or intent object; availability always fresh",
+  "deviceValidation": "cumulative install pending; no repeated playback or switching tests planned",
+  "performance": "Avoided repeated metadata assessment, no new real latency/FPS claim",
+  "remoteCI": "Previous4J/4K CI40990590163 succeeded; next cumulative run needed including4L exact selector and configuration-required migration"
+}

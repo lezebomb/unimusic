@@ -1,0 +1,25 @@
+{
+  "runId": 40990590163,
+  "head": "68e5351ec76e2105c6e29f57f4247eeb68b1c1fc",
+  "conclusion": "success",
+  "mandatoryDomainCheck": "success",
+  "androidAdditiveMigration": "not required for source-only range; prior40987129828 migration succeeded",
+  "actualXmlSummary": {
+    "PlaybackFeedbackTrackerTest": {
+      "tests": 5,
+      "failures": 0,
+      "skipped": 0
+    },
+    "SearchTextMatcherTest": {
+      "tests": 13,
+      "failures": 0,
+      "skipped": 0
+    },
+    "SourceAvailabilityCheckerTest": {
+      "tests": 7,
+      "failures": 0,
+      "skipped": 0
+    }
+  },
+  "limits": "Covers4J/4K;4L/4M are later"
+}

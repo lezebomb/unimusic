@@ -1,0 +1,6 @@
+<testsuite name="moe.ouom.neriplayer.ui.viewmodel.tab.search.ExploreSearchArtistIntentTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2026-10-30T02:22:59.015Z" hostname="local" time="0.389">
+  <properties />
+  <testcase name="intentArrivingDuringBackgroundRankingIsAppliedBeforePublicationAndOldQueriesStayCancelled" classname="moe.ouom.neriplayer.ui.viewmodel.tab.search.ExploreSearchArtistIntentTest" time="0.386" />
+  <system-out />
+  <system-err />
+</testsuite>

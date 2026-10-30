@@ -23,7 +23,8 @@ internal class ExploreSearchRankingSession(query: String) {
     private val requestedMetadata = RecordingMetadata(normalized, "", 0)
     private val requestedVersions = RecordingMatchPolicy.versions(requestedMetadata)
     private data class Score(val text: Int?, val versionPenalty: Int)
-    private data class Cached(val item: ExploreSearchResult, val score: Score)
+    private data class Cached(val item: ExploreSearchResult, val score: Score,
+        val intent: moe.ouom.neriplayer.ui.viewmodel.tab.search.SearchArtistIntent?, val intentTier: Int)
     private val scores = LinkedHashMap<String, Cached>(64, 0.75f, true)
     @Volatile var artistIntent: moe.ouom.neriplayer.ui.viewmodel.tab.search.SearchArtistIntent? = null
 
@@ -59,9 +60,14 @@ internal class ExploreSearchRankingSession(query: String) {
         val ranked = displayItems.mapIndexed { index, item ->
             if (index and 127 == 0) checkActive()
             val cached = scores[item.stableKey]
-            val score = if (cached != null && cached.item == item) cached.score else score(item).also { value ->
-                scores[item.stableKey] = Cached(item, value)
-                while (scores.size > 2048) scores.remove(scores.keys.first())
+            val unchanged = cached != null && cached.item == item
+            val prepared = if (unchanged && cached.intent === intent) cached else {
+                // Address probes change frequently; recording/artist evidence does not.
+                // Retain text scores when only the intent arrives, and invalidate both on metadata edits.
+                Cached(item, if (unchanged) cached.score else score(item), intent, intent?.tier(item) ?: 0).also {
+                    scores[item.stableKey] = it
+                    while (scores.size > 2048) scores.remove(scores.keys.first())
+                }
             }
             val check = searchAvailabilityCandidate(item)?.let { checks[it.key] }
                 ?.takeIf { now - it.checkedAtMillis in 0..120_000 }
@@ -70,7 +76,7 @@ internal class ExploreSearchRankingSession(query: String) {
                 null -> 1
                 else -> 2
             }
-            Ranked(item, index, score, availability, intent?.tier(item) ?: 0,
+            Ranked(item, index, prepared.score, availability, prepared.intentTier,
                 moe.ouom.neriplayer.ui.viewmodel.tab.search.searchPromotionPenalty(normalized, item))
         }
         val comparator = compareBy<Ranked> { it.promotion }
