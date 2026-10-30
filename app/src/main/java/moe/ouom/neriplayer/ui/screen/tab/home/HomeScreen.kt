@@ -85,12 +85,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.referentialEqualityPolicy
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -127,7 +125,6 @@ import moe.ouom.neriplayer.core.download.GlobalDownloadManager
 import moe.ouom.neriplayer.core.player.PlayerManager
 import moe.ouom.neriplayer.data.playlist.favorite.FavoritePlaylistRepository
 import moe.ouom.neriplayer.data.local.playlist.LocalPlaylistRepository
-import moe.ouom.neriplayer.data.model.playlist.LocalPlaylist
 import moe.ouom.neriplayer.data.playlist.usage.PlaylistUsageRepository
 import moe.ouom.neriplayer.data.local.playlist.system.FavoritesPlaylist
 import moe.ouom.neriplayer.data.model.stats.UsageEntry
@@ -259,29 +256,10 @@ fun HomeScreen(
     )
     val ui by vm.uiState.collectAsStateWithLifecycle()
     val localRecommendations by vm.localRecommendations.collectAsStateWithLifecycle()
-    var localPlaylistRepo by remember { mutableStateOf<LocalPlaylistRepository?>(null) }
-    var localPlaylists by remember {
-        mutableStateOf<List<LocalPlaylist>>(
-            value = emptyList(),
-            policy = referentialEqualityPolicy()
-        )
-    }
-    var localPlaylistsReady by remember { mutableStateOf(false) }
-    var localPlaylistSnapshotVersion by remember { mutableIntStateOf(0) }
-    LaunchedEffect(appContext) {
-        localPlaylistsReady = false
-        val initializedRepo = withContext(Dispatchers.IO) {
-            LocalPlaylistRepository.getInstance(appContext)
-                .takeIf { repository -> repository.awaitInitialized() }
-        }
-        localPlaylistRepo = initializedRepo
-        if (initializedRepo == null) return@LaunchedEffect
-        initializedRepo.playlists.collect { playlists ->
-            localPlaylists = playlists
-            localPlaylistSnapshotVersion += 1
-            localPlaylistsReady = true
-        }
-    }
+    val localLibrary by vm.localLibrary.collectAsStateWithLifecycle()
+    val localPlaylistRepo = localLibrary.repository
+    val localPlaylists = localLibrary.playlists
+    val localPlaylistsReady = localPlaylistRepo != null
     val favoriteRepo = remember(context) { FavoritePlaylistRepository.getInstance(context) }
     val favorites by favoriteRepo.favorites.collectAsStateWithLifecycle()
     val downloadedSongs by GlobalDownloadManager.downloadedSongs.collectAsStateWithLifecycle()
@@ -289,7 +267,7 @@ fun HomeScreen(
     val favoriteKeys = remember(favorites) {
         favorites.mapTo(mutableSetOf()) { "${it.source}:${it.id}" }
     }
-    val favoriteSongs = remember(localPlaylistSnapshotVersion, context) {
+    val favoriteSongs = remember(localLibrary, context) {
         localPlaylists
             .firstOrNull { FavoritesPlaylist.isSystemPlaylist(it, context) }
             ?.songs
@@ -304,7 +282,7 @@ fun HomeScreen(
         .mapTo(linkedSetOf()) { entry -> resolveLocalPlaylistUsageId(entry, appContext) }
     val localPlaylistUsageLookup by produceState(
         initialValue = emptyMap(),
-        key1 = localPlaylistSnapshotVersion,
+        key1 = localLibrary,
         key2 = localPlaylistCoverFallbackIds,
         key3 = appContext
     ) {
@@ -332,7 +310,7 @@ fun HomeScreen(
         hasLocalPlaylistUsage,
         hasLocalArtistUsage,
         localPlaylistsReady,
-        localPlaylistSnapshotVersion,
+        localLibrary,
         downloadedPlaybackCoverCandidates
     ) {
         if ((hasLocalPlaylistUsage || hasLocalArtistUsage) && localPlaylistsReady) {

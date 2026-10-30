@@ -1,0 +1,14 @@
+{
+  "stage": "4I",
+  "change": "Retain local library metadata in Home ViewModel; reference snapshot shared across tab recreation",
+  "automatedTests": "No new or repeated JVM tests for this small reversible UI optimization, per user preference",
+  "moduleBoundaries": "passed",
+  "build": "BUILD SUCCESSFUL in1m40s; cumulative app includes3L",
+  "apk": "build/outputs/unimusic/UniMusic-20261030-4I-debug.apk",
+  "versionName": "2b088bc9e468.dirty.10300957",
+  "sha256": "b6a7738affdfd33d74014fc1a38097a2a4460cd9bc2b6b8a8743e04420b61fb1",
+  "memory": "One lightweight metadata subscription/reference snapshot per existing Home ViewModel; no duplicate song copy or new network fetch",
+  "deviceValidation": "cumulative install and one tab round trip pending",
+  "speedClaims": "No new measured tab latency/fps improvement claimed",
+  "remoteCI": "2BR mandatoryCI40987129828 succeeded; next source-only cumulative run pending"
+}

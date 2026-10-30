@@ -211,6 +211,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
     private val localRecommendationController = HomeLocalRecommendationsController(application, viewModelScope)
     val localRecommendations = localRecommendationController.state
+    internal val localLibrary = moe.ouom.neriplayer.ui.viewmodel.tab.home.HomeLocalLibraryController(application, viewModelScope).state
 
     fun refreshLocalRecommendations() = localRecommendationController.refresh()
     suspend fun dismissLocalRecommendation(item: moe.ouom.neriplayer.data.recommendation.LocalRecommendation) =

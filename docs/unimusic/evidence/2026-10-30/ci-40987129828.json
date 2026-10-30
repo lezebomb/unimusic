@@ -1,0 +1,41 @@
+{
+  "runId": 40987129828,
+  "head": "bcb44f6c5785af3397e349add0e91065b4ec82b6",
+  "conclusion": "success",
+  "androidAdditiveMigration": "success",
+  "mandatoryDomainCheck": "success",
+  "actualXmlSummary": {
+    "CrashReportStoreTest": {
+      "tests": 6,
+      "failures": 0,
+      "skipped": 0
+    },
+    "DatabaseUpgradeInstrumentedTest": {
+      "tests": 3,
+      "failures": 0,
+      "skipped": 0
+    },
+    "DiagnosticLogTextTest": {
+      "tests": 2,
+      "failures": 0,
+      "skipped": 0
+    },
+    "ExploreSearchArtistIntentTest": {
+      "tests": 13,
+      "failures": 0,
+      "skipped": 0
+    },
+    "PlaybackFeedbackTrackerTest": {
+      "tests": 4,
+      "failures": 0,
+      "skipped": 0
+    },
+    "UnifiedLibraryMigrationTest": {
+      "tests": 1,
+      "failures": 0,
+      "skipped": 0
+    }
+  },
+  "deduplication": "class and testcase name; preserved Android copies counted once",
+  "limits": "Covers2BR;2BS,3L and Home snapshot optimization are later; no real private log export performed"
+}
