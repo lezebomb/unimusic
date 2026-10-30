@@ -108,4 +108,5 @@
     <string name="player_playback_url_error_detail">获取播放地址失败：%1$s</string>
     <string name="mini_player_volume">音量</string>
     <string name="mini_player_progress">播放进度</string>
+    <string name="player_full_recording_unavailable">暂未找到可播放的原唱完整版，请稍后重试。</string>
 </resources>

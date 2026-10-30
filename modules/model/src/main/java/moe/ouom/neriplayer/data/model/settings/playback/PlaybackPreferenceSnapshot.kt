@@ -35,7 +35,7 @@ data class PlaybackPreferenceSnapshot(
     val keepLastPlaybackProgress: Boolean = true,
     val rememberLongFormPlaybackProgress: Boolean = true,
     val keepPlaybackModeState: Boolean = true,
-    val neteaseAutoSourceSwitch: Boolean = false,
+    val neteaseAutoSourceSwitch: Boolean = true,
     val neteaseLocalSourceFallback: Boolean = false,
     val playbackFadeIn: Boolean = true,
     val playbackCrossfadeNext: Boolean = true,

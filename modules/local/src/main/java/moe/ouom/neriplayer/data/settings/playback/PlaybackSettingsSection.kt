@@ -266,7 +266,7 @@ abstract class PlaybackSettingsSection protected constructor() {
     @AutoSetting(
         key = "netease_auto_source_switch",
         type = SettingValueType.Boolean,
-        defaultBoolean = false,
+        defaultBoolean = true,
         order = 135,
         ui = SettingUiType.Custom,
         access = SettingAccessMode.KeyOnly

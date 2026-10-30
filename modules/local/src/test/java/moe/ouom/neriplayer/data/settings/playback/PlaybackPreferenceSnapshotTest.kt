@@ -183,7 +183,7 @@ class PlaybackPreferenceSnapshotTest {
         assertTrue(snapshot.keepLastPlaybackProgress)
         assertTrue(snapshot.rememberLongFormPlaybackProgress)
         assertTrue(snapshot.keepPlaybackModeState)
-        assertFalse(snapshot.neteaseAutoSourceSwitch)
+        assertTrue(snapshot.neteaseAutoSourceSwitch)
         assertFalse(snapshot.neteaseLocalSourceFallback)
         assertFalse(snapshot.allowMixedPlayback)
         assertTrue(snapshot.playbackFadeIn)
@@ -195,4 +195,10 @@ class PlaybackPreferenceSnapshotTest {
         assertTrue(snapshot.amllLyricsEnabled)
         assertEquals(1024L * 1024 * 1024, snapshot.maxCacheSizeBytes)
     }
+    @Test
+    fun `explicitly disabled automatic fallback survives the new default`() {
+        val snapshot = preferencesOf(SettingsKeys.NETEASE_AUTO_SOURCE_SWITCH to false).toPlaybackPreferenceSnapshot()
+        assertFalse(snapshot.neteaseAutoSourceSwitch)
+    }
+
 }

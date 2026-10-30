@@ -384,7 +384,7 @@ fun Preferences.toPlaybackPreferenceSnapshot(): PlaybackPreferenceSnapshot {
         keepLastPlaybackProgress = valueOr(SettingsKeys.KEEP_LAST_PLAYBACK_PROGRESS, true),
         rememberLongFormPlaybackProgress = valueOr(SettingsKeys.REMEMBER_LONG_FORM_PLAYBACK_PROGRESS, true),
         keepPlaybackModeState = valueOr(SettingsKeys.KEEP_PLAYBACK_MODE_STATE, true),
-        neteaseAutoSourceSwitch = valueOr(SettingsKeys.NETEASE_AUTO_SOURCE_SWITCH, false),
+        neteaseAutoSourceSwitch = valueOr(SettingsKeys.NETEASE_AUTO_SOURCE_SWITCH, true),
         neteaseLocalSourceFallback = valueOr(SettingsKeys.NETEASE_LOCAL_SOURCE_FALLBACK, false),
         playbackFadeIn = valueOr(SettingsKeys.PLAYBACK_FADE_IN, true),
         playbackCrossfadeNext = valueOr(SettingsKeys.PLAYBACK_CROSSFADE_NEXT, true),
@@ -505,7 +505,7 @@ private fun SharedPreferences.toCachedPlaybackPreferenceSnapshot(): PlaybackPref
         ),
         keepPlaybackModeState = prefs.getBoolean(PLAYBACK_KEEP_MODE_STATE_KEY, true),
         neteaseAutoSourceSwitch =
-            prefs.getBoolean(PLAYBACK_NETEASE_AUTO_SOURCE_SWITCH_KEY, false),
+            prefs.getBoolean(PLAYBACK_NETEASE_AUTO_SOURCE_SWITCH_KEY, true),
         neteaseLocalSourceFallback =
             prefs.getBoolean(PLAYBACK_NETEASE_LOCAL_SOURCE_FALLBACK_KEY, false),
         playbackFadeIn = prefs.getBoolean(PLAYBACK_FADE_IN_KEY, true),

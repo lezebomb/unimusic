@@ -628,7 +628,7 @@ class SettingsRepository(private val context: Context) {
         dataStoreSettingFlow { it[SettingsKeys.KEEP_PLAYBACK_MODE_STATE] ?: true }
 
     val neteaseAutoSourceSwitchFlow: Flow<Boolean> =
-        dataStoreSettingFlow { it[SettingsKeys.NETEASE_AUTO_SOURCE_SWITCH] ?: false }
+        dataStoreSettingFlow { it[SettingsKeys.NETEASE_AUTO_SOURCE_SWITCH] ?: true }
 
     val neteaseLocalSourceFallbackFlow: Flow<Boolean> =
         dataStoreSettingFlow { it[SettingsKeys.NETEASE_LOCAL_SOURCE_FALLBACK] ?: false }

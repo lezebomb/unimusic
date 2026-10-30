@@ -4,6 +4,7 @@ import moe.ouom.neriplayer.core.player.runtime.prefetch.resolveGenericUrlPrefetc
 import moe.ouom.neriplayer.core.player.runtime.prefetch.resolveGenericMediaPrefetchBytes
 import moe.ouom.neriplayer.core.player.runtime.prefetch.resolveGenericMediaPrefetchCacheKey
 
+import moe.ouom.neriplayer.core.player.runtime.source.fullRecordingPlaybackResultOrNull
 import android.os.SystemClock
 import androidx.media3.common.Player
 import kotlinx.coroutines.CancellationException
@@ -217,7 +218,8 @@ private suspend fun PlayerManager.consumeValidGenericUrlPrefetch(
     cacheKey: String,
     song: SongItem
 ): SongUrlResult.Success? {
-    val result = genericUrlPrefetchCache.consume(cacheKey, SystemClock.elapsedRealtime()) ?: return null
+    val result = genericUrlPrefetchCache.consume(cacheKey, SystemClock.elapsedRealtime())
+        ?.fullRecordingPlaybackResultOrNull() ?: return null
     // A rejected/reset match or changed account after prefetch must not reuse an old alternate URL.
     if (requiresFreshSourceDecision(result)) return null
     // 预取到消费之间开关可能被关掉或文件失效, 复验不过就丢弃走全新解析

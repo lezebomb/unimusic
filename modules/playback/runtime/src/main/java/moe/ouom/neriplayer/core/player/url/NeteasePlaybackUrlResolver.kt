@@ -26,14 +26,13 @@ internal suspend fun PlayerManager.getNeteaseSongUrl(
     suppressError: Boolean = false,
     sideEffects: RefreshResolverSideEffects = RefreshResolverSideEffects(),
     allowLocalFallback: Boolean = true,
-    allowPreviewFallback: Boolean = true,
     allowAutoBiliFallback: Boolean = true
 ): SongUrlResult {
     val requestSession = neteaseClient.searchSessionIdentity()
     fun current() = requestSession === neteaseClient.searchSessionIdentity()
     return withCurrentSourceResult<SongUrlResult>(::current, SongUrlResult.Failure) {
         resolveNeteaseForSession(song, suppressError, sideEffects.guardedBy(::current),
-            allowLocalFallback, allowPreviewFallback, allowAutoBiliFallback, ::current)
+            allowLocalFallback, allowAutoBiliFallback, ::current)
     }
 }
 
@@ -42,7 +41,6 @@ private suspend fun PlayerManager.resolveNeteaseForSession(
     suppressError: Boolean,
     sideEffects: RefreshResolverSideEffects,
     allowLocalFallback: Boolean,
-    allowPreviewFallback: Boolean,
     allowAutoBiliFallback: Boolean,
     isCurrent: () -> Boolean
 ): SongUrlResult = withContext(Dispatchers.IO) {
@@ -50,7 +48,7 @@ private suspend fun PlayerManager.resolveNeteaseForSession(
     try {
         val effectiveQuality = effectiveNeteaseQuality()
         val qualityCandidates = buildNeteaseQualityCandidates(effectiveQuality)
-        var previewFallback: SongUrlResult.Success? = null
+        var previewSeen = false
         var lastFailureReason: NeteasePlaybackResponseParser.FailureReason? = null
         var requiresLogin = false
         var primaryTimedOut = false
@@ -59,6 +57,8 @@ private suspend fun PlayerManager.resolveNeteaseForSession(
         val deadline = SystemClock.elapsedRealtime() + primaryBudget
 
         for ((index, quality) in qualityCandidates.withIndex()) {
+            // A preview at a premium level needs only the standard-level full-stream check.
+            if (previewSeen && quality != "standard") continue
             if (!isCurrent()) return@withContext SongUrlResult.Failure
             val remainingMs = deadline - SystemClock.elapsedRealtime()
             if (remainingMs <= 0L) { primaryTimedOut = true; break }
@@ -87,41 +87,21 @@ private suspend fun PlayerManager.resolveNeteaseForSession(
                 }
 
                 is NeteasePlaybackResponseParser.PlaybackResult.Success -> {
+                    if (parsed.notice == NeteasePlaybackResponseParser.Notice.PREVIEW_CLIP) {
+                        previewSeen = true
+                        NPLogger.d("NERI-PlayerManager", "Preview skipped; checking standard stream or alternate recording")
+                        continue
+                    }
                     val success = buildNeteaseSuccessResult(
                         parsed = parsed,
                         resolvedQualityKey = quality,
                         fallbackDurationMs = song.durationMs,
                         getLocalizedString = { getLocalizedString(it) }
-                    ).let { result ->
-                        if (parsed.notice == NeteasePlaybackResponseParser.Notice.PREVIEW_CLIP) {
-                            result.copy(
-                                cacheKeyOverride = buildNeteasePreviewCacheKey(
-                                    songId = song.id,
-                                    preferredQuality = quality
-                                )
-                            )
-                        } else {
-                            result
-                        }
+                    )
+                    if (quality != effectiveQuality) {
+                        NPLogger.d("NERI-PlayerManager", "Full stream available at lower quality: level=$quality")
                     }
-                    if (parsed.notice != NeteasePlaybackResponseParser.Notice.PREVIEW_CLIP) {
-                        if (quality != effectiveQuality) {
-                            NPLogger.w(
-                                "NERI-PlayerManager",
-                                "当前音质不可用，已自动降级: id=${song.id}, preferred=$effectiveQuality, resolved=$quality"
-                            )
-                        }
-                        return@withContext success
-                    }
-
-                    previewFallback = success
-                    if (index < qualityCandidates.lastIndex) {
-                        NPLogger.w(
-                            "NERI-PlayerManager",
-                            "当前音质仅返回试听片段，继续尝试更低音质: id=${song.id}, level=$quality"
-                        )
-                        continue
-                    }
+                    return@withContext success
                 }
 
                 is NeteasePlaybackResponseParser.PlaybackResult.Failure -> {
@@ -146,16 +126,13 @@ private suspend fun PlayerManager.resolveNeteaseForSession(
             return@withContext it
         }
 
-        if (allowPreviewFallback) {
-            previewFallback?.let { return@withContext it }
-        }
-
-        if (requiresLogin && !primaryTimedOut) {
+        if (requiresLogin && !primaryTimedOut && !previewSeen) {
             return@withContext SongUrlResult.RequiresLogin
         }
 
         if (!suppressError) {
-            val messageRes = if (primaryTimedOut) CoreCommonR.string.unimusic_source_request_timeout else when (lastFailureReason) {
+            val messageRes = if (previewSeen) CoreCommonR.string.player_full_recording_unavailable
+                else if (primaryTimedOut) CoreCommonR.string.unimusic_source_request_timeout else when (lastFailureReason) {
                 NeteasePlaybackResponseParser.FailureReason.NO_PERMISSION ->
                     CoreCommonR.string.player_netease_no_permission_switch_platform
                 NeteasePlaybackResponseParser.FailureReason.NO_PLAY_URL,

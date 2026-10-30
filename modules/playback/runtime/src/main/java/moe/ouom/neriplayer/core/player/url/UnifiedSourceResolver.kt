@@ -1,5 +1,6 @@
 package moe.ouom.neriplayer.core.player.url
 
+import moe.ouom.neriplayer.core.player.runtime.source.fullRecordingPlaybackResultOrNull
 import android.os.SystemClock
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.coroutines.CancellationException
@@ -38,7 +39,7 @@ internal suspend fun PlayerManager.resolveSongUrl(
         resolveSongUrlFromLegacySource(song, forceRefresh, youtubeRecoveryStrategy, sideEffects,
             allowGenericPrefetchCache, playbackRequestTokenOverride, shouldApplyCacheMutation, target?.songId)
     }
-    if (result != null) return result
+    if (result != null) return requireFullRecordingPlayback(result, sideEffects)
     if (shouldApplyCacheMutation()) emitSourceResolutionTimeout(sideEffects)
     return SongUrlResult.Failure
 }
@@ -71,7 +72,7 @@ internal suspend fun PlayerManager.resolveUnifiedSongUrl(
             shouldApplyCacheMutation = { backend.isCurrent(target) })
     }
     if (!backend.isCurrent(target)) return SongUrlResult.Failure
-    if (result != null) return result
+    if (result != null) return requireFullRecordingPlayback(result, sideEffects)
     emitSourceResolutionTimeout(sideEffects)
     return SongUrlResult.Failure
 }
@@ -81,4 +82,15 @@ private fun PlayerManager.emitSourceResolutionTimeout(sideEffects: RefreshResolv
     sideEffects.emitError {
         postPlayerEvent(PlayerEvent.ShowError(getLocalizedString(CoreCommonR.string.unimusic_sources_resolution_timeout)))
     }
+}
+
+private fun PlayerManager.requireFullRecordingPlayback(
+    result: SongUrlResult, sideEffects: RefreshResolverSideEffects
+): SongUrlResult {
+    if (result !is SongUrlResult.Success) return result
+    result.fullRecordingPlaybackResultOrNull()?.let { return it }
+    sideEffects.emitError {
+        postPlayerEvent(PlayerEvent.ShowError(getLocalizedString(CoreCommonR.string.player_full_recording_unavailable)))
+    }
+    return SongUrlResult.Failure
 }

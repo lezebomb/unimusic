@@ -38,7 +38,7 @@
     <string name="auth_cookie_invalid">No valid Cookie found</string>
     <string name="auth_cookie_empty">Cookie is empty</string>
     <string name="settings_netease_auto_source_switch">Automatic Source Fallback</string>
-    <string name="settings_netease_auto_source_switch_desc">Off by default. When enabled, match the same recording on NetEase, Kuwo and Bilibili after the original source fails, skipping that source. Account permissions and version checks still apply.</string>
+    <string name="settings_netease_auto_source_switch_desc">Automatically find a full-length recording by the same artist and in the same version when a source only offers a preview or is unavailable.</string>
     <string name="settings_netease_local_source_fallback">Local Audio Fallback</string>
     <string name="settings_netease_local_source_fallback_desc">Off by default. When enabled, prefer a local audio file matched to the same song when a NetEase song is unavailable or only returns a preview clip.</string>
     <string name="settings_youtube_playback_source">YouTube Playback Source</string>

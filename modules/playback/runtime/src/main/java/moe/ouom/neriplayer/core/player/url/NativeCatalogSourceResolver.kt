@@ -115,7 +115,7 @@ internal suspend fun PlayerManager.resolveNativeCatalogPlayback(song: SongItem, 
             val reason = (primary as? SourceAttempt.Rejected)?.reason
             if (primarySession == sourceResolutionSession(candidate.key.provider) && reason in setOf(
                     SourceFailure.AUTH_REQUIRED, SourceFailure.NO_PERMISSION, SourceFailure.NETWORK,
-                    SourceFailure.TIMEOUT, SourceFailure.UNAVAILABLE)) {
+                    SourceFailure.TIMEOUT, SourceFailure.UNAVAILABLE, SourceFailure.PREVIEW_ONLY)) {
                 recentNativePrimaryFailures.record(requestKey, sourceKey, primarySession)
             }
             return alternate

@@ -1,0 +1,24 @@
+{
+  "apk": "build/outputs/unimusic/UniMusic-20261030-2BT-debug.apk",
+  "version": "60eadd2f6b74.dirty.10301446",
+  "sha256": "ac5752bc329bc5326526f103a65ad13d8b0ee396f8f9b7e971c13e45628b112b",
+  "build": "BUILD SUCCESSFUL in 4m 57s",
+  "tests": [
+    {
+      "name": "moe.ouom.neriplayer.core.player.runtime.source.SongUrlResolutionRetryTest",
+      "tests": "3",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "name": "moe.ouom.neriplayer.data.settings.playback.PlaybackPreferenceSnapshotTest",
+      "tests": "2",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    }
+  ],
+  "boundaries": "passed",
+  "runtimeUnitTests": "not run locally; JDK21 unavailable"
+}
