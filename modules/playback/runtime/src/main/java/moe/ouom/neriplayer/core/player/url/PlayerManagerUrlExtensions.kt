@@ -312,8 +312,9 @@ internal suspend fun PlayerManager.resolveSongUrlFromLegacySource(
         val cachedContentLength = cache?.let {
             ContentMetadata.getContentLength(it.getContentMetadata(cacheKey))
         } ?: 0L
-        if (cachedAudioInfo?.isPreviewClip == true) {
-            // Preserve existing bytes, but a complete cache file can still contain only a preview.
+        if (cachedDescriptor?.shouldBypassMusicCache() == true) {
+            // Old complete caches can contain a preview or a muxed Bili video.
+            // Keep their bytes here and resolve a current independent audio source.
             hasCachedData = false
         } else if (
             cachedAudioInfo == null ||

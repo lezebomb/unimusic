@@ -6,6 +6,7 @@ import moe.ouom.neriplayer.data.model.bilibili.playback.BiliAudioStreamInfo
 import moe.ouom.neriplayer.data.model.bilibili.playback.DashStream
 import moe.ouom.neriplayer.data.model.bilibili.playback.Durl
 import moe.ouom.neriplayer.data.model.bilibili.playback.PlayOptions
+import org.json.JSONObject
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertThrows
@@ -219,6 +220,20 @@ class BiliClientPlayUrlTest {
     ) { http, client ->
         assertEquals(emptyList<BiliAudioStreamInfo>(), client.getAllAudioStreams("BV1xx411c7mD", 1001L))
         assertEquals(1, http.requestsTo(PLAY_URL_PATH).size)
+    }
+
+    @Test
+    fun `restricted audio is rejected by conversion and fetch without retries`() {
+        for ((key, value) in listOf("is_preview" to true, "is_preview" to 1, "is_drm" to true, "drm_type" to 1)) {
+            val body = JSONObject(FULL_PLAY_URL).apply { getJSONObject("data").put(key, value) }.toString()
+            biliClientTest(route = { request -> json(body).takeIf { request.url.encodedPath == PLAY_URL_PATH } }) { http, client ->
+                val info = client.getPlayInfoByBvid("BV1xx411c7mD", 1001L)
+                assertTrue(with(client) { info.toAudioStreamInfos() }.isEmpty())
+                assertTrue(client.getAllAudioStreams("BV1xx411c7mD", 1001L).isEmpty())
+                assertEquals(2, http.requestsTo(PLAY_URL_PATH).size)
+                assertEquals(0L, testScheduler.currentTime)
+            }
+        }
     }
 
     private companion object {

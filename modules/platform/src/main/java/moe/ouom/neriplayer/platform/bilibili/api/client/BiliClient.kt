@@ -235,6 +235,7 @@ class BiliClient(
     ): List<BiliAudioStreamInfo> {
         repeat(EMPTY_AUDIO_RETRY_COUNT) { attempt ->
             val info = getPlayInfoByBvid(bvid, cid, opts)
+            if (info.hasRestrictedAudio()) return emptyList()
             val streams = info.toAudioStreamInfos()
             if (streams.isNotEmpty() || !info.shouldRetryEmptyAudioFetch()) {
                 return streams
@@ -1363,6 +1364,12 @@ class BiliClient(
             hasDashVideo
     }
 
+    private fun PlayInfo.hasRestrictedAudio(): Boolean {
+        val data = raw.optJSONObject("data") ?: raw
+        return data.optBoolean("is_preview") || data.optInt("is_preview") == 1 ||
+            data.optBoolean("is_drm") || data.optInt("is_drm") == 1 || data.optInt("drm_type") > 0
+    }
+
     private fun bitrateKbpsFromBandwidth(bandwidth: Long): Int =
         max(0, (bandwidth / 1000L).toInt())
 
@@ -1383,6 +1390,7 @@ class BiliClient(
      * bitrateKbps = bandwidth(Byte/s)*8/1000, 并做非负保护
      */
     fun PlayInfo.toAudioStreamInfos(): List<BiliAudioStreamInfo> {
+        if (hasRestrictedAudio()) return emptyList()
         val list = mutableListOf<BiliAudioStreamInfo>()
 
         // 普通音轨

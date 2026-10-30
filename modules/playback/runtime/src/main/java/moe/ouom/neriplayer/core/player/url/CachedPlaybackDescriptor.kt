@@ -50,6 +50,10 @@ internal data class CachedPlaybackDescriptor(
     val isPreviewClip: Boolean = false
 )
 
+internal fun CachedPlaybackDescriptor.shouldBypassMusicCache(): Boolean =
+    isPreviewClip || (source == PlaybackAudioSource.BILIBILI &&
+        mimeType?.substringBefore(';')?.trim()?.startsWith("video/", ignoreCase = true) == true)
+
 internal fun cachedPlaybackDescriptorFromAudioInfo(
     audioInfo: PlaybackAudioInfo,
     expectedContentLength: Long?,

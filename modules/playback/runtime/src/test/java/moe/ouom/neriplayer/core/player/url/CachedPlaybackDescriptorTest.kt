@@ -37,11 +37,20 @@ class CachedPlaybackDescriptorTest {
         val encoded = encodeCachedPlaybackDescriptor(descriptor)
         val restored = decodeCachedPlaybackDescriptor(encoded)!!.toPlaybackAudioInfo { it.toString() }!!
         assertTrue(restored.isPreviewClip)
+        assertTrue(descriptor.shouldBypassMusicCache())
         assertFalse(descriptor.matches(info.copy(isPreviewClip = false), 123L, "same-recording"))
         assertNull(decodeCachedPlaybackDescriptor(encoded.replace("\"isPreviewClip\":true", "\"isPreviewClip\":false"))?.toPlaybackAudioInfo { it.toString() })
         val full = cachedPlaybackDescriptorFromAudioInfo(info.copy(isPreviewClip = false), 123L, "same-recording")
         val oldV2 = org.json.JSONObject(encodeCachedPlaybackDescriptor(full)).apply { remove("isPreviewClip") }.toString()
         assertFalse(decodeCachedPlaybackDescriptor(oldV2)!!.toPlaybackAudioInfo { it.toString() }!!.isPreviewClip)
+        assertFalse(decodeCachedPlaybackDescriptor(oldV2)!!.shouldBypassMusicCache())
+
+        val video = cachedPlaybackDescriptorFromAudioInfo(
+            info.copy(source = PlaybackAudioSource.BILIBILI, qualityKey = "high", isPreviewClip = false,
+                mimeType = " Video/MP4; codecs=avc1.640032"), 123L, "old-progressive-video")
+        assertTrue(decodeCachedPlaybackDescriptor(encodeCachedPlaybackDescriptor(video))!!.shouldBypassMusicCache())
+        assertFalse(video.copy(mimeType = "audio/mp4").shouldBypassMusicCache())
+        assertFalse(video.copy(source = PlaybackAudioSource.LOCAL).shouldBypassMusicCache())
     }
 
     @After
