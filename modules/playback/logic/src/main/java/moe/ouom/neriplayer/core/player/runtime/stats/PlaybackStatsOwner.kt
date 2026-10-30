@@ -104,6 +104,10 @@ class PlaybackStatsOwner(
         if (!pendingWrites.enqueue(snapshot)) suspendSampling()
     }
 
+    fun onPlaybackCycleStarted(song: SongItem, positionMs: Long) = pendingWrites.collect(this) {
+        feedback?.onPlaybackCycleStarted(song, positionMs)
+    }
+
     fun onUserSkip(writesEnabled: Boolean) = pendingWrites.collect(this) {
         if (canSample(writesEnabled)) recordFeedback(feedback?.onUserSkip().orEmpty(), writesEnabled)
     }

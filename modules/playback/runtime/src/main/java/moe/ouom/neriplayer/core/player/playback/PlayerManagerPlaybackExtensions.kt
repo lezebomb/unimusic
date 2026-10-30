@@ -647,6 +647,7 @@ internal fun PlayerManager.playAtIndex(
     )
     clearPendingSeekPosition()
     enterPendingMediaLoad(resolvedResumePositionMs)
+    playbackStatsOwner.onPlaybackCycleStarted(song, resolvedResumePositionMs)
     playJob = ioScope.launch {
         try {
         val localResult = resolveSongUrl(

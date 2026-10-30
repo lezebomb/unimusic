@@ -51,6 +51,15 @@ class PlaybackFeedbackTracker(
         resetCycle()
     }
 
+    /** Explicit media replacement, not a metadata refresh or pause/resume of the same media. */
+    @Synchronized fun onPlaybackCycleStarted(next: SongItem?, positionMs: Long) {
+        observeClearEpoch()
+        onPlayingChanged(false)
+        onSongChanged(next)
+        resetCycle()
+        lastPosition = positionMs.coerceAtLeast(0L)
+    }
+
     @Synchronized fun onPlayingChanged(value: Boolean) {
         if (playing == value) return
         collect()

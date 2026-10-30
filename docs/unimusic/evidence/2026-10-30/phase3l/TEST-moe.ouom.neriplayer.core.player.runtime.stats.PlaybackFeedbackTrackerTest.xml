@@ -1,0 +1,7 @@
+<testsuite name="moe.ouom.neriplayer.core.player.runtime.stats.PlaybackFeedbackTrackerTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-10-30T01:52:40.537Z" hostname="local" time="0.046">
+  <properties />
+  <testcase name="natural completion and continued replay are counted once per cycle" classname="moe.ouom.neriplayer.core.player.runtime.stats.PlaybackFeedbackTrackerTest" time="0.039" />
+  <testcase name="restartingTheSameRecordingDoesNotCombinePartialCyclesOrLoseLegitimateReplay" classname="moe.ouom.neriplayer.core.player.runtime.stats.PlaybackFeedbackTrackerTest" time="0.002" />
+  <system-out />
+  <system-err />
+</testsuite>

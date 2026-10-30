@@ -7,6 +7,30 @@ import org.junit.Assert.*
 import org.junit.Test
 
 class PlaybackFeedbackTrackerTest {
+    @Test fun restartingTheSameRecordingDoesNotCombinePartialCyclesOrLoseLegitimateReplay() {
+        var elapsed = 0L
+        val tracker = PlaybackFeedbackTracker({ it.id.toString() }, { elapsed }, { 1_000_000 + elapsed })
+        val song = song(10_000)
+        tracker.setEnabled(true);tracker.onSongChanged(song);tracker.onPlayingChanged(true)
+        elapsed = 6_000;tracker.onProgress(6_000)
+        tracker.onPlaybackCycleStarted(song, 0)
+        elapsed = 20_000 // Resolution/startup waiting never belongs to the new cycle.
+        tracker.onPlayingChanged(true)
+        elapsed = 23_000
+        assertTrue(tracker.onTrackEnded().isEmpty())
+        tracker.onPlaybackCycleStarted(song, 0)
+        tracker.onPlayingChanged(true)
+        elapsed = 29_000;tracker.onSongChanged(song.copy(name = "Edited display name"))
+        elapsed = 32_000
+        val complete = tracker.onTrackEnded().single()
+        assertEquals(PlaybackFeedbackKind.COMPLETE, complete.kind)
+        assertEquals(9_000L, complete.heardMs)
+        tracker.onPlaybackCycleStarted(song, 0)
+        tracker.onPlayingChanged(true)
+        elapsed = 34_500
+        assertEquals(PlaybackFeedbackKind.REPEAT, tracker.onProgress(2_500).single().kind)
+    }
+
     @Test fun pausedAndFreshlyRecoveredPlaybackDoNotBecomeDislikeEvidence() {
         var elapsed = 0L
         val tracker = PlaybackFeedbackTracker({ it.id.toString() }, { elapsed }, { 1_000_000 + elapsed })

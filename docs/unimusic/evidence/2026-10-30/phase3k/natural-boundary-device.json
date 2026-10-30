@@ -1,0 +1,135 @@
+{
+  "installedPackageVersion": "67338ee336f5.dirty.10300656",
+  "song": "どうして",
+  "previewBadgeAtStart": false,
+  "outcome": "ownTrackChanged",
+  "samples": [
+    {
+      "elapsedSeconds": 0.1,
+      "state": 3,
+      "positionMs": 22046,
+      "expectedTrack": true
+    },
+    {
+      "elapsedSeconds": 10.2,
+      "state": 3,
+      "positionMs": 32030,
+      "expectedTrack": true
+    },
+    {
+      "elapsedSeconds": 20.4,
+      "state": 3,
+      "positionMs": 42239,
+      "expectedTrack": true
+    },
+    {
+      "elapsedSeconds": 30.5,
+      "state": 3,
+      "positionMs": 52244,
+      "expectedTrack": true
+    },
+    {
+      "elapsedSeconds": 40.6,
+      "state": 3,
+      "positionMs": 62207,
+      "expectedTrack": true
+    },
+    {
+      "elapsedSeconds": 50.7,
+      "state": 3,
+      "positionMs": 72186,
+      "expectedTrack": true
+    },
+    {
+      "elapsedSeconds": 60.8,
+      "state": 3,
+      "positionMs": 82124,
+      "expectedTrack": true
+    },
+    {
+      "elapsedSeconds": 70.9,
+      "state": 3,
+      "positionMs": 92152,
+      "expectedTrack": true
+    },
+    {
+      "elapsedSeconds": 81.1,
+      "state": 3,
+      "positionMs": 102146,
+      "expectedTrack": true
+    },
+    {
+      "elapsedSeconds": 91.2,
+      "state": 3,
+      "positionMs": 112160,
+      "expectedTrack": true
+    },
+    {
+      "elapsedSeconds": 101.3,
+      "state": 3,
+      "positionMs": 122095,
+      "expectedTrack": true
+    },
+    {
+      "elapsedSeconds": 111.4,
+      "state": 3,
+      "positionMs": 132100,
+      "expectedTrack": true
+    },
+    {
+      "elapsedSeconds": 121.5,
+      "state": 3,
+      "positionMs": 142048,
+      "expectedTrack": true
+    },
+    {
+      "elapsedSeconds": 131.7,
+      "state": 3,
+      "positionMs": 152276,
+      "expectedTrack": true
+    },
+    {
+      "elapsedSeconds": 141.8,
+      "state": 3,
+      "positionMs": 164018,
+      "expectedTrack": true
+    },
+    {
+      "elapsedSeconds": 151.9,
+      "state": 3,
+      "positionMs": 174060,
+      "expectedTrack": true
+    },
+    {
+      "elapsedSeconds": 162.1,
+      "state": 3,
+      "positionMs": 2148,
+      "expectedTrack": false
+    }
+  ],
+  "finalOwnState": {
+    "state": 2,
+    "positionMs": 3186,
+    "expectedTrack": false
+  },
+  "feedbackEnabled": true,
+  "feedbackEventsBefore": 0,
+  "feedbackEventsAfter": 1,
+  "addedKinds": {
+    "COMPLETE": 1
+  },
+  "addedHeardMs": [
+    256273
+  ],
+  "addedDurationMs": [
+    181085
+  ],
+  "humanListeningValidation": false,
+  "source": "Netease according to current UI, not Kuwo/Bili fallback",
+  "limits": [
+    "Older3K package; not3L fix validation",
+    "Natural track change with COMPLETE event, not full-file verification or human listening",
+    "Heard256273ms includes preceding same-song partial cycle; not this single uninterrupted playback duration",
+    "No true source switch/fallback speed or Kuwo/Bili audio validation"
+  ]
+}
