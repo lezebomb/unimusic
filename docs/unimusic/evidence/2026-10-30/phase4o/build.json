@@ -1,0 +1,15 @@
+{
+  "apk": "build/outputs/unimusic/UniMusic-20261030-4O-debug.apk",
+  "version": "06ba1d9d736c.dirty.10301117",
+  "sha256": "5458b82a555fb7d10c0b9607d96bb8518ee67943da483f9ba2678deeb385edfb",
+  "build": "BUILD SUCCESSFUL in 40s",
+  "tests": {
+    "name": "moe.ouom.neriplayer.util.platform.PreferredRefreshRateWindowTest",
+    "tests": "2",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  "boundaries": "passed",
+  "startupRegressionEvidence": "build-before-continuous-refresh.json"
+}

@@ -32,10 +32,7 @@ import android.content.res.Configuration
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.os.SystemClock
-import android.view.MotionEvent
 import androidx.activity.ComponentActivity
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.compose.LocalActivity
@@ -176,9 +173,7 @@ import moe.ouom.neriplayer.common.logging.NPLogger
 import moe.ouom.neriplayer.util.platform.NightModeHelper
 import moe.ouom.neriplayer.core.startup.safemode.SafeModeManager
 import moe.ouom.neriplayer.util.platform.applyOnePlusHighDensityDisplayCorrection
-import moe.ouom.neriplayer.util.platform.AMBIENT_REFRESH_RATE_IDLE_MS
 import moe.ouom.neriplayer.util.platform.applyPreferredHighRefreshRate
-import moe.ouom.neriplayer.util.platform.isAmbientRefreshRateIdle
 import moe.ouom.neriplayer.util.platform.resolveOnePlusHighDensityUiScale
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.time.Duration.Companion.milliseconds
@@ -332,12 +327,7 @@ class MainActivity : ComponentActivity() {
     private var safeModeActive = false
     private var nowPlayingOrientationState = NowPlayingOrientationState()
     private var preferHighRefreshRate = false
-    private var nowPlayingShownForRefreshRate = false
-    private var ambientRefreshRateActive = false
-    private var touchInProgress = false
-    private var lastTouchAtMs = 0L
-    private val refreshRateHandler = Handler(Looper.getMainLooper())
-    private val refreshRateCheck = Runnable { updateWindowRefreshRate() }
+    private var resumedForRefreshRate = false
 
     override fun attachBaseContext(newBase: Context) {
         val localizedContext = LanguageManager.applyLanguage(newBase)
@@ -1145,11 +1135,6 @@ class MainActivity : ComponentActivity() {
                                             onNowPlayingVisibilityChanged = { visible ->
                                                 isNowPlayingVisible = visible
                                                 window.applyMainWindowBackground(useDark || visible)
-                                                if (nowPlayingShownForRefreshRate != visible) {
-                                                    nowPlayingShownForRefreshRate = visible
-                                                    lastTouchAtMs = SystemClock.uptimeMillis()
-                                                    updateWindowRefreshRate()
-                                                }
                                             },
                                             onNowPlayingOpenChanged = { open ->
                                                 nowPlayingOrientationState =
@@ -1360,7 +1345,7 @@ class MainActivity : ComponentActivity() {
     override fun onResume() {
         super.onResume()
         applyNavigationBarVisibility()
-        lastTouchAtMs = SystemClock.uptimeMillis()
+        resumedForRefreshRate = true
         updateWindowRefreshRate()
         if (safeModeActive) {
             return
@@ -1370,8 +1355,9 @@ class MainActivity : ComponentActivity() {
     }
 
     override fun onPause() {
-        super.onPause()
+        resumedForRefreshRate = false
         updateWindowRefreshRate()
+        super.onPause()
     }
 
     override fun onStop() {
@@ -1384,7 +1370,10 @@ class MainActivity : ComponentActivity() {
 
     override fun onWindowFocusChanged(hasFocus: Boolean) {
         super.onWindowFocusChanged(hasFocus)
-        if (hasFocus) applyNavigationBarVisibility()
+        if (hasFocus) {
+            applyNavigationBarVisibility()
+            updateWindowRefreshRate()
+        }
         if (safeModeActive) {
             return
         }
@@ -1685,39 +1674,9 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    /**
-     * 播放页静置时降到 60 Hz，动效本身不变；一碰屏幕立刻恢复原偏好，
-     * 松手 3 秒后再降，滚动、拖动进度和惯性动画都在高刷下完成
-     */
+    /** Keep all foreground screens at the requested panel rate, including an idle player. */
     private fun updateWindowRefreshRate() {
-        refreshRateHandler.removeCallbacks(refreshRateCheck)
-        val resumed = lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)
-        val idleForMs = SystemClock.uptimeMillis() - lastTouchAtMs
-        val ambientIdle = isAmbientRefreshRateIdle(
-            nowPlayingShown = nowPlayingShownForRefreshRate,
-            resumed = resumed,
-            touching = touchInProgress,
-            idleForMs = idleForMs
-        )
-        ambientRefreshRateActive = applyPreferredHighRefreshRate(preferHighRefreshRate, ambientIdle)
-        if (nowPlayingShownForRefreshRate && resumed && !touchInProgress && !ambientIdle) {
-            refreshRateHandler.postDelayed(refreshRateCheck, AMBIENT_REFRESH_RATE_IDLE_MS - idleForMs)
-        }
-    }
-
-    override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
-        lastTouchAtMs = SystemClock.uptimeMillis()
-        when (ev.actionMasked) {
-            MotionEvent.ACTION_DOWN -> {
-                touchInProgress = true
-                if (ambientRefreshRateActive) updateWindowRefreshRate()
-            }
-            MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
-                touchInProgress = false
-                if (nowPlayingShownForRefreshRate) updateWindowRefreshRate()
-            }
-        }
-        return super.dispatchTouchEvent(ev)
+        applyPreferredHighRefreshRate(preferHighRefreshRate && resumedForRefreshRate)
     }
 
     @Suppress("DEPRECATION")

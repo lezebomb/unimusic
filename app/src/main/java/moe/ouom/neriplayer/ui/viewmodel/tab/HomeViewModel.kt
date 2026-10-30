@@ -224,7 +224,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
     private val repo = AppContainer.neteaseCookieRepo
     private val client = AppContainer.neteaseClient
-    private val youtubeAuthRepo = AppContainer.youtubeAuthRepo
+    private val youtubeAuthRepo by lazy { AppContainer.youtubeAuthRepo }
 
     private val initialRecommendCookies = repo.withCurrentCookies { cookies ->
         client.setPersistedCookies(cookies)
@@ -353,8 +353,6 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     init {
-        lastYouTubeAuthFingerprint = buildYouTubeAuthFingerprint(youtubeAuthRepo.getAuthOnce())
-
         // 观察国际化设置变化, 切换推荐源
         viewModelScope.launch {
             combine(
@@ -363,7 +361,8 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
             ) { internationalizationEnabled, youtubeEnabled ->
                 internationalizationEnabled to youtubeEnabled
             }.collect { (internationalizationEnabled, youtubeEnabled) ->
-                val useYouTubeHome = internationalizationEnabled && youtubeEnabled
+                val useYouTubeHome = internationalizationEnabled && youtubeEnabled &&
+                    moe.ouom.neriplayer.platform.youtube.config.YouTubeFeatureGate.isEnabled()
                 NPLogger.d(
                     TAG,
                     "home source updated: international=$internationalizationEnabled, youtube=$youtubeEnabled"
@@ -384,7 +383,12 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         }
 
         viewModelScope.launch {
-            AppContainer.youtubeAuthRepo.authFlow.drop(1).collect { bundle ->
+            if (!moe.ouom.neriplayer.platform.youtube.config.YouTubeFeatureGate.isEnabled()) return@launch
+            val authRepo = withContext(Dispatchers.IO) { youtubeAuthRepo }
+            lastYouTubeAuthFingerprint = withContext(Dispatchers.IO) {
+                buildYouTubeAuthFingerprint(authRepo.getAuthOnce())
+            }
+            authRepo.authFlow.collect { bundle ->
                 val nextFingerprint = buildYouTubeAuthFingerprint(bundle)
                 if (nextFingerprint == lastYouTubeAuthFingerprint) {
                     return@collect

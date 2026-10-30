@@ -26,6 +26,7 @@ package moe.ouom.neriplayer.core.di
 import moe.ouom.neriplayer.platform.youtube.api.auth.hasEffectiveAuth
 import moe.ouom.neriplayer.platform.youtube.api.auth.normalized
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.collect
 import moe.ouom.neriplayer.platform.netease.api.auth.NeteaseYdDeviceTokenProvider
 import android.app.Application
 import kotlinx.coroutines.CoroutineScope
@@ -606,36 +607,43 @@ object AppContainer {
     }
 
     private fun startCookieObserver() {
-        neteaseCookieRepo.cookieFlow
-            .onEach { cookies ->
-                neteaseCookieRepo.withCurrentCookiesIfMatches(cookies) { currentCookies ->
-                    neteaseClient.setPersistedCookies(currentCookies)
+        // Accessing the lazy repository opens Android Keystore; do that inside the IO coroutine.
+        scope.launch {
+            val repository = neteaseCookieRepo
+            // Resolve the client's lazy initializer before taking the cookie lock.
+            val client = neteaseClient
+            repository.cookieFlow.collect { cookies ->
+                repository.withCurrentCookiesIfMatches(cookies) { currentCookies ->
+                    client.setPersistedCookies(currentCookies)
                 }
             }
-            .launchIn(scope)
+        }
     }
 
     private fun startYouTubeAuthObserver() {
-        youtubeAuthRepo.authFlow
-            .drop(1)
-            .distinctUntilChangedBy { bundle -> bundle.toWarmBootstrapKey() }
-            .onEach { bundle ->
-                if (!YouTubeFeatureGate.isEnabled()) {
-                    return@onEach
+        scope.launch {
+            moe.ouom.neriplayer.core.startup.AppStartupWorkGate.awaitInteractiveContentOrTimeout()
+            youtubeAuthRepo.authFlow
+                .drop(1)
+                .distinctUntilChangedBy { bundle -> bundle.toWarmBootstrapKey() }
+                .onEach { bundle ->
+                    if (!YouTubeFeatureGate.isEnabled()) {
+                        return@onEach
+                    }
+                    handleYouTubeAuthStateChanged(
+                        bundle = bundle,
+                        clearBootstrapCache = youtubeMusicClient::clearBootstrapCache,
+                        clearPlaybackAuthBoundCaches = { cancelInFlight ->
+                            youtubeMusicPlaybackRepository.clearAuthBoundCaches(cancelInFlight)
+                            youtubeMusicDownloadPlaybackRepository.clearAuthBoundCaches(cancelInFlight)
+                        },
+                        evictConnections = sharedOkHttpClient.connectionPool::evictAll,
+                        youtubeEnabled = YouTubeFeatureGate.isEnabled(),
+                        warmBootstrapAsync = youtubeMusicPlaybackRepository::warmBootstrapAsync
+                    )
                 }
-                handleYouTubeAuthStateChanged(
-                    bundle = bundle,
-                    clearBootstrapCache = youtubeMusicClient::clearBootstrapCache,
-                    clearPlaybackAuthBoundCaches = { cancelInFlight ->
-                        youtubeMusicPlaybackRepository.clearAuthBoundCaches(cancelInFlight)
-                        youtubeMusicDownloadPlaybackRepository.clearAuthBoundCaches(cancelInFlight)
-                    },
-                    evictConnections = sharedOkHttpClient.connectionPool::evictAll,
-                    youtubeEnabled = YouTubeFeatureGate.isEnabled(),
-                    warmBootstrapAsync = youtubeMusicPlaybackRepository::warmBootstrapAsync
-                )
-            }
-            .launchIn(scope)
+                .collect { }
+        }
     }
 
     private fun startSettingsObserver() {

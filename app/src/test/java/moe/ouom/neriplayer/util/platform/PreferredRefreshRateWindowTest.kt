@@ -79,40 +79,27 @@ class PreferredRefreshRateWindowTest {
     }
 
     @Test
-    fun `an idle now playing screen drops to 60 Hz and restores the preference afterwards`() {
-        val display = display(currentRate = 120f, 60f, 90f, 120f)
+    fun `high refresh pins a matching resolution mode until explicitly disabled`() {
+        val display = display(currentRate = 60f, 60f, 90f, 120f)
+        val modes = display.supportedModes
+        modes.forEachIndexed { index, mode ->
+            `when`(mode.modeId).thenReturn(index + 1)
+            `when`(mode.physicalWidth).thenReturn(1080)
+            `when`(mode.physicalHeight).thenReturn(2400)
+        }
+        `when`(display.mode).thenReturn(modes[0])
         `when`(decorView.display).thenReturn(display)
 
-        val ambient = activity.applyPreferredHighRefreshRate(highRefreshRateEnabled = true, ambientIdle = true)
-        assertEquals(true, ambient)
-        assertEquals(60f, attributes.preferredRefreshRate, 0f)
-
-        val restored = activity.applyPreferredHighRefreshRate(highRefreshRateEnabled = true, ambientIdle = false)
-        assertEquals(false, restored)
+        activity.applyPreferredHighRefreshRate(highRefreshRateEnabled = true)
         assertEquals(120f, attributes.preferredRefreshRate, 0f)
-    }
+        assertEquals(3, attributes.preferredDisplayModeId)
+        // Reapplying after quiet time preserves the same mode; no idle timer changes it.
+        activity.applyPreferredHighRefreshRate(highRefreshRateEnabled = true)
+        assertEquals(3, attributes.preferredDisplayModeId)
 
-    @Test
-    fun `a 60 Hz display has nothing to save and keeps the normal preference`() {
-        val display = display(currentRate = 60f, 60f)
-        `when`(decorView.display).thenReturn(display)
-
-        val ambient = activity.applyPreferredHighRefreshRate(highRefreshRateEnabled = false, ambientIdle = true)
-
-        assertEquals(false, ambient)
+        activity.applyPreferredHighRefreshRate(highRefreshRateEnabled = false)
         assertEquals(0f, attributes.preferredRefreshRate, 0f)
-    }
-
-    @Test
-    fun `ambient idle needs a visible resumed player and three quiet seconds`() {
-        assertEquals(true, isAmbientRefreshRateIdle(true, true, false, AMBIENT_REFRESH_RATE_IDLE_MS))
-        assertEquals(false, isAmbientRefreshRateIdle(true, true, false, AMBIENT_REFRESH_RATE_IDLE_MS - 1))
-        assertEquals(false, isAmbientRefreshRateIdle(true, true, true, AMBIENT_REFRESH_RATE_IDLE_MS))
-        assertEquals(false, isAmbientRefreshRateIdle(true, false, false, AMBIENT_REFRESH_RATE_IDLE_MS))
-        assertEquals(false, isAmbientRefreshRateIdle(false, true, false, AMBIENT_REFRESH_RATE_IDLE_MS))
-        assertEquals(null, resolveAmbientRefreshRate(listOf(30f, 60f)))
-        assertEquals(60f, resolveAmbientRefreshRate(listOf(30f, 60f, 90f, 120f)))
-        assertEquals(90f, resolveAmbientRefreshRate(listOf(48f, 90f)))
+        assertEquals(0, attributes.preferredDisplayModeId)
     }
 
     private fun display(currentRate: Float, vararg supportedRates: Float): Display =

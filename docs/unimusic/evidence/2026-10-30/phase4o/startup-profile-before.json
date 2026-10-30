@@ -1,0 +1,19 @@
+{
+  "scope": "One 2ms sampled startup trace on installed 4N; profiling overhead included; no method arguments or account values exported",
+  "profiledWallMs": 4660.5,
+  "startupCalls": [
+    {
+      "method": "moe.ouom.neriplayer.NeriPlayerApplication.onCreate",
+      "ms": 662.0
+    },
+    {
+      "method": "moe.ouom.neriplayer.NeriPlayerApplication.initializeNormalComponents$app",
+      "ms": 522.6
+    },
+    {
+      "method": "moe.ouom.neriplayer.core.di.AppContainer.initialize",
+      "ms": 483.8
+    }
+  ],
+  "finding": "AppContainer observer setup synchronously opened NetEase and YouTube encrypted preferences on the main thread. Trace stays ignored and local; account encryption is retained."
+}

@@ -1,0 +1,51 @@
+{
+  "version": "06ba1d9d736c.dirty.10301117",
+  "systemInstallSucceeded": true,
+  "dataPreservingUpdate": true,
+  "homeIdle": {
+    "quietSeconds": 6,
+    "activeModeId": [
+      "3"
+    ]
+  },
+  "myIdle": {
+    "quietSeconds": 6,
+    "activeModeId": [
+      "3"
+    ]
+  },
+  "mySettingsVisible": true,
+  "playerIdle": {
+    "quietSeconds": 6,
+    "activeModeId": [
+      "3"
+    ]
+  },
+  "playerControlsVisible": true,
+  "scope": "Final continuous-refresh APK; 6 seconds without touch per inspected screen; no audio started, no statistical FPS benchmark",
+  "interactionFollowUp": {
+    "homeScroll": {
+      "checked": true,
+      "scrollDurationMs": 1800,
+      "duringScrollModeIds": [
+        [
+          "1"
+        ],
+        [
+          "1"
+        ],
+        [
+          "1"
+        ]
+      ]
+    },
+    "remainingChecks": "UI target unavailable; partial observations only",
+    "foregroundWindowRequestedHz": [
+      "120.00001"
+    ],
+    "foregroundWindowRequestedModeId": [
+      "1"
+    ],
+    "note": "Mode1=120Hz, mode3=60Hz. Idle remained system-selected 60Hz despite persistent window request; no global system settings changed."
+  }
+}

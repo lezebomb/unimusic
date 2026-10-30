@@ -1,0 +1,41 @@
+{
+  "version": "06ba1d9d736c.dirty.10301106",
+  "systemInstallSucceeded": true,
+  "dataPreservingUpdate": true,
+  "startupSingleForceStop": {
+    "TotalTime": 1997,
+    "WaitTime": 2000
+  },
+  "homeVisible": true,
+  "mySettingsVisible": true,
+  "returnedHome": true,
+  "activeModeId": [
+    "3"
+  ],
+  "scope": "One unprofiled force-stop launch and one tab round trip; no new audio/account changes; not a statistical performance benchmark",
+  "followUp": {
+    "myLabels": [
+      "设置",
+      "我的",
+      "最近播放",
+      "本地",
+      "网易云",
+      "歌单",
+      "发现",
+      "我的"
+    ],
+    "duringMyModeId": [
+      "1"
+    ],
+    "duringHomeModeId": [
+      "1"
+    ],
+    "windowPreference": {
+      "preferredRefreshRate": [
+        "120.00001"
+      ],
+      "preferredDisplayModeId": []
+    }
+  },
+  "mySettingsCheckNote": "Match text or content-description; first probe checked only text"
+}

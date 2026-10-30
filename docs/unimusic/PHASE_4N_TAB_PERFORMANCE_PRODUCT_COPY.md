@@ -19,4 +19,4 @@
 
 ## 接续CI
 
-上一批84db048a的40991539945整体SUCCESS，实际下载聚焦报告，LibraryNeteaseRefreshOwner 1、ExploreSearchArtistIntent 13、PlaybackFeedbackTracker 5，均0失败；该run只列出unified-library作业，不能把它记为新Android设备迁移验收。最近明确的Android迁移成功仍为40987129828。本阶段推送后的CI另行核对。
+上一批84db048a的40991539945整体SUCCESS，实际下载聚焦报告，LibraryNeteaseRefreshOwner 1、ExploreSearchArtistIntent 13、PlaybackFeedbackTracker 5，均0失败；进一步核对作业内部步骤，40991539945的“Verify additive migration on Android”为SUCCESS；迁移在unified-library作业内执行，并非独立作业。4N提交06ba1d9d的CI40994150528亦SUCCESS，其Android迁移步骤按范围跳过。

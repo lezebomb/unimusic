@@ -21,46 +21,27 @@ internal fun resolvePreferredRefreshRate(
         ?: 0f
 }
 
-/** 播放页静置时只剩歌词推进、波形和背景这类慢速动效，60 Hz 足够顺滑 */
-internal const val AMBIENT_REFRESH_RATE_HZ = 60f
-
-/** 触摸结束后多久才降频，惯性滚动和点按反馈都在这之前结束 */
-internal const val AMBIENT_REFRESH_RATE_IDLE_MS = 3_000L
-
-internal fun isAmbientRefreshRateIdle(
-    nowPlayingShown: Boolean,
-    resumed: Boolean,
-    touching: Boolean,
-    idleForMs: Long
-): Boolean = nowPlayingShown && resumed && !touching && idleForMs >= AMBIENT_REFRESH_RATE_IDLE_MS
-
-/** 屏幕本来就不高于 60 Hz 时没有可省的，返回 null 沿用原偏好 */
-internal fun resolveAmbientRefreshRate(supportedRefreshRates: Iterable<Float>): Float? {
-    val rates = supportedRefreshRates.filter { rate -> rate.isFinite() && rate > 0f }
-    if (rates.none { rate -> rate > AMBIENT_REFRESH_RATE_HZ + 1f }) return null
-    return rates.filter { rate -> rate >= AMBIENT_REFRESH_RATE_HZ - 1f }.minOrNull()
-}
-
-internal fun Activity.applyPreferredHighRefreshRate(
-    highRefreshRateEnabled: Boolean,
-    ambientIdle: Boolean = false
-): Boolean {
+/** The foreground UI keeps its high refresh request until the user disables it or leaves the app. */
+internal fun Activity.applyPreferredHighRefreshRate(highRefreshRateEnabled: Boolean) {
     val display = window.decorView.display ?:
         (getSystemService(Context.DISPLAY_SERVICE) as? DisplayManager)
             ?.getDisplay(Display.DEFAULT_DISPLAY)
-    val supportedRates = display?.supportedModes.orEmpty().map { mode -> mode.refreshRate }
-    val ambientRefreshRate = if (ambientIdle) resolveAmbientRefreshRate(supportedRates) else null
-    val preferredRefreshRate = ambientRefreshRate ?: resolvePreferredRefreshRate(
+    val currentMode = display?.mode
+    val modes = display?.supportedModes.orEmpty().filter { mode ->
+        currentMode == null || (mode.physicalWidth == currentMode.physicalWidth &&
+            mode.physicalHeight == currentMode.physicalHeight)
+    }
+    val preferredRefreshRate = resolvePreferredRefreshRate(
         highRefreshRateEnabled = highRefreshRateEnabled,
-        supportedRefreshRates = supportedRates,
+        supportedRefreshRates = modes.map { it.refreshRate },
         currentRefreshRate = display?.refreshRate
     )
-    // 窗口偏好只决定默认模式，持续变化的内容仍会被系统按图层升到最高刷新率；
-    // 静置降频时同时指定显示模式，并在 Android 15+ 给视图图层投 60 fps 的票
-    val preferredModeId = ambientRefreshRate?.let { rate -> display?.matchingModeId(rate) } ?: 0
+    // Use a same-resolution mode as well as a rate vote so static Compose content retains the request.
+    val preferredModeId = if (highRefreshRateEnabled && preferredRefreshRate > 0f) {
+        display?.matchingModeId(preferredRefreshRate) ?: 0
+    } else 0
     applyPreferredRefreshRate(preferredRefreshRate, preferredModeId)
-    applyRequestedViewFrameRate(ambientRefreshRate)
-    return ambientRefreshRate != null
+    applyRequestedViewFrameRate(preferredRefreshRate.takeIf { highRefreshRateEnabled && it > 0f })
 }
 
 private fun Activity.applyRequestedViewFrameRate(frameRate: Float?) {

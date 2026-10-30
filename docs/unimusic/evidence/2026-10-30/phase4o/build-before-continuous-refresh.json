@@ -1,0 +1,14 @@
+{
+  "apk": "build/outputs/unimusic/UniMusic-20261030-4O-debug.apk",
+  "version": "06ba1d9d736c.dirty.10301106",
+  "sha256": "c12dfb0957ce3b8dedbdce311ddcbaa76725ba8a4563369c03266291d4637e04",
+  "build": "Initial build and 2 key regressions passed in 2m15s; after lock-order review final APK rebuilt in 40s without repeating tests",
+  "tests": {
+    "name": "moe.ouom.neriplayer.ui.viewmodel.tab.NeteaseHomeRecommendationsTest",
+    "tests": "2",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  "boundaries": "passed"
+}
