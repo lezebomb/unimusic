@@ -92,7 +92,7 @@ class LibraryViewModel(application: Application) : AndroidViewModel(application)
     )
     val uiState: StateFlow<LibraryUiState> = _uiState
     private var lastYouTubeAuthFingerprint: String? = null
-    private var youtubeEnabled = YouTubeFeatureGate.isEnabled()
+    private var youtubeEnabled = MusicSourceRegistry.isEnabled("youtube_music") && YouTubeFeatureGate.isEnabled()
     private var lastObservedYouTubeEnabled: Boolean? = null
     private val neteaseRefreshOwner = LibraryNeteaseRefreshOwner(
         scope = viewModelScope,

@@ -56,6 +56,29 @@ class BiliRecordingMatchTest {
         assertNull(selectStrictBiliPage(song.copy(name = "A", artist = "Sia"), asia, asia.title).page)
     }
 
+    @Test fun originalVocalLabelUsesTheVerifiedHeaderAndKeepsTheCorrectCid() {
+        for (label in listOf("On Vocal", "原曲", "原唱")) {
+            val info = video(page(11, label), page(22, "Off Vocal"), page(33, "Vocals"))
+            assertEquals(11L, selectStrictBiliPage(song, info, info.title).page?.cid)
+            assertNull(selectStrictBiliPage(song, info, info.title, selectedCid = 22).page)
+            assertNull(selectStrictBiliPage(song, info, info.title, selectedCid = 33).page)
+        }
+        val ambiguous = video(page(11, "On Vocal"), page(22, "原曲"))
+        assertEquals(SourceFailure.AMBIGUOUS,
+            selectStrictBiliPage(song, ambiguous, ambiguous.title).rejection)
+    }
+
+    @Test fun originalLabelCannotEraseCoverEvidenceOrBorrowTheCollectionDuration() {
+        val info = video(page(11, "On Vocal"), page(22, "Off Vocal"))
+        val cover = info.copy(title = "周杰伦 - 晴天 (Cover)")
+        assertNull(selectStrictBiliPage(song, cover, cover.title).page)
+        assertNull(selectStrictBiliPage(song, info, "周杰伦 - 晴天 AI翻唱").page)
+        val synthetic = info.copy(ownerName = "AI翻唱")
+        assertNull(selectStrictBiliPage(song, synthetic, synthetic.title).page)
+        val missing = info.copy(pages = info.pages.map { it.copy(durationSec = 0) })
+        assertNull(selectStrictBiliPage(song, missing, missing.title).page)
+    }
+
     @Test fun confirmedCidDisambiguatesOnlyTheSelectedCompatiblePage() {
         val info = video(page(11, "晴天"), page(22, "晴天"), page(33, "晴天 Live"))
         assertEquals(22L, selectStrictBiliPage(song, info, info.title, selectedCid = 22).page?.cid)

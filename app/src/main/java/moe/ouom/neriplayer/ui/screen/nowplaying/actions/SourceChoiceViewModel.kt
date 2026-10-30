@@ -46,7 +46,7 @@ internal data class SourceChoiceState(
 /** This owner remembers metadata decisions; saving never interrupts current playback. */
 internal class SourceChoiceViewModel(application: Application) : AndroidViewModel(application) {
     private val backend get() = AppContainer.sourceMatchBackend
-    private var youtubeEnabled = YouTubeFeatureGate.isEnabled()
+    private var youtubeEnabled = MusicSourceRegistry.isEnabled("youtube_music") && YouTubeFeatureGate.isEnabled()
     private val _state = MutableStateFlow(SourceChoiceState(youtubeEnabled = youtubeEnabled))
     val state = _state.asStateFlow()
     private var work: Job? = null

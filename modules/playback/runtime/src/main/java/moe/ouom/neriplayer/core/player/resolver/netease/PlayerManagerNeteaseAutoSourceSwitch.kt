@@ -127,10 +127,9 @@ internal suspend fun PlayerManager.resolveStrictBiliSource(
         val selected = selectStreamByPreference(available, effectiveBiliQuality())
         val stream = selected?.takeIf { it.url.isNotBlank() }
             ?: return SourceAttempt.Rejected(SourceFailure.NO_PERMISSION)
-        val duration = page.durationSec.takeIf { it > 0 }?.times(1000L) ?: info.durationSec * 1000L
         val expected = song.recordingMetadata()
-        val title = if (info.pages.size == 1 && page.part.matches(Regex("(?i)(?:p?1|正片|视频|音频|默认|video|audio)"))) info.title else page.part
-        val metadata = biliRecordingMetadata(expected, title, "${info.title} ${page.part}", info.ownerName, duration)
+        val metadata = biliPageRecordingMetadata(expected, info, page, candidate.titlePlain)
+        val duration = metadata.durationMs
         if (session != sourceResolutionSession("bilibili")) return SourceAttempt.Rejected(SourceFailure.AUTH_REQUIRED)
         if (automatic && !neteaseAutoSourceSwitchEnabled) return SourceAttempt.Rejected(SourceFailure.NO_PERMISSION)
         if (stamp != matchBackend.decisionStamp(song, sourceKey)) return SourceAttempt.Rejected(SourceFailure.NO_MATCH)

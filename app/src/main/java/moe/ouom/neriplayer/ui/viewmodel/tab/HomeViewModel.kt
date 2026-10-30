@@ -383,6 +383,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         }
 
         viewModelScope.launch {
+            if (!moe.ouom.neriplayer.data.model.unified.MusicSourceRegistry.isEnabled("youtube_music")) return@launch
             if (!moe.ouom.neriplayer.platform.youtube.config.YouTubeFeatureGate.isEnabled()) return@launch
             val authRepo = withContext(Dispatchers.IO) { youtubeAuthRepo }
             lastYouTubeAuthFingerprint = withContext(Dispatchers.IO) {

@@ -11,7 +11,7 @@ import kotlinx.coroutines.sync.withPermit
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import moe.ouom.neriplayer.core.di.AppContainer
-import moe.ouom.neriplayer.core.player.resolver.netease.biliRecordingMetadata
+import moe.ouom.neriplayer.core.player.resolver.netease.biliPageRecordingMetadata
 import moe.ouom.neriplayer.core.player.resolver.netease.recordingMetadata
 import moe.ouom.neriplayer.data.local.media.LocalSongSupport
 import moe.ouom.neriplayer.data.local.playlist.LocalPlaylistRepository
@@ -163,16 +163,10 @@ private suspend fun discoverBiliChoices(song: SongItem): SourceChoiceDiscoveryRe
                     }
                     val candidates = info.pages.asSequence().filter { it.cid > 0 && it.page > 0 }
                         .distinctBy { it.cid }.map { page ->
-                            val generic = page.part.trim()
-                                .matches(Regex("(?i)(?:p?1|正片|视频|音频|默认|video|audio)"))
-                            val title = if (info.pages.size == 1 && generic) info.title else page.part
-                            val evidence = "${searchItem.titlePlain} · ${info.title} · P${page.page} ${page.part} · ${info.ownerName}"
-                            val duration = page.durationSec.takeIf { it > 0 }?.times(1000L)
-                                ?: if (info.pages.size == 1) info.durationSec.coerceAtLeast(0) * 1000L else 0L
-                            val metadata = biliRecordingMetadata(expected, title, evidence, info.ownerName, duration)
+                            val metadata = biliPageRecordingMetadata(expected, info, page, searchItem.titlePlain)
                             RecordingSourceCandidate(
                                 SongSourceKey("bilibili", info.aid.toString(), page.cid.toString()),
-                                UnifiedSongMetadata(metadata.title, metadata.artist, evidence, duration,
+                                UnifiedSongMetadata(metadata.title, metadata.artist, metadata.versionContext, metadata.durationMs,
                                     RecordingMatchPolicy.versions(metadata).singleOrNull() ?: RecordingVersion.UNKNOWN)
                             )
                         }.sortedByDescending { assessSourceChoice(song, it).accepted }.take(24).toList()

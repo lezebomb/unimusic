@@ -11,6 +11,25 @@ import moe.ouom.neriplayer.data.model.bilibili.playback.PlayInfo
 
 internal data class BiliPageSelection(val page: VideoPage?, val rejection: SourceFailure?)
 
+private val genericSinglePage = Regex("(?i)(?:p?1|正片|视频|音频|默认|video|audio)")
+private val originalPageLabel = Regex("(?i)(?:原曲|原唱|on[\\s_-]*vocals?)")
+
+/** Only explicit full-vocal labels may use a multi-page video's title; stems keep their own names.
+ * All parent/search/page version evidence remains, including cover/AI/accompaniment markers.
+ */
+fun biliPageRecordingMetadata(
+    expected: RecordingMetadata, info: VideoBasicInfo, page: VideoPage, searchTitle: String = info.title
+): RecordingMetadata {
+    val part = Normalizer.normalize(page.part, Normalizer.Form.NFKC).trim()
+    val useParentTitle = originalPageLabel.matches(part) ||
+        (info.pages.size == 1 && genericSinglePage.matches(part))
+    val title = if (useParentTitle) info.title else page.part
+    val duration = page.durationSec.takeIf { it > 0 }?.times(1000L)
+        ?: if (info.pages.size == 1) info.durationSec.coerceAtLeast(0) * 1000L else 0L
+    return biliRecordingMetadata(expected, title,
+        "$searchTitle ${info.title} ${page.part} ${info.ownerName}", info.ownerName, duration)
+}
+
 /** A name match is corroborating text, never proof that the account is verified or owns a recording. */
 internal fun hasBiliUploaderArtistEvidence(artist: String, uploader: String): Boolean {
     val expected = RecordingMatchPolicy.canonicalArtist(artist)
@@ -33,12 +52,7 @@ internal fun selectStrictBiliPage(song: SongItem, info: VideoBasicInfo, searchTi
     val pages = info.pages.filter { page ->
         if (selectedCid != null && page.cid != selectedCid) return@filter false
         if (page.cid <= 0) return@filter false
-        val genericPart = page.part.trim().matches(Regex("(?i)(?:p?1|正片|视频|音频|默认|video|audio)"))
-        val title = if (info.pages.size == 1 && genericPart) info.title else page.part
-        val context = "$searchTitle ${info.title} ${page.part}"
-        val candidate = biliRecordingMetadata(expected, title, context, info.ownerName,
-            page.durationSec.takeIf { it > 0 }?.times(1000L)
-                ?: if (info.pages.size == 1) info.durationSec * 1000L else 0)
+        val candidate = biliPageRecordingMetadata(expected, info, page, searchTitle)
         RecordingMatchPolicy.assess(expected, candidate).accepted
     }
     return when (pages.size) {
