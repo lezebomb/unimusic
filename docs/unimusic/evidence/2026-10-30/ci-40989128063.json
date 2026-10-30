@@ -1,0 +1,31 @@
+{
+  "runId": 40989128063,
+  "head": "68eb61de04342a7b960b41faf5eacae61a265c27",
+  "conclusion": "success",
+  "mandatoryDomainCheck": "success",
+  "androidAdditiveMigration": "not required for this source-only range; previous required40987129828 succeeded",
+  "actualXmlSummary": {
+    "CrashReportStoreTest": {
+      "tests": 6,
+      "failures": 0,
+      "skipped": 0
+    },
+    "DiagnosticLogTextTest": {
+      "tests": 2,
+      "failures": 0,
+      "skipped": 0
+    },
+    "PlaybackFeedbackTrackerTest": {
+      "tests": 5,
+      "failures": 0,
+      "skipped": 0
+    },
+    "SourceAvailabilityCheckerTest": {
+      "tests": 7,
+      "failures": 0,
+      "skipped": 0
+    }
+  },
+  "artifactDownload": "First attempt EOF; download retried successfully, no CI rerun",
+  "limits": "Covers2BS,3L,4I; later4J excluded"
+}

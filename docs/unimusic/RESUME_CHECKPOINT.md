@@ -29,13 +29,14 @@
 | [2BP正常API鉴权](PHASE_2BP_BILI_API_AUTH_BOUNDARY.md) | 1新/共2 JVM、边界、Debug45s；自身HTTPS API正常鉴权与外部去凭据兼容 | eaac3fa7已push，CI40976201462 SUCCESS |
 | [2BQ歌手短期缓存](PHASE_2BQ_ARTIST_METADATA_CACHE.md) | 1新/共3 JVM、边界、Debug53s；2分钟小索引/10秒歌曲页、上下文失效、失败重试 | 56d6aaef已push，CI40976201462 SUCCESS |
 | [2BR旧日志脱敏](PHASE_2BR_LEGACY_DIAGNOSTIC_EXPORT.md) | 3新/共5 JVM、边界、Debug1m6s；查看/复制/流式导出保护、原文件保留 | bcb44f6c已push，CI40987129828含Android SUCCESS |
-| [2BS异常检查上下文](PHASE_2BS_EXCEPTIONAL_CHECK_CONTEXT.md) | 2新/共4 JVM、边界、Debug55s；旧账号/决定异常不更新当前检查，复核不延预算 | b0af53ad已commit，随4I一起push |
-| [3L同曲新周期](PHASE_3L_EXPLICIT_FEEDBACK_CYCLES.md) | 1新/共2 JVM、边界、runtime编译47s；同曲重新装载不累加旧偏好片段 | 2b088bc9已commit，随4I一起push |
-| [4I首页库快照](PHASE_4I_HOME_LIBRARY_SNAPSHOT.md) | 无新增JVM；边界/累计Debug1m40s，回来直接读ViewModel快照，减少清空重建 | 本检查点所在提交，连2BS/3L一起push |
+| [2BS异常检查上下文](PHASE_2BS_EXCEPTIONAL_CHECK_CONTEXT.md) | 2新/共4 JVM、边界、Debug55s；旧账号/决定异常不更新当前检查，复核不延预算 | b0af53ad已push，CI40989128063 SUCCESS |
+| [3L同曲新周期](PHASE_3L_EXPLICIT_FEEDBACK_CYCLES.md) | 1新/共2 JVM、边界、runtime编译47s；同曲重新装载不累加旧偏好片段 | 2b088bc9已push，CI40989128063 SUCCESS |
+| [4I首页库快照](PHASE_4I_HOME_LIBRARY_SNAPSHOT.md) | 无新增JVM；边界/累计Debug1m40s，回来直接读ViewModel快照，减少清空重建 | 68eb61de已push、CI成功、一趟装机往返通过 |
+| [4J搜索取消](PHASE_4J_PLAYLIST_SEARCH_WORK.md) | 仅1取消回归/边界/app编译1m29s；旧索引/结果不混用 | 本检查点所在提交，待相邻优化统一push |
 
-最新CI40987129828（bcb44f6c，含2BR）整体、依赖及必要Android无损迁移SUCCESS。XML诊断2、崩溃6、ArtistIntent13、FeedbackTracker4、增量迁移1/升级3均0失败/跳过，见ci-40987129828.json。2BS及3L已独立本地验证；4I只边界/一次累计APK，不加无用测试。本阶段将一起push，后续核对累计CI，勿重复以前迁移。
+最新CI40989128063（68eb61de，含2BS/3L/4I）整体/依赖SUCCESS；实际XML见ci-40989128063.json，均0失败/跳过。报告下载EOF只重取附件，没重跑CI。纯源码不重复迁移，前必要40987129828已成功。4J只1核心检查+app编译，尚无其新APK。
 
-最新构建：`build/outputs/unimusic/UniMusic-20261030-4I-debug.apk`，版本`2b088bc9e468.dirty.10300957`，SHA-256 `b6a7738affdfd33d74014fc1a38097a2a4460cd9bc2b6b8a8743e04420b61fb1`。边界/Debug1m40s通过，包含3L，无本地Gradle。设备当前仍为旧3K包，最终暂停；准备本累计包一次安装及标签往返，未有新速度测量。
+最新构建：`build/outputs/unimusic/UniMusic-20261030-4I-debug.apk`，版本`2b088bc9e468.dirty.10300957`，SHA-256 `b6a7738affdfd33d74014fc1a38097a2a4460cd9bc2b6b8a8743e04420b61fb1`。边界/Debug1m40s通过，包含3L，无本地Gradle。4I包已保留数据安装，adb/系统/版本匹配，一趟首页→我的→首页位置保持；未测延迟。4J仅编译，待相邻优化合并一次打包。
 
 ## 此前已完成，不重做
 
@@ -62,7 +63,7 @@
 
 ## 接下来
 
-1. 本阶段push后核对2BS/3L/4I累计CI；手机对4I累计包只做保留数据安装和一趟标签往返，记录实际结果，少做重复测试。
+1. 2BS/3L/4I已CI通过、4I装机往返通过；4J已1核心回归+编译。接着保留首页推荐快照，合并一次APK/一次push，不重复设备循环和历史套件。
 2. 下载路径已查到明确试听拒绝及现有回归，不重做。2BJ已修复未知署名、2BK已补名称边界、3J已隔离统计与亲和度；2BL已补跨语言版本；2BM已补流凭据边界；2BN浅克隆CI已修复且远端通过，勿重做；2BR旧日志查看/复制/导出已处理，勿导出真实秘密验证。
 3. 设备重新在线后仅做必要、保留数据的本地验收，明确试听与完整版差别；不为测试修改真实账号/清除用户书签或偏好。
 4. 继续高价值来源/匹配/推荐后台，按实际结果更新此短检查点，每阶段commit/push。

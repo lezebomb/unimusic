@@ -12,6 +12,21 @@ class SearchTextMatcherTest {
         val artist: String
     )
 
+    @Test fun cancelledIndexConstructionStopsBeforeWalkingTheWholeReplacedPlaylist() {
+        val items = (1..500).toList()
+        val job = kotlinx.coroutines.Job()
+        var visited = 0
+        org.junit.Assert.assertThrows(kotlinx.coroutines.CancellationException::class.java) {
+            SearchTextMatcher.index(items, checkActive = { job.ensureActive() }) {
+                if (++visited == 8) job.cancel()
+                listOf("晴天 $it")
+            }
+        }
+        assertTrue(visited < items.size)
+        val fresh = SearchTextMatcher.index(items) { listOf("晴天 $it") }
+        assertEquals(items, fresh.filterAndRank("qt"))
+    }
+
     @Test fun indexedScoringHonorsCancellationAndLeavesTheReusableIndexIntact() {
         val index = SearchTextMatcher.index((1..300).toList()) { listOf("Dream $it") }
         val job = kotlinx.coroutines.Job()

@@ -1,0 +1,13 @@
+{
+  "installedVersion": "2b088bc9e468.dirty.10300957",
+  "adbInstallSuccessCaptured": true,
+  "systemInstallSuccessAndVersionMatch": true,
+  "homeBeforeRoundTrip": true,
+  "mineEntryVisible": true,
+  "homeAfterRoundTrip": true,
+  "knownVisibleHomePositionsRestored": true,
+  "operation": "One Home -> My -> Home round trip; no repeated switching benchmark",
+  "data": "Existing account/library not cleared; no log export or credential operation",
+  "performance": "No app-frame/first-paint latency measured; UI dump time not used as performance",
+  "playback": "No audio started during tab check"
+}

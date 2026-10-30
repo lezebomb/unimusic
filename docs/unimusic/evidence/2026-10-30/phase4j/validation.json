@@ -1,0 +1,13 @@
+{
+  "stage": "4J",
+  "localTests": {
+    "class": "SearchTextMatcherTest",
+    "tests": 1,
+    "failures": 0
+  },
+  "moduleBoundaries": "passed",
+  "build": "BUILD SUCCESSFUL in1m29s; app Kotlin compile only",
+  "apk": "No new APK yet; next adjacent Home cache optimization shares one cumulative build",
+  "deviceValidation": "No4J UI or large-library benchmark; separate4I navigation sample passed",
+  "remoteCI": "New case uses existing common selector; no workflow expansion"
+}

@@ -65,13 +65,16 @@ object SearchTextMatcher {
         }
     }
 
-    fun <T> index(
-        items: List<T>,
-        tokens: (T) -> Iterable<Any?>
-    ): Index<T> {
-        val indexedCandidates = items.map { item ->
+    fun <T> index(items: List<T>, tokens: (T) -> Iterable<Any?>): Index<T> =
+        index(items, checkActive = {}, tokens = tokens)
+
+    fun <T> index(items: List<T>, checkActive: () -> Unit, tokens: (T) -> Iterable<Any?>): Index<T> {
+        checkActive()
+        val indexedCandidates = items.mapIndexed { position, item ->
+            if (position and 63 == 0) checkActive()
             collapseCandidates(tokens(item))
         }
+        checkActive()
         return Index(items = items, candidates = indexedCandidates)
     }
 

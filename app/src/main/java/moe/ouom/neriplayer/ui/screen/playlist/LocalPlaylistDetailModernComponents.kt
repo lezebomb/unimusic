@@ -86,6 +86,8 @@ import androidx.media3.common.Player
 import coil.compose.AsyncImage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import moe.ouom.neriplayer.common.R as CoreCommonR
@@ -355,6 +357,15 @@ internal fun shouldBuildPlaylistSearchIndex(
     query: String
 ): Boolean = searchVisible || query.isNotBlank()
 
+/** Published-list identity avoids deep comparisons while a user switches playlists or search queries. */
+private class PlaylistSearchSource<T>(val items: List<T>) {
+    override fun equals(other: Any?) = other is PlaylistSearchSource<*> && items === other.items
+    override fun hashCode() = System.identityHashCode(items)
+}
+
+private class PreparedPlaylistSearch<T>(val source: List<T>, val index: SearchTextMatcher.Index<T>)
+private class RankedPlaylistSearch<T>(val source: List<T>, val query: String, val items: List<T>)
+
 @Composable
 internal fun <T> rememberPlaylistSearchResults(
     query: String,
@@ -363,26 +374,36 @@ internal fun <T> rememberPlaylistSearchResults(
     buildIndex: Boolean = true
 ): List<T> {
     if (!buildIndex) return items
-
-    val indexState = produceState<SearchTextMatcher.Index<T>?>(initialValue = null, key1 = items) {
-        value = withContext(Dispatchers.Default) { SearchTextMatcher.index(items, tokens) }
+    val source = PlaylistSearchSource(items)
+    val indexState = produceState<PreparedPlaylistSearch<T>?>(initialValue = null, key1 = source) {
+        value = withContext(Dispatchers.Default) {
+            val context = currentCoroutineContext()
+            val index = SearchTextMatcher.index(items, checkActive = { context.ensureActive() }, tokens = tokens)
+            context.ensureActive()
+            PreparedPlaylistSearch(items, index)
+        }
     }
-    val displayedItems by produceState(
-        initialValue = items,
-        key1 = items,
-        key2 = indexState.value,
-        key3 = query
+    // produceState retains its old value until the new effect finishes; never rank a new
+    // playlist against the previous playlist's index or display a previous query's result.
+    val prepared = indexState.value?.takeIf { it.source === items }
+    val displayed by produceState<RankedPlaylistSearch<T>?>(
+        initialValue = null, key1 = source, key2 = prepared, key3 = query
     ) {
-        value = rankPlaylistSearchResults(items, indexState.value, query)
+        val result = rankPlaylistSearchResults(items, prepared?.index, query)
+        currentCoroutineContext().ensureActive()
+        value = RankedPlaylistSearch(items, query, result)
     }
-    return displayedItems
+    return displayed?.takeIf { it.source === items && it.query == query }?.items ?: items
 }
 
 private suspend fun <T> rankPlaylistSearchResults(
     items: List<T>,
     index: SearchTextMatcher.Index<T>?,
     query: String
-): List<T> = if (index == null) items else withContext(Dispatchers.Default) { index.filterAndRank(query) }
+): List<T> = if (index == null || query.isBlank()) items else withContext(Dispatchers.Default) {
+    val context = currentCoroutineContext()
+    index.filterAndRank(query) { context.ensureActive() }
+}
 
 private val PlaylistHeroCoverSize = 88.dp
 private val PlaylistHeroCoverCornerRadius = 14.dp
