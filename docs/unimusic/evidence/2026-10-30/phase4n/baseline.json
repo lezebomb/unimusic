@@ -1,0 +1,25 @@
+{
+  "scope": "installed 4I debug, one force-stop start and two tab round trips, no audio",
+  "startup": {
+    "TotalTime": 2355,
+    "WaitTime": 2361
+  },
+  "tabClicks": {
+    "completedWithoutException": 4,
+    "note": "helper returns None on success, earlier false booleans were not failed clicks"
+  },
+  "frames": [
+    "Total frames rendered: 307",
+    "Janky frames: 15 (4.89%)",
+    "50th percentile: 5ms",
+    "90th percentile: 6ms",
+    "95th percentile: 16ms",
+    "99th percentile: 150ms",
+    "Number Missed Vsync: 12",
+    "Number Slow UI thread: 15",
+    "Number Frame deadline missed: 15",
+    "50th gpu percentile: 2ms",
+    "90th gpu percentile: 3ms",
+    "95th gpu percentile: 3ms"
+  ]
+}

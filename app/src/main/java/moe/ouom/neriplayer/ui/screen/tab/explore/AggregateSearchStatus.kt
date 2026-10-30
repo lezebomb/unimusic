@@ -7,10 +7,6 @@ import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -22,7 +18,6 @@ import moe.ouom.neriplayer.ui.viewmodel.tab.ExploreSearchResult
 @Composable
 internal fun AggregateSearchStatus(snapshot: FederatedSearchSnapshot<ExploreSearchResult>?, onRetry: () -> Unit) {
     if (snapshot == null) return
-    var showTiming by remember(snapshot.query) { mutableStateOf(false) }
     val names = mapOf("local" to stringResource(CoreCommonR.string.local_files),
         "netease" to stringResource(CoreCommonR.string.platform_netease_short),
         "bilibili" to stringResource(CoreCommonR.string.platform_bilibili), "youtube" to "YouTube",
@@ -57,22 +52,6 @@ internal fun AggregateSearchStatus(snapshot: FederatedSearchSnapshot<ExploreSear
             }) {
             Text(stringResource(CoreCommonR.string.unimusic_search_check_network),
                 style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-        }
-        if (snapshot.sources.values.any { it.elapsedMillis != null }) {
-            androidx.compose.material3.TextButton(onClick = { showTiming = !showTiming }) {
-                Text(stringResource(if (showTiming) CoreCommonR.string.unimusic_search_timing_hide
-                    else CoreCommonR.string.unimusic_search_timing_show))
-            }
-            if (showTiming) {
-                snapshot.sources.forEach { (id, state) ->
-                    state.elapsedMillis?.let { elapsed ->
-                        Text(stringResource(CoreCommonR.string.unimusic_search_timing_value,
-                            (names[id] ?: id) + if (state.fromCache) " ($cached)" else "", elapsed / 1000.0), style = MaterialTheme.typography.labelSmall)
-                    }
-                }
-                Text(stringResource(CoreCommonR.string.unimusic_search_timing_description),
-                    style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-            }
         }
         if (snapshot.loading) LinearProgressIndicator(Modifier.fillMaxWidth().padding(top = 4.dp))
         if (!snapshot.loading && snapshot.retryableSourceIds.isNotEmpty()) {

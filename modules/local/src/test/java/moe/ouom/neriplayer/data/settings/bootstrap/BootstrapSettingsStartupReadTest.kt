@@ -1,6 +1,8 @@
 package moe.ouom.neriplayer.data.settings.bootstrap
 
 import android.os.Looper
+import androidx.datastore.preferences.core.booleanPreferencesKey
+import androidx.datastore.preferences.core.preferencesOf
 import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.core.preferencesOf
 import kotlinx.coroutines.test.runTest
@@ -106,12 +108,18 @@ class BootstrapSettingsStartupReadTest {
     }
 
     @Test
+    fun `explicit low refresh preference is preserved`() {
+        val preferences = preferencesOf(booleanPreferencesKey("prefer_high_refresh_rate") to false)
+        assertFalse(preferences.toBootstrapSettingsSnapshot().preferHighRefreshRate)
+    }
+
+    @Test
     fun `settings without bootstrap keys map to startup defaults`() {
         val snapshot = emptyPreferences().toBootstrapSettingsSnapshot()
 
         assertTrue(snapshot.bypassProxy)
         assertTrue(snapshot.youtubeEnabled)
-        assertFalse(snapshot.preferHighRefreshRate)
+        assertTrue(snapshot.preferHighRefreshRate)
         assertNull(snapshot.downloadDirectoryUri)
         assertNull(snapshot.downloadDirectoryLabel)
         assertTrue(snapshot.downloadFollowPlaybackAudioQuality)

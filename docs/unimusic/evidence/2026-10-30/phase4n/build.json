@@ -1,0 +1,34 @@
+{
+  "apk": "build/outputs/unimusic/UniMusic-20261030-4N-debug.apk",
+  "version": "84db048a62c7.dirty.10301040",
+  "sha256": "5dbe4aa5c8b1ba10df9daef756821e77c813844fbde8f17dcced4d85991db519",
+  "build": "BUILD SUCCESSFUL in 3m 36s",
+  "tests": [
+    {
+      "module": "app",
+      "name": "moe.ouom.neriplayer.ui.navigation.MainTabLayerTransitionControllerTest",
+      "tests": "2",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "module": "local",
+      "name": "moe.ouom.neriplayer.data.settings.AutoSettingsGeneratedTest",
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "module": "local",
+      "name": "moe.ouom.neriplayer.data.settings.bootstrap.BootstrapSettingsStartupReadTest",
+      "tests": "2",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    }
+  ],
+  "boundaries": "passed",
+  "touchedXml": "parsed"
+}

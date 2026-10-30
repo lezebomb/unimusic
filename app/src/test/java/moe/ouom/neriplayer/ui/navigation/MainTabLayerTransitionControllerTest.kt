@@ -177,7 +177,7 @@ class MainTabLayerTransitionControllerTest {
     }
 
     @Test
-    fun `later tab changes animate immediately`() = runTest {
+    fun `later tab changes also wait for the incoming scene`() = runTest {
         withController { controller ->
             controller.makeReady()
             completeFirstTransitionTo(controller, EXPLORE)
@@ -186,7 +186,8 @@ class MainTabLayerTransitionControllerTest {
             val entering = controller.visibleScenes.last()
 
             assertEquals(LIBRARY, entering.route)
-            assertEquals(0L, entering.transitionToken)
+            assertTrue(entering.transitionToken != 0L)
+            controller.onIncomingScenePrepared(entering.transitionToken)
 
             advanceUntilIdle()
 
@@ -265,6 +266,11 @@ class MainTabLayerTransitionControllerTest {
 
             advanceUntilIdle()
 
+            val entering = controller.visibleScenes.last()
+            assertEquals(SETTINGS, entering.route)
+            assertTrue(entering.transitionToken != 0L)
+            controller.onIncomingScenePrepared(entering.transitionToken)
+            advanceUntilIdle()
             assertEquals(SETTINGS, controller.visibleScenes.single().route)
         }
     }

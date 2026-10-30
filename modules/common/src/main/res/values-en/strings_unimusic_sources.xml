@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="unimusic_sources_title">Choose audio source</string>
-    <string name="unimusic_sources_description">Remember a preferred source for the next playback resolution. Current playback continues. Sources may require login or membership or have regional restrictions; confirming grants no additional playback rights.</string>
-    <string name="unimusic_sources_discovery_scope">Find candidates in local files, Kuwo, Bilibili and signed-in NetEase. Eligible recordings with verified audio addresses rank first. Conflicting versions, artists or durations prevent automatic selection. GD Studio remains a manual choice.</string>
-    <string name="unimusic_sources_youtube_disabled">YouTube Music is disabled, so no search requests are sent to it. Existing choices can be cleared or rejected.</string>
+    <string name="unimusic_sources_description">Choose your preferred music source.</string>
+
+
     <string name="unimusic_sources_provider_local">Local files</string>
     <string name="unimusic_sources_provider_bilibili">Bilibili</string>
     <string name="unimusic_sources_provider_netease">NetEase Music</string>
@@ -16,8 +16,8 @@
     <string name="unimusic_sources_count">%1$d sources</string>
     <string name="unimusic_sources_artist_duration">%1$s · %2$s</string>
     <string name="unimusic_sources_unknown_artist">Artist information missing</string>
-    <string name="unimusic_sources_version">Version evidence: %1$s</string>
-    <string name="unimusic_sources_version_unknown">Not established; check title and part details</string>
+    <string name="unimusic_sources_version">Version: %1$s</string>
+    <string name="unimusic_sources_version_unknown">Unknown version</string>
     <string name="unimusic_sources_version_studio">Studio</string>
     <string name="unimusic_sources_version_live">Live</string>
     <string name="unimusic_sources_version_cover">Cover</string>
@@ -42,11 +42,11 @@
     <string name="unimusic_sources_netease_key">NetEase Music · %1$s</string>
     <string name="unimusic_sources_youtube_key">YouTube Music · %1$s</string>
     <string name="unimusic_sources_mismatch_version">Recording versions differ. Confirmation is unavailable; rejection can be saved.</string>
-    <string name="unimusic_sources_mismatch_title">Title evidence differs. Confirmation is unavailable.</string>
-    <string name="unimusic_sources_mismatch_artist">Artist evidence differs or is missing. Confirmation is unavailable.</string>
+    <string name="unimusic_sources_mismatch_title">Song titles do not match.</string>
+    <string name="unimusic_sources_mismatch_artist">Artist information is different or incomplete.</string>
     <string name="unimusic_sources_mismatch_duration">Duration differs beyond the allowed range. Confirmation is unavailable.</string>
-    <string name="unimusic_sources_mismatch_missing">Essential metadata is missing. Confirmation is unavailable.</string>
-    <string name="unimusic_sources_metadata_only">This source currently provides catalog metadata only and cannot be selected for playback.</string>
+    <string name="unimusic_sources_mismatch_missing">Song information is incomplete.</string>
+    <string name="unimusic_sources_metadata_only">Playback unavailable</string>
     <string name="unimusic_sources_incomplete">Some sources timed out or failed. Available candidates are shown; refresh to retry.</string>
     <string name="unimusic_sources_offline">Offline: searching local library files only.</string>
     <string name="unimusic_sources_load_failed">Could not read source records. Refresh to retry.</string>
@@ -56,22 +56,22 @@
     <string name="unimusic_sources_account_changed">A platform account or the YouTube setting changed. Previous candidates were cleared; refresh before choosing again.</string>
     <string name="unimusic_sources_check">Check source</string>
     <string name="unimusic_sources_checking">Checking this source, up to about 8 seconds…</string>
-    <string name="unimusic_sources_check_address">The API returned an audio address for this check; playback has not been verified.</string>
-    <string name="unimusic_sources_check_local">The local file was readable during this check; playback has not started.</string>
+    <string name="unimusic_sources_check_address">Audio found.</string>
+    <string name="unimusic_sources_check_local">Local file available.</string>
     <string name="unimusic_sources_check_unsupported">This source identity or audio adapter is unsupported.</string>
     <string name="unimusic_sources_check_disabled">This source is disabled. Enable it in settings before retrying.</string>
     <string name="unimusic_sources_check_offline">Offline: no online audio address was requested.</string>
     <string name="unimusic_sources_check_rejected">This source was rejected. Clear the decision before checking again.</string>
-    <string name="unimusic_sources_check_mismatch">The latest recording metadata or version did not match. Refresh candidates before choosing.</string>
+    <string name="unimusic_sources_check_mismatch">Song information changed. Refresh and choose again.</string>
     <string name="unimusic_sources_check_permission">No readable audio was obtained. Check the source and access permissions.</string>
     <string name="unimusic_sources_check_preview">The preview or length check failed; this was not accepted as a full recording.</string>
     <string name="unimusic_sources_check_external">This content requires the platform player; standalone audio was not attempted.</string>
     <string name="unimusic_sources_check_network">The source request failed. Check the network or platform status.</string>
     <string name="unimusic_sources_check_unavailable">The source did not return suitable audio. Try again later.</string>
-    <string name="unimusic_sources_check_context">The account, setting or decision changed during the check. The old result was discarded.</string>
+    <string name="unimusic_sources_check_context">Source settings changed. Try again.</string>
     <string name="unimusic_sources_resolution_timeout">Audio source resolution timed out. Retry or choose a source manually from the source menu.</string>
     <string name="unimusic_sources_gd_key">GD Studio · NetEase ID %1$s</string>
-    <string name="unimusic_sources_gd_description">Source: GD Studio (music.gdstudio.xyz). Personal study and online streaming only; no offline saving or audio link sharing. Uses the exact NetEase ID. Availability depends on the service.</string>
+    <string name="unimusic_sources_gd_description">Streaming only.</string>
     <string name="unimusic_sources_gd_notice">Source: GD Studio · Online streaming only</string>
     <string name="unimusic_youtube_login_required">YouTube requires sign-in verification or this content is unavailable. Sign in to YouTube in settings, or choose another source.</string>
     <string name="unimusic_youtube_unavailable">YouTube is not providing audio for this track. Choose another source.</string>

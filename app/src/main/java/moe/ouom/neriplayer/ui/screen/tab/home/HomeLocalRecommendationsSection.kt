@@ -83,11 +83,6 @@ internal fun HomeLocalRecommendationsSection(
                 Icon(Icons.Default.Refresh, stringResource(CoreCommonR.string.unimusic_recommendations_refresh))
             }
         }
-        Text(
-            stringResource(CoreCommonR.string.unimusic_recommendations_description),
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
         when {
             state.failed -> LocalRecommendationNotice(CoreCommonR.string.unimusic_recommendations_error)
             items.isNotEmpty() -> LazyRow(horizontalArrangement = Arrangement.spacedBy(12.dp)) {

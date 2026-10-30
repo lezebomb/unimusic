@@ -444,12 +444,12 @@ class AutoSettingsGeneratedTest {
     }
 
     @Test
-    fun highRefreshRateDefaultsToDisabledInGeneralSettings() {
+    fun highRefreshRateDefaultsToEnabledInGeneralSettings() {
         val setting = AutoSettingsSchema.general.preferHighRefreshRate
         val metadata = AutoSettingsMetadata.setting(setting.key)
 
         assertEquals("prefer_high_refresh_rate", setting.preferencesKey.name)
-        assertEquals(false, setting.defaultValue)
+        assertEquals(true, setting.defaultValue)
         assertEquals(SettingValueType.Boolean, metadata?.valueType)
         assertEquals(SettingUiType.Switch, metadata?.ui)
         assertEquals(AutoSettingsSections.general, metadata?.section)

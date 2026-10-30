@@ -1,0 +1,42 @@
+{
+  "scope": "4N debug, one force-stop start and two tab round trips, no audio; small observation not FPS benchmark",
+  "version": [
+    "84db048a62c7.dirty.10301040"
+  ],
+  "startup": {
+    "TotalTime": 2406,
+    "WaitTime": 2411
+  },
+  "tabClicksCompleted": [
+    "我的",
+    "发现",
+    "我的",
+    "发现"
+  ],
+  "frames": [
+    "Total frames rendered: 328",
+    "Janky frames: 17 (5.18%)",
+    "50th percentile: 5ms",
+    "90th percentile: 7ms",
+    "95th percentile: 16ms",
+    "99th percentile: 105ms",
+    "Number Missed Vsync: 12",
+    "Number Slow UI thread: 17",
+    "Number Frame deadline missed: 17",
+    "50th gpu percentile: 2ms",
+    "90th gpu percentile: 3ms",
+    "95th gpu percentile: 3ms"
+  ],
+  "displayModes": [
+    "mDisplayModeSpecs={baseModeId=1 allowGroupSwitching=false primaryRefreshRateRange=[0 Infinity] appRequestRefreshRateRange=[0 Infinity]}",
+    "mActiveModeId=1"
+  ],
+  "visibleProductLabels": [
+    "发现",
+    "搜索关键词",
+    "猜你喜欢",
+    "发现",
+    "我的"
+  ],
+  "developerRecommendationDescriptionVisible": false
+}

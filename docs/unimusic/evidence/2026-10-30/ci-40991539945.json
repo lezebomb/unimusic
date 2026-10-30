@@ -1,0 +1,29 @@
+{
+  "run": 40991539945,
+  "head": "84db048a",
+  "conclusion": "success",
+  "downloaded": true,
+  "suites": [
+    {
+      "name": "moe.ouom.neriplayer.ui.viewmodel.tab.LibraryNeteaseRefreshOwnerTest",
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "name": "moe.ouom.neriplayer.ui.viewmodel.tab.search.ExploreSearchArtistIntentTest",
+      "tests": "13",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "name": "moe.ouom.neriplayer.core.player.runtime.stats.PlaybackFeedbackTrackerTest",
+      "tests": "5",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    }
+  ]
+}

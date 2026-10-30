@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="unimusic_recommendations_title">UniMusic local recommendations</string>
-    <string name="unimusic_recommendations_refresh">Refresh local recommendations</string>
-    <string name="unimusic_recommendations_description">A daily selection using Beijing time. Refresh to rebuild. Ranking uses your library and on-device listening without uploading history.</string>
-    <string name="unimusic_recommendations_empty">Add songs to a local playlist or import a playlist, then refresh local recommendations.</string>
+    <string name="unimusic_recommendations_title">Made for you</string>
+    <string name="unimusic_recommendations_refresh">Refresh recommendations</string>
+
+    <string name="unimusic_recommendations_empty">Save or import playlists to discover more music.</string>
     <string name="unimusic_recommendations_offline_empty">Offline recommendations use local files. Refresh after adding or downloading songs.</string>
     <string name="unimusic_recommendations_error">Your music library is temporarily unavailable. Refresh to try again.</string>
-    <string name="unimusic_recommendations_statistics_unavailable">Listening statistics are unavailable. Recommendations currently use library content.</string>
+    <string name="unimusic_recommendations_statistics_unavailable">Recommendations could not be updated. Try again later.</string>
     <string name="unimusic_recommendations_reason_explore">Explore more of your library</string>
     <string name="unimusic_recommendations_reason_added">Recently added to your library</string>
     <string name="unimusic_recommendations_reason_artist">From an artist you often listen to</string>

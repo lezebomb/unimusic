@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="unimusic_feedback_preferences">Recommendation preferences</string>
-    <string name="unimusic_feedback_enabled">Learn from playback</string>
-    <string name="unimusic_feedback_privacy">Save skips, completions and repeats only on this device to adjust recommendations. Turning this off clears these signals. Play history, playlists and hidden songs are kept.</string>
-    <string name="unimusic_feedback_clear">Clear playback signals</string>
-    <string name="unimusic_feedback_cleared">Playback signals cleared</string>
+    <string name="unimusic_feedback_enabled">Personalize from listening</string>
+    <string name="unimusic_feedback_privacy">Turning this off resets your listening preferences.</string>
+    <string name="unimusic_feedback_clear">Reset listening preferences</string>
+    <string name="unimusic_feedback_cleared">Listening preferences reset</string>
     <string name="unimusic_feedback_done">Done</string>
 </resources>

@@ -695,7 +695,11 @@ class MainActivity : ComponentActivity() {
                                     targetOffsetY = { -it / 14 }
                                 )
 
-                                enter togetherWith exit using SizeTransform(clip = false)
+                                if (targetState == StartupStage.Main) {
+                                    fadeIn(tween(160)) togetherWith androidx.compose.animation.ExitTransition.None
+                                } else {
+                                    enter togetherWith exit using SizeTransform(clip = false)
+                                }
                             },
                             label = "AppStageTransition"
                         ) { current ->

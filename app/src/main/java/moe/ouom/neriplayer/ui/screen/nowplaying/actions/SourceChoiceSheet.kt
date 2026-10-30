@@ -95,10 +95,6 @@ private fun SourceChoiceContent(song: SongItem, state: SourceChoiceState, owner:
                 originalSource?.let { Text(sourceLabel(it), style = MaterialTheme.typography.labelMedium) }
                 Text(stringResource(CoreCommonR.string.unimusic_sources_description),
                     style = MaterialTheme.typography.bodySmall)
-                Text(stringResource(CoreCommonR.string.unimusic_sources_discovery_scope),
-                    style = MaterialTheme.typography.bodySmall)
-                if (!state.youtubeEnabled) Text(stringResource(CoreCommonR.string.unimusic_sources_youtube_disabled),
-                    style = MaterialTheme.typography.bodySmall)
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                     HapticTextButton(onClick = owner::refresh, enabled = !state.loading && !state.saving && state.checking == null) {
                         Text(stringResource(CoreCommonR.string.unimusic_sources_refresh))
@@ -210,17 +206,8 @@ private fun SourceChoiceCard(
 }
 
 @Composable
-private fun sourceLabel(candidate: RecordingSourceCandidate): String = when (candidate.key.provider) {
-    "bilibili" -> stringResource(CoreCommonR.string.unimusic_sources_bilibili_key,
-        candidate.key.resourceId, candidate.key.subResourceId)
-    "local" -> stringResource(CoreCommonR.string.unimusic_sources_local_key, candidate.key.resourceId.takeLast(8))
-    "netease" -> stringResource(CoreCommonR.string.unimusic_sources_netease_key, candidate.key.resourceId)
-    "gdstudio_netease" -> stringResource(CoreCommonR.string.unimusic_sources_gd_key, candidate.key.resourceId)
-    "youtube_music" -> stringResource(CoreCommonR.string.unimusic_sources_youtube_key, candidate.key.resourceId)
-    "qqmusic" -> "QQ 音乐 · ${candidate.key.resourceId}"
-    "kuwo" -> "酷我音乐 · ${candidate.key.resourceId}"
-    else -> candidate.key.provider
-}
+private fun sourceLabel(candidate: RecordingSourceCandidate): String =
+    sourceProviderName(candidate.key.provider)
 
 private fun durationText(durationMs: Long): String =
     if (durationMs <= 0) "—" else "${durationMs / 60_000}:${(durationMs / 1000 % 60).toString().padStart(2, '0')}"
@@ -231,6 +218,9 @@ private fun sourceProviderName(provider: String): String = when (provider) {
     "bilibili" -> stringResource(CoreCommonR.string.unimusic_sources_provider_bilibili)
     "netease" -> stringResource(CoreCommonR.string.unimusic_sources_provider_netease)
     "youtube_music" -> stringResource(CoreCommonR.string.unimusic_sources_provider_youtube)
+    "gdstudio_netease" -> "GD音乐台"
+    "kuwo" -> stringResource(CoreCommonR.string.explore_catalog_kuwo)
+    "qqmusic" -> "QQ音乐"
     else -> provider
 }
 

@@ -52,6 +52,8 @@ import androidx.navigationevent.compose.rememberNavigationEventDispatcherOwner
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import moe.ouom.neriplayer.navigation.Destinations
+import moe.ouom.neriplayer.ui.effect.glass.AdvancedGlassScene
 import moe.ouom.neriplayer.ui.effect.glass.AdvancedGlassNavigationHandoff
 import moe.ouom.neriplayer.ui.effect.glass.ADVANCED_GLASS_MAIN_TAB_TRANSITION_DURATION_MS
 import moe.ouom.neriplayer.ui.effect.glass.DRAWER_NAVIGATION_CLOSE_DURATION_MS
@@ -227,21 +229,38 @@ internal class MainTabLayerTransitionState internal constructor(
     initialRoute: String
 ) {
     private val visitedRoutes = mutableSetOf(initialRoute)
+    private var retainedRoutesState by mutableStateOf(listOfNotNull(initialRoute.takeIf(::canRetainMainTab)))
+
+    val retainedRoutes: List<String>
+        get() = retainedRoutesState
+
+    private fun retainRoute(route: String) {
+        if (canRetainMainTab(route) && route !in retainedRoutesState) {
+            retainedRoutesState = retainedRoutesState + route
+        }
+    }
+
+    private fun canRetainMainTab(route: String): Boolean =
+        route == Destinations.Home.route || route == Destinations.Library.route
 
     val visibleScenes: List<MainTabLayerScene>
         get() = controller.visibleScenes
 
     fun request(targetRoute: String) {
+        retainRoute(targetRoute)
         controller.request(
             targetRoute = targetRoute,
             restored = !visitedRoutes.add(targetRoute)
         )
     }
 
-    fun beginPredictiveBack(targetRoute: String): Boolean = controller.beginPredictiveBack(
-        targetRoute = targetRoute,
-        restored = !visitedRoutes.add(targetRoute)
-    )
+    fun beginPredictiveBack(targetRoute: String): Boolean {
+        retainRoute(targetRoute)
+        return controller.beginPredictiveBack(
+            targetRoute = targetRoute,
+            restored = !visitedRoutes.add(targetRoute)
+        )
+    }
 
     fun seekPredictiveBack(progress: Float) = controller.seekPredictiveBack(progress)
 
@@ -327,14 +346,19 @@ internal fun MainTabLayerHost(
                     transitionState.onContainerWidthChanged(size.width)
                 }
         ) {
-            visibleScenes.forEach { scene ->
+            val scenesByRoute = visibleScenes.associateBy { it.route }
+            val composedRoutes = (transitionState.retainedRoutes + scenesByRoute.keys).distinct()
+            composedRoutes.forEach { route ->
+                val sceneVisible = route in scenesByRoute
+                val scene = scenesByRoute[route] ?: MainTabLayerScene(route, MainTabLayerScenePhase.Settled)
                 key(scene.route) {
                     val parentGlassOpacity = LocalAdvancedGlassSceneOpacity.current
                     val glassOpacity = remember(
                         transitionState,
                         scene,
                         parentGlassOpacity,
-                        useScaleTransition
+                        useScaleTransition,
+                        sceneVisible
                     ) {
                         {
                             val sceneAlpha = if (useScaleTransition) {
@@ -344,7 +368,7 @@ internal fun MainTabLayerHost(
                             } else {
                                 1f
                             }
-                            parentGlassOpacity() * sceneAlpha
+                            if (sceneVisible) parentGlassOpacity() * sceneAlpha else 0f
                         }
                     }
                     val blockSceneInput by remember(transitionState, scene) {
@@ -352,67 +376,72 @@ internal fun MainTabLayerHost(
                             shouldBlockMainTabSceneInput(scene.phase, transitionState.offsetFractionFor(scene))
                         }
                     }
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .then(
-                                if (useScaleTransition) {
-                                    Modifier
-                                } else {
-                                    Modifier.offset {
-                                        IntOffset(
-                                            x = (
-                                                transitionState.offsetFractionFor(scene) * widthPx
-                                            ).roundToInt(),
-                                            y = 0
-                                        )
+                    RetainedMainTabScene(active = sceneVisible) {
+                        Box(
+                            modifier = Modifier
+                                .mainTabSceneVisibility(sceneVisible)
+                                .fillMaxSize()
+                                .then(
+                                    if (useScaleTransition) {
+                                        Modifier
+                                    } else {
+                                        Modifier.offset {
+                                            IntOffset(
+                                                x = (
+                                                    transitionState.offsetFractionFor(scene) * widthPx
+                                                ).roundToInt(),
+                                                y = 0
+                                            )
+                                        }
                                     }
+                                )
+                                .blockInactiveMainTabScene(!sceneVisible || blockSceneInput)
+                                .graphicsLayer {
+                                    if (useScaleTransition) {
+                                        val transform = resolveMainTabLayerSceneTransform(
+                                            transitionState.offsetFractionFor(scene)
+                                        )
+                                        scaleX = transform.scale
+                                        scaleY = transform.scale
+                                        alpha = transform.alpha
+                                    } else {
+                                        scaleX = 1f
+                                        scaleY = 1f
+                                        alpha = 1f
+                                    }
+                                    transformOrigin = TransformOrigin.Center
                                 }
-                            )
-                            .blockInactiveMainTabScene(blockSceneInput)
-                            .graphicsLayer {
-                                if (useScaleTransition) {
-                                    val transform = resolveMainTabLayerSceneTransform(
-                                        transitionState.offsetFractionFor(scene)
-                                    )
-                                    scaleX = transform.scale
-                                    scaleY = transform.scale
-                                    alpha = transform.alpha
-                                } else {
-                                    scaleX = 1f
-                                    scaleY = 1f
-                                    alpha = 1f
-                                }
-                                transformOrigin = TransformOrigin.Center
-                            }
-                    ) {
-                        CompositionLocalProvider(
-                            LocalAdvancedGlassSceneOpacity provides glassOpacity,
-                            LocalAdvancedGlassNavigationOwner provides scene.glassOwner,
-                            LocalMainTabSceneRestored provides scene.restored
                         ) {
-                            MainTabSceneBackScope(
-                                enabled = backHandlingEnabled && scene.route == selectedRoute
+                            CompositionLocalProvider(
+                                LocalAdvancedGlassSceneOpacity provides glassOpacity,
+                                LocalAdvancedGlassNavigationOwner provides scene.glassOwner,
+                                LocalMainTabSceneRestored provides scene.restored
                             ) {
-                                saveableStateHolder.SaveableStateProvider(scene.route) {
-                                    content(scene.route)
-                                }
-                                if (scene.restored) {
-                                    LaunchedEffect(scene.restorationToken) {
-                                        withFrameNanos { }
-                                        transitionState.consumeRestoredScene(scene.restorationToken)
-                                    }
-                                }
-                                if (
-                                    scene.phase == MainTabLayerScenePhase.Entering &&
-                                    scene.transitionToken != 0L
+                                MainTabSceneBackScope(
+                                    enabled = sceneVisible && backHandlingEnabled && scene.route == selectedRoute
                                 ) {
-                                    LaunchedEffect(scene.transitionToken) {
-                                        withFrameNanos { }
-                                        withFrameNanos { }
-                                        transitionState.onIncomingScenePrepared(
-                                            scene.transitionToken
-                                        )
+                                    AdvancedGlassScene(active = sceneVisible) {
+                                        saveableStateHolder.SaveableStateProvider(scene.route) {
+                                            content(scene.route)
+                                        }
+                                    }
+                                    if (scene.restored) {
+                                        LaunchedEffect(scene.restorationToken) {
+                                            withFrameNanos { }
+                                            transitionState.consumeRestoredScene(scene.restorationToken)
+                                        }
+                                    }
+                                    if (
+                                        scene.phase == MainTabLayerScenePhase.Entering &&
+                                        scene.transitionToken != 0L
+                                    ) {
+                                        LaunchedEffect(scene.transitionToken) {
+                                            withFrameNanos { }
+                                            withFrameNanos { }
+                                            transitionState.onIncomingScenePrepared(
+                                                scene.transitionToken
+                                            )
+                                        }
                                     }
                                 }
                             }
@@ -473,7 +502,6 @@ internal class MainTabLayerTransitionController(
     private var initialSceneFrameRendered = false
     private var pendingTransitionStart: TransitionStart? = null
     private var awaitingIncomingScenePreparation = false
-    private var hasStartedTabAnimation = false
     private var queuedTransitionRequest: TransitionRequest? = null
     private var predictiveBackActive = false
     private var predictiveBackStartProgress = 0f
@@ -554,7 +582,6 @@ internal class MainTabLayerTransitionController(
         predictiveBackActive = false
         // 取消后仍需完成手势开始前已选中的页面，提交返回时才放弃它
         if (commit) queuedTransitionRequest = null
-        hasStartedTabAnimation = true
         val requestGeneration = generation
         val targetProgress = if (commit) 1f else 0f
         val durationMillis = (
@@ -647,7 +674,6 @@ internal class MainTabLayerTransitionController(
     }
 
     private fun launchTransition(requestGeneration: Long) {
-        hasStartedTabAnimation = true
         transitionJob = scope.launch {
             try {
                 animateProgressTo(targetValue = 1f, requestGeneration = requestGeneration)
@@ -676,12 +702,9 @@ internal class MainTabLayerTransitionController(
         progressState = next.progress.coerceIn(0f, 1f)
         targetSceneRestoredState = next.restored
         targetSceneRestorationToken = requestGeneration
-        awaitingIncomingScenePreparation = !hasStartedTabAnimation
+        awaitingIncomingScenePreparation = true
         runningState = true
         transitionJob = null
-        if (!awaitingIncomingScenePreparation) {
-            launchTransition(requestGeneration)
-        }
     }
 
     private fun cancelIncomingScenePreparation() {
@@ -711,7 +734,6 @@ internal class MainTabLayerTransitionController(
         containerHasWidth = false
         initialSceneFrameRendered = false
         awaitingIncomingScenePreparation = false
-        hasStartedTabAnimation = false
         queuedTransitionRequest = null
         targetSceneRestoredState = false
         targetSceneRestorationToken = 0L
