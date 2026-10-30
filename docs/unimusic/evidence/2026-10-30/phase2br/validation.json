@@ -1,0 +1,25 @@
+{
+  "stage": "2BR",
+  "localTests": [
+    {
+      "class": "DiagnosticLogTextTest",
+      "tests": 2,
+      "failures": 0
+    },
+    {
+      "class": "CrashReportStoreTest",
+      "tests": 3,
+      "failures": 0
+    }
+  ],
+  "moduleBoundaries": "passed",
+  "build": "BUILD SUCCESSFUL in 1m 6s",
+  "apk": "build/outputs/unimusic/UniMusic-20261030-2BR-debug.apk",
+  "versionName": "56d6aaef4e88.dirty.10300937",
+  "sha256": "ac9b7dcf4d7580f32174278c6b8fffd7cd72d4aa12dc2698b304a61e4c17dc87",
+  "privacyValidation": "Only synthetic fixtures; no real private logs were opened/exported",
+  "localFiles": "Original log/crash files preserved; visible/exported text sanitized",
+  "limits": "Bounded1Mi-character view,64Ki-character crash preview; overlong lines omitted; not a universal unknown-secret detector",
+  "deviceValidation": "not installed",
+  "remoteCI": "new selectors/workflow paths require cumulative CI including safety migration"
+}

@@ -1,0 +1,35 @@
+{
+  "runId": 40976201462,
+  "head": "56d6aaef4e88e9035d53a9d361ba0ebf6dda58ff",
+  "conclusion": "success",
+  "mandatoryDomainCheck": "success",
+  "androidAdditiveMigration": "skipped as expected; source/cache/API-only changes, last mandatory migration40974329323 success",
+  "actualXmlSummary": {
+    "BiliStreamCredentialInterceptorTest": {
+      "tests": 3,
+      "failures": 0,
+      "skipped": 0
+    },
+    "ExploreSearchArtistIntentTest": {
+      "tests": 13,
+      "failures": 0,
+      "skipped": 0
+    },
+    "LocalRecommendationRankerTest": {
+      "tests": 9,
+      "failures": 0,
+      "skipped": 0
+    },
+    "PlaybackFeedbackTrackerTest": {
+      "tests": 4,
+      "failures": 0,
+      "skipped": 0
+    },
+    "RecordingMatchPolicyTest": {
+      "tests": 11,
+      "failures": 0,
+      "skipped": 0
+    }
+  },
+  "limits": "CI covers2BP/2BQ; not subsequent legacy-log export changes or new physical-device/audio checks"
+}

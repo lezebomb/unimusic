@@ -1,6 +1,9 @@
 package moe.ouom.neriplayer.util.crash
 
 import android.content.Context
+import android.content.ContentResolver
+import android.net.Uri
+import java.io.ByteArrayOutputStream
 import java.io.File
 import moe.ouom.neriplayer.util.crash.CrashReportStore.CrashOrigin
 import moe.ouom.neriplayer.util.crash.CrashReportStore.PendingCrashReport
@@ -40,7 +43,7 @@ class CrashReportStoreTest {
     }
 
     @Test
-    fun `large crash logs are previewed up to 64 KiB`() {
+    fun `large crash logs have a bounded sanitized preview`() {
         val baseDir = temporaryFolder.newFolder("external")
         val context = context(baseDir)
         val log = File(crashDirectory(baseDir), "anr_1.log").apply { writeText("x".repeat(70_000)) }
@@ -49,8 +52,33 @@ class CrashReportStoreTest {
         val report = CrashReportStore.readPendingCrashReport(context)!!
 
         assertEquals(CrashOrigin.Anr, report.origin)
-        assertEquals(64 * 1024, report.previewContent.length)
+        assertEquals("[diagnostic text truncated]", report.previewContent)
         assertTrue(report.previewTruncated)
+    }
+
+    @Test
+    fun `legacy report viewing and export redact secrets without modifying the original file`() {
+        val baseDir = temporaryFolder.newFolder("legacy")
+        val context = context(baseDir)
+        val raw = "Cookie: SESSDATA=synthetic-session\n" +
+            "request https://media.example/a?signature=synthetic-signature\n" +
+            "at app.Player.play(Player.kt:42)"
+        val log = File(crashDirectory(baseDir), "legacy.log").apply { writeText(raw) }
+        CrashReportStore.markPendingCrash(context, log, CrashOrigin.Jvm)
+        val preview = CrashReportStore.readPendingCrashReport(context)!!
+        val full = CrashReportStore.readFullCrashReport(log)!!
+        val resolver = mock(ContentResolver::class.java)
+        val destination = mock(Uri::class.java)
+        val output = ByteArrayOutputStream()
+        `when`(context.contentResolver).thenReturn(resolver)
+        `when`(resolver.openOutputStream(destination)).thenReturn(output)
+        CrashReportStore.exportCrashReport(context, log, destination)
+        assertEquals(preview.previewContent, full)
+        assertEquals(full, output.toString("UTF-8"))
+        assertFalse(full.contains("synthetic-session"))
+        assertFalse(full.contains("synthetic-signature"))
+        assertTrue(full.contains("Player.kt:42"))
+        assertEquals(raw, log.readText())
     }
 
     @Test

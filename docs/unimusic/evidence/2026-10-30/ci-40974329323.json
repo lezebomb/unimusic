@@ -1,6 +1,6 @@
 {
   "runId": 40974329323,
-  "head": "7561fcdf112dd521c96efbc6a733fb99da2f4d40",
+  "head": "7561fcdf112df027fef5d40c285515cbb2c4bc99",
   "conclusion": "success",
   "androidAdditiveMigration": "success",
   "mandatoryDomainCheck": "success",
@@ -32,5 +32,6 @@
     }
   },
   "deduplication": "class and test name",
-  "limits": "Covers2BO; normal API regression2BP and cache2BQ are later, not claimed here"
+  "limits": "Covers2BO; normal API regression2BP and cache2BQ are later, not claimed here",
+  "evidenceCorrection": "Commit identity read from Actions and verified against local Git; test/migration results unchanged"
 }

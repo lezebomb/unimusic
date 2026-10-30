@@ -65,6 +65,7 @@ import moe.ouom.neriplayer.ui.feedback.showNeriSnackbar
 import moe.ouom.neriplayer.ui.util.ClipboardCopyResult
 import moe.ouom.neriplayer.ui.util.copyPlainTextSafely
 import java.io.File
+import moe.ouom.neriplayer.common.logging.DiagnosticLogText
 import java.io.FileNotFoundException
 import java.net.URLDecoder
 import java.nio.charset.StandardCharsets
@@ -91,8 +92,12 @@ fun LogViewerScreen(
                 coroutineScope.launch(Dispatchers.IO) {
                     try {
                         context.contentResolver.openOutputStream(it)?.use { outputStream ->
-                            File(decodedFilePath).inputStream().copyTo(outputStream)
-                        }
+                            File(decodedFilePath).bufferedReader(Charsets.UTF_8).use { reader ->
+                                outputStream.bufferedWriter(Charsets.UTF_8).use { writer ->
+                                    DiagnosticLogText.copySanitized(reader, writer)
+                                }
+                            }
+                        } ?: error("Cannot open SAF output stream")
                         withContext(Dispatchers.Main) {
                             snackbarHostState.showNeriSnackbar(composeResources.getString(CoreCommonR.string.log_exported))
                         }
@@ -109,7 +114,9 @@ fun LogViewerScreen(
     LaunchedEffect(decodedFilePath) {
         withContext(Dispatchers.IO) {
             try {
-                val lines = File(decodedFilePath).readLines()
+                val lines = File(decodedFilePath).bufferedReader(Charsets.UTF_8).use {
+                    DiagnosticLogText.read(it).text.lines()
+                }
                 withContext(Dispatchers.Main) {
                     logContent = lines
                 }

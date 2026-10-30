@@ -4,13 +4,14 @@ import android.content.Context
 import android.net.Uri
 import moe.ouom.neriplayer.core.crash.ExceptionHandler
 import moe.ouom.neriplayer.common.logging.NPLogger
+import moe.ouom.neriplayer.common.logging.DiagnosticLogText
 import java.io.File
 import java.io.FileOutputStream
 
 internal object CrashReportStore {
 
     private const val PENDING_STARTUP_CRASH_FLAG = "pending_startup_crash.flag"
-    private const val PREVIEW_MAX_BYTES = 64 * 1024
+    private const val PREVIEW_MAX_CHARS = 64 * 1024
 
     enum class CrashOrigin {
         Jvm,
@@ -71,18 +72,15 @@ internal object CrashReportStore {
                 return null
             }
 
-            val fileBytes = logFile.readBytes()
-            val previewBytes = if (fileBytes.size > PREVIEW_MAX_BYTES) {
-                fileBytes.copyOf(PREVIEW_MAX_BYTES)
-            } else {
-                fileBytes
+            val preview = logFile.bufferedReader(Charsets.UTF_8).use {
+                DiagnosticLogText.read(it, PREVIEW_MAX_CHARS)
             }
 
             PendingCrashReport(
                 origin = origin,
                 file = logFile,
-                previewContent = previewBytes.toString(Charsets.UTF_8),
-                previewTruncated = fileBytes.size > PREVIEW_MAX_BYTES
+                previewContent = preview.text,
+                previewTruncated = preview.truncated
             )
         }.onFailure { error ->
             NPLogger.e("CrashReportStore", "Failed to read pending crash report", error)
@@ -120,7 +118,7 @@ internal object CrashReportStore {
             if (!reportFile.exists() || !reportFile.isFile()) {
                 return null
             }
-            reportFile.readText(Charsets.UTF_8)
+            reportFile.bufferedReader(Charsets.UTF_8).use { DiagnosticLogText.read(it).text }
         }.onFailure { error ->
             NPLogger.e("CrashReportStore", "Failed to read full crash report", error)
         }.getOrNull()
@@ -128,8 +126,10 @@ internal object CrashReportStore {
 
     fun exportCrashReport(context: Context, reportFile: File, destination: Uri) {
         context.contentResolver.openOutputStream(destination)?.use { outputStream ->
-            reportFile.inputStream().use { inputStream ->
-                inputStream.copyTo(outputStream)
+            reportFile.bufferedReader(Charsets.UTF_8).use { reader ->
+                outputStream.bufferedWriter(Charsets.UTF_8).use { writer ->
+                    DiagnosticLogText.copySanitized(reader, writer)
+                }
             }
         } ?: error("Cannot open SAF output stream")
     }

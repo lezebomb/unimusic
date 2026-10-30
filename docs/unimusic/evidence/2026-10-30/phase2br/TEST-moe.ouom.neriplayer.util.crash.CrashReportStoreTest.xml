@@ -1,0 +1,8 @@
+<testsuite name="moe.ouom.neriplayer.util.crash.CrashReportStoreTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-10-30T01:37:55.002Z" hostname="local" time="1.872">
+  <properties />
+  <testcase name="large crash logs have a bounded sanitized preview" classname="moe.ouom.neriplayer.util.crash.CrashReportStoreTest" time="1.604" />
+  <testcase name="pending crash marker exposes the origin and log preview" classname="moe.ouom.neriplayer.util.crash.CrashReportStoreTest" time="0.043" />
+  <testcase name="legacy report viewing and export redact secrets without modifying the original file" classname="moe.ouom.neriplayer.util.crash.CrashReportStoreTest" time="0.221" />
+  <system-out />
+  <system-err />
+</testsuite>

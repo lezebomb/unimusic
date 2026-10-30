@@ -1,0 +1,7 @@
+<testsuite name="moe.ouom.neriplayer.common.logging.DiagnosticLogTextTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-10-30T01:37:22.530Z" hostname="local" time="0.218">
+  <properties />
+  <testcase name="oversizedLinesAndPartialFieldsNeverEscapeBoundedViewsOrStreamingExports" classname="moe.ouom.neriplayer.common.logging.DiagnosticLogTextTest" time="0.096" />
+  <testcase name="legacyLogsAreSanitizedForViewingAndStreamingWithoutLosingUsefulDiagnostics" classname="moe.ouom.neriplayer.common.logging.DiagnosticLogTextTest" time="0.114" />
+  <system-out />
+  <system-err />
+</testsuite>
