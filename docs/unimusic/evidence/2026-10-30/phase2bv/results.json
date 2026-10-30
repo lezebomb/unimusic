@@ -1,0 +1,182 @@
+{
+  "phase2bv-install.json": {
+    "apk": "build/outputs/unimusic/UniMusic-20261030-2BV-debug.apk",
+    "sha256": "da960d4287214d9b8ef1841197fc5599e50dbfd21431627c379798431aa81951",
+    "version": "6edb177466dd.dirty.10301555",
+    "installedVersionMatches": true,
+    "success": true,
+    "builds": [
+      "2m10s",
+      "49s"
+    ],
+    "moduleBoundaries": "passed"
+  },
+  "phase2bv-probe.json": {
+    "instrumentationCompleted": true,
+    "reports": [
+      {
+        "automaticFallbackEnabled": true,
+        "primaryFound": true,
+        "title": "誰にもなれない私だから",
+        "artist": "トゲナシトゲアリ",
+        "durationMs": 189816,
+        "discoveryMs": 1356,
+        "failures": {},
+        "candidates": [
+          {
+            "provider": "netease",
+            "title": "誰にもなれない私だから",
+            "artist": "トゲナシトゲアリ",
+            "durationMs": 190146,
+            "match": "ACCEPTED"
+          },
+          {
+            "provider": "bilibili",
+            "title": "【ニコカラ】 -誰にもなれない私だから(动画《GIRLS BAND CRY》ED)",
+            "artist": "トゲナシトゲアリ",
+            "durationMs": 191000,
+            "match": "TITLE"
+          },
+          {
+            "provider": "bilibili",
+            "title": "Off Vocal",
+            "artist": "トゲナシトゲアリ",
+            "durationMs": 191000,
+            "match": "VERSION"
+          },
+          {
+            "provider": "bilibili",
+            "title": "[官谱] 誰にもなれない私だから Girls Band Cry ED 乐队总谱 TAB",
+            "artist": "",
+            "durationMs": 191000,
+            "match": "MISSING_METADATA"
+          },
+          {
+            "provider": "bilibili",
+            "title": "【纯k投屏/自用】誰にもなれない私だから —— ",
+            "artist": "トゲナシトゲアリ",
+            "durationMs": 195000,
+            "match": "TITLE"
+          },
+          {
+            "provider": "bilibili",
+            "title": " 武道馆live一周年纪念|弹唱cover「誰にもなれない私だから」",
+            "artist": "トゲナシトゲアリ",
+            "durationMs": 285000,
+            "match": "VERSION"
+          },
+          {
+            "provider": "bilibili",
+            "title": "誰にもなれない私だから_(Instrumental)",
+            "artist": "",
+            "durationMs": 191000,
+            "match": "VERSION"
+          },
+          {
+            "provider": "bilibili",
+            "title": "誰にもなれない私だから_(Vocals)",
+            "artist": "",
+            "durationMs": 191000,
+            "match": "VERSION"
+          },
+          {
+            "provider": "bilibili",
+            "title": "誰にもなれない私だから_(Guitar)",
+            "artist": "",
+            "durationMs": 191000,
+            "match": "VERSION"
+          },
+          {
+            "provider": "netease",
+            "title": "誰にもなれない私だから (ED Long Intro ver.)",
+            "artist": "トゲナシトゲアリ",
+            "durationMs": 115306,
+            "match": "TITLE"
+          },
+          {
+            "provider": "netease",
+            "title": "誰にもなれない私だから (ED)",
+            "artist": "トゲナシトゲアリ",
+            "durationMs": 91613,
+            "match": "TITLE"
+          },
+          {
+            "provider": "netease",
+            "title": "崖の際に立ち、遥か彼方に霞む彼岸を見つめながら、迷うことなく、ただ跳ぶ、愛を信じるこの心だけは、いつまでも変わらず、たとえ何が起ころうとも、信じ続けることをやめない、身を投げ出すその瞬間、君が必ず受け止めてくれるのだと、疑いさえ抱かぬまま——そうして二人、あらゆるすべてを超え、高く、高く、どこまでも舞い上がり、他の誰も知らぬ、私たちだけの場所へと、ただ二人きりで辿り着く",
+            "artist": "t e l e p a t h テレパシー能力者",
+            "durationMs": 954000,
+            "match": "TITLE"
+          },
+          {
+            "provider": "netease",
+            "title": "誰にもなれない私だから",
+            "artist": "トゲナシトゲアリ",
+            "durationMs": 189816,
+            "match": "VERSION"
+          },
+          {
+            "provider": "netease",
+            "title": "崖の際に立ち、遥か彼方に霞む彼岸を見つめながら、迷うことなく、ただ跳ぶ、愛を信じるこの心だけは、いつまでも変わらず、たとえ何が起ころうとも、信じ続けることをやめない、身を投げ出すその瞬間、君が必ず受け止めてくれるのだと、疑いさえ抱かぬまま——そうして二人、あらゆるすべてを超え、高く、高く、どこまでも舞い上がり、他の誰も知らぬ、私たちだけの場所へと、ただ二人きりで辿り着く",
+            "artist": "t e l e p a t h テレパシー能力者",
+            "durationMs": 954044,
+            "match": "TITLE"
+          },
+          {
+            "provider": "netease",
+            "title": "崖の際に立ち、遥か彼方に霞む彼岸を見つめながら、迷うことなく、ただ跳ぶ、愛を信じるこの心だけは、いつまでも変わらず、たとえ何が起ころうとも、信じ続けることをやめない、身を投げ出すその瞬間、君が必ず受け止めてくれるのだと、疑いさえ抱かぬまま——そうして二人、あらゆるすべてを超え、高く、高く、どこまでも舞い上がり、他の誰も知らぬ、私たちだけの場所へと、ただ二人きりで辿り着く",
+            "artist": "",
+            "durationMs": 954000,
+            "match": "MISSING_METADATA"
+          },
+          {
+            "provider": "netease",
+            "title": "誰にもなれない私だから（翻唱热播）",
+            "artist": "原始之音",
+            "durationMs": 189815,
+            "match": "VERSION"
+          }
+        ],
+        "checks": [
+          {
+            "provider": "netease",
+            "primary": true,
+            "title": "誰にもなれない私だから",
+            "status": "PREVIEW_ONLY",
+            "elapsedMs": 469
+          },
+          {
+            "provider": "netease",
+            "primary": false,
+            "title": "誰にもなれない私だから",
+            "status": "PREVIEW_ONLY",
+            "elapsedMs": 540
+          }
+        ],
+        "stage": "COMPLETE",
+        "elapsedMs": 4075
+      }
+    ]
+  },
+  "phase2bv-startup-ui.json": {
+    "product": "2BV",
+    "amTotalTimeMs": 1961,
+    "amLaunchReportedSuccess": true,
+    "note": "Single cold launch; not a statistical performance comparison",
+    "rootControlsVisible": {
+      "discover": true,
+      "mine": true,
+      "search": true
+    },
+    "mineReachable": true,
+    "discoverReturned": true
+  },
+  "phase2bv-ci.json": {
+    "downloadSucceeded": false
+  },
+  "ci": {
+    "runId": 41023503882,
+    "conclusion": "success",
+    "caseXmlIndependentlyDownloaded": false,
+    "runtimeLocalJvm": "not run; JDK21 unavailable"
+  }
+}

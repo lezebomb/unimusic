@@ -1,0 +1,35 @@
+{
+  "phase4q-install.json": {
+    "apk": "build/outputs/unimusic/UniMusic-20261030-4Q-debug.apk",
+    "sha256": "d87a79b3eace01368d3c828fcb0884aec6e6d4dd8e7fc6ea9a7a88740616ff6d",
+    "version": "174f23ee9b02.dirty.10301607",
+    "installedVersionMatches": true,
+    "success": true,
+    "build": "1m35s",
+    "tests": {
+      "name": "moe.ouom.neriplayer.ui.viewmodel.tab.NeteaseHomeRecommendationsTest",
+      "tests": "2",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    "moduleBoundaries": "passed"
+  },
+  "phase4q-startup-ui.json": {
+    "product": "4Q",
+    "amTotalTimeMs": 2128,
+    "amLaunchReportedSuccess": true,
+    "scope": "One cold launch and one root-tab return; no stable FPS or statistical speed claim",
+    "rootControlsVisible": {
+      "discover": true,
+      "mine": true,
+      "search": true
+    },
+    "mineReachable": true,
+    "discoverReturned": true
+  },
+  "limits": [
+    "One UI round only; no stable FPS, statistical speed, audio or account-switch fault-injection result",
+    "2BV cold launch 1961ms and 4Q 2128ms; no measured speedup claim"
+  ]
+}

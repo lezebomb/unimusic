@@ -494,6 +494,10 @@ class NeteaseHomeRecommendationsTest {
         val accountA = mapOf("MUSIC_U" to "account-a")
         val accountB = mapOf("MUSIC_U" to "account-b")
 
+        // Async startup has no construction snapshot, even when the real account is anonymous.
+        assertTrue(shouldHandleInitialNeteaseHomeCookieEmission(true, null, emptyMap()))
+        assertTrue(shouldHandleInitialNeteaseHomeCookieEmission(true, null, accountA))
+
         assertFalse(
             shouldHandleInitialNeteaseHomeCookieEmission(
                 isFirstEmission = true,

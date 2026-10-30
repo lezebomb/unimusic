@@ -30,6 +30,7 @@ import android.content.Context
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
@@ -129,9 +130,9 @@ internal fun shouldScheduleYouTubeMusicHomeRefresh(
 
 internal fun shouldHandleInitialNeteaseHomeCookieEmission(
     isFirstEmission: Boolean,
-    initialCookies: Map<String, String>,
+    initialCookies: Map<String, String>?,
     emittedCookies: Map<String, String>
-): Boolean = !isFirstEmission || initialCookies != emittedCookies
+): Boolean = !isFirstEmission || initialCookies == null || initialCookies != emittedCookies
 
 internal enum class HomeSectionLoadGroup {
     PLAYLISTS,
@@ -222,15 +223,12 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     suspend fun setPlaybackFeedbackEnabled(enabled: Boolean) = localRecommendationController.setPlaybackFeedbackEnabled(enabled)
     suspend fun clearPlaybackFeedback() = localRecommendationController.clearPlaybackFeedback()
 
-    private val repo = AppContainer.neteaseCookieRepo
-    private val client = AppContainer.neteaseClient
+    private val repo by lazy { AppContainer.neteaseCookieRepo }
+    private val client by lazy { AppContainer.neteaseClient }
     private val youtubeAuthRepo by lazy { AppContainer.youtubeAuthRepo }
 
-    private val initialRecommendCookies = repo.withCurrentCookies { cookies ->
-        client.setPersistedCookies(cookies)
-        cookies
-    }
-    private var hasRecommendLogin = !initialRecommendCookies["MUSIC_U"].isNullOrBlank()
+    private val neteaseHomeAccountReady = CompletableDeferred<Unit>()
+    private var hasRecommendLogin = false
     private val _uiState = MutableStateFlow(createHomeUiState(hasRecommendLogin, loading = true))
     val uiState: StateFlow<HomeUiState> = _uiState
 
@@ -244,7 +242,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     private var ytMusicHomeLoadGeneration: Long = 0L
     private var homeRecommendationsBootstrapped = false
     private var lastYouTubeAuthFingerprint: String? = null
-    private var lastNeteaseRadarCacheContext = neteaseRadarCacheContext(repo.getCookiesOnce())
+    private var lastNeteaseRadarCacheContext = neteaseRadarCacheContext(emptyMap())
     private var radarPlaylistLoadGeneration: Long = 0L
     private var offlineMode = false
 
@@ -417,17 +415,22 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
         // 登录后自动刷新首页推荐歌单
         viewModelScope.launch {
+            // Resolve both lazy dependencies on IO before taking the cookie lock.
+            val (accountRepo, accountClient) = withContext(Dispatchers.IO) { repo to client }
             var isFirstCookieEmission = true
-            repo.cookieFlow.collect { raw ->
-                if (!repo.withCurrentCookiesIfMatches(raw) { currentCookies ->
-                        client.setPersistedCookies(currentCookies)
+            accountRepo.cookieFlow.collect { raw ->
+                val applied = withContext(Dispatchers.IO) {
+                    accountRepo.withCurrentCookiesIfMatches(raw) { currentCookies ->
+                        accountClient.setPersistedCookies(currentCookies)
                     }
-                ) {
+                }
+                // An account may change while dispatching back to the UI thread.
+                if (!applied || !accountRepo.withCurrentCookiesIfMatches(raw) { }) {
                     return@collect
                 }
                 val shouldHandleEmission = shouldHandleInitialNeteaseHomeCookieEmission(
                     isFirstEmission = isFirstCookieEmission,
-                    initialCookies = initialRecommendCookies,
+                    initialCookies = null,
                     emittedCookies = raw
                 )
                 isFirstCookieEmission = false
@@ -449,7 +452,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                     }
                 }
                 if (
-                    shouldRefreshNeteaseHome(
+                    homeRecommendationsBootstrapped && shouldRefreshNeteaseHome(
                         loginChanged = loginChanged,
                         recommendationsBootstrapped = homeRecommendationsBootstrapped,
                         accountContextChanged = accountContextChanged
@@ -458,10 +461,14 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                     homeRecommendationsBootstrapped = true
                     refreshNeteaseHome()
                 }
+                // Complete last: the deferred initial load must see the current account state,
+                // and resuming it inline must not trigger a second refresh in this emission.
+                neteaseHomeAccountReady.complete(Unit)
             }
         }
         viewModelScope.launch {
             delay(HOME_INITIAL_LOAD_DEFER_MS.milliseconds)
+            neteaseHomeAccountReady.await()
             if (!homeRecommendationsBootstrapped) {
                 homeRecommendationsBootstrapped = true
                 refreshNeteaseHome()
@@ -505,7 +512,8 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun refreshNeteaseHome() {
-        if (offlineMode) return
+        if (offlineMode || !neteaseHomeAccountReady.isCompleted) return
+        homeRecommendationsBootstrapped = true
 
         refreshRecommend()
         loadHomeRecommendations(force = true)
@@ -514,7 +522,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
     /** 拉首页推荐歌单 */
     fun refreshRecommend() {
-        if (offlineMode) return
+        if (offlineMode || !neteaseHomeAccountReady.isCompleted) return
 
         val sources = availableNeteaseHomePlaylistSources(
             candidates = NeteaseHomePlaylistSources,
@@ -551,7 +559,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun loadHomeRecommendations(force: Boolean = false) {
-        if (offlineMode) return
+        if (offlineMode || !neteaseHomeAccountReady.isCompleted) return
 
         val state = _uiState.value
         if (!force) {
