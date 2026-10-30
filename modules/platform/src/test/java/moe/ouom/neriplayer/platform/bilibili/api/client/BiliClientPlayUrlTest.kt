@@ -160,7 +160,7 @@ class BiliClientPlayUrlTest {
     }
 
     @Test
-    fun `empty dash audio is retried with backoff before using the html5 progressive stream`() = biliClientTest(
+    fun `video only response never becomes a progressive music stream`() = biliClientTest(
         route = { request ->
             when {
                 request.url.encodedPath != PLAY_URL_PATH -> null
@@ -172,28 +172,15 @@ class BiliClientPlayUrlTest {
         val streams = client.getAllAudioStreams("BV1xx411c7mD", 1001L, PlayOptions(qn = 64, session = "sess01"))
 
         val playRequests = http.requestsTo(PLAY_URL_PATH)
-        assertEquals(listOf("pc", "pc", "pc", "html5"), playRequests.map { it.url.queryParameter("platform") })
-        val html5 = playRequests.last().url
-        assertEquals("0", html5.queryParameter("fnval"))
-        assertEquals("0", html5.queryParameter("fourk"))
-        assertEquals("1", html5.queryParameter("high_quality"))
-        assertEquals("64", html5.queryParameter("qn"))
-        assertEquals("sess01", html5.queryParameter("session"))
+        assertEquals(listOf("pc", "pc", "pc"), playRequests.map { it.url.queryParameter("platform") })
+        assertEquals("64", playRequests.last().url.queryParameter("qn"))
+        assertEquals("sess01", playRequests.last().url.queryParameter("session"))
         assertEquals(750L, testScheduler.currentTime)
-        assertEquals(
-            listOf(
-                BiliAudioStreamInfo(
-                    id = null, mimeType = "video/mp4", bitrateKbps = 500, qualityTag = null,
-                    url = "https://upos-sz.bilivideo.com/h5.mp4",
-                    candidateUrls = listOf("https://upos-sz.bilivideo.com/h5.mp4", "https://cn-hk.bilivideo.com/h5.mp4")
-                )
-            ),
-            streams
-        )
+        assertTrue(streams.isEmpty())
     }
 
     @Test
-    fun `unusable html5 fallback reuses the last progressive stream from the dash response`() = biliClientTest(
+    fun `progressive only response is not offered as audio`() = biliClientTest(
         route = { request ->
             when {
                 request.url.encodedPath != PLAY_URL_PATH -> null
@@ -204,16 +191,25 @@ class BiliClientPlayUrlTest {
     ) { http, client ->
         val streams = client.getAllAudioStreams("BV1xx411c7mD", 1001L)
 
-        assertEquals(4, http.requestsTo(PLAY_URL_PATH).size)
-        assertEquals(
-            listOf(
-                BiliAudioStreamInfo(
-                    id = null, mimeType = "video/mp4", bitrateKbps = 0, qualityTag = null,
-                    url = "https://upos-sz.bilivideo.com/pc.mp4"
-                )
-            ),
-            streams
+        assertEquals(3, http.requestsTo(PLAY_URL_PATH).size)
+        assertTrue(http.requestsTo(PLAY_URL_PATH).none { it.url.queryParameter("platform") == "html5" })
+        assertTrue(streams.isEmpty())
+    }
+
+    @Test
+    fun `audio sections reject video mime and dimensions across all qualities`() = biliClientTest(
+        route = { request -> json(FULL_PLAY_URL).takeIf { request.url.encodedPath == PLAY_URL_PATH } }
+    ) { _, client ->
+        val info = client.getPlayInfoByBvid("BV1xx411c7mD", 1001L)
+        val video = info.dashVideo.single()
+        val dimensionalAudio = info.dashAudio.single().copy(width = 1920, height = 1080)
+        val malformed = info.copy(
+            dashAudio = listOf(video.copy(width = 0, height = 0), dimensionalAudio),
+            dolby = info.dolby!!.copy(audios = listOf(video)),
+            flac = info.flac!!.copy(audio = video)
         )
+        assertTrue(with(client) { malformed.toAudioStreamInfos() }.isEmpty())
+        assertEquals(listOf(null, "dolby", "hires"), with(client) { info.toAudioStreamInfos() }.map { it.qualityTag })
     }
 
     @Test

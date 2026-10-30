@@ -233,14 +233,11 @@ class BiliClient(
         cid: Long,
         opts: PlayOptions = PlayOptions()
     ): List<BiliAudioStreamInfo> {
-        var lastInfo: PlayInfo? = null
         repeat(EMPTY_AUDIO_RETRY_COUNT) { attempt ->
             val info = getPlayInfoByBvid(bvid, cid, opts)
-            lastInfo = info
             val streams = info.toAudioStreamInfos()
             if (streams.isNotEmpty() || !info.shouldRetryEmptyAudioFetch()) {
-                if (streams.isNotEmpty()) return streams
-                return info.toProgressiveFallbackStreamInfos()
+                return streams
             }
             if (attempt < EMPTY_AUDIO_RETRY_COUNT - 1) {
                 NPLogger.w(
@@ -250,16 +247,9 @@ class BiliClient(
                 delay((EMPTY_AUDIO_RETRY_DELAY_MS * (attempt + 1)).milliseconds)
             }
         }
-        val html5Info = getPlayInfoByBvid(bvid, cid, buildHtml5FallbackOptions(opts))
-        val html5Streams = html5Info.toProgressiveFallbackStreamInfos()
-        if (html5Streams.isNotEmpty()) {
-            NPLogger.w(
-                TAG,
-                "Play info returned empty DASH audio, fallback to html5/mp4: bvid=$bvid cid=$cid"
-            )
-            return html5Streams
-        }
-        return lastInfo?.toProgressiveFallbackStreamInfos().orEmpty()
+        // A progressive MP4 contains video too. Missing audio must not turn a music
+        // request into a video download; the caller can try another music source.
+        return emptyList()
     }
 
     // 视频基础信息 //
@@ -1374,45 +1364,13 @@ class BiliClient(
             (hasDashVideo || hasMp4Fallback)
     }
 
-    private fun buildHtml5FallbackOptions(opts: PlayOptions): PlayOptions {
-        return PlayOptions(
-            qn = opts.qn,
-            fnval = 0,
-            fnver = opts.fnver,
-            fourk = 0,
-            platform = "html5",
-            highQuality = 1,
-            tryLook = opts.tryLook,
-            session = opts.session,
-            gaiaSource = opts.gaiaSource,
-            isGaiaAvoided = opts.isGaiaAvoided
-        )
-    }
-
     private fun bitrateKbpsFromBandwidth(bandwidth: Long): Int =
         max(0, (bandwidth / 1000L).toInt())
 
-    private fun PlayInfo.toProgressiveFallbackStreamInfos(): List<BiliAudioStreamInfo> {
-        if (durl.size != 1) return emptyList()
-        val item = durl.first()
-        val candidateUrls = prioritizeBiliStreamUrls(item.url, item.backupUrls)
-        val preferredUrl = candidateUrls.firstOrNull() ?: item.url
-        if (preferredUrl.isBlank()) return emptyList()
-        return listOf(
-            BiliAudioStreamInfo(
-                id = null,
-                mimeType = "video/mp4",
-                bitrateKbps = estimateProgressiveBitrateKbps(item),
-                qualityTag = null,
-                url = preferredUrl,
-                candidateUrls = candidateUrls.ifEmpty { listOf(preferredUrl) }
-            )
-        )
-    }
-
-    private fun estimateProgressiveBitrateKbps(item: Durl): Int {
-        if (item.lengthMs <= 0L || item.sizeBytes <= 0L) return 0
-        return max(0, ((item.sizeBytes * 8L) / item.lengthMs).toInt())
+    private fun DashStream.isAudioOnly(): Boolean {
+        val mediaType = mimeType.substringBefore(';').trim()
+        return width == 0 && height == 0 &&
+            (mediaType.isBlank() || mediaType.startsWith("audio/", ignoreCase = true))
     }
 
     // 将 PlayInfo 映射为统一的音频流结构 //
@@ -1430,6 +1388,7 @@ class BiliClient(
 
         // 普通音轨
         for (a in dashAudio) {
+            if (!a.isAudioOnly()) continue
             val candidateUrls = prioritizeBiliStreamUrls(a.baseUrl, a.backupUrls)
             list += BiliAudioStreamInfo(
                 id = a.id,
@@ -1443,6 +1402,7 @@ class BiliClient(
 
         // 杜比音轨
         dolby?.audios?.forEach { a ->
+            if (!a.isAudioOnly()) return@forEach
             val candidateUrls = prioritizeBiliStreamUrls(a.baseUrl, a.backupUrls)
             list += BiliAudioStreamInfo(
                 id = a.id,
@@ -1456,6 +1416,7 @@ class BiliClient(
 
         // Hi-Res (flac)
         flac?.audio?.let { a ->
+            if (!a.isAudioOnly()) return@let
             val candidateUrls = prioritizeBiliStreamUrls(a.baseUrl, a.backupUrls)
             list += BiliAudioStreamInfo(
                 id = a.id,
