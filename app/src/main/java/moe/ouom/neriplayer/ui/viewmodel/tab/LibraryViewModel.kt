@@ -53,6 +53,7 @@ import moe.ouom.neriplayer.data.local.playlist.LocalPlaylistRepository
 import moe.ouom.neriplayer.data.model.playlist.LocalPlaylistDeleteResult
 import moe.ouom.neriplayer.data.local.playlist.runLocalPlaylistMutationSafely
 import moe.ouom.neriplayer.data.model.SongItem
+import moe.ouom.neriplayer.data.model.unified.MusicSourceRegistry
 import moe.ouom.neriplayer.common.logging.NPLogger
 import org.json.JSONArray
 import org.json.JSONObject
@@ -84,7 +85,6 @@ class LibraryViewModel(application: Application) : AndroidViewModel(application)
 
     private val biliCookieRepo = AppContainer.biliCookieRepo
     private val biliClient = AppContainer.biliClient
-    private val youtubeAuthRepo = AppContainer.youtubeAuthRepo
 
 
     private val _uiState = MutableStateFlow(
@@ -139,9 +139,10 @@ class LibraryViewModel(application: Application) : AndroidViewModel(application)
         }
 
         // YouTube Music
-        viewModelScope.launch {
+        if (MusicSourceRegistry.isEnabled("youtube_music")) viewModelScope.launch {
+            val authFlow = withContext(Dispatchers.IO) { AppContainer.youtubeAuthRepo.authFlow }
             combine(
-                youtubeAuthRepo.authFlow,
+                authFlow,
                 AppContainer.settingsRepo.youtubeEnabledFlow
             ) { bundle, enabled ->
                 bundle to enabled

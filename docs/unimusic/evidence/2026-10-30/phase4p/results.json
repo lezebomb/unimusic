@@ -1,0 +1,23 @@
+{
+  "compileAndSelectedTests": "BUILD SUCCESSFUL in 1m 50s",
+  "tests": [
+    {
+      "name": "moe.ouom.neriplayer.ui.screen.nowplaying.actions.SourceChoiceMetadataTest",
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "name": "moe.ouom.neriplayer.ui.viewmodel.tab.LibraryNeteaseRefreshOwnerTest",
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    }
+  ],
+  "newJvmTests": 0,
+  "apkBuiltOrInstalled": false,
+  "nextInstall": "Cumulative with next audio-matching stage",
+  "performanceMeasurement": "No new frame/startup timing measurement; no FPS improvement claim"
+}

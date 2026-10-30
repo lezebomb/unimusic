@@ -360,9 +360,11 @@ class ExploreViewModel(application: Application) : AndroidViewModel(application)
 
     init {
         viewModelScope.launch {
-            var revision = AppContainer.qqMusicAuthRepo.generation()
-            AppContainer.qqMusicAuthRepo.state.collect {
-                val current = AppContainer.qqMusicAuthRepo.generation()
+            if (!moe.ouom.neriplayer.data.model.unified.MusicSourceRegistry.isEnabled("qqmusic")) return@launch
+            val authRepo = withContext(Dispatchers.IO) { AppContainer.qqMusicAuthRepo }
+            var revision = authRepo.generation()
+            authRepo.state.collect {
+                val current = authRepo.generation()
                 if (current != revision) { revision = current; invalidateSearchMetadataCaches(); restartAggregateSearch() }
             }
         }

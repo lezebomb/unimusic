@@ -10,6 +10,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import moe.ouom.neriplayer.core.di.AppContainer
 import moe.ouom.neriplayer.core.player.resolver.netease.recordingMetadata
@@ -22,6 +24,8 @@ import moe.ouom.neriplayer.data.model.unified.SourceMatchDecision
 import moe.ouom.neriplayer.data.model.unified.SongSourceKey
 import moe.ouom.neriplayer.data.model.unified.SourceCheckResult
 import moe.ouom.neriplayer.data.model.unified.SourceCheckStatus
+import moe.ouom.neriplayer.data.model.unified.MusicSourceRegistry
+import moe.ouom.neriplayer.data.model.youtube.auth.YouTubeAuthBundle
 import moe.ouom.neriplayer.platform.youtube.config.YouTubeFeatureGate
 
 internal enum class SourceChoiceNotice { INCOMPLETE, OFFLINE, LOAD_FAILED, SAVE_FAILED, SAVED, CLEARED, ACCOUNT_CHANGED }
@@ -47,18 +51,27 @@ internal class SourceChoiceViewModel(application: Application) : AndroidViewMode
     val state = _state.asStateFlow()
     private var work: Job? = null
     private var generation = 0L
+    private val inactiveYouTubeAuth = YouTubeAuthBundle()
     private var account = accountSnapshot()
 
     init {
         viewModelScope.launch {
+            val youtubeAccounts = if (MusicSourceRegistry.isEnabled("youtube_music"))
+                AppContainer.youtubeAuthRepo.authFlow else flowOf(inactiveYouTubeAuth)
+            val youtubeSettings = if (MusicSourceRegistry.isEnabled("youtube_music"))
+                AppContainer.settingsRepo.youtubeEnabledFlow else flowOf(false)
+            val qqRevisions = if (MusicSourceRegistry.isEnabled("qqmusic")) {
+                val repo = AppContainer.qqMusicAuthRepo
+                repo.state.map { repo.generation() }
+            } else flowOf(0L)
             combine(
                 AppContainer.biliCookieRepo.cookieFlow,
                 AppContainer.neteaseCookieRepo.cookieFlow,
-                AppContainer.youtubeAuthRepo.authFlow,
-                AppContainer.settingsRepo.youtubeEnabledFlow,
-                AppContainer.qqMusicAuthRepo.state
-            ) { bili, netease, youtube, enabled, _ ->
-                sourceChoiceSession(bili, netease, youtube, enabled).copy(qqRevision = AppContainer.qqMusicAuthRepo.generation())
+                youtubeAccounts,
+                youtubeSettings,
+                qqRevisions
+            ) { bili, netease, youtube, enabled, qqRevision ->
+                sourceChoiceSession(bili, netease, youtube, enabled).copy(qqRevision = qqRevision)
             }.distinctUntilChanged().collect { current ->
                 youtubeEnabled = current.youtubeEnabled
                 if (account != current) {
@@ -193,7 +206,7 @@ internal class SourceChoiceViewModel(application: Application) : AndroidViewMode
     private fun accountSnapshot(): SourceChoiceSession = sourceChoiceSession(
         AppContainer.biliCookieRepo.cookieFlow.value,
         AppContainer.neteaseCookieRepo.cookieFlow.value,
-        AppContainer.youtubeAuthRepo.authFlow.value,
+        if (MusicSourceRegistry.isEnabled("youtube_music")) AppContainer.youtubeAuthRepo.authFlow.value else inactiveYouTubeAuth,
         youtubeEnabled
-    ).copy(qqRevision = AppContainer.qqMusicAuthRepo.generation())
+    ).copy(qqRevision = if (MusicSourceRegistry.isEnabled("qqmusic")) AppContainer.qqMusicAuthRepo.generation() else 0L)
 }
