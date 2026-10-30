@@ -107,11 +107,12 @@ object NeteasePlaybackResponseParser {
         val previewInfoPresent = data.opt("freeTrialInfo")
             ?.let { it != JSONObject.NULL }
             ?: false
-        if (!previewInfoPresent) return false
+        if (previewInfoPresent) return true
 
-        // 只要接口明确给出 freeTrialInfo，就直接按试听资源提示
-        // originalDurationMs 保留给调用方的结束时长兜底逻辑使用
-        return originalDurationMs >= 0L
+        // A missing trial flag cannot make a known truncated stream a full recording.
+        // Compare against this song's duration, not an arbitrary minimum song length.
+        val reportedDurationMs = data.optLongOrNull("time")?.takeIf { it > 0L } ?: return false
+        return originalDurationMs > 0L && originalDurationMs - reportedDurationMs > 4_000L
     }
 
     private fun extractDataObject(root: JSONObject): JSONObject? {

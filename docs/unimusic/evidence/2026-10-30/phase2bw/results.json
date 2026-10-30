@@ -1,0 +1,58 @@
+{
+  "phase2bw-install.json": {
+    "apk": "build/outputs/unimusic/UniMusic-20261030-2BW-debug.apk",
+    "sha256": "d2b053731ac1bcdd44e918455936fdbd40a5dbd3ac0298dfd0ef8426cb4986a3",
+    "version": "0defb3d098df.dirty.10301624",
+    "installedVersionMatches": true,
+    "success": true,
+    "build": "1m15s",
+    "tests": {
+      "name": "moe.ouom.neriplayer.platform.netease.api.playback.parser.NeteasePlaybackResponseParserTest",
+      "tests": "2",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    }
+  },
+  "phase2bw-address-probe.json": {
+    "instrumentationCompleted": true,
+    "reports": [
+      {
+        "automaticFallbackEnabled": true,
+        "primaryFound": false,
+        "stage": "COMPLETE",
+        "elapsedMs": 1680
+      }
+    ]
+  },
+  "phase2bw-ui.json": {
+    "launchSucceeded": true,
+    "rootControlsVisible": true,
+    "mineReachable": true,
+    "returnedToDiscover": false,
+    "scope": "One root-tab visit and quick return sequence; no frame-rate measurement or audio claim"
+  },
+  "phase2bw-ui-followup.json": {
+    "returnedToDiscover": false,
+    "selector": "Lowest visible matching navigation item; initial attempt used a non-clickable page-heading coordinate",
+    "scope": "One corrected quick navigation sequence; no FPS or audio claim"
+  },
+  "phase2bw-ui-verified.json": {
+    "discoverAfterVisibleNavClick": true,
+    "discoverAfterQuickReturn": true,
+    "selector": "Each tab target captured while unselected with nonzero bottom bounds; no heading or hidden selected-label coordinates",
+    "scope": "One corrected navigation sequence; no FPS/audio claim"
+  },
+  "checks": {
+    "moduleBoundaries": "passed",
+    "workflowYaml": "parsed",
+    "newParserJvmTests": 2,
+    "outgoingTabPriorComposeRegressionTests": 1
+  },
+  "limits": [
+    "Band sample query どうして had no exact credited studio match in the bounded result page; it did not reach an address/playback check",
+    "Navigation text-node attempts selected non-clickable headings when selected labels had zero bounds; corrected unselected-bottom-label targets returned to Discover",
+    "No full-audio playback, full-band availability, stable FPS or statistical speed result in this phase",
+    "Absent duration and trial flags still cannot prove a full recording; unknown duration is not classified solely by a 30-second cutoff"
+  ]
+}

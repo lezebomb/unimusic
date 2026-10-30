@@ -8,6 +8,28 @@ import org.junit.Test
 class NeteasePlaybackResponseParserTest {
 
     @Test
+    fun parsePlayback_marksUnlabelledTruncatedResponseAsPreview() {
+        val raw = """{"code":200,"data":[{"url":"https://example.com/audio.mp3","time":60000}]}"""
+        val result = NeteasePlaybackResponseParser.parsePlayback(raw, 184_243L)
+            as NeteasePlaybackResponseParser.PlaybackResult.Success
+        assertEquals(NeteasePlaybackResponseParser.Notice.PREVIEW_CLIP, result.notice)
+    }
+
+    @Test
+    fun parsePlayback_keepsShortFullSongsAndSmallDurationDifferences() {
+        for ((expected, reported) in listOf(30_000L to 30_000L, 180_000L to 176_000L, 0L to 60_000L)) {
+            val raw = """{"code":200,"data":[{"url":"https://example.com/audio.mp3","time":$reported}]}"""
+            val result = NeteasePlaybackResponseParser.parsePlayback(raw, expected)
+                as NeteasePlaybackResponseParser.PlaybackResult.Success
+            assertNull(result.notice)
+        }
+        val explicit = """{"code":200,"data":[{"url":"https://example.com/audio.mp3","freeTrialInfo":{}}]}"""
+        assertEquals(NeteasePlaybackResponseParser.Notice.PREVIEW_CLIP,
+            (NeteasePlaybackResponseParser.parsePlayback(explicit, -1L)
+                as NeteasePlaybackResponseParser.PlaybackResult.Success).notice)
+    }
+
+    @Test
     fun parsePlayback_marksNoPermissionWhenUrlIsJsonNull() {
         val raw = """
             {
