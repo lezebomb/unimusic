@@ -42,12 +42,24 @@ class SourceAvailabilityChecker(private val now: () -> Long = System::currentTim
         return try {
             withTimeoutOrNull(budgetMs) {
                 if (!current()) return@withTimeoutOrNull SourceCheckStatus.CONTEXT_CHANGED
-                val result = resolve()
-                if (!current()) SourceCheckStatus.CONTEXT_CHANGED
-                else when (result) {
-                    is SourceAttempt.Ready -> if (candidate.key.provider == "local") SourceCheckStatus.LOCAL_READABLE else SourceCheckStatus.ADDRESS_RESOLVED
-                    is SourceAttempt.Rejected -> result.reason.checkStatus()
+                val status = try {
+                    when (val result = resolve()) {
+                        is SourceAttempt.Ready -> if (candidate.key.provider == "local") SourceCheckStatus.LOCAL_READABLE else SourceCheckStatus.ADDRESS_RESOLVED
+                        is SourceAttempt.Rejected -> result.reason.checkStatus()
+                    }
+                } catch (cancelled: CancellationException) {
+                    currentCoroutineContext().ensureActive()
+                    if (cancelled is TimeoutCancellationException) SourceCheckStatus.TIMED_OUT else SourceCheckStatus.UNAVAILABLE
+                } catch (_: java.net.SocketTimeoutException) {
+                    SourceCheckStatus.TIMED_OUT
+                } catch (_: IOException) {
+                    SourceCheckStatus.NETWORK
+                } catch (_: Exception) {
+                    SourceCheckStatus.UNAVAILABLE
                 }
+                // A stale failure is no more useful than a stale address. Keep this final check
+                // inside the original deadline; account/decision storage must not extend it.
+                if (!current()) SourceCheckStatus.CONTEXT_CHANGED else status
             } ?: SourceCheckStatus.TIMED_OUT
         } catch (cancelled: CancellationException) {
             currentCoroutineContext().ensureActive()

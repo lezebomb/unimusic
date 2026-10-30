@@ -16,6 +16,40 @@ class SourceAvailabilityCheckerTest {
     private val candidate = RecordingSourceCandidate(SongSourceKey("bilibili", "10", "11"),
         UnifiedSongMetadata("晴天", "周杰伦", "叶惠美", 269_000))
 
+    @Test fun changedAccountOrDecisionInvalidatesExceptionalResultsJustLikeOldAddresses() = runTest {
+        val failures = listOf(
+            IOException("synthetic network") to SourceCheckStatus.NETWORK,
+            java.net.SocketTimeoutException("synthetic timeout") to SourceCheckStatus.TIMED_OUT,
+            IllegalStateException("synthetic unavailable") to SourceCheckStatus.UNAVAILABLE,
+            kotlinx.coroutines.CancellationException("synthetic adapter cancellation") to SourceCheckStatus.UNAVAILABLE
+        )
+        for ((failure, expectedStatus) in failures) {
+            var current = true
+            val stale = checker.check(expected, candidate, true, true, false, stillCurrent = { current }) {
+                current = false
+                throw failure
+            }
+            assertEquals(SourceCheckStatus.CONTEXT_CHANGED, stale.status)
+            assertEquals(expectedStatus, checker.check(expected, candidate, true, true, false) { throw failure }.status)
+        }
+    }
+
+    @Test fun failureContextRecheckUsesTheOriginalBudgetAndCannotDelayANewRequest() = runTest {
+        var checks = 0
+        val result = checker.check(expected, candidate, true, true, false, budgetMs = 10, stillCurrent = {
+            if (++checks > 1) kotlinx.coroutines.delay(20)
+            true
+        }) {
+            kotlinx.coroutines.delay(8)
+            throw IOException("synthetic request failed")
+        }
+        assertEquals(SourceCheckStatus.TIMED_OUT, result.status)
+        assertEquals(10L, testScheduler.currentTime)
+        assertEquals(2, checks)
+        assertEquals(SourceCheckStatus.ADDRESS_RESOLVED,
+            checker.check(expected, candidate, true, true, false) { SourceAttempt.Ready(Unit) }.status)
+    }
+
     @Test fun nativePublicPagesRequireExactPhysicalIdsAndSupportedContexts() {
         assertEquals("https://www.kuwo.cn/play_detail/42", MusicSourceRegistry.publicPageUrl(SongSourceKey("kuwo", "42")))
         assertEquals("https://y.qq.com/n/ryqq/songDetail/003OUlho2HcRHC",

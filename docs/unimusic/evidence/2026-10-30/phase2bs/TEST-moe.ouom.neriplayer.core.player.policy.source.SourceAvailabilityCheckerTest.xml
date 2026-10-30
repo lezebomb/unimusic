@@ -1,0 +1,9 @@
+<testsuite name="moe.ouom.neriplayer.core.player.policy.source.SourceAvailabilityCheckerTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-10-30T01:43:14.102Z" hostname="local" time="0.476">
+  <properties />
+  <testcase name="failureContextRecheckUsesTheOriginalBudgetAndCannotDelayANewRequest" classname="moe.ouom.neriplayer.core.player.policy.source.SourceAvailabilityCheckerTest" time="0.439" />
+  <testcase name="timeoutCancelsTheRequestAndCallerCancellationPropagates" classname="moe.ouom.neriplayer.core.player.policy.source.SourceAvailabilityCheckerTest" time="0.017" />
+  <testcase name="changedAccountOrDecisionInvalidatesExceptionalResultsJustLikeOldAddresses" classname="moe.ouom.neriplayer.core.player.policy.source.SourceAvailabilityCheckerTest" time="0.008" />
+  <testcase name="anAdaptersOwnTimeoutIsACompletedCheckRatherThanACancelledCaller" classname="moe.ouom.neriplayer.core.player.policy.source.SourceAvailabilityCheckerTest" time="0.006" />
+  <system-out />
+  <system-err />
+</testsuite>

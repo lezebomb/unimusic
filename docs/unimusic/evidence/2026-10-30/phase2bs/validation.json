@@ -1,0 +1,16 @@
+{
+  "stage": "2BS",
+  "localTests": {
+    "class": "SourceAvailabilityCheckerTest",
+    "tests": 4,
+    "failures": 0
+  },
+  "moduleBoundaries": "passed",
+  "build": "BUILD SUCCESSFUL in 55s",
+  "apk": "build/outputs/unimusic/UniMusic-20261030-2BS-debug.apk",
+  "versionName": "bcb44f6c5785.dirty.10300943",
+  "sha256": "1614c50362e581b259dec46bb65c39d88bdfa678c71b8f86191ffc4a360953a7",
+  "remoteCI": "Existing checker selector includes new2 cases; wait for preceding2BR mandatory workflow40987129828 before push",
+  "deviceValidation": "Not installed; ongoing device natural-boundary check uses preceding3K package only",
+  "limits": "Simulated account/decision/network exceptions and deadlines, no real account switch or fallback timing claim"
+}
