@@ -38,8 +38,10 @@ internal class HomeLocalRecommendationsController(application: Application, scop
     private var handledFeedbackRevision = feedback.revision.value to playbackFeedback.revision.value
     private val refreshVersion = MutableStateFlow(0L)
     private var handledRefreshVersion = 0L
+    // WhileSubscribed may restart after leaving Home. Reuse the last visible snapshot
+    // until current library/feedback evidence has refreshed it; do not flash an empty row.
+    private var latest = LocalRecommendations()
     val state = channelFlow {
-        var latest = LocalRecommendations()
         refreshVersion.collectLatest { requestedRefreshVersion ->
             send(HomeLocalRecommendationsState(latest, loading = true))
             try {

@@ -1,0 +1,13 @@
+{
+  "stage": "4K",
+  "change": "Keep last recommendation state across WhileSubscribed restarts instead of clearing the row on return",
+  "automatedTests": "None added/repeated for this small state-retention change",
+  "moduleBoundaries": "passed",
+  "build": "BUILD SUCCESSFUL in1m56s; cumulative APK includes4J and3L",
+  "apk": "build/outputs/unimusic/UniMusic-20261030-4K-debug.apk",
+  "versionName": "24356f0410c3.dirty.10301011",
+  "sha256": "42c3cf0b62b8cd15bdad7852f5f58144f02d54ac66d026001d8f73d43730edd6",
+  "deviceValidation": "Not installed again; phone currently verified4I with one tab round trip",
+  "limits": "Refresh and invalidation still run; last snapshot can briefly be shown as loading until current evidence arrives; no latency/fps number or changed recommendation algorithm",
+  "remoteCI": "Existing source-path workflow; no new selectors or migration change"
+}
