@@ -12,7 +12,8 @@ import moe.ouom.neriplayer.core.player.resolver.netease.recordingMetadata
 import moe.ouom.neriplayer.core.player.resolver.netease.biliRecordingMetadata
 import moe.ouom.neriplayer.core.player.resolver.netease.tryResolveNeteaseMatchedLocalSource
 import moe.ouom.neriplayer.core.player.resolver.netease.NeteaseAutoSourceState
-import moe.ouom.neriplayer.core.player.resolver.unm.tryResolveUnmBridgeSource
+import moe.ouom.neriplayer.core.player.resolver.unm.UnmSourceResult
+import moe.ouom.neriplayer.core.player.resolver.unm.resolveUnmBridgeSource
 import moe.ouom.neriplayer.core.player.runtime.refresh.RefreshResolverSideEffects
 import moe.ouom.neriplayer.data.identity.stableKey
 import moe.ouom.neriplayer.data.model.SongItem
@@ -118,7 +119,7 @@ private suspend fun PlayerManager.tryResolveStoredSource(song: SongItem, sideEff
                     }
                 }
         }
-        val hasPublicSource = matches.any { it.candidate.key.provider in setOf("gdstudio_netease", "qqmusic", "kuwo") }
+        val hasPublicSource = matches.any { it.candidate.key.provider in setOf("gdstudio_netease", "unm_netease", "qqmusic", "kuwo") }
         val budget = if (automatic) sourceStageBudgetMs(1_200, 2_500)
             else if (hasPublicSource) sourceStageBudgetMs(5_000, 8_000) else sourceStageBudgetMs(2_000, 8_000)
         if (budget <= 0) return null
@@ -211,8 +212,10 @@ internal suspend fun PlayerManager.resolveSourceCandidate(subject: SongItem, can
         "unm_netease" -> {
             // The bridge answers by Netease id, so this candidate must describe the same recording.
             if (source.resourceId != subject.id.toString()) return SourceAttempt.Rejected(SourceFailure.NO_MATCH)
-            tryResolveUnmBridgeSource(subject, sideEffects)
-                ?: return SourceAttempt.Rejected(SourceFailure.UNAVAILABLE)
+            when (val bridge = resolveUnmBridgeSource(subject, sideEffects)) {
+                is UnmSourceResult.Ready -> bridge.success
+                is UnmSourceResult.Unavailable -> return SourceAttempt.Rejected(bridge.failure)
+            }
         }
         else -> return SourceAttempt.Rejected(SourceFailure.EXTERNAL_PLAYER_REQUIRED)
     }

@@ -160,6 +160,9 @@ private fun SourceChoiceCard(
             if (candidate.key.provider == "gdstudio_netease") {
                 Text(stringResource(CoreCommonR.string.unimusic_sources_gd_description), style = MaterialTheme.typography.bodySmall)
             }
+            if (candidate.key.provider == "unm_netease") {
+                Text(stringResource(CoreCommonR.string.unimusic_sources_unm_description), style = MaterialTheme.typography.bodySmall)
+            }
             Text(metadata.title, style = MaterialTheme.typography.titleMedium)
             Text(stringResource(CoreCommonR.string.unimusic_sources_artist_duration,
                 metadata.artist.ifBlank { stringResource(CoreCommonR.string.unimusic_sources_unknown_artist) },
@@ -219,6 +222,7 @@ private fun sourceProviderName(provider: String): String = when (provider) {
     "netease" -> stringResource(CoreCommonR.string.unimusic_sources_provider_netease)
     "youtube_music" -> stringResource(CoreCommonR.string.unimusic_sources_provider_youtube)
     "gdstudio_netease" -> "GD音乐台"
+    "unm_netease" -> stringResource(CoreCommonR.string.unimusic_sources_provider_unm)
     "kuwo" -> stringResource(CoreCommonR.string.explore_catalog_kuwo)
     "qqmusic" -> "QQ音乐"
     else -> provider

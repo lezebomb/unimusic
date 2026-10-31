@@ -7,6 +7,7 @@
     <string name="unimusic_sources_provider_local">本地文件</string>
     <string name="unimusic_sources_provider_bilibili">Bilibili</string>
     <string name="unimusic_sources_provider_netease">网易云音乐</string>
+<string name="unimusic_sources_provider_unm">完整音源匹配</string>
     <string name="unimusic_sources_provider_youtube">YouTube Music</string>
     <string name="unimusic_sources_failure">%1$s：%2$s</string>
     <string name="unimusic_sources_failure_timeout">搜索超时，可刷新重试。</string>

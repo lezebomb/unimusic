@@ -74,7 +74,13 @@
 - `modules/playback/runtime/.../core/player/resolver/unm/PlayerManagerUnmBridgeSource.kt`：`tryResolveUnmBridgeSource(song, sideEffects)`，预算 `sourceStageBudgetMs(3_000, 5_000)`，返回前复核开关、地址、会话是否仍然有效。
 - 该任务作为 `NeteasePlaybackUrlResolver.resolveNeteaseAlternates` 里 `raceFreshPlaybackSources` 的**第三个并行候选**，与「原生目录备选」「网易云自动 B 站」并列竞速；不再串联新的超时，服务不可达时只是该候选返回 null，不会拖垮其他来源。
 - 结果构造为 `SongUrlResult.Success`：带真实 `durationMs`、`expectedContentLength`、`mimeType = audio/mpeg`、`audioInfo`（`NETEASE`、码率标签）、`cacheKeyOverride = "unm-<source>-<id>-<br>"`、`isPreviewClip = false`，因此能通过 `fullRecordingPlaybackResultOrNull()` 的完整录音门禁。
-- `RememberedSourceResolver.resolveSourceCandidate` 也支持 `unm_netease` 候选，便于「来源」菜单显式选择。
+- `RememberedSourceResolver.resolveSourceCandidate` 也支持 `unm_netease` 候选，便于「来源」菜单显式选择；这里用的是 `resolveUnmBridgeSource`，它返回 `UnmSourceResult.Ready / Unavailable(SourceFailure)`，因此显式检查能拿到真实原因：桥不可达 → `NETWORK`、没有该录音 → `NO_MATCH`、被白名单/时长门禁拒绝 → `UNAVAILABLE`、超出预算 → `TIMEOUT`。竞速路径继续用 `tryResolveUnmBridgeSource`（失败静默返回 `null`）。
+
+### 3.4 来源菜单与发现
+
+- 「来源」面板（`SourceChoiceDiscovery` / `SourceChoiceSheet`）只在**开关打开且地址非空**时才列出一项「完整音源匹配」，且只挑与当前歌曲**同一个网易云 ID** 的身份——桥按 ID 匹配，跨 ID 候选没有意义。
+- 面板打开本身不会请求桥；只有点「检查」才走 `checkSourceAvailability` → `resolveSourceCandidate`（`unm_netease` 分支），结果按 §3.3 的原因映射显示在卡片上。
+- 失败原因也进入 `SourceAvailabilityChecker` 的统一状态映射，与 GD 音乐台、酷我、QQ 面板行为一致。
 
 ## 4. 设置
 
@@ -107,6 +113,15 @@
 | ダレモ | PLAYED | `m701.music.126.net` |
 
 四首全部脱离 `PREVIEW_CLIP`，播放推进超过 2 秒且来自完整音轨主机。测试内固定把媒体音量设为 0，跑完恢复。
+
+### 6.1 负例（必须保持的行为）
+
+| 输入 | 桥的响应 | App 侧结果 |
+| --- | --- | --- |
+| 不存在的网易云 ID（`1`、`9999999999`） | `{"ok":false,"reason":"match_failed"}` | `NO_MATCH` → 面板显示「元数据不匹配」，播放不被接管，继续走原有回退 |
+| 非法 ID（`0`、`abc`） | `{"ok":false,"reason":"bad_id"}`（HTTP 400） | 请求在客户端就被 `parseUnmBridgeBaseUrl`/ID 校验挡下，不产生 HTTP 调用 |
+| 桥不可达（端口关闭） | 连接失败 | `NETWORK` → 面板显示「网络异常」；竞速路径静默跳过，其他来源不受影响 |
+| 返回被截断的音轨（`bilivideo` 那类） | `size` 与码率反推时长超出容差 | `REJECTED` → `UNAVAILABLE`，不会拿 1 MB 的片段冒充完整曲 |
 
 ## 7. 已知边界
 

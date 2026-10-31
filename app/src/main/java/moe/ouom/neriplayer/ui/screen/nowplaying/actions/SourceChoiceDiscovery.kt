@@ -24,6 +24,7 @@ import moe.ouom.neriplayer.data.model.unified.RecordingVersion
 import moe.ouom.neriplayer.data.model.unified.SongSourceKey
 import moe.ouom.neriplayer.data.model.unified.UnifiedSongMetadata
 import moe.ouom.neriplayer.data.model.youtube.music.YouTubeMusicSearchFilter
+import moe.ouom.neriplayer.data.settings.playback.readPlaybackPreferenceSnapshotSync
 import moe.ouom.neriplayer.data.traffic.isOfflineModeNow
 import moe.ouom.neriplayer.data.unified.sourceCandidateForSong
 import moe.ouom.neriplayer.platform.youtube.config.YouTubeFeatureDisabledException
@@ -41,6 +42,13 @@ internal data class SourceChoiceDiscoveryResult(
 internal fun assessSourceChoice(song: SongItem, candidate: RecordingSourceCandidate) =
     RecordingMatchPolicy.assess(song.recordingMetadata(), candidate.recordingMetadata(),
         if (candidate.key.provider == "local") 8_000 else 4_000)
+
+/** The bridge is opt-in: both the switch and an address are required before it is ever offered. */
+private fun unmBridgeUsable(context: Context): Boolean {
+    if (!moe.ouom.neriplayer.data.model.unified.MusicSourceRegistry.isEnabled("unm_netease")) return false
+    val snapshot = readPlaybackPreferenceSnapshotSync(context)
+    return snapshot.unmBridgeEnabled && snapshot.unmBridgeBaseUrl.isNotBlank()
+}
 
 private fun RecordingSourceCandidate.recordingMetadata() = metadata.let {
     RecordingMetadata(it.title, it.artist, it.durationMs, it.version, it.album)
@@ -77,8 +85,13 @@ internal suspend fun discoverSourceChoices(
         val gdChoices = ((sourceCandidateForSong(song)?.let(::listOf) ?: emptyList()) +
             results.flatMap { it.candidates }).filter { it.key.provider == "netease" }
             .map { it.copy(key = it.key.copy(provider = "gdstudio_netease")) }
+        // The bridge matches by Netease id, so it only ever describes this very recording.
+        val unmChoices = if (unmBridgeUsable(context)) {
+            gdChoices.filter { it.key.resourceId == song.id.toString() }
+                .map { it.copy(key = it.key.copy(provider = "unm_netease")) }
+        } else emptyList()
         SourceChoiceDiscoveryResult(
-            candidates = (gdChoices + results.flatMap { result -> result.candidates.filter { it.key != originalKey }
+            candidates = (gdChoices + unmChoices + results.flatMap { result -> result.candidates.filter { it.key != originalKey }
                 .sortedByDescending { assessSourceChoice(song, it).accepted }.take(8) }
                 ).distinctBy { it.key }.sortedByDescending { assessSourceChoice(song, it).accepted },
             incomplete = results.any { it.incomplete },

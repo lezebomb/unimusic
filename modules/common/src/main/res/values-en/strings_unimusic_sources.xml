@@ -7,6 +7,7 @@
     <string name="unimusic_sources_provider_local">Local files</string>
     <string name="unimusic_sources_provider_bilibili">Bilibili</string>
     <string name="unimusic_sources_provider_netease">NetEase Music</string>
+<string name="unimusic_sources_provider_unm">Full-recording match</string>
     <string name="unimusic_sources_provider_youtube">YouTube Music</string>
     <string name="unimusic_sources_failure">%1$s: %2$s</string>
     <string name="unimusic_sources_failure_timeout">Search timed out. Refresh to retry.</string>
