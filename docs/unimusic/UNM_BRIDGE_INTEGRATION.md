@@ -114,6 +114,13 @@
 
 四首全部脱离 `PREVIEW_CLIP`，播放推进超过 2 秒且来自完整音轨主机。测试内固定把媒体音量设为 0，跑完恢复。
 
+`app/src/androidTest/java/moe/ouom/neriplayer/sources/UnmBridgeSourceChoiceDeviceTest.kt`（同一门控参数）覆盖来源面板：
+
+- 打开开关并填地址后，`discoverSourceChoices` 必须为当前曲目给出 `unm_netease` 候选，且 `resourceId` 等于该曲的网易云 ID；
+- 关掉开关后，同一调用不得再出现 `unm_netease`。
+
+真机结果：`OK (1 test)`（2026-10-31，app `d65ed1ffd15a`）。同一次构建上 `UnmBridgeDeviceTest` 四首仍全部 `PLAYED`、`source=unm_netease`。
+
 ### 6.1 负例（必须保持的行为）
 
 | 输入 | 桥的响应 | App 侧结果 |
