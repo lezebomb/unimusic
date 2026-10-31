@@ -315,6 +315,24 @@ abstract class PlaybackSettingsSection protected constructor() {
         icon = AutoSettingIcon.AdsClick
     )
 
+    @AutoSetting(order = 139)
+    val unmBridgeEnabled = autoSwitchSetting(
+        key = "unm_bridge_enabled",
+        defaultValue = false,
+        titleRes = CoreCommonR.string.settings_unm_bridge_enabled,
+        descriptionRes = CoreCommonR.string.settings_unm_bridge_enabled_desc,
+        icon = AutoSettingIcon.Router
+    )
+
+    @AutoSetting(order = 141)
+    val unmBridgeBaseUrl = autoStringSetting(
+        key = "unm_bridge_base_url",
+        defaultValue = "",
+        titleRes = CoreCommonR.string.settings_unm_bridge_base_url,
+        descriptionRes = CoreCommonR.string.settings_unm_bridge_base_url_desc,
+        icon = AutoSettingIcon.Router
+    )
+
     @AutoSetting(
         key = "keep_playback_mode_state",
         type = SettingValueType.Boolean,

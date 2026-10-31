@@ -17,6 +17,7 @@ import moe.ouom.neriplayer.core.player.policy.source.SourceAttempt
 import moe.ouom.neriplayer.core.player.policy.source.SourceFailure
 import moe.ouom.neriplayer.core.player.resolver.netease.tryResolveNeteaseAutoBiliSource
 import moe.ouom.neriplayer.core.player.resolver.netease.tryResolveNeteaseMatchedLocalSource
+import moe.ouom.neriplayer.core.player.resolver.unm.tryResolveUnmBridgeSource
 import moe.ouom.neriplayer.core.player.runtime.refresh.RefreshResolverSideEffects
 import moe.ouom.neriplayer.data.model.SongItem
 import moe.ouom.neriplayer.data.model.playback.PlayerEvent
@@ -223,7 +224,8 @@ private suspend fun PlayerManager.resolveNeteaseAlternates(
         return raceFreshPlaybackSources<SongUrlResult.Success>(
             tasks = listOf(
                 { isolated -> tryResolveNativeCatalogAlternate(song, isolated) },
-                { isolated -> tryResolveNeteaseAutoBiliSource(song, isolated) as? SongUrlResult.Success }
+                { isolated -> tryResolveNeteaseAutoBiliSource(song, isolated) as? SongUrlResult.Success },
+                { isolated -> tryResolveUnmBridgeSource(song, isolated) }
             ),
             isCurrent = ::current,
             applyWinner = { ready -> ready.durationMs?.takeIf { it > 0L }?.let { duration ->

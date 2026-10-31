@@ -95,6 +95,8 @@ import moe.ouom.neriplayer.core.player.policy.pending.shouldAcceptPlayerCallback
 import moe.ouom.neriplayer.core.player.policy.pending.shouldExposePlayerCallbackState
 import moe.ouom.neriplayer.core.player.audio.wake.PlaybackTransitionWakeLock
 import moe.ouom.neriplayer.core.player.prefetch.prefetchNextGenericTrackUrl
+import moe.ouom.neriplayer.core.player.resolver.unm.applyUnmBridgePreferences
+import moe.ouom.neriplayer.core.player.resolver.unm.observeUnmBridgeSettings
 import moe.ouom.neriplayer.core.player.resolver.youtube.YouTubeSeekRefreshPolicy
 import moe.ouom.neriplayer.core.player.url.currentPlaybackCacheKeyForRecovery
 import moe.ouom.neriplayer.core.player.url.shouldAdvanceAfterStuckTrackEnd
@@ -429,6 +431,7 @@ private fun PlayerManager.applyInitialPlaybackPreferences(
         initialPlaybackPreferences.neteaseAutoSourceSwitch
     neteaseLocalSourceFallbackEnabled =
         initialPlaybackPreferences.neteaseLocalSourceFallback
+    applyUnmBridgePreferences(initialPlaybackPreferences)
     playbackFadeInEnabled = initialPlaybackPreferences.playbackFadeIn
     playbackCrossfadeNextEnabled =
         initialPlaybackPreferences.playbackCrossfadeNext
@@ -1114,6 +1117,7 @@ private fun PlayerManager.createCachedPlaybackDataSourceFactory(
 
 private fun PlayerManager.observePlaybackSettings() {
     attachLiveLyricSurfaces()
+    observeUnmBridgeSettings()
     ioScope.launch {
         settingsRepo.audioQualityFlow.collect { q ->
             val previousQuality = preferredQuality

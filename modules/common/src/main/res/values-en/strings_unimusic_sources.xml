@@ -73,6 +73,9 @@
     <string name="unimusic_sources_gd_key">GD Studio · NetEase ID %1$s</string>
     <string name="unimusic_sources_gd_description">Streaming only.</string>
     <string name="unimusic_sources_gd_notice">Source: GD Studio · Online streaming only</string>
+    <string name="unimusic_sources_unm_key">Full-recording match · NetEase ID %1$s</string>
+    <string name="unimusic_sources_unm_description">This source fetches the same recording through the match service you configured.</string>
+    <string name="unimusic_sources_unm_notice">Source: full-recording match · Online streaming</string>
     <string name="unimusic_youtube_login_required">YouTube requires sign-in verification or this content is unavailable. Sign in to YouTube in settings, or choose another source.</string>
     <string name="unimusic_youtube_unavailable">YouTube is not providing audio for this track. Choose another source.</string>
 </resources>

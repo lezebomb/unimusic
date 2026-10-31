@@ -27,6 +27,7 @@ import moe.ouom.neriplayer.data.model.settings.playback.DEFAULT_MOBILE_DATA_BILI
 import moe.ouom.neriplayer.data.model.settings.playback.DEFAULT_MOBILE_DATA_NETEASE_AUDIO_QUALITY
 import moe.ouom.neriplayer.data.model.settings.playback.DEFAULT_MOBILE_DATA_YOUTUBE_AUDIO_QUALITY
 import moe.ouom.neriplayer.data.model.settings.playback.PlaybackPreferenceSnapshot
+import moe.ouom.neriplayer.data.model.settings.playback.normalizeUnmBridgeBaseUrl
 import moe.ouom.neriplayer.data.settings.SettingsKeys
 import moe.ouom.neriplayer.data.settings.dataStore
 import moe.ouom.neriplayer.data.model.settings.lyrics.DEFAULT_AMLL_TTML_LYRIC_OFFSET_MS
@@ -107,6 +108,8 @@ private const val PLAYBACK_REMEMBER_LONG_FORM_PROGRESS_KEY =
 private const val PLAYBACK_KEEP_MODE_STATE_KEY = "keep_playback_mode_state"
 private const val PLAYBACK_NETEASE_AUTO_SOURCE_SWITCH_KEY = "netease_auto_source_switch"
 private const val PLAYBACK_NETEASE_LOCAL_SOURCE_FALLBACK_KEY = "netease_local_source_fallback"
+private const val PLAYBACK_UNM_BRIDGE_ENABLED_KEY = "unm_bridge_enabled"
+private const val PLAYBACK_UNM_BRIDGE_BASE_URL_KEY = "unm_bridge_base_url"
 private const val PLAYBACK_FADE_IN_KEY = "playback_fade_in"
 private const val PLAYBACK_CROSSFADE_NEXT_KEY = "playback_crossfade_next"
 private const val PLAYBACK_SLEEP_TIMER_FINISH_CURRENT_ON_EXPIRY_KEY =
@@ -250,6 +253,14 @@ fun persistPlaybackPreferenceSnapshot(
                     PLAYBACK_NETEASE_LOCAL_SOURCE_FALLBACK_KEY,
                     normalizedSnapshot.neteaseLocalSourceFallback
                 )
+                .putBoolean(
+                    PLAYBACK_UNM_BRIDGE_ENABLED_KEY,
+                    normalizedSnapshot.unmBridgeEnabled
+                )
+                .putString(
+                    PLAYBACK_UNM_BRIDGE_BASE_URL_KEY,
+                    normalizedSnapshot.unmBridgeBaseUrl
+                )
                 .putBoolean(PLAYBACK_FADE_IN_KEY, normalizedSnapshot.playbackFadeIn)
                 .putBoolean(PLAYBACK_CROSSFADE_NEXT_KEY, normalizedSnapshot.playbackCrossfadeNext)
                 .putBoolean(
@@ -386,6 +397,8 @@ fun Preferences.toPlaybackPreferenceSnapshot(): PlaybackPreferenceSnapshot {
         keepPlaybackModeState = valueOr(SettingsKeys.KEEP_PLAYBACK_MODE_STATE, true),
         neteaseAutoSourceSwitch = valueOr(SettingsKeys.NETEASE_AUTO_SOURCE_SWITCH, true),
         neteaseLocalSourceFallback = valueOr(SettingsKeys.NETEASE_LOCAL_SOURCE_FALLBACK, false),
+        unmBridgeEnabled = valueOr(SettingsKeys.UNM_BRIDGE_ENABLED, false),
+        unmBridgeBaseUrl = valueOr(SettingsKeys.UNM_BRIDGE_BASE_URL, ""),
         playbackFadeIn = valueOr(SettingsKeys.PLAYBACK_FADE_IN, true),
         playbackCrossfadeNext = valueOr(SettingsKeys.PLAYBACK_CROSSFADE_NEXT, true),
         sleepTimerFinishCurrentOnExpiry = valueOr(SettingsKeys.PLAYBACK_SLEEP_TIMER_FINISH_CURRENT_ON_EXPIRY, false),
@@ -508,6 +521,8 @@ private fun SharedPreferences.toCachedPlaybackPreferenceSnapshot(): PlaybackPref
             prefs.getBoolean(PLAYBACK_NETEASE_AUTO_SOURCE_SWITCH_KEY, true),
         neteaseLocalSourceFallback =
             prefs.getBoolean(PLAYBACK_NETEASE_LOCAL_SOURCE_FALLBACK_KEY, false),
+        unmBridgeEnabled = prefs.getBoolean(PLAYBACK_UNM_BRIDGE_ENABLED_KEY, false),
+        unmBridgeBaseUrl = prefs.stringOr(PLAYBACK_UNM_BRIDGE_BASE_URL_KEY, ""),
         playbackFadeIn = prefs.getBoolean(PLAYBACK_FADE_IN_KEY, true),
         playbackCrossfadeNext = prefs.getBoolean(PLAYBACK_CROSSFADE_NEXT_KEY, true),
         sleepTimerFinishCurrentOnExpiry = prefs.getBoolean(
@@ -631,6 +646,7 @@ fun PlaybackPreferenceSnapshot.sanitized(): PlaybackPreferenceSnapshot {
             normalizeMobileDataYouTubeAudioQuality(mobileDataYouTubeAudioQuality),
         mobileDataBiliAudioQuality =
             normalizeMobileDataBiliAudioQuality(mobileDataBiliAudioQuality),
+        unmBridgeBaseUrl = normalizeUnmBridgeBaseUrl(unmBridgeBaseUrl),
         playbackFadeInDurationMs = playbackFadeInDurationMs.coerceAtLeast(0L),
         playbackFadeOutDurationMs = playbackFadeOutDurationMs.coerceAtLeast(0L),
         playbackCrossfadeInDurationMs = playbackCrossfadeInDurationMs.coerceAtLeast(0L),

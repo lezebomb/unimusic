@@ -119,4 +119,16 @@
     <string name="settings_account_sign_in_again">Sign in again</string>
     <string name="settings_account_avatar">%1$s account avatar</string>
     <string name="web_login_webview_unavailable">System WebView is unavailable, so web sign-in cannot open. Enable or update Android System WebView in system settings and try again</string>
+    <string name="settings_unm_bridge_enabled">Use full-recording match service</string>
+    <string name="settings_unm_bridge_enabled_desc">When the original source only offers a preview or is unavailable, fetch the same recording from the match service you configured. Nothing is used until an address is set.</string>
+    <string name="settings_unm_bridge_base_url">Match service address</string>
+    <string name="settings_unm_bridge_base_url_desc">For example http://192.168.1.10:8900, reachable from this phone on the same network.</string>
+    <string name="settings_unm_bridge_base_url_unset">Not set</string>
+    <string name="settings_unm_bridge_dialog_title">Match service address</string>
+    <string name="settings_unm_bridge_dialog_hint">http://192.168.1.10:8900</string>
+    <string name="settings_unm_bridge_check">Test</string>
+    <string name="settings_unm_bridge_checking">Testing connection…</string>
+    <string name="settings_unm_bridge_check_ok">Connection OK</string>
+    <string name="settings_unm_bridge_check_failed">Cannot reach the service, check the address and network</string>
+    <string name="settings_unm_bridge_invalid_address">Invalid address, use one starting with http:// or https://</string>
 </resources>

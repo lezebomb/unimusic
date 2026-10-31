@@ -37,6 +37,10 @@ data class PlaybackPreferenceSnapshot(
     val keepPlaybackModeState: Boolean = true,
     val neteaseAutoSourceSwitch: Boolean = true,
     val neteaseLocalSourceFallback: Boolean = false,
+    /** Opt-in for the self-hosted matching bridge; it is never enabled by default. */
+    val unmBridgeEnabled: Boolean = false,
+    /** Base URL of the matching bridge; blank means "not configured yet". */
+    val unmBridgeBaseUrl: String = "",
     val playbackFadeIn: Boolean = true,
     val playbackCrossfadeNext: Boolean = true,
     val sleepTimerFinishCurrentOnExpiry: Boolean = false,

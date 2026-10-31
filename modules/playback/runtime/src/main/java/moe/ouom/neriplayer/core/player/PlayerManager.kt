@@ -464,6 +464,12 @@ object PlayerManager {
     internal var neteaseAutoSourceSwitchEnabled = false
     @Volatile
     internal var neteaseLocalSourceFallbackEnabled = false
+    /** User opt-in for the self-hosted full-recording match bridge. */
+    @Volatile
+    internal var unmBridgeEnabled = false
+    /** Normalized bridge base URL, or blank when the user has not configured one. */
+    @Volatile
+    internal var unmBridgeBaseUrl = ""
     internal var stopOnBluetoothDisconnectEnabled = true
     @Volatile
     var usbExclusivePlaybackEnabled = false

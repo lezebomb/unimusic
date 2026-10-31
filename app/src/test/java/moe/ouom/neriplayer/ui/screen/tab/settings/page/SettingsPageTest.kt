@@ -143,6 +143,10 @@ class SettingsPageTest {
 
         assertEquals(SettingsPage.PlaybackSource, autoSourceSwitch.settingsPage())
         assertEquals(SettingsPage.PlaybackSource, localSourceFallback.settingsPage())
+        listOf("unm_bridge_enabled", "unm_bridge_base_url").forEach { keyName ->
+            val setting = AutoSettingsMetadata.settings.first { it.keyName == keyName }
+            assertEquals(SettingsPage.PlaybackSource, setting.settingsPage())
+        }
     }
 
     @Test

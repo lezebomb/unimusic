@@ -82,6 +82,7 @@ import moe.ouom.neriplayer.ui.screen.tab.settings.component.playback.SettingsAud
 import moe.ouom.neriplayer.ui.screen.tab.settings.component.lyrics.SettingsLyricsSection
 import moe.ouom.neriplayer.ui.screen.tab.settings.component.appearance.SettingsMotionSection
 import moe.ouom.neriplayer.ui.screen.tab.settings.component.playback.SettingsPlaybackSection
+import moe.ouom.neriplayer.ui.screen.tab.settings.component.playback.UnmBridgeSourceSetting
 import moe.ouom.neriplayer.ui.screen.tab.settings.component.traffic.SettingsTrafficManagementSection
 import moe.ouom.neriplayer.ui.screen.tab.settings.component.ThemeModeActionButton
 import moe.ouom.neriplayer.ui.screen.tab.settings.component.ThemeSeedListItem
@@ -984,6 +985,12 @@ internal fun SettingsScreen(
                                     onClick = {
                                         playbackActions.onNeteaseAutoSourceSwitchChange(!playbackState.playbackSources.neteaseAutoSourceSwitch)
                                     }
+                                )
+                                UnmBridgeSourceSetting(
+                                    repository = repository,
+                                    highlightTargetId = settingsHighlightTargetId,
+                                    highlightPulse = settingsHighlightPulse,
+                                    onHighlightFinished = onSettingsHighlightFinished
                                 )
                             }
                         },

@@ -73,6 +73,9 @@
     <string name="unimusic_sources_gd_key">GD音乐台 · 网易云 ID %1$s</string>
     <string name="unimusic_sources_gd_description">此来源仅支持在线播放。</string>
     <string name="unimusic_sources_gd_notice">当前来源：GD音乐台 · 仅在线播放</string>
+    <string name="unimusic_sources_unm_key">完整音源匹配 · 网易云 ID %1$s</string>
+    <string name="unimusic_sources_unm_description">此来源通过你填写的匹配服务获取同一首歌的完整录音。</string>
+    <string name="unimusic_sources_unm_notice">当前来源：完整音源匹配 · 在线播放</string>
     <string name="unimusic_youtube_login_required">YouTube 要求登录验证或当前内容不可播。请在设置中完成 YouTube 登录，或选择其他音源。</string>
     <string name="unimusic_youtube_unavailable">YouTube 当前不提供这首歌曲的音频，请选择其他音源。</string>
 </resources>

@@ -61,6 +61,7 @@ import moe.ouom.neriplayer.data.model.settings.lyrics.resolveFloatingLyricsTrans
 import moe.ouom.neriplayer.data.model.settings.lyrics.resolveFloatingLyricsTranslationOutlineWidthDp
 import moe.ouom.neriplayer.data.settings.lyrics.resolveLyricFontScales
 import moe.ouom.neriplayer.data.model.settings.playback.PlaybackControlLayoutPreferences
+import moe.ouom.neriplayer.data.model.settings.playback.normalizeUnmBridgeBaseUrl
 import moe.ouom.neriplayer.data.settings.playback.normalizeMobileDataBiliAudioQuality
 import moe.ouom.neriplayer.data.settings.playback.normalizeMobileDataNeteaseAudioQuality
 import moe.ouom.neriplayer.data.settings.playback.normalizeMobileDataYouTubeAudioQuality
@@ -632,6 +633,12 @@ class SettingsRepository(private val context: Context) {
 
     val neteaseLocalSourceFallbackFlow: Flow<Boolean> =
         dataStoreSettingFlow { it[SettingsKeys.NETEASE_LOCAL_SOURCE_FALLBACK] ?: false }
+
+    val unmBridgeEnabledFlow: Flow<Boolean> =
+        dataStoreSettingFlow { it[SettingsKeys.UNM_BRIDGE_ENABLED] ?: false }
+
+    val unmBridgeBaseUrlFlow: Flow<String> =
+        dataStoreSettingFlow { it[SettingsKeys.UNM_BRIDGE_BASE_URL] ?: "" }
 
     val stopOnBluetoothDisconnectFlow: Flow<Boolean> =
         dataStoreSettingFlow { it[SettingsKeys.STOP_ON_BLUETOOTH_DISCONNECT] ?: true }
@@ -1458,6 +1465,21 @@ class SettingsRepository(private val context: Context) {
         context.dataStore.edit { it[SettingsKeys.NETEASE_LOCAL_SOURCE_FALLBACK] = enabled }
         updatePlaybackPreferenceSnapshot(context) {
             it.copy(neteaseLocalSourceFallback = enabled)
+        }
+    }
+
+    suspend fun setUnmBridgeEnabled(enabled: Boolean) {
+        context.dataStore.edit { it[SettingsKeys.UNM_BRIDGE_ENABLED] = enabled }
+        updatePlaybackPreferenceSnapshot(context) {
+            it.copy(unmBridgeEnabled = enabled)
+        }
+    }
+
+    suspend fun setUnmBridgeBaseUrl(baseUrl: String) {
+        val normalized = normalizeUnmBridgeBaseUrl(baseUrl)
+        context.dataStore.edit { it[SettingsKeys.UNM_BRIDGE_BASE_URL] = normalized }
+        updatePlaybackPreferenceSnapshot(context) {
+            it.copy(unmBridgeBaseUrl = normalized)
         }
     }
 

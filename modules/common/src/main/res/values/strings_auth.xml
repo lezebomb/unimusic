@@ -119,4 +119,16 @@
     <string name="settings_account_sign_in_again">重新登录</string>
     <string name="settings_account_avatar">%1$s 账号头像</string>
     <string name="web_login_webview_unavailable">系统 WebView 不可用，无法打开网页登录。请在系统设置中启用或更新 Android System WebView 后重试</string>
+    <string name="settings_unm_bridge_enabled">使用完整音源匹配服务</string>
+    <string name="settings_unm_bridge_enabled_desc">原音源只提供试听或不可用时，通过你填写的匹配服务获取同一首歌的完整录音；未填写地址时不会启用。</string>
+    <string name="settings_unm_bridge_base_url">匹配服务地址</string>
+    <string name="settings_unm_bridge_base_url_desc">例如 http://192.168.1.10:8900，与手机在同一局域网内可访问。</string>
+    <string name="settings_unm_bridge_base_url_unset">未填写</string>
+    <string name="settings_unm_bridge_dialog_title">匹配服务地址</string>
+    <string name="settings_unm_bridge_dialog_hint">http://192.168.1.10:8900</string>
+    <string name="settings_unm_bridge_check">检测</string>
+    <string name="settings_unm_bridge_checking">正在检测连接…</string>
+    <string name="settings_unm_bridge_check_ok">连接正常</string>
+    <string name="settings_unm_bridge_check_failed">无法连接，请检查地址与网络</string>
+    <string name="settings_unm_bridge_invalid_address">地址格式不正确，请填写以 http:// 或 https:// 开头的地址</string>
 </resources>

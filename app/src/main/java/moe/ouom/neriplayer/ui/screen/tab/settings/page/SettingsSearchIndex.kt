@@ -109,7 +109,9 @@ internal fun AutoSettingInfo.settingsPage(): SettingsPage? {
     }
     if (
         keyName == "netease_auto_source_switch" ||
-        keyName == "netease_local_source_fallback"
+        keyName == "netease_local_source_fallback" ||
+        keyName == "unm_bridge_enabled" ||
+        keyName == "unm_bridge_base_url"
     ) {
         return SettingsPage.PlaybackSource
     }
@@ -1068,6 +1070,21 @@ private val SettingSearchAliases = mapOf(
         "本地音源",
         "本地还原",
         "bendi yinyuan"
+    ),
+    "unm_bridge_enabled" to listOf(
+        "unm",
+        "unblockneteasemusic",
+        "match bridge",
+        "完整音源",
+        "匹配服务",
+        "wanzheng yinyuan"
+    ),
+    "unm_bridge_base_url" to listOf(
+        "unm address",
+        "bridge url",
+        "服务地址",
+        "匹配服务地址",
+        "fuwu dizhi"
     ),
     "bili_sponsor_block_enabled" to listOf(
         "哔哩哔哩",
