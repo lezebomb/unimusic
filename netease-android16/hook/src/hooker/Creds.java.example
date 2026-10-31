@@ -1,0 +1,22 @@
+package hooker;
+
+/**
+ * 示例文件 —— 复制为 Creds.java 后由 tools/gen_creds.py 自动填充。
+ *
+ * 说明：
+ *  - prefsXml() 返回 shared_prefs/cm_cookie_storage.xml 的 base64；
+ *  - mmkv()     返回 files/mmkv/cm_cookie_storage 的 base64。
+ * 这两个文件里有 MUSIC_U 等登录 cookie，等于账号凭证：
+ * 只在你自己的机器上生成，不要把填好的 Creds.java 提交到公开仓库。
+ */
+public final class Creds {
+    private Creds() {}
+
+    public static String prefsXml() {
+        return "";
+    }
+
+    public static String mmkv() {
+        return "";
+    }
+}
